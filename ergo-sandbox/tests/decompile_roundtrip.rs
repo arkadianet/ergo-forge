@@ -182,6 +182,19 @@ fn negation_of_a_constant_renders_as_the_zero_plus_form() {
     assert_eq!(bytes2, bytes);
 }
 
+/// Precedence is derived from the operator symbol, not carried on the node.
+/// Nested arithmetic at mixed precedence must still parenthesize correctly.
+#[test]
+fn mixed_precedence_arithmetic_round_trips() {
+    let src = "(1 + 2 * 3 - 4) / 5 == 0";
+    let bytes = compile_source(src, 3, NetworkPrefix::Testnet)
+        .expect("compile")
+        .tree_bytes;
+    let out = decompile_net(&bytes, true);
+    let again = recompile(&out, 3, NetworkPrefix::Testnet).expect("recompile");
+    assert_eq!(again, bytes, "rendered as: {out}");
+}
+
 // ----- network -----
 
 #[test]
