@@ -1,0 +1,24 @@
+[workspace]
+resolver = "2"
+members = ["ergo-sandbox"]
+
+[workspace.package]
+version    = "0.1.0"
+edition    = "2021"
+license    = "MIT OR Apache-2.0"
+repository = "https://github.com/arkadianet/ergo-forge"
+
+[workspace.dependencies]
+# Engine crates — consumed from the Rust Ergo node (arkadianet/ergo).
+# Pinned to a main rev for reproducible builds; bump deliberately.
+ergo-primitives = { git = "https://github.com/arkadianet/ergo", rev = "5ac1e92a6946ac91fd4120533f5b48cf27feac97" }
+ergo-ser        = { git = "https://github.com/arkadianet/ergo", rev = "5ac1e92a6946ac91fd4120533f5b48cf27feac97" }
+ergo-sigma      = { git = "https://github.com/arkadianet/ergo", rev = "5ac1e92a6946ac91fd4120533f5b48cf27feac97" }
+ergo-compiler   = { git = "https://github.com/arkadianet/ergo", rev = "5ac1e92a6946ac91fd4120533f5b48cf27feac97" }
+
+thiserror  = "2"
+serde      = { version = "1", features = ["derive"] }
+serde_json = "1"
+hex        = "0.4"
+indexmap   = { version = "2", features = ["serde"] }
+num-bigint = "0.4"

@@ -1,0 +1,29 @@
+[package]
+name        = "ergo-sandbox"
+description = "ErgoScript workbench engine: scenario-driven evaluation, cost reporting, compile, and structural decompile on the consensus interpreter. Sandbox only — never a consensus surface."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish    = false
+
+[dependencies]
+thiserror       = { workspace = true }
+ergo-primitives = { workspace = true }
+ergo-ser        = { workspace = true }
+ergo-sigma      = { workspace = true }
+ergo-compiler   = { workspace = true }
+serde           = { workspace = true }
+serde_json      = { workspace = true }
+hex             = { workspace = true }
+indexmap        = { workspace = true }
+num-bigint      = { workspace = true }
+
+[[bin]]
+name = "ergo-es"
+path = "src/bin/ergo-es.rs"
+
+[features]
+# Passthrough to ergo-sigma's debug cost tracer (global Vec push per cost
+# record — dev/diagnostic builds only, never ship in a consensus path).
+cost-trace = ["ergo-sigma/cost-trace"]
