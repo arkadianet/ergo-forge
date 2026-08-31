@@ -244,15 +244,24 @@ fn decompile_mainnet(limit: Option<&String>) -> Result<(), String> {
     Ok(())
 }
 
-/// `ergo-es roundtrip` — decompile → recompile → byte-compare over a tree
-/// or a corpus. Exit output is a compact tally; the CI harness feeds on it.
+/// `ergo-es roundtrip` — decompile → recompile → byte-compare over a tree or
+/// a corpus. Prints the tally plus the first few failure reasons (pass `-v`
+/// for every reason). Corpus paths resolve against the ergo node checkout
+/// (sibling of this repo).
 fn cmd_roundtrip(args: &[String]) -> Result<(), String> {
-    let (mut exact, mut diff, mut raw, mut err) = (0usize, 0usize, 0usize, 0usize);
+    let verbose = args.iter().any(|a| a == "-v" || a == "--verbose");
+    let mut tally = Tally {
+        exact: 0,
+        diff: 0,
+        raw: 0,
+        err: 0,
+        reasons: Vec::new(),
+    };
     match args.first().map(String::as_str) {
         Some("--seed") | Some("--mainnet") => {
             let is_seed = args[0] == "--seed";
-            // Seed trees were captured at treeVersion 3 on testnet;
-            // mainnet trees are pre-v3 under mainnet.
+            // Seed vectors were captured at treeVersion 3 on testnet; mainnet
+            // trees are pre-v3 under mainnet.
             let (tree_version, network) = if is_seed {
                 (3, NetworkPrefix::Testnet)
             } else {
@@ -264,105 +273,149 @@ fn cmd_roundtrip(args: &[String]) -> Result<(), String> {
                     .map(|(t, s)| (t, Some(s)))
                     .collect()
             } else {
-                mainnet_trees(args.get(1))?
+                mainnet_trees(first_positional(args))?
                     .into_iter()
                     .map(|t| (t, None))
                     .collect()
             };
             for (h, source) in &vectors {
-                // Skip env-dependent sources (oracle demo env not available).
+                // Skip env-dependent sources (oracle demo env unavailable).
                 if let Some(orig) = source {
                     if ergo_sandbox::compile_source(orig, tree_version, network).is_err() {
                         continue;
                     }
                 }
                 let bytes = hex::decode(h).map_err(|e| e.to_string())?;
-                classify_tree(
-                    &bytes,
-                    tree_version,
-                    network,
-                    &mut exact,
-                    &mut diff,
-                    &mut raw,
-                    &mut err,
-                );
+                classify_tree(&bytes, tree_version, network, &mut tally);
             }
             println!(
                 "trees: {} exact={} diff={} raw={} err={}",
                 vectors.len(),
-                exact,
-                diff,
-                raw,
-                err
+                tally.exact,
+                tally.diff,
+                tally.raw,
+                tally.err
             );
+            print_reasons(&tally, verbose);
             Ok(())
+        }
+        Some(arg) if arg == "-v" || arg == "--verbose" => {
+            Err("roundtrip needs a tree, a file, --seed, or --mainnet [N]".into())
         }
         Some(arg) => {
             let bytes = resolve_bytes(arg)?;
-            // Literal hex: infer network from the tree version nibble.
-            let tv = tree_version_of(&bytes);
             classify_tree(
                 &bytes,
-                tv,
+                tree_version_of(&bytes),
                 NetworkPrefix::Mainnet,
-                &mut exact,
-                &mut diff,
-                &mut raw,
-                &mut err,
+                &mut tally,
             );
             println!(
                 "{}",
-                if exact == 1 {
+                if tally.exact == 1 {
                     "EXACT"
-                } else if raw == 1 {
+                } else if tally.raw == 1 {
                     "RAW"
-                } else if err == 1 {
+                } else if tally.err == 1 {
                     "ERR"
                 } else {
                     "DIFF"
                 }
             );
+            print_reasons(&tally, verbose);
             Ok(())
         }
-        None => Err("roundtrip needs tree hex, a file path, --seed, or --mainnet [N]".into()),
+        None => Err("roundtrip needs a tree, a file, --seed, or --mainnet [N]".into()),
     }
 }
 
-/// Classify one tree: decompile, detect raw placeholders, recompile, compare.
-fn classify_tree(
-    bytes: &[u8],
-    tree_version: u8,
-    network: NetworkPrefix,
-    exact: &mut usize,
-    diff: &mut usize,
-    raw: &mut usize,
-    err: &mut usize,
-) {
-    let src = match ergo_sandbox::decompile::decompile_bytes(bytes) {
-        Ok(s) => s,
-        Err(_) => {
-            *err += 1;
+fn first_positional(args: &[String]) -> Option<&String> {
+    args.iter().skip(1).find(|a| !a.starts_with('-'))
+}
+
+fn print_reasons(tally: &Tally, verbose: bool) {
+    if tally.reasons.is_empty() {
+        return;
+    }
+    let limit = if verbose {
+        tally.reasons.len()
+    } else {
+        tally.reasons.len().min(5)
+    };
+    for r in tally.reasons.iter().take(limit) {
+        println!("  - {r}");
+    }
+    if !verbose && tally.reasons.len() > limit {
+        println!(
+            "  …and {} more (pass -v for all)",
+            tally.reasons.len() - limit
+        );
+    }
+}
+
+/// Per-corpus round-trip totals plus the failure reasons seen.
+struct Tally {
+    exact: usize,
+    diff: usize,
+    raw: usize,
+    err: usize,
+    reasons: Vec<String>,
+}
+
+/// Classify one tree: decompile, recompile, compare.
+///
+/// Decompiles with the SAME network the source will be compiled against (PK
+/// address constants are network-tagged), and records the failure reason
+/// instead of swallowing it.
+fn classify_tree(bytes: &[u8], tree_version: u8, network: NetworkPrefix, tally: &mut Tally) {
+    let owned = bytes.to_vec();
+    let out = ergo_sandbox::decompile::with_large_stack(move || {
+        ergo_sandbox::decompile::decompile_report(&owned, network == NetworkPrefix::Testnet)
+    });
+    let decompiled = match out {
+        Ok(d) => d,
+        Err(e) => {
+            tally.err += 1;
+            tally.reasons.push(e.to_string());
             return;
         }
     };
-    if src.contains("<unparsed")
-        || src.contains("<op ")
-        || src.contains("<method ")
-        || src.contains("<const ")
-    {
-        *raw += 1;
+    if decompiled.raw_placeholders > 0 {
+        tally.raw += 1;
+        if decompiled.truncated {
+            tally.reasons.push(format!(
+                "nesting deeper than the lift ceiling ({} placeholders, {} levels max)",
+                decompiled.raw_placeholders,
+                ergo_sandbox::decompile::MAX_LIFT_DEPTH
+            ));
+        }
         return;
     }
-    match ergo_sandbox::compile_source(&src, tree_version, network) {
-        Ok(out) if out.tree_bytes == bytes => *exact += 1,
-        Ok(_) => *diff += 1,
-        Err(_) => *err += 1,
+    match ergo_sandbox::compile_source(&decompiled.source, tree_version, network) {
+        Ok(out) if out.tree_bytes == bytes => tally.exact += 1,
+        Ok(out) => {
+            tally.diff += 1;
+            tally.reasons.push(format!(
+                "recompiled to different bytes (want {}, got {})",
+                hex::encode(bytes),
+                hex::encode(&out.tree_bytes)
+            ));
+        }
+        Err(e) => {
+            tally.err += 1;
+            tally.reasons.push(e.to_string());
+        }
     }
 }
 
-fn tree_version_of(_bytes: &[u8]) -> u8 {
-    // Mainnet trees are pre-v3 (version 0 header); compile under v0.
-    0
+fn tree_version_of(bytes: &[u8]) -> u8 {
+    // ErgoTree header: bits 0..2 are the tree version, bit 3 = has_size,
+    // bit 4 = constant segregation. Recompilation needs the header version
+    // (it selects v5 vs v6 method visibility).
+    match bytes.first() {
+        Some(h) => h & 0x07,
+        None => 0,
+    }
 }
 
 fn seed_vectors() -> Result<Vec<(String, String)>, String> {

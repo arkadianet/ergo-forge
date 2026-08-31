@@ -46,9 +46,26 @@ pub fn decompile_bytes(bytes: &[u8]) -> Result<String, crate::SandboxError> {
 /// `PK("…")` address constants (the corpus bar compiles on testnet;
 /// mainnet trees need mainnet addresses to recompile).
 pub fn decompile_bytes_net(bytes: &[u8], testnet: bool) -> Result<String, crate::SandboxError> {
-    let tree = crate::inspect::parse_tree(bytes)?;
-    Ok(render_net(&tree, testnet))
+    Ok(decompile_report(bytes, testnet)?.source)
 }
+
+/// Decompile with lift diagnostics: the network version of
+/// [`render_report_net`].
+pub fn decompile_report(bytes: &[u8], testnet: bool) -> Result<Decompiled, crate::SandboxError> {
+    let tree = crate::inspect::parse_tree(bytes)?;
+    Ok(render_report_net(&tree, testnet))
+}
+
+/// Recursion ceiling for the lift.
+///
+/// The lift is a recursive descent over the ErgoTree IR, and each frame is
+/// wide in debug builds (`L` is a large enum, moved by value): a 46-level
+/// nesting — deeper than any real contract — needs ≈3 MiB of stack. ergo-ser
+/// caps parsed trees at `MAX_EXPR_DEPTH = 110`, so legitimate input never
+/// approaches this. The ceiling exists so decompilation is TOTAL: past it we
+/// emit a raw placeholder instead of overflowing the stack, which matters for
+/// small-stack callers (test threads, and later the WASM/HTTP shells).
+pub const MAX_LIFT_DEPTH: usize = 128;
 
 /// Decompile a parsed tree (testnet address constants — the corpus bar).
 #[must_use]
@@ -56,9 +73,53 @@ pub fn render(tree: &ergo_ser::ergo_tree::ErgoTree) -> String {
     render_net(tree, true)
 }
 
+/// Stack budget for [`with_large_stack`].
+///
+/// Measured: a 46-level nesting (deeper than any real contract) needs ≈3 MiB
+/// in a debug build — each `lift`/`print_l` frame is wide because `L` is a
+/// large enum moved by value. 16 MiB leaves a large margin while staying well
+/// inside what hosted threads allow.
+pub const LARGE_STACK_BYTES: usize = 16 * 1024 * 1024;
+
+/// Run `f` with a stack large enough for deep-tree decompilation.
+///
+/// The lift/print are recursive descents, and default thread stacks (2 MiB in
+/// the Rust test harness, similarly small in HTTP/WASM worker threads) are
+/// marginal for deeply nested contracts. Shells should decompile through this
+/// wrapper; on `wasm32` (no threads) it runs inline, so WASM callers must
+/// arrange their own stack budget.
+#[cfg(not(target_arch = "wasm32"))]
+pub fn with_large_stack<T, F>(f: F) -> T
+where
+    F: FnOnce() -> T + Send + 'static,
+    T: Send + 'static,
+{
+    std::thread::Builder::new()
+        .stack_size(LARGE_STACK_BYTES)
+        .spawn(f)
+        .expect("spawn decompile thread")
+        .join()
+        .expect("decompile thread must not panic")
+}
+
+/// wasm32 has no threads: run inline (see [`with_large_stack`]).
+#[cfg(target_arch = "wasm32")]
+pub fn with_large_stack<T, F: FnOnce() -> T>(f: F) -> T {
+    f()
+}
+
 /// Decompile a parsed tree, addresses encoded for the chosen network.
 #[must_use]
 pub fn render_net(tree: &ergo_ser::ergo_tree::ErgoTree, testnet: bool) -> String {
+    render_report_net(tree, testnet).source
+}
+
+/// Decompile with lift diagnostics: how much of the tree had no source-like
+/// lift. Callers should use this instead of re-scanning the rendered text for
+/// `<…>` marker substrings — fragile, and wrong for a contract that happens
+/// to contain those characters.
+#[must_use]
+pub fn render_report_net(tree: &ergo_ser::ergo_tree::ErgoTree, testnet: bool) -> Decompiled {
     let mut cx = LiftCtx {
         testnet,
         ..LiftCtx::new()
@@ -69,7 +130,62 @@ pub fn render_net(tree: &ergo_ser::ergo_tree::ErgoTree, testnet: bool) -> String
     };
     let mut out = String::new();
     print_l(&lifted, None, &mut out);
-    out
+    Decompiled {
+        source: out,
+        raw_placeholders: cx.raw + count_raw(&lifted),
+        truncated: cx.truncated,
+    }
+}
+
+/// The result of a decompilation, with lift diagnostics.
+#[derive(Debug, Clone)]
+pub struct Decompiled {
+    /// The rendered source-like ErgoScript.
+    pub source: String,
+    /// Number of `<…>` raw placeholders — constructs with no source-like lift
+    /// yet. Zero means the whole tree was lifted.
+    pub raw_placeholders: usize,
+    /// Set when the lift hit the recursion ceiling ([`MAX_LIFT_DEPTH`]).
+    pub truncated: bool,
+}
+
+/// Count `L::Raw` nodes in a lifted tree.
+fn count_raw(e: &L) -> usize {
+    let mut n = usize::from(matches!(e, L::Raw(_)));
+    match e {
+        L::Unary(_, a) => n += count_raw(a),
+        L::Infix(_, _, a, b) => n += count_raw(a) + count_raw(b),
+        L::Method(o, _, args) | L::ApplyFn(o, args) | L::GetRegDyn(o, _, args) => {
+            n += count_raw(o) + args.iter().map(count_raw).sum::<usize>()
+        }
+        L::Prop(o, _) | L::GetReg(o, _, _) => n += count_raw(o),
+        L::Coll(_, items) | L::Tuple(items) => n += items.iter().map(count_raw).sum::<usize>(),
+        L::Global(_, args) => n += args.iter().map(count_raw).sum::<usize>(),
+        L::Lambda(_, b) => n += count_raw(b),
+        L::If(c, t, els) => n += count_raw(c) + count_raw(t) + count_raw(els),
+        L::AtLeast(k, c) => n += count_raw(k) + count_raw(c),
+        L::Index(a, b, d) => {
+            n += count_raw(a) + count_raw(b) + d.as_deref().map(count_raw).unwrap_or(0)
+        }
+        L::Block(stmts, result) => {
+            n += stmts
+                .iter()
+                .map(|s| match s {
+                    Stmt::Val(_, e) | Stmt::Def(_, e) => count_raw(e),
+                })
+                .sum::<usize>()
+                + count_raw(result)
+        }
+        L::Raw(_)
+        | L::Bool(_)
+        | L::Int(_)
+        | L::Num(_)
+        | L::Const(_)
+        | L::Val(_)
+        | L::GetVar(..)
+        | L::Leaf(_) => {}
+    }
+    n
 }
 
 // ── operator tables ──────────────────────────────────────────────────────────
@@ -408,6 +524,14 @@ struct LiftCtx {
     global: BTreeMap<u32, String>,
     /// next counter per prefix.
     counters: BTreeMap<&'static str, usize>,
+    /// Current lift recursion depth, bounded by [`MAX_LIFT_DEPTH`].
+    depth: usize,
+    /// Number of raw `<…>` placeholders emitted — i.e. constructs that have
+    /// no source-like lift yet. Counted during lift, not by re-scanning the
+    /// rendered text.
+    raw: usize,
+    /// Set when the recursion ceiling was hit (see [`MAX_LIFT_DEPTH`]).
+    truncated: bool,
 }
 
 impl LiftCtx {
@@ -417,6 +541,9 @@ impl LiftCtx {
             scopes: vec![BTreeMap::new()],
             global: BTreeMap::new(),
             counters: BTreeMap::new(),
+            depth: 0,
+            raw: 0,
+            truncated: false,
         }
     }
 
@@ -462,11 +589,24 @@ impl LiftCtx {
 
 /// Lift a wire expression into the printer AST.
 fn lift(e: &Expr, cx: &mut LiftCtx, constants: &[(SigmaType, SigmaValue)]) -> L {
-    match e {
-        Expr::Const { tpe, val } => lift_const(tpe, val, cx),
-        Expr::Unparsed(bytes) => L::Raw(format!("<unparsed {} bytes>", bytes.len())),
-        Expr::Op(node) => lift_op(node, cx, constants),
+    // Bounded recursion: past the ceiling we degrade to a raw placeholder
+    // rather than growing the stack. See [`MAX_LIFT_DEPTH`].
+    if cx.depth >= MAX_LIFT_DEPTH {
+        cx.raw += 1;
+        cx.truncated = true;
+        return L::Raw(format!("<nesting deeper than {MAX_LIFT_DEPTH} levels>"));
     }
+    cx.depth += 1;
+    let out = match e {
+        Expr::Const { tpe, val } => lift_const(tpe, val, cx),
+        Expr::Unparsed(bytes) => {
+            cx.raw += 1;
+            L::Raw(format!("<unparsed {} bytes>", bytes.len()))
+        }
+        Expr::Op(node) => lift_op(node, cx, constants),
+    };
+    cx.depth -= 1;
+    out
 }
 
 fn lift_const(tpe: &SigmaType, val: &SigmaValue, cx: &LiftCtx) -> L {
@@ -589,10 +729,13 @@ fn lift_method_like(
         }
         None => {
             // Unknown method: honest raw fallback.
-            L::Raw(format!(
-                "<method 0x{type_id:02X}.0x{method_id:02X} on {}>",
-                debug_expr(obj)
-            ))
+            {
+                cx.raw += 1;
+                L::Raw(format!(
+                    "<method 0x{type_id:02X}.0x{method_id:02X} on {}>",
+                    debug_expr(obj)
+                ))
+            }
         }
     }
 }
@@ -645,7 +788,10 @@ fn lift_op_inner(
             0xDD => "Global",
             0xFE => "CONTEXT",
             0x82 => "groupGenerator",
-            _ => return L::Raw(format!("<op 0x{op:02X}>")),
+            _ => {
+                cx.raw += 1;
+                return L::Raw(format!("<op 0x{op:02X}>"));
+            }
         }),
         Payload::One(inner) => {
             let inner_l = lift(inner, cx, constants);
@@ -703,8 +849,10 @@ fn lift_op_inner(
                     // ProveDlog(x): source predef `proveDlog(x)`. A bare GE
                     // constant already prints as PK(…) (sigma-typed by
                     // construction); any COMPUTED argument (val, var,
-                    // method result) needs the explicit proveDlog(…).
-                    L::Val(_) | L::GetVar(..) | L::Method(..) => {
+                    // method result, global call such as decodePoint(…))
+                    // needs the explicit proveDlog(…) or the result types as
+                    // GroupElement and cannot satisfy Coll[SigmaProp].
+                    L::Val(_) | L::GetVar(..) | L::Method(..) | L::Global(..) => {
                         L::Global("proveDlog".into(), vec![inner_l])
                     }
                     other => other, // a bare ProveDlog leaf prints as PK(…)
@@ -731,7 +879,10 @@ fn lift_op_inner(
                     L::Coll(t, items) => L::Global("anyOf".into(), vec![L::Coll(t, items)]),
                     other => L::Global("anyOf".into(), vec![other]),
                 },
-                _ => L::Raw(debug()),
+                _ => {
+                    cx.raw += 1;
+                    L::Raw(debug())
+                }
             }
         }
         Payload::Two(a, b) => {
@@ -761,7 +912,10 @@ fn lift_op_inner(
                 0xB3 => L::Infix("++", 7, Box::new(al), Box::new(bl)),
                 0xB5 => L::Method(Box::new(al), "filter".into(), vec![bl]),
                 0xE5 => L::Method(Box::new(al), "getOrElse".into(), vec![bl]),
-                _ => L::Raw(debug()),
+                _ => {
+                    cx.raw += 1;
+                    L::Raw(debug())
+                }
             }
         }
         Payload::Three(a, b, c) => match op {
@@ -784,7 +938,10 @@ fn lift_op_inner(
                 let lam = lift(c, cx, constants);
                 L::Method(Box::new(coll), "fold".into(), vec![zero, lam])
             }
-            _ => L::Raw(debug()),
+            _ => {
+                cx.raw += 1;
+                L::Raw(debug())
+            }
         },
         Payload::Four(..) => L::Raw(debug()),
         Payload::ValUse { id } => L::Val(cx.lookup(*id).unwrap_or_else(|| format!("%{id}"))),

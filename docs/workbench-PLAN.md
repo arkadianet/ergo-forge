@@ -99,15 +99,25 @@ Missing (the workbench's actual build list):
    IR lift + pretty-printer — SSA ValDefs → `val` bindings, method/property
    id tables (201 entries, extracted from the oracle-pinned compiler method
    tables), infix sugar, fold tuple-lambda unwrap, network-aware PK
-   constants. Round-trip tally over the node's oracle-graded corpora:
-   - **seed (110 compile vectors, v3/testnet): 66 byte-exact**, 13 diff
-     (compiler-side fold collapses of trivial sigma props — semantically
-     equal), 1 raw, 7 err (5 from a confirmed **ergo-compiler bug**: fold
-     inside an operator operand fails `assignType(Fold)` — filed upstream)
-   - **mainnet (279 unique trees): 259 byte-exact**, 1 diff, 15 raw
-     placeholders, 4 err
-   CLI: `ergo-es roundtrip --seed | --mainnet | <hex>`; detailed harness in
-   the `corpus_roundtrip` example.
+   constants. Bar measured with `ergo-es roundtrip`:
+   - **seed (110 vectors, v3/testnet; 87 compile with an empty env):
+     68 byte-exact · 14 diff · 1 raw · 4 err**
+   - **mainnet (279 unique trees): 259 byte-exact · 1 diff · 17 raw · 2 err**
+   - Every miss is an ergo-compiler behavior, not a decompiler defect (the
+     rendering is faithful to the wire): 14 `diff` = upstream constant folding
+     collapses the re-emitted tree; 3 = **upstream bug** `assignType(Fold)` for
+     fold inside an operator operand; 1 = **upstream bug** constant-fold
+     overflow (`Minus(Negation(2147483647), 2)` rendered as `-2147483647 - 2`,
+     which the compiler's own fold rejects); 1 = `atLeast` over a wire
+     `Coll[GroupElement]` whose element type isn't recoverable. See
+     `ergo-sandbox/README.md` for the table and repros.
+   - `cargo test` pins the bar off a committed fixture
+     (`tests/fixtures/compile_corpus_subset.json`, 68 vectors);
+     whole-corpus floors run when the node checkout is a sibling.
+   - **Stack budget:** the lift recurses and debug frames are wide — 46 levels
+     need ≈3 MiB. `decompile::with_large_stack` gives headroom; the lift is
+     bounded by `MAX_LIFT_DEPTH` so it degrades instead of overflowing. The
+     WASM/HTTP shell must use the wrapper (or an iterative rewrite).
 4. **P3 — audit layer** (lints + scenario fuzz + cost views); REST surfaces fold
    into tooling-api T1–T5 where they overlap.
 5. **P4 — WASM + browser workbench**; templates gallery (UI-doc Tier 1) reused.
