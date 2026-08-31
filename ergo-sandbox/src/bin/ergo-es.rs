@@ -23,6 +23,7 @@ fn main() -> ExitCode {
         "eval" => cmd_eval(rest),
         "decompile" => cmd_decompile(rest),
         "roundtrip" => cmd_roundtrip(rest),
+        "audit" => cmd_audit(rest),
         "help" | "--help" | "-h" => {
             usage();
             return ExitCode::SUCCESS;
@@ -60,6 +61,9 @@ USAGE:
       Decompile → recompile → byte-compare. Single trees accept --network
       (default mainnet); -v prints every failure reason. Corpora paths
       resolve against the ergo node checkout (sibling of this repo).
+  ergo-es audit <hex | --seed | --mainnet>
+      Static lints over the lifted tree. Single trees print findings;
+      corpora print a summary tally.
 "
     );
 }
@@ -491,4 +495,37 @@ fn corpus_err(path: &std::path::Path, e: std::io::Error) -> String {
          or pass tree hex directly",
         path.display()
     )
+}
+
+/// `ergo-es audit <tree-hex>` — static lints over the lifted tree.
+fn cmd_audit(args: &[String]) -> Result<(), String> {
+    let hex_arg = args.first().ok_or("usage: ergo-es audit <tree-hex>")?;
+    let bytes = hex::decode(hex_arg.trim()).map_err(|e| format!("bad hex: {e}"))?;
+    let tree = ergo_sandbox::inspect::parse_tree(&bytes).map_err(|e| e.to_string())?;
+    let lifted =
+        ergo_sandbox::decompile::with_large_stack(move || ergo_sandbox::lift_tree(&tree, false));
+    let report = ergo_sandbox::audit::audit(&lifted);
+
+    match report.completeness {
+        ergo_sandbox::audit::Completeness::Complete => {
+            println!("audit: {} finding(s)  [complete]", report.findings.len());
+        }
+        ergo_sandbox::audit::Completeness::Partial {
+            raw_placeholders,
+            truncated,
+        } => {
+            println!(
+                "audit: {} finding(s)  [PARTIAL: {raw_placeholders} raw placeholder(s){}]",
+                report.findings.len(),
+                if truncated { ", truncated" } else { "" }
+            );
+            println!("  part of this contract was not analysed — no findings does not mean clean");
+        }
+    }
+    for f in &report.findings {
+        println!("\n{}  {}  node {}", f.severity.label(), f.lint, f.node_id);
+        println!("  {}", f.message);
+        println!("  {}", f.snippet);
+    }
+    Ok(())
 }
