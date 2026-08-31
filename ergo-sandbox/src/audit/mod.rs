@@ -5,6 +5,7 @@
 //! chain. See `docs/superpowers/specs/2026-08-31-lift-target-ast-design.md`.
 
 pub mod finding;
+pub mod lints;
 pub mod visit;
 
 pub use finding::{snippet, Finding, Severity, SNIPPET_MAX};
@@ -13,7 +14,7 @@ pub use visit::children;
 use crate::{Lifted, Node};
 
 /// Every lint, applied in order. Findings are sorted afterwards.
-const LINTS: &[fn(&Node) -> Vec<Finding>] = &[];
+const LINTS: &[fn(&Node) -> Vec<Finding>] = &[lints::unchecked_get];
 
 /// Whether the audit saw the whole contract.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
