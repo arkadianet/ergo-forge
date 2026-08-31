@@ -41,6 +41,7 @@
 //! assert!(outcome.cost > 0);
 //! ```
 
+pub mod audit;
 pub mod box_build;
 pub mod compile;
 pub mod decompile;
@@ -49,6 +50,7 @@ pub mod inspect;
 pub mod method_names;
 pub mod scenario;
 
+pub use audit::{Finding, Severity};
 pub use compile::{compile_source, CompileOutput};
 pub use decompile::{lift_tree, Lifted, Node, NodeKind};
 pub use eval::{eval_scenario, EvalOutcome, Verdict, DEFAULT_COST_LIMIT};
