@@ -151,7 +151,7 @@ pub fn sigma_boolean_pretty(sb: &SigmaBoolean) -> String {
 }
 
 /// Parse ErgoTree wire bytes (public shim for the decompile module).
-pub(crate) fn parse_tree(bytes: &[u8]) -> Result<ErgoTree, crate::SandboxError> {
+pub fn parse_tree(bytes: &[u8]) -> Result<ErgoTree, crate::SandboxError> {
     let mut r = VlqReader::new(bytes);
     read_ergo_tree(&mut r).map_err(|e| crate::SandboxError::Tree(e.to_string()))
 }

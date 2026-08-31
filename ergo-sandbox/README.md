@@ -45,6 +45,17 @@ method/property calls (tables extracted from the oracle-pinned compiler),
 infix sugar with precedence, `fold`'s wire tuple-lambda unwrapped to the
 2-arg source form, network-aware `PK("…")` constants.
 
+The decompiler exposes both shapes:
+
+- `decompile::render_report_net(tree, testnet) -> Decompiled` — rendered source
+  plus diagnostics.
+- `decompile::lift_tree(tree, testnet) -> Lifted` — the lifted AST plus the same
+  diagnostics, for the audit layer. `decompile::print(&node)` renders it.
+
+`Node::id` is lift-local (unique within one decompilation), not the shared IR
+preorder index the compiler's source map will key on — see
+`docs/superpowers/specs/2026-08-31-lift-target-ast-design.md`.
+
 Verification bar: `decompile → recompile → byte-identical`. Current tally over
 the node's oracle-graded corpora (`ergo-es roundtrip --seed | --mainnet`):
 
