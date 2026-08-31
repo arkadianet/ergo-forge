@@ -42,8 +42,8 @@ Built since (see Phases for the verified records):
    trees is in place.
 
 Still missing (the actual build list):
-3. **Public lifted AST** — the decompiler's tree is private and only text
-   escapes, so lints have nothing to run on. Blocks (4). See P2.5.
+3. ~~**Public lifted AST**~~ — **DONE (P2.5).** `decompile::lift_tree` exposes
+   `Node { id, kind }` to lints; ids are lift-local pending `ergo_ser::preorder`.
 4. **Audit layer** — static lints over the lifted tree (height guards, `anyOf`
    shadowing, trust assumptions, unchecked `get()`), scenario fuzzing
    ("spendable by anyone?" hunts) over the sandbox, cost hot-spot reports.

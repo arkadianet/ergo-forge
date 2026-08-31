@@ -216,18 +216,12 @@ fn lift_const(tpe: &SigmaType, val: &SigmaValue, cx: &mut LiftCtx) -> NodeKind {
                 _ => "Byte".into(),
             },
             vs.iter()
-                .map(|v| Node {
-                    id: cx.alloc_id(),
-                    kind: lift_const(&sigma_type_of(v), v, cx),
-                })
+                .map(|v| lift_const_child(&sigma_type_of(v), v, cx))
                 .collect(),
         ),
         (_, SigmaValue::Tuple(vs)) => NodeKind::Tuple(
             vs.iter()
-                .map(|v| Node {
-                    id: cx.alloc_id(),
-                    kind: lift_const(&SigmaType::SAny, v, cx),
-                })
+                .map(|v| lift_const_child(&SigmaType::SAny, v, cx))
                 .collect(),
         ),
         (tpe, val) => {
@@ -235,6 +229,29 @@ fn lift_const(tpe: &SigmaType, val: &SigmaValue, cx: &mut LiftCtx) -> NodeKind {
             NodeKind::Raw(crate::inspect::value_debug(tpe, val))
         }
     }
+}
+
+/// Lift an element value of a composite constant (Coll/Tuple element).
+///
+/// Value nesting recurses inside `lift_const` WITHOUT going through
+/// [`lift`], so it must account for its own depth against
+/// [`MAX_LIFT_DEPTH`] — the same ceiling and degradation (Raw placeholder +
+/// `truncated`) as expression lifting. Parsed trees are already capped by
+/// the parser's value-depth limit (110 < 128), so this only binds
+/// hand-built or future-format input — the case the ceiling exists for.
+fn lift_const_child(tpe: &SigmaType, val: &SigmaValue, cx: &mut LiftCtx) -> Node {
+    let id = cx.alloc_id();
+    if cx.depth >= MAX_LIFT_DEPTH {
+        cx.truncated = true;
+        return Node {
+            id,
+            kind: NodeKind::Raw(format!("<nesting deeper than {MAX_LIFT_DEPTH} levels>")),
+        };
+    }
+    cx.depth += 1;
+    let kind = lift_const(tpe, val, cx);
+    cx.depth -= 1;
+    Node { id, kind }
 }
 
 /// Best-effort static type of a value (for nested constant lifting).

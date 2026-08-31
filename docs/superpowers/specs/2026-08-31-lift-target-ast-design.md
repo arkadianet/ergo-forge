@@ -1,7 +1,7 @@
 # Lift-target AST — design
 
 Date: 2026-08-31
-Status: approved, not yet implemented
+Status: implemented (P2.5, 2026-09-01) — shipped names differ where noted below
 Scope: the AST the audit layer lints against, and the module split that exposes it.
 
 ## Problem
@@ -109,7 +109,7 @@ modules, extracting the crate is mechanical.
 ### Public API after the split
 
 ```rust
-pub fn lift(tree: &ErgoTree, testnet: bool) -> Lifted;
+pub fn lift_tree(tree: &ErgoTree, testnet: bool) -> Lifted;   // spec named it `lift`
 pub fn print(node: &Node) -> String;
 
 pub struct Lifted {
@@ -182,15 +182,23 @@ Two changes follow for this spec.
 ### 1. `Node` carries `ir_id`, added in P2.5
 
 ```rust
-pub struct Node { pub id: u64, pub kind: NodeKind }   // id = IR preorder index
+pub struct Node { pub id: u64, pub kind: NodeKind }   // id = LIFT-LOCAL (see below)
 ```
 
-The lifted node keeps the **IR node id**, not a `Pos`. Rationale: an id is
+The lifted node keeps an **IR node id**, not a `Pos`. Rationale: an id is
 meaningful with no source map at all — a contract lifted from a mainnet address
 has no source — whereas a `Pos` is only meaningful when we compiled the source
 ourselves. Source citation becomes a lookup (`map.get(node.id)`) layered on top,
 and lints get stable node identity for free, which they need anyway to dedupe
 findings and reference nodes across a report.
+
+> **As shipped (P2.5):** ids are **lift-local** — assigned by the sandbox's own
+> walk, unique within one decompilation, but NOT the shared `ergo_ser::preorder`
+> index this section assumed, because that walk does not exist yet and
+> independently-derived indices misalign silently (`MAX_LIFT_DEPTH` skips
+> subtrees without descending). When `ergo_ser::preorder` lands, only the
+> *source* of the id changes; the AST shape does not. See the P2.5 plan's
+> "On `ir_id`" section.
 
 Adding the slot during P2.5 avoids re-opening the AST later, which is the whole
 point of doing P2.5 before P3.

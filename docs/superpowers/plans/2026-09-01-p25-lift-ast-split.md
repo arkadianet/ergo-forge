@@ -875,5 +875,7 @@ git commit -m "docs: record the P2.5 AST split"
 - `Node`, `NodeKind`, `Stmt`, `Lifted`, `lift_tree`, `print` are public and re-exported from `lib.rs`.
 - `L::Infix` no longer carries a precedence field.
 - Seed and mainnet round-trip counts are **unchanged** (73/11/0/3 and 270/6/2/1).
-- 25 tests pass, clippy `-D warnings` clean, `cargo fmt --check` clean.
+- 27 tests pass (the plan was authored against a 21-test baseline; main had
+  gained 2 passing tests — an `#[ignore]` removal — by execution time, and the
+  plan itself adds 4), clippy `-D warnings` clean, `cargo fmt --check` clean.
 - P3 can be started without touching `decompile/` internals.

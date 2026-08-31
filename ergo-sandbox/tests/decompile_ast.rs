@@ -4,6 +4,10 @@
 
 use ergo_sandbox::{compile_source, decompile};
 use ergo_ser::address::NetworkPrefix;
+use ergo_ser::ergo_tree::ErgoTree;
+use ergo_ser::opcode::Expr;
+use ergo_ser::sigma_type::SigmaType;
+use ergo_ser::sigma_value::SigmaValue;
 
 /// Compile a source string to tree bytes, then parse it back to a tree.
 fn tree_of(src: &str) -> ergo_ser::ergo_tree::ErgoTree {
@@ -76,4 +80,36 @@ fn lift_local_ids_are_unique_within_one_tree() {
     sorted.sort_unstable();
     sorted.dedup();
     assert_eq!(sorted.len(), ids.len(), "duplicate lift ids: {ids:?}");
+}
+
+/// A constant whose Tuple value nests deeper than MAX_LIFT_DEPTH must
+/// truncate to the Raw placeholder, not overflow the stack. The parser caps
+/// constant-value nesting at 110 (< 128), so this is only reachable through
+/// a hand-built tree — exactly the input class the lift ceiling exists for.
+#[test]
+fn deeply_nested_constant_truncates_instead_of_overflowing() {
+    let mut tpe = SigmaType::SInt;
+    let mut val = SigmaValue::Int(1);
+    for _ in 0..200 {
+        val = SigmaValue::Tuple(vec![val]);
+        tpe = SigmaType::STuple(vec![tpe]);
+    }
+    let tree = ErgoTree {
+        version: 3,
+        has_size: false,
+        constant_segregation: false,
+        constants: vec![],
+        body: Expr::Const { tpe, val },
+    };
+    let lifted = decompile::lift_tree(&tree, true);
+    assert!(lifted.truncated, "deep constant must set truncated");
+    assert!(
+        lifted.raw_placeholders > 0,
+        "deep constant must degrade to a Raw placeholder"
+    );
+    let rendered = decompile::print(&lifted.node);
+    assert!(
+        rendered.contains("<nesting deeper than 128 levels>"),
+        "rendered: {rendered}"
+    );
 }
