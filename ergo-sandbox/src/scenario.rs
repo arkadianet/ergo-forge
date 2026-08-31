@@ -154,6 +154,16 @@ pub struct TypedValue {
 
 // ── Value parsing ────────────────────────────────────────────────────────────
 
+/// Parse a user type name into a `SigmaType`. Supports the base types and
+/// arbitrarily nested collections (`Coll[T]` for any `T`, including
+/// another `Coll[…]`).
+fn parse_type_name(tpe: &str) -> Result<SigmaType, SandboxError> {
+    if let Some(elem) = tpe.strip_prefix("Coll[").and_then(|s| s.strip_suffix(']')) {
+        return Ok(SigmaType::SColl(Box::new(parse_type_name(elem)?)));
+    }
+    parse_base_type(tpe)
+}
+
 fn parse_base_type(tpe: &str) -> Result<SigmaType, SandboxError> {
     Ok(match tpe {
         "Boolean" => SigmaType::SBoolean,
@@ -178,8 +188,8 @@ fn parse_base_type(tpe: &str) -> Result<SigmaType, SandboxError> {
 /// Supported types: `Boolean`, `Byte`, `Short`, `Int`, `Long`, `BigInt`
 /// (decimal string), `GroupElement` (33-byte hex), `SigmaProp` (`true`,
 /// `false`, or 33-byte pubkey hex → `ProveDlog`), and `Coll[T]` for any
-/// base `T` (`Coll[Byte]` from a hex string; everything else from JSON
-/// arrays).
+/// `T` — including nested `Coll[Coll[T]]` (`Coll[Byte]` from a hex
+/// string; everything else from JSON arrays).
 pub fn parse_typed_value(
     tpe: &str,
     value: &serde_json::Value,
@@ -282,7 +292,7 @@ fn parse_coll(
         vals.push(v);
     }
     Ok((
-        SigmaType::SColl(Box::new(parse_base_type(elem)?)),
+        SigmaType::SColl(Box::new(parse_type_name(elem)?)),
         SigmaValue::Coll(CollValue::Values(vals)),
     ))
 }

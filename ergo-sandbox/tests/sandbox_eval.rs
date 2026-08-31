@@ -130,12 +130,16 @@ fn malformed_scenarios_fail_at_the_boundary() {
     )
     .unwrap();
     assert!(eval_scenario(&sc).is_err());
-    // Non-dense registers are rejected.
-    let sc: Scenario = serde_json::from_str(
-        r#"{"height":100,"source":"sigmaProp(true)","outputs":[{"ergoTree":"10","registers":{"R5":{"type":"Int","value":1}}}]}"#,
-    )
+    // Non-dense registers are rejected (valid tree, so the failure is the
+    // density check — eval parses the tree before building boxes).
+    let sc: Scenario = serde_json::from_str(&format!(
+        r#"{{"height":100,"source":"sigmaProp(true)","outputs":[{{"ergoTree":"{HEIGHT_TREE}","registers":{{"R5":{{"type":"Int","value":1}}}}}}]}}"#
+    ))
     .unwrap();
-    assert!(eval_scenario(&sc).is_err());
+    assert!(matches!(
+        eval_scenario(&sc),
+        Err(ergo_sandbox::SandboxError::Scenario(_))
+    ));
 }
 
 #[test]
@@ -193,10 +197,9 @@ fn decompile_recompile_byte_identity_over_the_compile_corpus() {
         ("{ val x = HEIGHT; x > 5 }", "1001040ad191a37300"),
         ("true && (1 == 1)", "1000d1ed8503"),
         ("HEIGHT>5 && HEIGHT<9", "1002040a0412d1ed91a373008fa37301"),
-        (
-            "col1.exists({(x:Long)=>x>1L})",
-            "1002110202040502d1ae7300d90101059172017301",
-        ),
+        // (The corpus's `col1.exists(…)` vector needs the oracle's demo env
+        //  (`col1` binding); skipped here — the sandbox compiles with an
+        //  empty env. See arkadianet/ergo compile_semantic_parity.rs.)
         ("!true", "10010100d17300"),
         ("1 == 2", "100204020404d19373007301"),
         ("1 < 2L", "10010101d17300"),
@@ -208,11 +211,54 @@ fn decompile_recompile_byte_identity_over_the_compile_corpus() {
     ];
     for (source, hex_str) in FIXTURE {
         let bytes = hex::decode(hex_str).unwrap();
+        // The identity claim needs BOTH halves: the source must compile to
+        // exactly these bytes (catches source/tree mismatch or a compile
+        // regression), and the bytes must re-serialize identically.
+        let compiled =
+            ergo_sandbox::compile_source(source, 3, ergo_ser::address::NetworkPrefix::Testnet)
+                .unwrap_or_else(|e| panic!("fixture source {source} failed to compile: {e}"));
+        assert_eq!(
+            hex::encode(&compiled.tree_bytes),
+            *hex_str,
+            "fixture source {source} does not compile to the pinned tree"
+        );
         let report = inspect::tree_report(&bytes)
             .unwrap_or_else(|e| panic!("fixture {source} failed to inspect: {e}"));
         assert!(
             report.contains("byte-identical"),
             "fixture {source} did not re-serialize byte-identical:\n{report}"
+        );
+    }
+}
+
+#[test]
+fn opcode_name_covers_the_parser_supported_set_exactly() {
+    use ergo_sandbox::inspect::opcode_name;
+    // Exhaustive over the pinned ergo-ser `opcode_pattern` accept set
+    // (the parse-accept set = the set that can appear in any valid tree):
+    // every supported opcode byte has a name, and no unsupported byte does.
+    const SUPPORTED: &[u8] = &[
+        0x71, 0x72, 0x73, 0x74, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x82, 0x83, 0x85, 0x86,
+        0x8C, 0x8F, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99, 0x9A, 0x9B, 0x9C,
+        0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xAC, 0xAD, 0xAE, 0xAF,
+        0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6, 0xB7, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7,
+        0xCB, 0xCC, 0xCD, 0xCE, 0xCF, 0xD0, 0xD1, 0xD4, 0xD5, 0xD6, 0xD7, 0xD8, 0xD9, 0xDA, 0xDB,
+        0xDC, 0xDD, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, 0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF,
+        0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8, 0xFE, 0xFF,
+    ];
+    for &op in SUPPORTED {
+        assert!(
+            opcode_name(op).is_some(),
+            "0x{op:02X} is parser-supported but unnamed"
+        );
+    }
+    // Reserved/unsupported bytes must stay unnamed (0x81 UnitConstant,
+    // 0x87..=0x8B Select1..5, 0xB8 FlatMap, 0xDE SomeValue, 0xDF NoneValue —
+    // none parser-accepted).
+    for op in [0x81u8, 0x87, 0x88, 0x89, 0x8A, 0x8B, 0xB8, 0xDE, 0xDF] {
+        assert!(
+            opcode_name(op).is_none(),
+            "0x{op:02X} unsupported but named"
         );
     }
 }

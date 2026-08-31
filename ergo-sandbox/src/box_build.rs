@@ -16,22 +16,31 @@ use crate::SandboxError;
 /// `default_tree_bytes` is the box's own locking script (canonical ErgoTree
 /// wire bytes) used when the scenario box omits its tree — the self-box
 /// synthesis case, where the spent box carries the tree under evaluation.
-/// When supplied, the scenario's `ergoTree` field is IGNORED for this box.
+/// When supplied, it takes PRECEDENCE over the scenario's `ergoTree` field
+/// (used only for the self box, so `SELF` always exposes the tree under
+/// evaluation).
 pub fn build_eval_box(
     field: &'static str,
     sb: &ScenarioBox,
     default_tree_bytes: Option<&[u8]>,
 ) -> Result<EvalBox, SandboxError> {
-    let script_bytes: Vec<u8> = match (&sb.ergo_tree, default_tree_bytes) {
-        (Some(hex_str), _) => {
-            hex::decode(hex_str.trim()).map_err(|source| SandboxError::Hex { field, source })?
-        }
-        (None, Some(bytes)) => bytes.to_vec(),
-        (None, None) => {
-            return Err(SandboxError::Scenario(format!(
-                "`{field}` box needs `ergoTree` (only the self box may omit it)"
-            )))
-        }
+    let script_bytes: Vec<u8> = match default_tree_bytes {
+        Some(bytes) => bytes.to_vec(),
+        None => match sb
+            .ergo_tree
+            .as_deref()
+            .map(str::trim)
+            .filter(|s| !s.is_empty())
+        {
+            Some(hex_str) => {
+                hex::decode(hex_str).map_err(|source| SandboxError::Hex { field, source })?
+            }
+            None => {
+                return Err(SandboxError::Scenario(format!(
+                    "`{field}` box needs `ergoTree` (only the self box may omit it)"
+                )))
+            }
+        },
     };
 
     let id: [u8; 32] = match &sb.box_id {

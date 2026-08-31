@@ -64,7 +64,12 @@ fn flag_value(args: &[String], name: &str) -> Result<Option<String>, String> {
     let mut it = args.iter();
     while let Some(a) = it.next() {
         if a == name {
-            return Ok(it.next().cloned());
+            return Ok(Some(
+                it.next()
+                    .filter(|v| !v.starts_with("--"))
+                    .ok_or_else(|| format!("flag {name} needs a value"))?
+                    .clone(),
+            ));
         }
     }
     Ok(None)

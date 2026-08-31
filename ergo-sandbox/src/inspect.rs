@@ -114,7 +114,14 @@ pub fn opcode_name(op: u8) -> Option<&'static str> {
         0xEE => "DecodePoint",
         0xEF => "LogicalNot",
         0xF0 => "Negation",
+        0xF1 => "BitInversion",
+        0xF2 => "BitOr",
+        0xF3 => "BitAnd",
         0xF4 => "BinXor",
+        0xF5 => "BitXor",
+        0xF6 => "BitShiftRight",
+        0xF7 => "BitShiftLeft",
+        0xF8 => "BitShiftRightZeroed",
         0xFE => "CONTEXT",
         0xFF => "XorOf",
         _ => return None,
@@ -390,10 +397,7 @@ fn fmt_expr(e: &Expr, out: &mut String) {
                     tpe,
                     default,
                 } => {
-                    out.push_str(&format!(
-                        "(deserializeRegister R{reg_id}:{})",
-                        type_str(tpe)
-                    ));
+                    out.push_str(&format!("(deserializeRegister R{reg_id}:{}", type_str(tpe)));
                     if let Some(d) = default {
                         out.push(' ');
                         fmt_expr(d, out);

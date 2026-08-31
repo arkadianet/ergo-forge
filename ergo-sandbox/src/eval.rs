@@ -126,22 +126,22 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
     let mut r = VlqReader::new(&tree_bytes);
     let tree = read_ergo_tree(&mut r).map_err(|e| SandboxError::Tree(e.to_string()))?;
 
-    // 2. Box collections. An omitted `inputs` list defaults to `[self]` —
-    // the convention CONTEXT.INPUTS(0) == SELF relies on.
+    // 2. Box collections. SELF is ALWAYS INPUTS(0) — the invariant
+    // `CONTEXT.INPUTS(0) == SELF` relies on. An omitted `inputs` list
+    // defaults to `[self]`; an explicit `inputs` list is a proposal for
+    // INPUTS(1..), prepended with the self box. To override the spent box's
+    // other fields, use `selfBox`.
     let default_self = ScenarioBox::default();
     let self_box = build_eval_box(
         "selfBox",
         sc.self_box.as_ref().unwrap_or(&default_self),
         Some(&tree_bytes),
     )?;
-    let inputs: Vec<EvalBox> = if sc.inputs.is_empty() {
-        vec![self_box.clone()]
-    } else {
-        sc.inputs
-            .iter()
-            .map(|b| build_eval_box("inputs", b, None))
-            .collect::<Result<_, _>>()?
-    };
+    let mut inputs: Vec<EvalBox> = Vec::with_capacity(sc.inputs.len() + 1);
+    inputs.push(self_box.clone());
+    for (i, b) in sc.inputs.iter().enumerate() {
+        inputs.push(build_eval_box("inputs", b, None).map_err(index_err(i))?);
+    }
     let outputs: Vec<EvalBox> = sc
         .outputs
         .iter()
@@ -218,15 +218,24 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
     };
 
     // 6. Bounded cost budget (never `recording_only()` — this is a
-    // code-execution surface).
+    // code-execution surface). The diagnostic reduction and the proof
+    // verification each get their OWN budget-fresh accumulator: the verify
+    // path re-evaluates the tree internally, and `CostAccumulator` is
+    // additive — sharing one accumulator would double-charge the preview
+    // pass and could reject a spend that fits the budget on a single
+    // evaluation (what the consensus path actually charges).
     let limit = sc.cost_limit.unwrap_or(DEFAULT_COST_LIMIT);
-    let mut cost = ergo_primitives::cost::CostAccumulator::new(
-        ergo_primitives::cost::JitCost::from_block_cost(limit)
-            .map_err(|_| SandboxError::CostLimit(limit))?,
-    );
+    let new_accumulator = || -> Result<ergo_primitives::cost::CostAccumulator, SandboxError> {
+        Ok(ergo_primitives::cost::CostAccumulator::new(
+            ergo_primitives::cost::JitCost::from_block_cost(limit)
+                .map_err(|_| SandboxError::CostLimit(limit))?,
+        ))
+    };
+    let mut cost = new_accumulator()?;
 
-    // 7. Reduce, with the semantic trace. With the `cost-trace` feature,
-    // capture the per-step cost breakdown from the global recorder.
+    // 7. Diagnostic reduction, with the semantic trace. With the
+    // `cost-trace` feature, capture the per-step cost breakdown from the
+    // global recorder.
     #[cfg(feature = "cost-trace")]
     ergo_sigma::cost_trace::enable();
     let (reduced, entries) =
@@ -280,7 +289,8 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
 
     // 8. Optional proof verification through the FULL consensus path
     // (pre-reduction checks + deserialize-substitution cost + trivial fast
-    // path + evaluator + crypto verify).
+    // path + evaluator + crypto verify) with a FRESH accumulator — this is
+    // the authoritative spend cost; the diagnostic pass above is a preview.
     if let Some(proof_hex) = &sc.proof {
         let proof_bytes = hex::decode(proof_hex.trim()).map_err(|source| SandboxError::Hex {
             field: "proof",
@@ -293,12 +303,13 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
             })?,
             None => Vec::new(),
         };
+        let mut verify_cost = new_accumulator()?;
         match verify_spending_proof_with_context_and_cost(
             &tree,
             &proof_bytes,
             &message,
             &ctx,
-            &mut cost,
+            &mut verify_cost,
         ) {
             Ok(true) => outcome.verdict = Verdict::ProofAccepted,
             Ok(false) => outcome.verdict = Verdict::ProofRejected,
@@ -307,13 +318,21 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
                 outcome.error = Some(e.to_string());
             }
         }
+        outcome.cost = verify_cost.total_block_cost();
     }
 
-    outcome.cost = cost.total_block_cost();
     Ok(outcome)
 }
 
 // ── helpers ──────────────────────────────────────────────────────────────────
+
+/// Prefix a box-marshalling error with the box's index in its collection.
+fn index_err(i: usize) -> impl Fn(SandboxError) -> SandboxError {
+    move |e| match e {
+        SandboxError::Hex { field, source } => SandboxError::Hex { field, source },
+        other => SandboxError::Scenario(format!("[{i}] {}", other)),
+    }
+}
 
 fn parse_network(name: Option<&str>) -> Result<Option<NetworkPrefix>, SandboxError> {
     match name {
