@@ -5,7 +5,7 @@
 
 use std::fmt::Write as _;
 
-use super::ast::{Stmt, L};
+use super::ast::{Node, NodeKind, Stmt};
 
 // ── printer ──────────────────────────────────────────────────────────────────
 
@@ -29,21 +29,21 @@ pub(crate) fn prec_of(sym: &str) -> u8 {
 }
 
 /// Operator precedence context: `None` = top level (no parens needed).
-pub(crate) fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
+pub(crate) fn print_node(n: &Node, parent: Option<u8>, out: &mut String) {
     let parens = |out: &mut String, f: &dyn Fn(&mut String)| {
         out.push('(');
         f(out);
         out.push(')');
     };
-    match e {
-        L::Bool(b) => out.push_str(if *b { "true" } else { "false" }),
-        L::Int(i) => {
+    match &n.kind {
+        NodeKind::Bool(b) => out.push_str(if *b { "true" } else { "false" }),
+        NodeKind::Int(i) => {
             let _ = write!(out, "{i}");
         }
-        L::Num(s) => out.push_str(s),
-        L::Const(s) => out.push_str(s),
-        L::Val(name) => out.push_str(name),
-        L::GetVar(id, tpe) => {
+        NodeKind::Num(s) => out.push_str(s),
+        NodeKind::Const(s) => out.push_str(s),
+        NodeKind::Val(name) => out.push_str(name),
+        NodeKind::GetVar(id, tpe) => {
             // Source form is `getVar[T](id)` — the compiler's predef parses
             // the type parameter in brackets and the id in call parens.
             if tpe.is_empty() {
@@ -52,8 +52,8 @@ pub(crate) fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
                 let _ = write!(out, "getVar[{tpe}]({id})");
             }
         }
-        L::Leaf(s) => out.push_str(s),
-        L::Unary(op, inner) => {
+        NodeKind::Leaf(s) => out.push_str(s),
+        NodeKind::Unary(op, inner) => {
             let this = 8u8;
             let needs = parent.is_some_and(|p| p > this);
             // Binder quirk (upstream): `!v.R5[T].isDefined` types the `!`
@@ -63,7 +63,7 @@ pub(crate) fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
             let emit_inner = |o: &mut String| {
                 if *op == "!" {
                     o.push('(');
-                    print_l(inner, Some(this), o);
+                    print_node(inner, Some(this), o);
                     o.push(')');
                 } else if *op == "-" {
                     // Negation over a numeric literal must NOT render as a
@@ -76,21 +76,21 @@ pub(crate) fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
                     // what the reference compiler does with the original
                     // source). Verified against the JVM TyperOracle
                     // (sigma-state 6.0.2).
-                    match inner.as_ref() {
-                        L::Int(n) => {
+                    match &inner.kind {
+                        NodeKind::Int(n) => {
                             o.push_str("(0 + ");
                             let _ = write!(o, "{n}");
                             o.push(')');
                         }
-                        L::Num(t) if t.ends_with('L') => {
+                        NodeKind::Num(t) if t.ends_with('L') => {
                             o.push_str("(0 + ");
                             o.push_str(t);
                             o.push(')');
                         }
-                        _ => print_l(inner, Some(this), o),
+                        _ => print_node(inner, Some(this), o),
                     }
                 } else {
-                    print_l(inner, Some(this), o);
+                    print_node(inner, Some(this), o);
                 }
             };
             if needs {
@@ -103,11 +103,11 @@ pub(crate) fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
                 emit_inner(out);
             }
         }
-        L::Infix(sym, lhs, rhs) => {
+        NodeKind::Infix(sym, lhs, rhs) => {
             let this = prec_of(sym);
             let needs = parent.is_some_and(|p| p > this);
             let emit = |o: &mut String| {
-                print_l(lhs, Some(this), o);
+                print_node(lhs, Some(this), o);
                 o.push(' ');
                 o.push_str(sym);
                 o.push(' ');
@@ -115,7 +115,7 @@ pub(crate) fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
                 // at EQUAL precedence, or the parser re-associates left:
                 // Minus(a, Minus(b, c)) must print `a - (b - c)`, not
                 // `a - b - c`.
-                print_l(rhs, Some(this + 1), o);
+                print_node(rhs, Some(this + 1), o);
             };
             if needs {
                 parens(out, &emit);
@@ -123,9 +123,9 @@ pub(crate) fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
                 emit(out);
             }
         }
-        L::Method(obj, name, args) => {
+        NodeKind::Method(obj, name, args) => {
             // Receiver binds like a postfix expression (tightest).
-            print_l(obj, Some(9), out);
+            print_node(obj, Some(9), out);
             out.push('.');
             out.push_str(name);
             if !args.is_empty() {
@@ -134,39 +134,39 @@ pub(crate) fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
                     if i > 0 {
                         out.push_str(", ");
                     }
-                    print_l(a, None, out);
+                    print_node(a, None, out);
                 }
                 out.push(')');
             }
         }
-        L::ApplyFn(f, args) => {
-            print_l(f, Some(9), out);
+        NodeKind::ApplyFn(f, args) => {
+            print_node(f, Some(9), out);
             out.push('(');
             for (i, a) in args.iter().enumerate() {
                 if i > 0 {
                     out.push_str(", ");
                 }
-                print_l(a, None, out);
+                print_node(a, None, out);
             }
             out.push(')');
         }
-        L::Prop(obj, name) => {
-            print_l(obj, Some(9), out);
+        NodeKind::Prop(obj, name) => {
+            print_node(obj, Some(9), out);
             out.push('.');
             out.push_str(name);
         }
-        L::GetRegDyn(obj, tpe, args) => {
-            print_l(obj, Some(9), out);
+        NodeKind::GetRegDyn(obj, tpe, args) => {
+            print_node(obj, Some(9), out);
             out.push_str(&format!(".getReg[{tpe}]("));
             for (i, a) in args.iter().enumerate() {
                 if i > 0 {
                     out.push_str(", ");
                 }
-                print_l(a, None, out);
+                print_node(a, None, out);
             }
             out.push(')');
         }
-        L::Coll(elem, items) => {
+        NodeKind::Coll(elem, items) => {
             // An EMPTY collection literal needs its element type ascribed
             // (`Coll[Byte]()`); a non-empty one infers from the items.
             if items.is_empty() {
@@ -177,40 +177,40 @@ pub(crate) fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
                     if i > 0 {
                         out.push_str(", ");
                     }
-                    print_l(it, None, out);
+                    print_node(it, None, out);
                 }
                 out.push(')');
             }
         }
-        L::Tuple(items) => {
+        NodeKind::Tuple(items) => {
             out.push('(');
             for (i, it) in items.iter().enumerate() {
                 if i > 0 {
                     out.push_str(", ");
                 }
-                print_l(it, None, out);
+                print_node(it, None, out);
             }
             out.push(')');
         }
-        L::Index(input, index, default) => {
-            print_l(input, Some(9), out);
+        NodeKind::Index(input, index, default) => {
+            print_node(input, Some(9), out);
             out.push('[');
-            print_l(index, None, out);
+            print_node(index, None, out);
             out.push(']');
             if let Some(d) = default {
                 out.push_str(".getOrElse(");
-                print_l(d, None, out);
+                print_node(d, None, out);
                 out.push(')');
             }
         }
-        L::If(cond, then, els) => {
+        NodeKind::If(cond, then, els) => {
             let emit = |o: &mut String| {
                 o.push_str("if (");
-                print_l(cond, None, o);
+                print_node(cond, None, o);
                 o.push_str(") ");
-                print_l(then, None, o);
+                print_node(then, None, o);
                 o.push_str(" else ");
-                print_l(els, None, o);
+                print_node(els, None, o);
             };
             // An `if..else` used as an operand (inside `&&`, arithmetic, …)
             // needs explicit parens — the parser ends the operator's right
@@ -221,7 +221,7 @@ pub(crate) fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
                 emit(out);
             }
         }
-        L::Lambda(args, body) => {
+        NodeKind::Lambda(args, body) => {
             let emit = |o: &mut String| {
                 o.push_str("{ (");
                 for (i, a) in args.iter().enumerate() {
@@ -231,7 +231,7 @@ pub(crate) fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
                     o.push_str(a);
                 }
                 o.push_str(") => ");
-                print_l(body, None, o);
+                print_node(body, None, o);
                 o.push('}');
             };
             if parent.is_some_and(|p| p > 0) {
@@ -240,32 +240,32 @@ pub(crate) fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
                 emit(out);
             }
         }
-        L::Global(name, args) => {
+        NodeKind::Global(name, args) => {
             out.push_str(name);
             out.push('(');
             for (i, a) in args.iter().enumerate() {
                 if i > 0 {
                     out.push_str(", ");
                 }
-                print_l(a, None, out);
+                print_node(a, None, out);
             }
             out.push(')');
         }
-        L::AtLeast(k, items) => {
+        NodeKind::AtLeast(k, items) => {
             out.push_str("atLeast(");
-            print_l(k, None, out);
+            print_node(k, None, out);
             out.push_str(", ");
-            print_l(items, None, out);
+            print_node(items, None, out);
             out.push(')');
         }
-        L::Raw(s) => out.push_str(s),
-        L::Block(stmts, result) => {
+        NodeKind::Raw(s) => out.push_str(s),
+        NodeKind::Block(stmts, result) => {
             out.push_str("{ ");
             for s in stmts {
                 print_stmt(s, out);
                 out.push_str("; ");
             }
-            print_l(result, None, out);
+            print_node(result, None, out);
             out.push_str(" }");
         }
     }
@@ -275,11 +275,11 @@ fn print_stmt(s: &Stmt, out: &mut String) {
     match s {
         Stmt::Val(name, e) => {
             let _ = write!(out, "val {name} = ");
-            print_l(e, None, out);
+            print_node(e, None, out);
         }
         Stmt::Def(name, e) => {
             let _ = write!(out, "def {name} = ");
-            print_l(e, None, out);
+            print_node(e, None, out);
         }
     }
 }

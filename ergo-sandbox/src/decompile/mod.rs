@@ -25,11 +25,13 @@ use ergo_ser::opcode::Expr;
 
 mod ast;
 
+pub use ast::{Node, NodeKind, Stmt};
+
 use ast::count_raw;
 
 mod print;
 
-use print::print_l;
+use print::print_node;
 
 mod lift;
 
@@ -126,26 +128,63 @@ pub fn render_net(tree: &ergo_ser::ergo_tree::ErgoTree, testnet: bool) -> String
     render_report_net(tree, testnet).source
 }
 
+/// A lifted tree with lift diagnostics — the tree-shaped counterpart to
+/// [`Decompiled`]. This is what the audit layer consumes.
+#[derive(Debug, Clone)]
+pub struct Lifted {
+    /// Root of the lifted AST.
+    pub node: Node,
+    /// Number of `NodeKind::Raw` placeholders — constructs with no
+    /// source-like lift. Non-zero means an audit over this tree is
+    /// incomplete and must say so rather than reporting clean.
+    pub raw_placeholders: usize,
+    /// Set when the lift hit [`MAX_LIFT_DEPTH`].
+    pub truncated: bool,
+}
+
+/// Lift a parsed tree to the AST, without rendering it.
+#[must_use]
+pub fn lift_tree(tree: &ergo_ser::ergo_tree::ErgoTree, testnet: bool) -> Lifted {
+    let mut cx = LiftCtx {
+        testnet,
+        ..LiftCtx::new()
+    };
+    let node = match &tree.body {
+        Expr::Op(n) if n.opcode == 0xD1 => {
+            let id = cx.alloc_id_pub();
+            Node {
+                id,
+                kind: lift_op_inner(n, &mut cx, &tree.constants, true),
+            }
+        }
+        other => lift(other, &mut cx, &tree.constants),
+    };
+    Lifted {
+        raw_placeholders: count_raw(&node),
+        truncated: cx.truncated,
+        node,
+    }
+}
+
+/// Render a lifted node as source-like ErgoScript.
+#[must_use]
+pub fn print(node: &Node) -> String {
+    let mut out = String::new();
+    print_node(node, None, &mut out);
+    out
+}
+
 /// Decompile with lift diagnostics: how much of the tree had no source-like
 /// lift. Callers should use this instead of re-scanning the rendered text for
 /// `<…>` marker substrings — fragile, and wrong for a contract that happens
 /// to contain those characters.
 #[must_use]
 pub fn render_report_net(tree: &ergo_ser::ergo_tree::ErgoTree, testnet: bool) -> Decompiled {
-    let mut cx = LiftCtx {
-        testnet,
-        ..LiftCtx::new()
-    };
-    let lifted = match &tree.body {
-        Expr::Op(n) if n.opcode == 0xD1 => lift_op_inner(n, &mut cx, &tree.constants, true),
-        other => lift(other, &mut cx, &tree.constants),
-    };
-    let mut out = String::new();
-    print_l(&lifted, None, &mut out);
+    let lifted = lift_tree(tree, testnet);
     Decompiled {
-        source: out,
-        raw_placeholders: count_raw(&lifted),
-        truncated: cx.truncated,
+        source: print(&lifted.node),
+        raw_placeholders: lifted.raw_placeholders,
+        truncated: lifted.truncated,
     }
 }
 
