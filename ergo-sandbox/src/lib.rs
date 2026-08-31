@@ -43,8 +43,10 @@
 
 pub mod box_build;
 pub mod compile;
+pub mod decompile;
 pub mod eval;
 pub mod inspect;
+pub mod method_names;
 pub mod scenario;
 
 pub use compile::{compile_source, CompileOutput};

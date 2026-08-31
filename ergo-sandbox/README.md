@@ -33,8 +33,32 @@ assert_eq!(outcome.verdict, Verdict::Pass);
 cargo run -p ergo-sandbox --bin ergo-es -- compile src/timelock.es
 cargo run -p ergo-sandbox --bin ergo-es -- eval scenario.json
 cargo run -p ergo-sandbox --bin ergo-es -- decompile 100104c801d191a37300
+cargo run -p ergo-sandbox --bin ergo-es -- roundtrip 100104c801d191a37300
 cargo run -p ergo-sandbox --features cost-trace --bin ergo-es -- eval scenario.json
 ```
+
+## Decompile (P2)
+
+`ergo_sandbox::decompile` lifts ErgoTree wire bytes to source-like
+ErgoScript: SSA `ValDef`s → `val` bindings, `(type_id, method_id)`
+dispatches → named method/property calls (tables extracted from the
+oracle-pinned compiler), infix sugar with precedence, `fold`'s wire
+tuple-lambda unwrapped back to the 2-arg source form.
+
+Verification bar (`decompile → recompile → byte-identical`), current
+tally over the node's oracle-graded corpora (`--seed` = compile vectors
+v3/testnet, `--mainnet` = unique trees from the mainnet diff corpus):
+
+```text
+seed:    110 trees → 66 exact, 13 diff (compiler-side fold collapses),
+         1 raw, 7 err (5 = an ergo-compiler bug: fold inside an operator
+         operand fails type-assignment — upstream fix needed)
+mainnet: 279 trees → 259 exact, 1 diff, 15 raw placeholders, 4 err
+```
+
+`ergo-es roundtrip --seed | --mainnet | <hex>` prints the tally; the
+`corpus_roundtrip` example is the detailed harness. Raw placeholders are
+honest degradation for hand-built trees, never silently wrong.
 
 ## Scenario schema (v1)
 

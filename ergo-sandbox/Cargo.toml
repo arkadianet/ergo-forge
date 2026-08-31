@@ -18,6 +18,7 @@ serde_json      = { workspace = true }
 hex             = { workspace = true }
 indexmap        = { workspace = true }
 num-bigint      = { workspace = true }
+bs58            = { workspace = true }
 
 [[bin]]
 name = "ergo-es"

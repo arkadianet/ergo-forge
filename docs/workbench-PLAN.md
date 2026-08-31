@@ -95,6 +95,19 @@ Missing (the workbench's actual build list):
 3. **P2 — decompiler v1** with the verification bar above; powers
    `inspect`-upgrade and the "read live contracts" loop (paste address/box-id →
    readable source).
+   **DONE 2026-08-31 (`ergo-sandbox/src/decompile.rs` + `method_names.rs`):**
+   IR lift + pretty-printer — SSA ValDefs → `val` bindings, method/property
+   id tables (201 entries, extracted from the oracle-pinned compiler method
+   tables), infix sugar, fold tuple-lambda unwrap, network-aware PK
+   constants. Round-trip tally over the node's oracle-graded corpora:
+   - **seed (110 compile vectors, v3/testnet): 66 byte-exact**, 13 diff
+     (compiler-side fold collapses of trivial sigma props — semantically
+     equal), 1 raw, 7 err (5 from a confirmed **ergo-compiler bug**: fold
+     inside an operator operand fails `assignType(Fold)` — filed upstream)
+   - **mainnet (279 unique trees): 259 byte-exact**, 1 diff, 15 raw
+     placeholders, 4 err
+   CLI: `ergo-es roundtrip --seed | --mainnet | <hex>`; detailed harness in
+   the `corpus_roundtrip` example.
 4. **P3 — audit layer** (lints + scenario fuzz + cost views); REST surfaces fold
    into tooling-api T1–T5 where they overlap.
 5. **P4 — WASM + browser workbench**; templates gallery (UI-doc Tier 1) reused.
