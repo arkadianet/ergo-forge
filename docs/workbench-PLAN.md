@@ -24,25 +24,33 @@ constraints from the compiler-UI doc.
 ## What exists vs. what's missing
 
 Exists (engine-level, grounded):
-- compile + errors-with-spans + templates (`ergo-compiler` M1–M4; 95/110 byte-parity)
+- compile + templates (`ergo-compiler` M1–M4; 95/110 byte-parity). **Positions are
+  partial:** `CompileError::pos()` returns real offsets for `Parse`/`Bind` only;
+  `Type`/`Root`/`Emit`/`Write` return `0` because `TypedExpr` carries no positions
+  (typecheck.rs:101, E12). Type errors — the class a playground user hits most —
+  are not underlinable today. See P5.
 - evaluator reachable standalone (`EvalBox`, `ReductionContext::minimal`, `CostTrace`)
 - node API design for inspect/execute/cost/simulate/explain/diff (tooling-api doc T1–T5)
 - dashboard UI tiers (templates / editor / safety rails) — compiler-UI doc
 
-Missing (the workbench's actual build list):
-1. **Sandbox crate** — context construction sugar + eval session + cost trace
-   exposed to non-consensus callers (thin re-plumb of validation's
-   `tx/script/mod.rs` wiring; WASM-clean deps only).
-2. **Decompiler** — ErgoTree bytes → readable ErgoScript. The long pole. Not
-   covered by any existing doc (tooling-api's `inspect` ships opcode dump +
-   typed s-expr only; UI doc's "disassemble" is the same). Needs IR → lifted
-   AST → pretty-print, normalization via cast-fold/CSE, graceful degradation to
-   a structural view for hand-built/soft-fork trees.
-3. **Audit layer** — static lints over the lifted AST (height guards, anyOf
+Built since (see Phases for the verified records):
+1. ~~**Sandbox crate**~~ — **DONE (P1).** Context construction, eval session,
+   cost trace, WASM-clean deps.
+2. ~~**Decompiler**~~ — **DONE (P2).** ErgoTree bytes → readable ErgoScript; the
+   long pole, and still the capability nothing else in the ecosystem has.
+   Graceful degradation to honest `<…>` placeholders for hand-built/soft-fork
+   trees is in place.
+
+Still missing (the actual build list):
+3. **Public lifted AST** — the decompiler's tree is private and only text
+   escapes, so lints have nothing to run on. Blocks (4). See P2.5.
+4. **Audit layer** — static lints over the lifted tree (height guards, `anyOf`
    shadowing, trust assumptions, unchecked `get()`), scenario fuzzing
    ("spendable by anyone?" hunts) over the sandbox, cost hot-spot reports.
-4. **Standalone browser shell** — the classroom for non-node-operators;
-   WASM bindings over (1)–(3). Later.
+5. **Standalone browser shell** — the classroom for non-node-operators;
+   WASM bindings over the engine.
+6. **Positions** — type errors carry no source offset, so the editor cannot
+   underline the most common failure. Node-side work; blocks the LSP story.
 
 ## Verification bar (decided)
 
@@ -120,17 +128,66 @@ Missing (the workbench's actual build list):
      need ≈3 MiB. `decompile::with_large_stack` gives headroom; the lift is
      bounded by `MAX_LIFT_DEPTH` so it degrades instead of overflowing. The
      WASM/HTTP shell must use the wrapper (or an iterative rewrite).
-4. **P3 — audit layer** (lints + scenario fuzz + cost views); REST surfaces fold
-   into tooling-api T1–T5 where they overlap.
-5. **P4 — WASM + browser workbench**; templates gallery (UI-doc Tier 1) reused.
+4. **P2.5 — expose the lifted AST (DONE 2026-09-01)** (prerequisite for P3; design:
+   `docs/superpowers/specs/2026-08-31-lift-target-ast-design.md`).
+   `decompile.rs` splits into `decompile/{ast,lift,print,mod}.rs`; the lifted
+   node types go public (`L` → `Node`), precedence moves out of the AST into the
+   printer, `lift()` returns `Lifted { node, raw_placeholders, truncated }`, and
+   every node carries `ir_id` (its IR preorder index) so source citation is a
+   later lookup rather than an AST change. Behaviour-preserving: every existing
+   test must pass with no edits to expected values. Small, and it unblocks
+   everything in P3.
+   Shipped: `decompile/{mod,ast,lift,print}.rs`; `pub Node { id, kind }`,
+   `pub NodeKind`, `pub Stmt`, `lift_tree() -> Lifted`, `print(&Node)`.
+   Precedence derives from the operator symbol in `print::prec_of`. Ids are
+   lift-local pending `ergo_ser::preorder` (P5-B).
+5. **P3 — audit layer.** Lints run on the **lifted tree**, not on parsed source —
+   authored source reaches them via `compile_source` then `lift`, the same path
+   an on-chain address takes. One lint suite serves both inputs, and it audits
+   what consensus will actually execute. A `Raw` placeholder in the tree is a
+   confidence signal: an audit over a tree containing one degrades its verdict
+   rather than reporting clean.
+   - static lints over `Node` (height guards, `anyOf` shadowing, unchecked
+     `get()`, trust assumptions)
+   - scenario fuzz over the sandbox ("spendable by anyone?" hunts)
+   - cost hot-spot views off the existing `cost-trace`
+   - REST surfaces fold into tooling-api T1–T5 where they overlap
+6. **P4 — WASM + browser workbench**; templates gallery (UI-doc Tier 1) reused.
+   Two carried constraints: the lift and the printer both recurse (≈3 MiB at 46
+   levels), and `wasm32` has no threads — so `with_large_stack` degrades to
+   inline and worker stacks are small. Either budget the stack or take the
+   iterative rewrite. This is also the point the `ergo-decompile` crate
+   extraction pays for itself (browser builds pull decompile without
+   `eval`/`scenario`); mechanical once P2.5 has landed the module split.
+7. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
+   tree-level audit findings project back onto authored source — squiggles,
+   hovers, eventually LSP.
+   - **A — DONE 2026-08-31** (`compiler/source-positions`, `8479a58`): every
+     `TypedExpr` carries `pos`; `CompileError::pos()` is real for `Type`.
+     Verified additive — oracle grading compares verdict + exception class, not
+     position, and all 1015 `ergo-compiler` tests pass unchanged. Scala *does*
+     carry typer positions (`Value._sourceContext`, ~75 cited sites in
+     `SigmaTyper.scala`), so the old `0` was a gap, not parity.
+   - **B — designed, not built** (`docs/ergoscript-compiler-source-map-design.md`
+     in the node): emit-time IR-node ↔ source-offset map. **Its keying contract
+     needs one change before implementation** — indices must come from a single
+     shared `ergo_ser::preorder` walk, not be computed independently on each
+     side. Today's lift skips subtrees at `MAX_LIFT_DEPTH`, which would silently
+     misalign every citation after the first deep contract. See the amendment in
+     `docs/superpowers/specs/2026-08-31-lift-target-ast-design.md`.
+   - Carried limitation: the parser records start offsets only, so P5 yields
+     carets, not underlines. Ranges need end-offset capture in `ast.rs` +
+     `parse/*` first.
 
 ## Crates
 
 - `ergo-sandbox` (workspace member): eval/compile/decompile session APIs.
   Deps: ergo-ser, ergo-sigma, ergo-compiler, ergo-primitives. No tokio/redb.
-  The decompiler lives at `ergo-sandbox/src/decompile.rs` (the separate
-  `ergo-decompile` crate originally planned was folded in — it shares too much
-  of the lift context to pay a crate boundary).
+  The decompiler lives at `ergo-sandbox/src/decompile.rs`, becoming
+  `decompile/{ast,lift,print}.rs` at P2.5. The separate `ergo-decompile` crate
+  originally planned is **deferred, not cancelled**: it buys nothing until a
+  browser build wants decompile without `eval`/`scenario` (P4), and the P2.5
+  module split makes extracting it mechanical when that day comes.
 - CLI shell: `ergo-sandbox/src/bin/ergo-es.rs` (`compile` / `eval` /
   `decompile` / `roundtrip`).
 - Web: separate repo later; consumes WASM builds of ergo-sandbox.
@@ -139,6 +196,11 @@ Missing (the workbench's actual build list):
 
 - ~~Byte-exact vs canonical re-serialization tolerance~~ — **resolved by P0**:
   394/394 real trees re-serialize byte-exact; the bar is byte-exact.
-- Whether the audit lints operate on the lifted AST inside
-  `ergo-sandbox/src/decompile.rs` or a separate crate — decided when the lint
-  set exists.
+- ~~Whether the audit lints operate on the lifted AST or a separate crate~~ —
+  **resolved 2026-08-31** (design doc above): lints operate on the lifted AST,
+  made public in place by P2.5. No separate crate until P4 needs the dependency
+  split. `ergo_compiler::ast::Expr` was rejected as the lift target — it is
+  oracle-pinned to the Scala parser, and a `Raw` variant the parser can never
+  emit would weaken that parity artifact.
+- Whether the P5 source map lives in `ergo-compiler`'s emit phase or a parallel
+  side-table — decided when span threading starts.
