@@ -497,35 +497,98 @@ fn corpus_err(path: &std::path::Path, e: std::io::Error) -> String {
     )
 }
 
-/// `ergo-es audit <tree-hex>` — static lints over the lifted tree.
+/// `ergo-es audit <tree-hex> | --seed | --mainnet [N]` — static lints over
+/// the lifted tree.
 fn cmd_audit(args: &[String]) -> Result<(), String> {
-    let hex_arg = args.first().ok_or("usage: ergo-es audit <tree-hex>")?;
-    let bytes = hex::decode(hex_arg.trim()).map_err(|e| format!("bad hex: {e}"))?;
-    let tree = ergo_sandbox::inspect::parse_tree(&bytes).map_err(|e| e.to_string())?;
-    let lifted =
-        ergo_sandbox::decompile::with_large_stack(move || ergo_sandbox::lift_tree(&tree, false));
-    let report = ergo_sandbox::audit::audit(&lifted);
+    match args.first().map(String::as_str) {
+        Some("--seed") | Some("--mainnet") => {
+            let is_seed = args[0] == "--seed";
+            let (testnet, trees): (bool, Vec<String>) = if is_seed {
+                (true, seed_vectors()?.into_iter().map(|(t, _)| t).collect())
+            } else {
+                (false, mainnet_trees(first_positional(args))?)
+            };
+            let mut flagged = 0usize;
+            let mut findings_total = 0usize;
+            let mut partial = 0usize;
+            let mut parse_errors = 0usize;
+            for h in &trees {
+                let bytes = hex::decode(h).map_err(|e| e.to_string())?;
+                let tree = match ergo_sandbox::inspect::parse_tree(&bytes) {
+                    Ok(t) => t,
+                    Err(_) => {
+                        parse_errors += 1;
+                        continue;
+                    }
+                };
+                let lifted = ergo_sandbox::decompile::with_large_stack(move || {
+                    ergo_sandbox::lift_tree(&tree, testnet)
+                });
+                let report = ergo_sandbox::audit::audit(&lifted);
+                let n = report.findings.len();
+                if n > 0 {
+                    flagged += 1;
+                    // Verification aid on stderr: the tally above stays the
+                    // only stdout output, but the acceptance gate requires
+                    // decompiling flagged trees by hand.
+                    eprintln!("flagged {h}");
+                }
+                findings_total += n;
+                if !matches!(
+                    report.completeness,
+                    ergo_sandbox::audit::Completeness::Complete
+                ) {
+                    partial += 1;
+                }
+            }
+            let audited = trees.len() - parse_errors;
+            let pct = if audited > 0 {
+                100.0 * flagged as f64 / audited as f64
+            } else {
+                0.0
+            };
+            println!("audited: {audited} trees");
+            println!("  flagged: {flagged} ({pct:.1}%)");
+            println!("  findings: {findings_total}");
+            println!("  partial: {partial}");
+            if parse_errors > 0 {
+                println!("  parse-errors: {parse_errors}");
+            }
+            Ok(())
+        }
+        Some(hex_arg) => {
+            let bytes = hex::decode(hex_arg.trim()).map_err(|e| format!("bad hex: {e}"))?;
+            let tree = ergo_sandbox::inspect::parse_tree(&bytes).map_err(|e| e.to_string())?;
+            let lifted = ergo_sandbox::decompile::with_large_stack(move || {
+                ergo_sandbox::lift_tree(&tree, false)
+            });
+            let report = ergo_sandbox::audit::audit(&lifted);
 
-    match report.completeness {
-        ergo_sandbox::audit::Completeness::Complete => {
-            println!("audit: {} finding(s)  [complete]", report.findings.len());
+            match report.completeness {
+                ergo_sandbox::audit::Completeness::Complete => {
+                    println!("audit: {} finding(s)  [complete]", report.findings.len());
+                }
+                ergo_sandbox::audit::Completeness::Partial {
+                    raw_placeholders,
+                    truncated,
+                } => {
+                    println!(
+                        "audit: {} finding(s)  [PARTIAL: {raw_placeholders} raw placeholder(s){}]",
+                        report.findings.len(),
+                        if truncated { ", truncated" } else { "" }
+                    );
+                    println!(
+                        "  part of this contract was not analysed — no findings does not mean clean"
+                    );
+                }
+            }
+            for f in &report.findings {
+                println!("\n{}  {}  node {}", f.severity.label(), f.lint, f.node_id);
+                println!("  {}", f.message);
+                println!("  {}", f.snippet);
+            }
+            Ok(())
         }
-        ergo_sandbox::audit::Completeness::Partial {
-            raw_placeholders,
-            truncated,
-        } => {
-            println!(
-                "audit: {} finding(s)  [PARTIAL: {raw_placeholders} raw placeholder(s){}]",
-                report.findings.len(),
-                if truncated { ", truncated" } else { "" }
-            );
-            println!("  part of this contract was not analysed — no findings does not mean clean");
-        }
+        None => Err("audit needs tree hex, --seed, or --mainnet [N]".into()),
     }
-    for f in &report.findings {
-        println!("\n{}  {}  node {}", f.severity.label(), f.lint, f.node_id);
-        println!("  {}", f.message);
-        println!("  {}", f.snippet);
-    }
-    Ok(())
 }
