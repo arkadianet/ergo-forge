@@ -20,23 +20,25 @@ use crate::method_names::METHOD_NAMES;
 /// Infix binary operators: opcode → (symbol, precedence).
 /// Higher precedence binds tighter. Mirrors ErgoScript/Scala precedence:
 /// unary > multiplicative > additive > comparison > logical.
-fn infix_op(op: u8) -> Option<(&'static str, u8)> {
+/// Infix binary operators: opcode → symbol. Precedence lives in
+/// `print::prec_of`, keyed by symbol.
+fn infix_op(op: u8) -> Option<&'static str> {
     Some(match op {
-        0xEC => ("||", 1), // BinOr (lazy)
-        0xED => ("&&", 2), // BinAnd (lazy)
-        0x8F => ("<", 4),  // Lt
-        0x90 => ("<=", 4), // Le
-        0x91 => (">", 4),  // Gt
-        0x92 => (">=", 4), // Ge
-        0x93 => ("==", 4), // Eq
-        0x94 => ("!=", 4), // Neq
-        0xF4 => ("^", 5),  // BinXor (strict) — Scala assigns ^ lower than && but
+        0xEC => "||", // BinOr (lazy)
+        0xED => "&&", // BinAnd (lazy)
+        0x8F => "<",  // Lt
+        0x90 => "<=", // Le
+        0x91 => ">",  // Gt
+        0x92 => ">=", // Ge
+        0x93 => "==", // Eq
+        0x94 => "!=", // Neq
+        0xF4 => "^",  // BinXor (strict) — Scala assigns ^ lower than && but
         // ErgoScript parity keeps it above comparisons in practice; pinned by round-trip.
-        0x99 => ("-", 6), // Minus
-        0x9A => ("+", 6), // Plus
-        0x9C => ("*", 7), // Multiply
-        0x9D => ("/", 7), // Divide
-        0x9E => ("%", 7), // Modulo
+        0x99 => "-", // Minus
+        0x9A => "+", // Plus
+        0x9C => "*", // Multiply
+        0x9D => "/", // Divide
+        0x9E => "%", // Modulo
         _ => return None,
     })
 }
@@ -304,11 +306,10 @@ pub(crate) fn lift_op_inner(
     let debug = || debug_expr(&Expr::Op(node.clone()));
     // Infix operators — the wire parses comparisons/booleans as `Payload::Two`
     // (the packed-bool 0x85 form only appears for `Coll[Boolean]` constants).
-    if let Some((sym, prec)) = infix_op(op) {
+    if let Some(sym) = infix_op(op) {
         if let Payload::Two(a, b) = payload {
             return L::Infix(
                 sym,
-                prec,
                 Box::new(lift(a, cx, constants)),
                 Box::new(lift(b, cx, constants)),
             );
@@ -431,7 +432,7 @@ pub(crate) fn lift_op_inner(
                     };
                     L::AtLeast(Box::new(al), Box::new(wrapped))
                 }
-                0x9B => L::Infix("xorBytes", 6, Box::new(al), Box::new(bl)),
+                0x9B => L::Infix("xorBytes", Box::new(al), Box::new(bl)),
                 0x9F => L::Method(Box::new(al), "exp".into(), vec![bl]),
                 0xA0 => L::Method(Box::new(al), "multiply".into(), vec![bl]),
                 0xA1 => L::Global("min".into(), vec![al, bl]),
@@ -439,7 +440,7 @@ pub(crate) fn lift_op_inner(
                 0xAD => L::Method(Box::new(al), "map".into(), vec![bl]),
                 0xAE => L::Method(Box::new(al), "exists".into(), vec![bl]),
                 0xAF => L::Method(Box::new(al), "forall".into(), vec![bl]),
-                0xB3 => L::Infix("++", 7, Box::new(al), Box::new(bl)),
+                0xB3 => L::Infix("++", Box::new(al), Box::new(bl)),
                 0xB5 => L::Method(Box::new(al), "filter".into(), vec![bl]),
                 0xE5 => L::Method(Box::new(al), "getOrElse".into(), vec![bl]),
                 _ => L::Raw(debug()),
@@ -660,7 +661,7 @@ pub(crate) fn lift_op_inner(
             // SigmaAnd/SigmaOr recompile from `&&`/`||` chains over sigma
             // children (0xED BinAnd on SigmaProps lifts to 0xEA on compile).
             let items_l: Vec<L> = items.iter().map(|i| lift(i, cx, constants)).collect();
-            let (sym, prec) = if op == 0xEA { ("&&", 2u8) } else { ("||", 1u8) };
+            let sym = if op == 0xEA { "&&" } else { "||" };
             match items_l.len() {
                 0 => L::Const(if op == 0xEA { "true" } else { "false" }.into()),
                 1 => items_l.into_iter().next().expect("len 1"),
@@ -668,7 +669,7 @@ pub(crate) fn lift_op_inner(
                     let mut it = items_l.into_iter();
                     let first = it.next().expect("non-empty");
                     it.fold(first, |acc, item| {
-                        L::Infix(sym, prec, Box::new(acc), Box::new(item))
+                        L::Infix(sym, Box::new(acc), Box::new(item))
                     })
                 }
             }
@@ -736,9 +737,8 @@ fn rewrite_fold_fields(e: L, bound: &str, n1: &str, n2: &str) -> L {
                 .map(|a| rewrite_fold_fields(a, bound, n1, n2))
                 .collect(),
         ),
-        L::Infix(sym, prec, a, b) => L::Infix(
+        L::Infix(sym, a, b) => L::Infix(
             sym,
-            prec,
             Box::new(rewrite_fold_fields(*a, bound, n1, n2)),
             Box::new(rewrite_fold_fields(*b, bound, n1, n2)),
         ),

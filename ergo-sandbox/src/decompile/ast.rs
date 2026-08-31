@@ -22,7 +22,10 @@ pub(crate) enum L {
     /// Height/output/input/… leaves.
     Leaf(&'static str),
     Unary(&'static str, Box<L>),
-    Infix(&'static str, u8, Box<L>, Box<L>),
+    /// Infix binary operator application. Precedence is derived from the
+    /// symbol at print time (`print::prec_of`) — it is a rendering concern,
+    /// not part of the recovered structure.
+    Infix(&'static str, Box<L>, Box<L>),
     Method(Box<L>, String, Vec<L>),
     /// `fn(args…)` — an apply form the compiler parses back as ByIndex on
     /// collection-typed receivers (OUTPUTS(0), tokens(0), …).
@@ -66,7 +69,7 @@ pub(crate) fn count_raw(e: &L) -> usize {
     let mut n = usize::from(matches!(e, L::Raw(_)));
     match e {
         L::Unary(_, a) => n += count_raw(a),
-        L::Infix(_, _, a, b) => n += count_raw(a) + count_raw(b),
+        L::Infix(_, a, b) => n += count_raw(a) + count_raw(b),
         L::Method(o, _, args) | L::ApplyFn(o, args) | L::GetRegDyn(o, _, args) => {
             n += count_raw(o) + args.iter().map(count_raw).sum::<usize>()
         }

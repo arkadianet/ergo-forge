@@ -9,6 +9,25 @@ use super::ast::{Stmt, L};
 
 // ── printer ──────────────────────────────────────────────────────────────────
 
+/// Precedence for an infix operator symbol. Higher binds tighter. Mirrors
+/// ErgoScript/Scala: unary > multiplicative > additive > comparison > logical.
+/// Inverse of `lift::infix_op`'s table; every symbol there is distinct.
+pub(crate) fn prec_of(sym: &str) -> u8 {
+    match sym {
+        "||" => 1,
+        "&&" => 2,
+        "<" | "<=" | ">" | ">=" | "==" | "!=" => 4,
+        "^" => 5,
+        "-" | "+" => 6,
+        "*" | "/" | "%" => 7,
+        // Constructed directly in `lift` (not via `infix_op`), with the same
+        // precedences they carried on the node before prec_of existed.
+        "xorBytes" => 6,
+        "++" => 7,
+        other => unreachable!("unknown infix operator {other:?}"),
+    }
+}
+
 /// Operator precedence context: `None` = top level (no parens needed).
 pub(crate) fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
     let parens = |out: &mut String, f: &dyn Fn(&mut String)| {
@@ -84,8 +103,8 @@ pub(crate) fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
                 emit_inner(out);
             }
         }
-        L::Infix(sym, prec, lhs, rhs) => {
-            let this = *prec;
+        L::Infix(sym, lhs, rhs) => {
+            let this = prec_of(sym);
             let needs = parent.is_some_and(|p| p > this);
             let emit = |o: &mut String| {
                 print_l(lhs, Some(this), o);
