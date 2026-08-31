@@ -270,6 +270,7 @@ dependencies = [
 name = "ergo-sandbox"
 version = "0.1.0"
 dependencies = [
+ "bs58",
  "ergo-compiler",
  "ergo-primitives",
  "ergo-ser",

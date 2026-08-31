@@ -150,6 +150,12 @@ pub fn sigma_boolean_pretty(sb: &SigmaBoolean) -> String {
     }
 }
 
+/// Parse ErgoTree wire bytes (public shim for the decompile module).
+pub(crate) fn parse_tree(bytes: &[u8]) -> Result<ErgoTree, crate::SandboxError> {
+    let mut r = VlqReader::new(bytes);
+    read_ergo_tree(&mut r).map_err(|e| crate::SandboxError::Tree(e.to_string()))
+}
+
 /// Render an ErgoTree's wire bytes as a human-readable report: header info,
 /// the constants table, the structural body, and a byte-identity note.
 pub fn tree_report(bytes: &[u8]) -> Result<String, SandboxError> {
@@ -187,6 +193,39 @@ pub fn tree_structure(tree: &ErgoTree) -> String {
     out
 }
 
+/// Encode a compressed SEC1 point as a P2PK (base58) address — the form
+/// ErgoScript's `PK("…")` predef accepts. `testnet` selects the header the
+/// compile corpus was captured with (header 0x11 = testnet 0x10 | P2PK 0x01);
+/// mainnet uses 0x01.
+#[must_use]
+pub fn group_element_base58_net(bytes: &[u8; 33], testnet: bool) -> String {
+    // Address = base58(header ‖ pubkey ‖ checksum[0..4])
+    let mut body = Vec::with_capacity(1 + 33 + 4);
+    body.push(if testnet { 0x11 } else { 0x01 });
+    body.extend_from_slice(bytes);
+    let hash = ergo_primitives::digest::blake2b256(&body);
+    body.extend_from_slice(&hash.as_bytes()[..4]);
+    bs58::encode(body).into_string()
+}
+
+/// Testnet shorthand (the corpus round-trip bar's network).
+#[must_use]
+pub fn group_element_base58(bytes: &[u8; 33]) -> String {
+    group_element_base58_net(bytes, true)
+}
+
+/// Fallback debug form for a constant the lifted printer can't render.
+#[must_use]
+pub fn value_debug(tpe: &SigmaType, val: &SigmaValue) -> String {
+    format!("<const {} = {}>", type_str(tpe), value_str(val))
+}
+
+/// Raw structural print of a single expression (public for decompile's
+/// fallback rendering).
+pub(crate) fn fmt_expr_raw(e: &Expr, out: &mut String) {
+    fmt_expr(e, out);
+}
+
 // ── structural printer ───────────────────────────────────────────────────────
 
 fn ge_short(bytes: &[u8; 33]) -> String {
@@ -198,21 +237,28 @@ fn join_sigma(op: &str, xs: &[SigmaBoolean]) -> String {
     format!("{op}({inner})", inner = inner.join(", "))
 }
 
-fn type_str(t: &SigmaType) -> String {
+pub(crate) fn type_str(t: &SigmaType) -> String {
     match t {
-        SigmaType::SBoolean => "Bool".into(),
+        SigmaType::SBoolean => "Boolean".into(),
         SigmaType::SByte => "Byte".into(),
         SigmaType::SShort => "Short".into(),
         SigmaType::SInt => "Int".into(),
         SigmaType::SLong => "Long".into(),
         SigmaType::SBigInt => "BigInt".into(),
-        SigmaType::SGroupElement => "GE".into(),
+        SigmaType::SGroupElement => "GroupElement".into(),
         SigmaType::SSigmaProp => "SigmaProp".into(),
         SigmaType::SBox => "Box".into(),
         SigmaType::SAvlTree => "AvlTree".into(),
         SigmaType::SContext => "Context".into(),
+        SigmaType::SHeader => "Header".into(),
+        SigmaType::SPreHeader => "PreHeader".into(),
+        SigmaType::SUnsignedBigInt => "UnsignedBigInt".into(),
         SigmaType::SOption(inner) => format!("Option[{}]", type_str(inner)),
         SigmaType::SColl(inner) => format!("Coll[{}]", type_str(inner)),
+        SigmaType::STuple(items) => format!(
+            "({})",
+            items.iter().map(type_str).collect::<Vec<_>>().join(", ")
+        ),
         other => format!("{other:?}"),
     }
 }

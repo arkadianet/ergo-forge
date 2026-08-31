@@ -1,0 +1,434 @@
+[
+  {
+    "network": "testnet",
+    "source": "sigmaProp(HEIGHT > 100)",
+    "tree": "100104c801d191a37300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "{ val x = HEIGHT; x > 5 }",
+    "tree": "1001040ad191a37300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "true && (1 == 1)",
+    "tree": "1000d1ed8503",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "HEIGHT>5 && HEIGHT<9",
+    "tree": "1002040a0412d1ed91a373008fa37301",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "HEIGHT > 5",
+    "tree": "1001040ad191a37300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "PK(\"3WwXpssaZwcNzaGMv3AgxBdTPJQBt5gCmqBsg3DykQ39bYdhJBsN\")",
+    "tree": "0008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "!true",
+    "tree": "10010100d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "1 == 2",
+    "tree": "100204020404d19373007301",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "1 < 2L",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "allOf(Coll(HEIGHT > 5, HEIGHT < 9))",
+    "tree": "1002040a0412d19683020191a373008fa37301",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "anyOf(Coll(HEIGHT > 5))",
+    "tree": "1001040ad191a37300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "xorOf(Coll(HEIGHT > 5, HEIGHT < 9))",
+    "tree": "1002040a0412d1ff83020191a373008fa37301",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "getVar[Coll[Byte]](1).isDefined",
+    "tree": "1000d1e6e3010e",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(true) && sigmaProp(false)",
+    "tree": "100201010100ea02d17300d17301",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(true) || sigmaProp(false)",
+    "tree": "100201010100eb02d17300d17301",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(true) && (1 == 1)",
+    "tree": "1000d1ed8503",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "(1 == 1) && sigmaProp(true)",
+    "tree": "1000d1ed8503",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(true) ^ (1 == 1)",
+    "tree": "10010100d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "(1 == 1) ^ sigmaProp(true)",
+    "tree": "10010100d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "true ^ false",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "INPUTS.size > 1",
+    "tree": "10010402d191b1a47300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "PK(\"3WzPmMVoyrrj1m9NkmpWchWoiZy1wN3wYsmn8gE1cZXcdwck7LBg\")",
+    "tree": "0008cd03f28773c2d975288bc7d1d205c3748651b075fbc6610e58cddeeddf8f19405aa8",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "{\n    // todo: rework note contracts to produce valid redemption, check that the new contract is compatible with redproducer\n\n    // Note contract\n\n    // It has two execution paths:\n\n    // spend: full spending or with change\n\n    // redeem:\n\n    // to create a note, ...\n\n    // box data:\n    // R4 - history of ownership (under AVL+ tree),\n    //      tree contains reserveId as a key, signature as value,\n    //      and message is note value and token id\n    // R5 - current holder of the note (public key given as a group element)\n    // R6 - current length of the chain (as long int)\n    // R7 - note value (as long int)\n\n    val g: GroupElement = groupGenerator\n\n    val history = SELF.R4[AvlTree].get\n\n    val action = getVar[Byte](0).get\n\n    val reserve = CONTEXT.dataInputs(0)\n    val reserveId = reserve.tokens(0)._1\n\n    if (action >= 0) {\n      // spending path\n\n      val holder = SELF.R5[GroupElement].get\n\n      val selfOutput = OUTPUTS(action)\n\n      // Message to be signed is position + note amount + note id\n      val position = SELF.R6[Long].get\n      val noteValueBytes = longToByteArray(SELF.R7[Long].get)\n      val positionBytes = longToByteArray(position)\n      val message = positionBytes ++ noteValueBytes ++ SELF.id\n\n      // Computing challenge\n      val e: Coll[Byte] = blake2b256(message) // weak Fiat-Shamir - todo: should be strong\n      val eInt = byteArrayToBigInt(e) // challenge as big integer\n\n      // a of signature in (a, z)\n      val a = getVar[GroupElement](1).get\n      val aBytes = a.getEncoded\n\n      // z of signature in (a, z)\n      val zBytes = getVar[Coll[Byte]](2).get\n      val z = byteArrayToBigInt(zBytes)\n\n      val properHolder = holder == reserve.R4[GroupElement].get\n\n      // Signature is valid if g^z = a * x^e\n      val properSignature = (g.exp(z) == a.multiply(holder.exp(eInt))) && properHolder\n\n      val keyBytes = longToByteArray(position) ++ reserveId\n\n      val valueBytes = aBytes ++ zBytes\n\n      val keyVal = (keyBytes, valueBytes)\n      val proof = getVar[Coll[Byte]](3).get\n\n      val nextTree: Option[AvlTree] = history.insert(Coll(keyVal), proof)\n      // This will fail if the operation failed or the proof is incorrect due to calling .get on the Option\n      val outputDigest: Coll[Byte] = nextTree.get.digest\n\n      def nextNoteCorrect(noteOut: Box): Boolean = {\n        val insertionPerformed = noteOut.R4[AvlTree].get.digest == outputDigest\n        val sameScript = noteOut.propositionBytes == SELF.propositionBytes\n        val nextHolderDefined = noteOut.R5[GroupElement].isDefined\n        val valuePreserved = noteOut.value >= SELF.value\n        val positionIncreased = noteOut.R6[Long].get == (position + 1)\n\n        positionIncreased && insertionPerformed && sameScript && nextHolderDefined && valuePreserved\n      }\n\n      val changeIdx = getVar[Byte](4) // optional index of change output\n\n      val selfValue = SELF.R6[Long].get\n      val selfOutValue = selfOutput.R6[Long].get\n\n      val outputsValid = if(changeIdx.isDefined) {\n        val changeOutput = OUTPUTS(changeIdx.get)\n\n        val changeOutValue = changeOutput.R6[Long].get\n\n        (selfOutValue + changeOutValue) <= selfValue && // burn allowed\n            selfOutValue > 0 &&\n            changeOutValue > 0 &&\n            nextNoteCorrect(selfOutput) &&\n            nextNoteCorrect(changeOutput)\n      } else {\n        (selfOutValue == selfValue) && nextNoteCorrect(selfOutput)\n      }\n\n      sigmaProp(properSignature && outputsValid)\n    } else {\n      // redemption path\n\n      // called by setting action variable to any negative value, -1 considered as standard by offchain apps\n\n      val redeemOutput = OUTPUTS(0)\n      val redemptionCorrect = redeemOutput.tokens(0)._1 == fromBase58(\"\") //todo: redemption token id\n      val historyCorrect = redeemOutput.R4[AvlTree].get == SELF.R4[AvlTree].get\n      val redemptionDeadlineValid = redeemOutput.R5[Int].get >= HEIGHT + 1440\n\n      sigmaProp(redemptionCorrect && historyCorrect && redemptionDeadlineValid)\n    }\n\n}",
+    "tree": "100a040004000502040005000500040004000e0004c016d803d6017ee4e3000204d602b2db6501fe730000d603e4c6a70464959272017301d809d604e4e3020ed605e4e30107d606e4c6a70507d607e4c6a70605d6087a7207d609e30402d60ab2a5720100d60be4c6720a0605d60cd9010c63edededed93e4c6720c06059a7207730293db6401e4c6720c0464db6401e4dc640c72030283013c0e0e8602b372088cb2db6308720273030001b3db070272057204e4e3030e93c2720cc2a7e6c6720c050792c1720cc1a7d1eded939fdb6a01dd7b7204a072059f72067bcbb3b372087ae4c6a70705c5a7937206e4c67202040795e67209d802d60db2a57ee472090400d60ee4c6720d0605edededed909a720b720e720791720b730491720e7305da720c01720ada720c01720ded93720b7207da720c01720ad801d604b2a5730600d1eded938cb2db6308720473070001730893e4c672040464720392e4c6720405049aa37309",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "{\n // contract which is producing redemption contract boxes\n // it holds redemption contract tokens and releasing it\n // one token can be released when the contract is invoked\n // if an output with the token bound to the redemption contract\n //\n // TOKENS\n // #0 - contract NFT\n // #1 - redemption request token\n\n val redeemScriptHash = fromBase58(\"\")\n\n val selfOutput = OUTPUTS(0)\n val redemptionRequestOutput = OUTPUTS(1)\n\n val redemptionRequestTokenId = SELF.tokens(1)._1\n val redemptionRequestTokensInSelf = SELF.tokens(1)._2\n\n val selfOutCorrect = selfOutput.value >= SELF.value && selfOutput.tokens(0) == SELF.tokens(0) &&\n                        selfOutput.tokens(1)._1 == redemptionRequestTokenId &&\n                        selfOutput.tokens(1)._2 == redemptionRequestTokensInSelf - 1\n\n val redemptionTokenCorrect = redemptionRequestOutput.tokens(0)._1 == redemptionRequestTokenId &&\n                                redemptionRequestOutput.tokens(0)._2 == 1\n\n val properCollateral = redemptionRequestOutput.value == 2000000000\n\n val properDeadline = redemptionRequestOutput.R8[Int].get >= HEIGHT + 720 // one day for contestation\n\n val properRedeemPosition = redemptionRequestOutput.R6[(Long, Coll[Byte])].get._1 <= redemptionRequestOutput.R5[Long].get\n\n val redeemR7 = redemptionRequestOutput.R7[(Long, Boolean)].get\n\n val redeemR7Correct = redeemR7._1 == -1 && redeemR7._2 == false\n\n val redemptionScriptCorrect = blake2b256(redemptionRequestOutput.propositionBytes) == redeemScriptHash\n\n val redemptionRequestCorrect = redemptionTokenCorrect && properCollateral && properDeadline &&\n                                properRedeemPosition && redeemR7Correct && redemptionScriptCorrect\n\n sigmaProp(selfOutCorrect && redemptionRequestCorrect)\n\n}",
+    "tree": "100e04000402040204000400040004020402050205020580d0acf30e04a00b05010e00d807d601b2a5730000d602db6308a7d603b27202730100d6048c720301d605b2a5730200d606b2db63087205730300d607e4c67205074101d1edededed92c17201c1a793b2db63087201730400b27202730500938cb2db63087201730600017204938cb2db6308720173070002998c7203027308edededededed938c7206017204938c720602730993c17205730a92e4c6720508049aa3730b908ce4c6720506410e01e4c672050505ed938c720701730cef8c72070293cbc27205730d",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "{\n\tdef getSellerPk(box: Box)              = box.R4[Coll[SigmaProp]].get(0)\n\tdef getPoolPk(box: Box)                = box.R4[Coll[SigmaProp]].get(1)\n\tdef unlockHeight(box: Box)             = box.R5[Int].get\n\t\n\tif(HEIGHT > unlockHeight(SELF)){\n\t\tgetSellerPk(SELF)\n\t}else{\n\t\tgetSellerPk(SELF) // && getPoolPk(SELF)\n\t}\n}",
+    "tree": "10010400d801d601d9010163b2e4c6720104147300009591a3dad9010263e4c67202050401a7da720101a7da720101a7",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "{\n  // Contract which is releasing GORT to developers (Gold cooperative), 1 ERG per block.\n  // It supports two actions: top-up and withdrawal\n\n  // Registers:\n  // R4 (int) - last payment height\n  // R5 (SigmaProp) - auth\n\n  // tokens:\n  // #0 - box id NFT\n  // #1 - GORT\n\n  // context vars:\n  // #0 - output index of SELF\n  // #1 - action (top-up / withdrawal)\n\n  val lastHeight = SELF.R4[Int].get // last payout height\n\n  val selfOutIndex = getVar[Short](0).get\n\n  val selfOut = OUTPUTS(selfOutIndex)\n\n  // strip header byte from trees\n  val selfOutTree = selfOut.propositionBytes.slice(1, selfOut.propositionBytes.size)\n  val selfInTree = SELF.propositionBytes.slice(1, SELF.propositionBytes.size)\n\n  val commonPreservationRules =\n    selfOut.tokens(0) == SELF.tokens(0) && // NFT preserved\n    selfOut.tokens(1)._1 == SELF.tokens(1)._1 && // GORT token id preserved\n    selfOutTree == selfInTree && // script preserved\n    selfOut.value >= SELF.value // ERG value preserved or increased\n\n  val action = getVar[Byte](1).get\n\n  if (action == 0) {  // top-up:\n    sigmaProp(\n        commonPreservationRules &&\n        selfOut.tokens(1)._2 > SELF.tokens(1)._2 && // GORTs must be added\n        selfOut.R4[Int].get == lastHeight && // payout height preserved\n        selfOut.R5[SigmaProp].get == SELF.R5[SigmaProp].get // auth preserved\n    )\n  } else {  // withdrawal\n    val newHeight = selfOut.R4[Int].get\n    sigmaProp(\n        commonPreservationRules &&\n        SELF.tokens(1)._2 > selfOut.tokens(1)._2 && // GORTs withdrawn\n        SELF.tokens(1)._2 - selfOut.tokens(1)._2 <= newHeight - lastHeight && // <= 1 GORT per block can be released\n        newHeight > lastHeight && // payout height increased\n        newHeight <= HEIGHT   // can't take rewards from future\n        // R5 is not checked here so could be changed\n    ) && SELF.R5[SigmaProp].get // signature from proposition stored in R5 is needed to withdraw (and possibly update payout data)\n  }\n}",
+    "tree": "100d0400040004020402040204020400040204020402040204020402d807d601b2a57ee4e300030400d602db63087201d603db6308a7d604c27201d605c2a7d606ededed93b27202730000b27203730100938cb27202730200018cb272037303000193b472047304b17204b472057305b1720592c17201c1a7d607e4c6a7040495937ee4e30102047306d1ededed7206918cb27202730700028cb272037308000293e4c672010404720793e4c672010508e4c6a70508d801d608e4c672010404ea02d1edededed7206918cb27203730900028cb27202730a000290998cb27203730b00028cb27202730c00027e9972087207059172087207907208a3e4c6a70508",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "// Sample ErgoScript contract\n// Simple height-lock contract that checks if current height is above 100\n{\n  HEIGHT > 100\n}\n",
+    "tree": "100104c801d191a37300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "// Simple contract that checks height\n{\n  HEIGHT > 100\n}\n",
+    "tree": "100104c801d191a37300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "{\n  val deadline = SELF.R4[Int].get\n  sigmaProp(HEIGHT > deadline)\n}\n",
+    "tree": "1000d191a3e4c6a70404",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(true)\n",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp((2147483647 + 0) < 0)",
+    "tree": "10010100d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp((2147483646 + 1) < 0)",
+    "tree": "10010100d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp((-9223372036854775807L - 1L) < 0L)",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp((HEIGHT + 2147483647) > 0)",
+    "tree": "100204feffffffffffffffff010400d1919aa373007301",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(SELF.getReg[Int](5).isDefined)",
+    "tree": "1000d1e6c6a70504",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(SELF.getReg[Int](9).isDefined)",
+    "tree": "1000d1e6c6a70904",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(SELF.getReg[Int](0).isDefined)",
+    "tree": "1000d1e6c6a70004",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(SELF.getReg[Long](4).getOrElse(7L) == 7L)",
+    "tree": "1002050e050ed193e5c6a7040573007301",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(SELF.getReg[Int](HEIGHT).isDefined)",
+    "tree": "1000d1e6dc6313a701a304",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(7.toByte.toBytes.size == 1)",
+    "tree": "10020e01070402d193b173007301",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(5.toShort.toBytes.size == 2)",
+    "tree": "10020e0200050404d193b173007301",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(HEIGHT.toBytes.size == 4)",
+    "tree": "10010408d193b1db0406a37300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(Coll[UnsignedBigInt]().size == 0)",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(Coll(HEIGHT).size == 1)",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(Coll(1, 2).size == 2)",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp((min(1, 2) + 1) == 2)",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp((max(1, 2) + 1) == 3)",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp((5.toByte.bitwiseOr(3.toByte)) == 7.toByte)",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp((5.toByte.bitwiseXor(3.toByte)) == 6.toByte)",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(1.toByte.toLong.toBigInt > 0.toBigInt)",
+    "tree": "10020201060100d1917e7e730005067301",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp((4 / 2) == 2)",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp((5 / 2) == 2)",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp((5 % 3) == 2)",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp((1 / 0) == 0)",
+    "tree": "1003040204000400d1939d730073017302",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp((1 % 0) == 0)",
+    "tree": "1003040204000400d1939e730073017302",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "anyOf(Coll(true, false))",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "allOf(Coll(true, false))",
+    "tree": "10010100d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(!(HEIGHT < 5))",
+    "tree": "1001040ad192a37300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(Coll(1, 2).fold(0, {(a: Int, b: Int) => a + b}) == 3)",
+    "tree": "10040402040404000406d193b0830204730073017302d90101589a8c7201018c7201027303",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "{ val unused = Coll({(f: Int => Int) => 1}); sigmaProp(true) }",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "{ val a = HEIGHT; val b = a; val c = b; sigmaProp(c > 5) }",
+    "tree": "1001040ad191a37300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "{ val x = 2; sigmaProp(x + 1 == 3) }",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "{ val unused = Coll[BigInt](); sigmaProp(true) }",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "{ val t = HEIGHT + 1; sigmaProp(OUTPUTS.exists({(b: Box) => b.creationInfo._1 < t})) }",
+    "tree": "10010402d1aea5d90101638f8cc77201019aa37300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(allOf(Coll[Boolean]()))",
+    "tree": "10010101d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(anyOf(Coll[Boolean]()))",
+    "tree": "10010100d17300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(SELF.R4[Coll[Boolean]].getOrElse(Coll(true, false)).size == 2)",
+    "tree": "10010404d193b1e5c6a7040d8502017300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(SELF.R4[Coll[Boolean]].getOrElse(Coll(true, false, true, false, true)).size > 0)",
+    "tree": "10010400d191b1e5c6a7040d8505157300",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(SELF.R4[Coll[Int]].getOrElse(Coll(1, 2)).size == 2)",
+    "tree": "1003040204040404d193b1e5c6a70410830204730073017302",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "{ val t = HEIGHT + 1; sigmaProp(OUTPUTS.exists({(b: Box) => b.value > t}) && INPUTS.exists({(c: Box) => c.value > 0})) }",
+    "tree": "100204020500d1edaea5d901016391c172017e9aa3730005aea4d901016391c172017301",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(Coll(1L, 2L).fold(0L, {(a: Long, c: Long) => a + c}) > 0 && OUTPUTS.exists({(b: Box) => b.value > 0}))",
+    "tree": "100505020504050005000500d1ed91b0830205730073017302d90101599a8c7201018c7201027303aea5d901016391c172017304",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
+    "source": "sigmaProp(OUTPUTS.exists({(a: Box) => a.value > 0}) || INPUTS.exists({(b: Box) => b.value > 1}) || OUTPUTS.exists({(c: Box) => c.value > 2}))",
+    "tree": "1003050005020504d1ececaea5d901016391c172017300aea4d901016391c172017301aea5d901016391c172017302",
+    "treeVersion": 3
+  }
+]
