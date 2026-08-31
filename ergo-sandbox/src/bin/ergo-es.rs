@@ -55,10 +55,11 @@ USAGE:
   ergo-es decompile <hex | file | --seed | --mainnet [N]>
       Print the structural view of ErgoTree bytes (--seed / --mainnet run
       the bundled corpora instead).
-  ergo-es roundtrip <hex | file | --seed | --mainnet [N]>
-      Decompile → recompile → byte-compare. Reports exact / different /
-      recompile-failure per tree. Corpora paths resolve against the ergo
-      node checkout (sibling of this repo).
+  ergo-es roundtrip <hex | file | [--network mainnet|testnet] | --seed |
+                     --mainnet [N]> [-v]
+      Decompile → recompile → byte-compare. Single trees accept --network
+      (default mainnet); -v prints every failure reason. Corpora paths
+      resolve against the ergo node checkout (sibling of this repo).
 "
     );
 }
@@ -278,6 +279,7 @@ fn cmd_roundtrip(args: &[String]) -> Result<(), String> {
                     .map(|t| (t, None))
                     .collect()
             };
+            let mut processed = 0usize;
             for (h, source) in &vectors {
                 // Skip env-dependent sources (oracle demo env unavailable).
                 if let Some(orig) = source {
@@ -287,9 +289,11 @@ fn cmd_roundtrip(args: &[String]) -> Result<(), String> {
                 }
                 let bytes = hex::decode(h).map_err(|e| e.to_string())?;
                 classify_tree(&bytes, tree_version, network, &mut tally);
+                processed += 1;
             }
             println!(
-                "trees: {} exact={} diff={} raw={} err={}",
+                "trees: {} (of {}) exact={} diff={} raw={} err={}",
+                processed,
                 vectors.len(),
                 tally.exact,
                 tally.diff,
@@ -388,22 +392,35 @@ fn classify_tree(bytes: &[u8], tree_version: u8, network: NetworkPrefix, tally: 
                 decompiled.raw_placeholders,
                 ergo_sandbox::decompile::MAX_LIFT_DEPTH
             ));
+        } else {
+            tally.reasons.push(format!(
+                "{} construct(s) have no source-like lift yet",
+                decompiled.raw_placeholders
+            ));
         }
         return;
     }
-    match ergo_sandbox::compile_source(&decompiled.source, tree_version, network) {
-        Ok(out) if out.tree_bytes == bytes => tally.exact += 1,
-        Ok(out) => {
+    // The compiler's parse recursion is unbounded upstream — recompile on the
+    // large stack for the same reason the decompile runs there.
+    let src = decompiled.source;
+    let compile_out = ergo_sandbox::decompile::with_large_stack(move || {
+        ergo_sandbox::compile_source(&src, tree_version, network)
+            .map(|o| o.tree_bytes)
+            .map_err(|e| e.to_string())
+    });
+    match compile_out {
+        Ok(tree_bytes) if tree_bytes == bytes => tally.exact += 1,
+        Ok(tree_bytes) => {
             tally.diff += 1;
             tally.reasons.push(format!(
                 "recompiled to different bytes (want {}, got {})",
                 hex::encode(bytes),
-                hex::encode(&out.tree_bytes)
+                hex::encode(&tree_bytes)
             ));
         }
         Err(e) => {
             tally.err += 1;
-            tally.reasons.push(e.to_string());
+            tally.reasons.push(e);
         }
     }
 }
@@ -430,7 +447,7 @@ fn seed_vectors() -> Result<Vec<(String, String)>, String> {
         .as_array()
         .ok_or("vectors array")?
         .iter()
-        .filter(|v| v["oracle"].as_str() == Some("ACCEPT"))
+        .filter(|v| v["oracle"].as_str() == Some("ACCEPT") && v["tree_version"].as_u64() == Some(3))
         .filter_map(|v| {
             Some((
                 v["tree_hex"].as_str()?.to_string(),

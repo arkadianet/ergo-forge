@@ -40,17 +40,26 @@ fn fixture() -> Vec<Vector> {
 /// Decompile with a stack large enough for deep trees — the test harness
 /// gives each test a 2 MiB thread stack, and deeply nested contracts need
 /// about 3 MiB (see `decompile::LARGE_STACK_BYTES`).
-fn decompile_net(bytes: &[u8], testnet: bool) -> String {
+fn decompile_report_net(bytes: &[u8], testnet: bool) -> decompile::Decompiled {
     let owned = bytes.to_vec();
     decompile::with_large_stack(move || {
-        decompile::decompile_bytes_net(&owned, testnet).expect("decompile")
+        decompile::decompile_report(&owned, testnet).expect("decompile")
     })
 }
 
+fn decompile_net(bytes: &[u8], testnet: bool) -> String {
+    decompile_report_net(bytes, testnet).source
+}
+
 fn recompile(src: &str, tv: u8, net: NetworkPrefix) -> Result<Vec<u8>, String> {
-    compile_source(src, tv, net)
-        .map(|o| o.tree_bytes)
-        .map_err(|e| e.to_string())
+    // The compiler's parse recursion is unbounded upstream, so deeply nested
+    // source needs the same stack headroom the decompiler needs.
+    let owned = src.to_string();
+    decompile::with_large_stack(move || {
+        compile_source(&owned, tv, net)
+            .map(|o| o.tree_bytes)
+            .map_err(|e| e.to_string())
+    })
 }
 
 fn fixture_by_source(needle: &str) -> Vector {
@@ -71,17 +80,18 @@ fn fixture_trees_decompile_and_recompile_byte_identically() {
     assert!(!vectors.is_empty(), "fixture must not be empty");
     let mut failures: Vec<String> = Vec::new();
     for v in &vectors {
-        let src = decompile_net(&v.tree, true);
         // A raw placeholder means "not liftable yet" — a fixture vector must
         // be fully liftable, otherwise the fixture has silently regressed.
-        if src.contains("<unparsed")
-            || src.contains("<op ")
-            || src.contains("<method ")
-            || src.contains("<const ")
-        {
-            failures.push(format!("{}: raw placeholder in `{}`", v.tree_hex, src));
+        // Counted structurally (decompile_report), never by re-scanning text.
+        let report = decompile_report_net(&v.tree, true);
+        if report.raw_placeholders > 0 || report.truncated {
+            failures.push(format!(
+                "{}: {} raw placeholder(s) in `{}`",
+                v.tree_hex, report.raw_placeholders, report.source
+            ));
             continue;
         }
+        let src = report.source;
         match recompile(&src, v.tree_version, NetworkPrefix::Testnet) {
             Ok(bytes) if bytes == v.tree => {}
             Ok(bytes) => failures.push(format!(

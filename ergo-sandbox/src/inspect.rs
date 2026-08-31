@@ -217,7 +217,7 @@ pub fn group_element_base58(bytes: &[u8; 33]) -> String {
 /// Fallback debug form for a constant the lifted printer can't render.
 #[must_use]
 pub fn value_debug(tpe: &SigmaType, val: &SigmaValue) -> String {
-    format!("<const {:?} = {}>", type_str(tpe), value_str(val))
+    format!("<const {} = {}>", type_str(tpe), value_str(val))
 }
 
 /// Raw structural print of a single expression (public for decompile's

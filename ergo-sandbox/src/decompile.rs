@@ -38,6 +38,13 @@ use crate::method_names::METHOD_NAMES;
 /// the round-trip test over the compile corpus). When a construct has no
 /// source-like lift yet, it renders as an honest `<…>` raw placeholder —
 /// never silently wrong.
+///
+/// **Network default: mainnet** — `PK("…")` address constants are encoded
+/// for mainnet, so the source must be recompiled with
+/// [`ergo_ser::address::NetworkPrefix::Mainnet`]. `render` (testnet) is the
+/// corpus-bar counterpart; use [`decompile_bytes_net`]/[`decompile_report`]
+/// to choose explicitly. A mismatched network fails recompilation with a
+/// PK network-mismatch error rather than producing wrong bytes.
 pub fn decompile_bytes(bytes: &[u8]) -> Result<String, crate::SandboxError> {
     decompile_bytes_net(bytes, false)
 }
@@ -132,7 +139,7 @@ pub fn render_report_net(tree: &ergo_ser::ergo_tree::ErgoTree, testnet: bool) ->
     print_l(&lifted, None, &mut out);
     Decompiled {
         source: out,
-        raw_placeholders: cx.raw + count_raw(&lifted),
+        raw_placeholders: count_raw(&lifted),
         truncated: cx.truncated,
     }
 }
@@ -158,7 +165,7 @@ fn count_raw(e: &L) -> usize {
         L::Method(o, _, args) | L::ApplyFn(o, args) | L::GetRegDyn(o, _, args) => {
             n += count_raw(o) + args.iter().map(count_raw).sum::<usize>()
         }
-        L::Prop(o, _) | L::GetReg(o, _, _) => n += count_raw(o),
+        L::Prop(o, _) => n += count_raw(o),
         L::Coll(_, items) | L::Tuple(items) => n += items.iter().map(count_raw).sum::<usize>(),
         L::Global(_, args) => n += args.iter().map(count_raw).sum::<usize>(),
         L::Lambda(_, b) => n += count_raw(b),
@@ -253,8 +260,6 @@ enum L {
     ApplyFn(Box<L>, Vec<L>),
     /// `obj.name` (property call, no args).
     Prop(Box<L>, String),
-    /// `obj.getReg[T](n)` — bracket-typed method form.
-    GetReg(Box<L>, String, i64),
     /// `obj.getReg[T](expr)` — dynamic register index.
     GetRegDyn(Box<L>, String, Vec<L>),
     /// `Coll(a, b, …)` literal, with the element type name for the empty
@@ -317,11 +322,27 @@ fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
         L::Unary(op, inner) => {
             let this = 8u8;
             let needs = parent.is_some_and(|p| p > this);
+            // Binder quirk (upstream): `!v.R5[T].isDefined` types the `!`
+            // operand as the UNAPPLIED generic accessor (SFunc → Option[T]).
+            // Parenthesizing the operand keeps it intact, so a logical-not
+            // always renders as `(!(operand))`.
+            let emit_inner = |o: &mut String| {
+                if *op == "!" {
+                    o.push('(');
+                    print_l(inner, Some(this), o);
+                    o.push(')');
+                } else {
+                    print_l(inner, Some(this), o);
+                }
+            };
             if needs {
-                parens(out, &mut |o| print_l(inner, Some(this), o));
+                parens(out, &|o| {
+                    o.push_str(op);
+                    emit_inner(o);
+                });
             } else {
                 out.push_str(op);
-                print_l(inner, Some(this), out);
+                emit_inner(out);
             }
         }
         L::Infix(sym, prec, lhs, rhs) => {
@@ -332,7 +353,11 @@ fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
                 o.push(' ');
                 o.push_str(sym);
                 o.push(' ');
-                print_l(rhs, Some(this), o);
+                // Right operand of a left-associative operator needs parens
+                // at EQUAL precedence, or the parser re-associates left:
+                // Minus(a, Minus(b, c)) must print `a - (b - c)`, not
+                // `a - b - c`.
+                print_l(rhs, Some(this + 1), o);
             };
             if needs {
                 parens(out, &emit);
@@ -371,10 +396,6 @@ fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
             print_l(obj, Some(9), out);
             out.push('.');
             out.push_str(name);
-        }
-        L::GetReg(obj, tpe, reg) => {
-            print_l(obj, Some(9), out);
-            let _ = write!(out, ".getReg[{tpe}]({reg})");
         }
         L::GetRegDyn(obj, tpe, args) => {
             print_l(obj, Some(9), out);
@@ -526,10 +547,6 @@ struct LiftCtx {
     counters: BTreeMap<&'static str, usize>,
     /// Current lift recursion depth, bounded by [`MAX_LIFT_DEPTH`].
     depth: usize,
-    /// Number of raw `<…>` placeholders emitted — i.e. constructs that have
-    /// no source-like lift yet. Counted during lift, not by re-scanning the
-    /// rendered text.
-    raw: usize,
     /// Set when the recursion ceiling was hit (see [`MAX_LIFT_DEPTH`]).
     truncated: bool,
 }
@@ -542,7 +559,6 @@ impl LiftCtx {
             global: BTreeMap::new(),
             counters: BTreeMap::new(),
             depth: 0,
-            raw: 0,
             truncated: false,
         }
     }
@@ -592,17 +608,13 @@ fn lift(e: &Expr, cx: &mut LiftCtx, constants: &[(SigmaType, SigmaValue)]) -> L 
     // Bounded recursion: past the ceiling we degrade to a raw placeholder
     // rather than growing the stack. See [`MAX_LIFT_DEPTH`].
     if cx.depth >= MAX_LIFT_DEPTH {
-        cx.raw += 1;
         cx.truncated = true;
         return L::Raw(format!("<nesting deeper than {MAX_LIFT_DEPTH} levels>"));
     }
     cx.depth += 1;
     let out = match e {
         Expr::Const { tpe, val } => lift_const(tpe, val, cx),
-        Expr::Unparsed(bytes) => {
-            cx.raw += 1;
-            L::Raw(format!("<unparsed {} bytes>", bytes.len()))
-        }
+        Expr::Unparsed(bytes) => L::Raw(format!("<unparsed {} bytes>", bytes.len())),
         Expr::Op(node) => lift_op(node, cx, constants),
     };
     cx.depth -= 1;
@@ -616,7 +628,10 @@ fn lift_const(tpe: &SigmaType, val: &SigmaValue, cx: &LiftCtx) -> L {
         (SigmaType::SShort, SigmaValue::Short(x)) => L::Num(format!("{x}.toShort")),
         (SigmaType::SInt, SigmaValue::Int(x)) => L::Int(*x as i64),
         (SigmaType::SLong, SigmaValue::Long(x)) => L::Num(format!("{x}L")),
-        (SigmaType::SBigInt, SigmaValue::BigInt(n)) => L::Const(format!("{n}L")),
+        // `bigInt("<decimal>")` is the compiler's BigInt predef — a bare
+        // `{n}L` would be a Long literal (wrong type), and `.toBigInt` cannot
+        // express values outside the Long range.
+        (SigmaType::SBigInt, SigmaValue::BigInt(n)) => L::Const(format!("bigInt(\"{n}\")")),
         (SigmaType::SGroupElement, SigmaValue::GroupElement(ge)) => L::Const(format!(
             "PK(\"{}\")",
             crate::inspect::group_element_base58_net(ge.as_bytes(), cx.testnet)
@@ -629,16 +644,14 @@ fn lift_const(tpe: &SigmaType, val: &SigmaValue, cx: &LiftCtx) -> L {
             SigmaBoolean::TrivialProp(b) => L::Const(format!("sigmaProp({b})")),
             other => L::Raw(format!("{other:?}")),
         },
+        // `fromBase16("<hex>")` is the compiler's byte-coll predef: any
+        // length, and byte signedness is handled by the compiler (its Bytes
+        // are signed i8, so plain integer elements above 0x7F would be an
+        // out-of-range Byte).
         (SigmaType::SColl(inner), SigmaValue::Coll(CollValue::Bytes(bs)))
-            if **inner == SigmaType::SByte && bs.len() <= 8 =>
+            if **inner == SigmaType::SByte =>
         {
-            L::Const(format!(
-                "Coll[Byte]({})",
-                bs.iter()
-                    .map(|b| format!("{b}"))
-                    .collect::<Vec<_>>()
-                    .join(", ")
-            ))
+            L::Const(format!("fromBase16(\"{}\")", hex::encode(bs)))
         }
         (_, SigmaValue::Coll(CollValue::BoolBits(bits))) => {
             L::Coll("Boolean".into(), bits.iter().map(|b| L::Bool(*b)).collect())
@@ -730,7 +743,6 @@ fn lift_method_like(
         None => {
             // Unknown method: honest raw fallback.
             {
-                cx.raw += 1;
                 L::Raw(format!(
                     "<method 0x{type_id:02X}.0x{method_id:02X} on {}>",
                     debug_expr(obj)
@@ -789,7 +801,6 @@ fn lift_op_inner(
             0xFE => "CONTEXT",
             0x82 => "groupGenerator",
             _ => {
-                cx.raw += 1;
                 return L::Raw(format!("<op 0x{op:02X}>"));
             }
         }),
@@ -811,30 +822,25 @@ fn lift_op_inner(
                 0xF0 => L::Unary("-", Box::new(inner_l)),
                 0xE4 => L::Method(Box::new(inner_l), "get".into(), vec![]),
                 0xE6 => {
-                    // OptionIsDefined over a register read must source as
-                    // `getReg[T](n).isDefined` — the `R5[T]` accessor form
-                    // unwraps the Option in the source type system.
-                    let reg_form = match inner_l {
-                        L::Prop(ref obj, ref name)
-                            if name.starts_with('R') && name.contains('[') =>
-                        {
-                            let n = &name[1..name.find('[').unwrap_or(1)];
-                            let t = &name[name.find('[').unwrap_or(0) + 1..name.len() - 1];
-                            Some((obj.clone(), n.to_string(), t.to_string()))
-                        }
-                        // R0 → `value` (register 0, type unknown at this
-                        // point — source `value` is R0 unwrapped; getReg
-                        // keeps the Option. The wire D1(E6(C6(A7,0,Int)))
-                        // sources ONLY as getReg-form.
-                        L::Prop(ref obj, ref name) if name == "value" => {
-                            Some((obj.clone(), "0".to_string(), "Int".to_string()))
-                        }
+                    // OptionIsDefined over a register read: render the typed
+                    // accessor `R{n}[T].isDefined` — version-neutral (the
+                    // `getReg[T]` source form is v6-only, so pre-v3 trees
+                    // could never recompile it). The element type comes from
+                    // the wire's ExtractRegisterAs payload, which also covers
+                    // R0 (whose non-isDefined rendering is the unwrapped
+                    // `value` property).
+                    let reg_accessor: Option<L> = match &**inner {
+                        Expr::Op(n) => match &n.payload {
+                            Payload::ExtractRegisterAs { input, reg_id, tpe } => Some(L::Prop(
+                                Box::new(lift(input, cx, constants)),
+                                format!("R{}[{}]", reg_id, crate::inspect::type_str(tpe)),
+                            )),
+                            _ => None,
+                        },
                         _ => None,
                     };
-                    match reg_form {
-                        Some((obj, n, t)) => {
-                            L::GetReg(obj, t.to_string(), n.parse().unwrap_or(0)).into_is_defined()
-                        }
+                    match reg_accessor {
+                        Some(accessor) => L::Method(Box::new(accessor), "isDefined".into(), vec![]),
                         None => L::Method(Box::new(inner_l), "isDefined".into(), vec![]),
                     }
                 }
@@ -879,10 +885,7 @@ fn lift_op_inner(
                     L::Coll(t, items) => L::Global("anyOf".into(), vec![L::Coll(t, items)]),
                     other => L::Global("anyOf".into(), vec![other]),
                 },
-                _ => {
-                    cx.raw += 1;
-                    L::Raw(debug())
-                }
+                _ => L::Raw(debug()),
             }
         }
         Payload::Two(a, b) => {
@@ -912,10 +915,7 @@ fn lift_op_inner(
                 0xB3 => L::Infix("++", 7, Box::new(al), Box::new(bl)),
                 0xB5 => L::Method(Box::new(al), "filter".into(), vec![bl]),
                 0xE5 => L::Method(Box::new(al), "getOrElse".into(), vec![bl]),
-                _ => {
-                    cx.raw += 1;
-                    L::Raw(debug())
-                }
+                _ => L::Raw(debug()),
             }
         }
         Payload::Three(a, b, c) => match op {
@@ -938,10 +938,7 @@ fn lift_op_inner(
                 let lam = lift(c, cx, constants);
                 L::Method(Box::new(coll), "fold".into(), vec![zero, lam])
             }
-            _ => {
-                cx.raw += 1;
-                L::Raw(debug())
-            }
+            _ => L::Raw(debug()),
         },
         Payload::Four(..) => L::Raw(debug()),
         Payload::ValUse { id } => L::Val(cx.lookup(*id).unwrap_or_else(|| format!("%{id}"))),
@@ -1020,19 +1017,24 @@ fn lift_op_inner(
             // re-wraps a 2-arg source lambda on emit. Unwrap: render the
             // 2-arg source form so recompilation reproduces the wire.
             if args.len() == 1 {
+                // Only a 2-field tuple is the fold wrap shape; other arities
+                // fall through to the generic lambda rendering (never index
+                // past the field list).
                 if let Some(SigmaType::STuple(field_types)) = &args[0].1 {
-                    let (id, _) = &args[0];
-                    let n1 = cx.fresh("t");
-                    let n2 = cx.fresh("t");
-                    let names = vec![
-                        format!("{}: {}", n1, crate::inspect::type_str(&field_types[0])),
-                        format!("{}: {}", n2, crate::inspect::type_str(&field_types[1])),
-                    ];
-                    let bound = cx.bind(*id, "t");
-                    let mut body_l = lift(body, cx, constants);
-                    body_l = rewrite_fold_fields(body_l, &bound, &n1, &n2);
-                    cx.pop_scope();
-                    return L::Lambda(names, Box::new(body_l));
+                    if field_types.len() == 2 {
+                        let (id, _) = &args[0];
+                        let n1 = cx.fresh("t");
+                        let n2 = cx.fresh("t");
+                        let names = vec![
+                            format!("{}: {}", n1, crate::inspect::type_str(&field_types[0])),
+                            format!("{}: {}", n2, crate::inspect::type_str(&field_types[1])),
+                        ];
+                        let bound = cx.bind(*id, "t");
+                        let mut body_l = lift(body, cx, constants);
+                        body_l = rewrite_fold_fields(body_l, &bound, &n1, &n2);
+                        cx.pop_scope();
+                        return L::Lambda(names, Box::new(body_l));
+                    }
                 }
             }
             let mut names = Vec::with_capacity(args.len());
@@ -1186,15 +1188,6 @@ fn lift_op_inner(
 }
 
 /// A Relation2 payload may be the packed-bool form; treat `None` arms.
-trait IntoIsDefined {
-    fn into_is_defined(self) -> L;
-}
-impl IntoIsDefined for L {
-    fn into_is_defined(self) -> L {
-        L::Method(Box::new(self), "isDefined".into(), vec![])
-    }
-}
-
 /// Rewrite `Prop(Val(bound), "_1"/"_2")` to the fresh fold-field names
 /// (fold tuple-unwrap: the wire's 1-arg tuple lambda back to source 2-arg).
 fn rewrite_fold_fields(e: L, bound: &str, n1: &str, n2: &str) -> L {
@@ -1275,7 +1268,6 @@ fn rewrite_fold_fields(e: L, bound: &str, n1: &str, n2: &str) -> L {
             Box::new(rewrite_fold_fields(*k, bound, n1, n2)),
             Box::new(rewrite_fold_fields(*c, bound, n1, n2)),
         ),
-        L::GetReg(o, t, n) => L::GetReg(Box::new(rewrite_fold_fields(*o, bound, n1, n2)), t, n),
         L::GetRegDyn(o, t, args) => L::GetRegDyn(
             Box::new(rewrite_fold_fields(*o, bound, n1, n2)),
             t,
@@ -1295,6 +1287,8 @@ fn wrap_sigma(e: L) -> L {
         // AtLeast, sigma and/or.
         L::Global(ref name, _) if name == "sigmaProp" || name == "proveDlog" => e,
         L::AtLeast(..) => e,
+        // PK("…") and sigmaProp(…) constants are already SigmaProp-typed.
+        L::Const(ref s) if s.starts_with("PK(") || s.starts_with("sigmaProp(") => e,
         // Everything else (bool comparisons, and-chains of bools) wraps.
         _ => L::Global("sigmaProp".into(), vec![e]),
     }
