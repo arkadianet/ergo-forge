@@ -320,6 +320,10 @@ fn seed_corpus_holds_the_exact_floor_when_checkout_present() {
         total, 87,
         "compile corpus size changed — re-check the floor"
     );
+    assert!(
+        exact >= 73,
+        "seed corpus dropped to {exact}/87 byte-exact (floor is 73)"
+    );
 }
 
 #[test]
