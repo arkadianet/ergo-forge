@@ -101,45 +101,6 @@ Missing (the workbench's actual build list):
    tables), infix sugar, fold tuple-lambda unwrap, network-aware PK
    constants. Bar measured with `ergo-es roundtrip`:
    - **seed (110 vectors, v3/testnet; 87 compile with an empty env):
-     68 byte-exact · 14 diff · 1 raw · 4 err**
-   - **mainnet (279 unique trees): 259 byte-exact · 1 diff · 17 raw · 2 err**
-   - Every miss is an ergo-compiler behavior, not a decompiler defect (the
-     rendering is faithful to the wire): 14 `diff` = upstream constant folding
-     collapses the re-emitted tree; 3 = **upstream bug** `assignType(Fold)` for
-     fold inside an operator operand; 1 = **upstream bug** constant-fold
-     overflow (`Minus(Negation(2147483647), 2)` rendered as `-2147483647 - 2`,
-     which the compiler's own fold rejects); 1 = `atLeast` over a wire
-     `Coll[GroupElement]` whose element type isn't recoverable. See
-     `ergo-sandbox/README.md` for the table and repros.
-   - `cargo test` pins the bar off a committed fixture
-     (`tests/fixtures/compile_corpus_subset.json`, 68 vectors);
-     whole-corpus floors run when the node checkout is a sibling.
-   - **Stack budget:** the lift recurses and debug frames are wide — 46 levels
-     need ≈3 MiB. `decompile::with_large_stack` gives headroom; the lift is
-     bounded by `MAX_LIFT_DEPTH` so it degrades instead of overflowing. The
-     WASM/HTTP shell must use the wrapper (or an iterative rewrite).
-4. **P3 — audit layer** (lints + scenario fuzz + cost views); REST surfaces fold
-   into tooling-api T1–T5 where they overlap.
-5. **P4 — WASM + browser workbench**; templates gallery (UI-doc Tier 1) reused.
-
-## Crates
-
-- `ergo-sandbox` (workspace member): eval/compile/decompile session APIs.
-  Deps: ergo-ser, ergo-sigma, ergo-compiler, ergo-primitives. No tokio/redb.
-  The decompiler lives at `ergo-sandbox/src/decompile.rs` (the separate
-  `ergo-decompile` crate originally planned was folded in — it shares too much
-  of the lift context to pay a crate boundary).
-- CLI shell: `ergo-sandbox/src/bin/ergo-es.rs` (`compile` / `eval` /
-  `decompile` / `roundtrip`).
-- Web: separate repo later; consumes WASM builds of ergo-sandbox.
-
-## Open decisions
-
-- ~~Byte-exact vs canonical re-serialization tolerance~~ — **resolved by P0**:
-  394/394 real trees re-serialize byte-exact; the bar is byte-exact.
-- Whether the audit lints live in `ergo-decompile` (operate on lifted AST) or a
-  third crate — decided when the lifted AST shape exists.   Bar measured with `ergo-es roundtrip`:
-   - **seed (110 vectors, v3/testnet; 87 compile with an empty env):
      73 byte-exact · 11 diff · 0 raw · 3 err**
    - **mainnet (279 unique trees): 270 byte-exact · 6 diff · 2 raw · 1 err**
    - Two failure classes: `raw` = decompiler placeholders (honest `<…>` for
@@ -178,42 +139,6 @@ Missing (the workbench's actual build list):
 
 - ~~Byte-exact vs canonical re-serialization tolerance~~ — **resolved by P0**:
   394/394 real trees re-serialize byte-exact; the bar is byte-exact.
-- Whether the audit lints live in `ergo-decompile` (operate on lifted AST) or a
-  third crate — decided when the lifted AST shape exists.   Bar measured with `ergo-es roundtrip`:
-   - **seed (110 vectors, v3/testnet; 87 compile with an empty env):
-     72 byte-exact · 11 diff · 0 raw · 4 err**
-   - **mainnet (279 unique trees): 267 byte-exact · 9 diff · 2 raw · 1 err**
-   - Two failure classes: `raw` = decompiler placeholders (honest `<…>` for
-     constructs with no lift yet); `diff`/`err` = ergo-compiler behaviors on a
-     faithful rendering (20 `diff` from upstream constant folding; 3
-     `assignType(Fold)` **upstream bug**; 1 constant-fold-overflow **upstream
-     bug** (`-2147483647 - 2`); 1 fold-lambda typing err). Full table with
-     repros in `ergo-sandbox/README.md`.
-   - `cargo test` pins the bar off a committed fixture
-     (`tests/fixtures/compile_corpus_subset.json`, 72 vectors);
-     whole-corpus floors run when the node checkout is a sibling.
-   - **Stack budget:** the lift recurses and debug frames are wide — 46 levels
-     need ≈3 MiB. `decompile::with_large_stack` gives headroom; the lift is
-     bounded by `MAX_LIFT_DEPTH` so it degrades instead of overflowing. The
-     WASM/HTTP shell must use the wrapper (or an iterative rewrite).
-4. **P3 — audit layer** (lints + scenario fuzz + cost views); REST surfaces fold
-   into tooling-api T1–T5 where they overlap.
-5. **P4 — WASM + browser workbench**; templates gallery (UI-doc Tier 1) reused.
-
-## Crates
-
-- `ergo-sandbox` (workspace member): eval/compile/decompile session APIs.
-  Deps: ergo-ser, ergo-sigma, ergo-compiler, ergo-primitives. No tokio/redb.
-  The decompiler lives at `ergo-sandbox/src/decompile.rs` (the separate
-  `ergo-decompile` crate originally planned was folded in — it shares too much
-  of the lift context to pay a crate boundary).
-- CLI shell: `ergo-sandbox/src/bin/ergo-es.rs` (`compile` / `eval` /
-  `decompile` / `roundtrip`).
-- Web: separate repo later; consumes WASM builds of ergo-sandbox.
-
-## Open decisions
-
-- ~~Byte-exact vs canonical re-serialization tolerance~~ — **resolved by P0**:
-  394/394 real trees re-serialize byte-exact; the bar is byte-exact.
-- Whether the audit lints live in `ergo-decompile` (operate on lifted AST) or a
-  third crate — decided when the lifted AST shape exists.
+- Whether the audit lints operate on the lifted AST inside
+  `ergo-sandbox/src/decompile.rs` or a separate crate — decided when the lint
+  set exists.
