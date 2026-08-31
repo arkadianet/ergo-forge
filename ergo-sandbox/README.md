@@ -50,25 +50,25 @@ the node's oracle-graded corpora (`ergo-es roundtrip --seed | --mainnet`):
 
 ```text
 seed    (110 vectors, v3/testnet; 87 compile with an empty env):
-        72 byte-exact · 11 diff · 0 raw · 4 err
+        73 byte-exact · 11 diff · 0 raw · 3 err
 mainnet (279 unique trees):
-        267 byte-exact · 9 diff · 2 raw · 1 err
+        270 byte-exact · 6 diff · 2 raw · 1 err
 ```
 
 Two different failure classes:
 
 - **`raw` — decompiler placeholders.** Constructs with no source-like lift yet
-  render as honest `<…>` markers (never silently wrong). 1 seed vector (a
-  deeply nested reserve contract), 2 mainnet trees.
-- **`diff` / `err` — ergo-compiler behaviors.** The decompiled source is a
-  faithful rendering of the wire; recompiling it trips an upstream compiler
-  behavior:
+  render as honest `<…>` markers (never silently wrong). 2 mainnet trees.
+- **`diff` / `err` — re-renderings the compiler refuses.** The decompiled
+  source is a faithful rendering of the wire, but recompiling it trips an
+  upstream compiler behavior — and in every `err` case **Scala's reference
+  compiler rejects the identical source** (verified 2026-08-31 with this repo's
+  JVM TyperOracle, sigma-state 6.0.2), so there is no Rust/Scala divergence:
 
   | Class | Count | Cause |
   |---|---|---|
-  | `diff` | 20 (11 seed + 9 mainnet) | Upstream constant folding collapses the re-emitted tree (e.g. `Coll[Byte](7).size == 1` folds to `true`) where the reference compiler left it unfolded. Semantically equal trees. |
-  | `assignType(Fold)` err | 3 (seed) | **Upstream bug**: `fold` inside an operator operand fails type-assignment. `INPUTS.fold(0L, {…}) * 2L` is rejected; binding to a `val` first compiles. |
-  | constant-fold overflow err | 1 (seed) | **Upstream bug**: the compiler rejects re-emitting a shape it produced — `Minus(Negation(2147483647), 2)` renders as `-2147483647 - 2`, which its own constant fold rejects as an `Int` overflow. |
+  | `diff` | 17 (11 seed + 6 mainnet) | Upstream constant folding collapses the re-emitted tree (e.g. `Coll[Byte](7).size == 1` folds to `true`) where the reference compiler left it unfolded. Semantically equal trees. |
+  | `assignType(Fold)` err | 3 (seed) | Fold inside an operator operand: the wire shape is `FuncApply(FuncValue-inline, coll)` (the reference binder inlines `def` bodies at call sites), and `({ (x: Coll[Box]) => … })(INPUTS)` re-parses to a `TyperException` under **both** compilers. Rust's `Don't know how to assignType(Fold)` is the twin of Scala's `TyperException`. Fix (future): def-rehydration in the decompiler — hoist the lambda into a `def` and call it, restoring the original source shape. |
   | fold-lambda typing err | 1 (mainnet) | `filter(f).fold(…)` — the fold lambda's `SFunc` domain types as a tuple where a 2-arg lambda is expected. |
 
 The bar runs in `cargo test` off a committed fixture

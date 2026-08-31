@@ -331,6 +331,30 @@ fn print_l(e: &L, parent: Option<u8>, out: &mut String) {
                     o.push('(');
                     print_l(inner, Some(this), o);
                     o.push(')');
+                } else if *op == "-" {
+                    // Negation over a numeric literal must NOT render as a
+                    // negative literal: the binder folds `-n` into
+                    // `Const(-n)`, collapsing the Negation op — and at the
+                    // Int bound the surrounding `Minus(Const(-2147483647), 2)`
+                    // then overflows the constant folder. `(0 + n)` after the
+                    // unary minus re-parses to Negation(Const(n)) —
+                    // byte-identical to the wire (the `0 + n` identity fold is
+                    // what the reference compiler does with the original
+                    // source). Verified against the JVM TyperOracle
+                    // (sigma-state 6.0.2).
+                    match inner.as_ref() {
+                        L::Int(n) => {
+                            o.push_str("(0 + ");
+                            let _ = write!(o, "{n}");
+                            o.push(')');
+                        }
+                        L::Num(t) if t.ends_with('L') => {
+                            o.push_str("(0 + ");
+                            o.push_str(t);
+                            o.push(')');
+                        }
+                        _ => print_l(inner, Some(this), o),
+                    }
                 } else {
                     print_l(inner, Some(this), o);
                 }

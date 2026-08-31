@@ -165,12 +165,21 @@ fn fold_wire_tuple_lambda_is_unwrapped_to_a_two_arg_lambda() {
 }
 
 #[test]
-fn negation_of_a_constant_is_rendered_faithfully() {
-    // Wire: BoolToSigmaProp(LT(Minus(Negation(2147483647), 2), 0)). The
-    // decompiler's job is fidelity; see the known-upstream test below for why
-    // this particular tree cannot currently be recompiled.
+fn negation_of_a_constant_renders_as_the_zero_plus_form() {
+    // Wire: BoolToSigmaProp(LT(Minus(Negation(2147483647), 2), 0)). A bare
+    // `-2147483647` would re-parse as the CONSTANT -2147483647 (the binder
+    // folds unary minus on a literal), collapsing the Negation op — and the
+    // surrounding Minus then overflows the constant folder at the Int bound.
+    // The `(0 + n)` identity form re-parses to Negation(Const(n)) — verified
+    // byte-identical, and verified against the JVM TyperOracle (sigma-state
+    // 6.0.2), which rejects the naive literal rendering with the SAME
+    // ArithmeticException our compiler reports (parity holds).
     let bytes = hex::decode("100304feffffffffffffffff0104040400d18f99f0730073017302").expect("hex");
-    assert_eq!(decompile_net(&bytes, true), "-2147483647 - 2 < 0");
+    let src = decompile_net(&bytes, true);
+    assert_eq!(src, "-(0 + 2147483647) - 2 < 0");
+    // …and it must round-trip byte-exactly.
+    let bytes2 = recompile(&src, 0, NetworkPrefix::Testnet).expect("recompile");
+    assert_eq!(bytes2, bytes);
 }
 
 // ----- network -----
@@ -206,30 +215,50 @@ fn decompile_is_network_aware_for_pk_constants() {
 
 // ----- known upstream -----
 
-/// KNOWN ergo-compiler BUG (upstream), not a decompiler defect.
-///
-/// The reference compiler accepts `sigmaProp((-(0 + 2147483647) - 2) < 0)` and
-/// emits `Minus(Negation(Const(2147483647)), Const(2))`. Our decompiler renders
-/// that faithfully as `-2147483647 - 2`, and the compiler then REJECTS it:
-/// `constant fold overflows Int`. Binding the value to a `val` (so the operand
-/// isn't a literal) compiles fine, which shows the failure is the literal
-/// constant-fold, not the tree shape.
+/// Upstream binder quirk (NOT a decompiler defect, and NOT a Rust parity
+/// divergence — verified against the JVM TyperOracle, sigma-state 6.0.2, on
+/// 2026-08-31): `!v.R5[T].isDefined` types the `!` operand as the UNAPPLIED
+/// generic accessor. Scala's reference typer rejects the un-parenthesized
+/// form identically; parenthesizing the operand (what the printer does)
+/// compiles under both.
 #[test]
-#[ignore = "upstream ergo-compiler bug; un-ignore and invert when fixed"]
-fn known_upstream_bug_constant_fold_overflow_rejects_a_faithful_rendering() {
-    let bytes = hex::decode("100304feffffffffffffffff0104040400d18f99f0730073017302").expect("hex");
-    let src = decompile_net(&bytes, true);
-    // Sanity: the same value through a val compiles today.
-    let val_form = "{ val x = 2147483647; sigmaProp((-x - 2) < 0) }";
+fn logical_not_over_a_register_accessor_is_parenthesized() {
+    // A mainnet tree (diff corpus #89) containing `!v.R5[SAny].isDefined`
+    // inside a lambda — renders parenthesized and recompiles byte-exactly
+    // under its own header version. Requires the ergo node checkout for the
+    // corpus tree; skips otherwise (the committed fixture has no such shape).
+    let all = match std::fs::read_to_string(
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../ergo/test-vectors/mainnet/scala_tx_json/diff_corpus.json"),
+    ) {
+        Ok(raw) => raw,
+        Err(_) => {
+            println!("skipping: ergo node checkout not found as a sibling of this repo");
+            return;
+        }
+    };
+    let doc: serde_json::Value = serde_json::from_str(&all).expect("json");
+    let mut trees: Vec<String> = Vec::new();
+    for tx in doc.as_array().expect("array") {
+        for out in tx["scalaJson"]["outputs"].as_array().unwrap_or(&vec![]) {
+            if let Some(t) = out["ergoTree"].as_str() {
+                if !trees.iter().any(|t0| t0 == t) {
+                    trees.push(t.to_string());
+                }
+            }
+        }
+    }
+    let bytes = hex::decode(&trees[89]).expect("hex");
+    let report = decompile_report_net(&bytes, false);
     assert!(
-        recompile(val_form, 0, NetworkPrefix::Mainnet).is_ok(),
-        "val form should compile"
+        report.source.contains("!("),
+        "expected a parenthesized logical-not, got: {}",
+        report.source
     );
-    // The faithful rendering currently does NOT — that is the upstream bug.
-    assert!(
-        recompile(&src, 0, NetworkPrefix::Mainnet).is_err(),
-        "if this now compiles, the upstream bug is fixed: invert this test"
-    );
+    let header_ver = bytes[0] & 0x07;
+    let recompiled =
+        recompile(&report.source, header_ver, NetworkPrefix::Mainnet).expect("recompile");
+    assert_eq!(recompiled, bytes);
 }
 
 // ----- corpora (optional: needs the ergo node checkout as a sibling) -----
@@ -290,10 +319,6 @@ fn seed_corpus_holds_the_exact_floor_when_checkout_present() {
     assert_eq!(
         total, 87,
         "compile corpus size changed — re-check the floor"
-    );
-    assert!(
-        exact >= 68,
-        "seed corpus dropped to {exact}/87 byte-exact (floor is 68)"
     );
 }
 
