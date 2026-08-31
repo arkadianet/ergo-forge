@@ -250,6 +250,10 @@ pub(crate) fn type_str(t: &SigmaType) -> String {
         SigmaType::SBox => "Box".into(),
         SigmaType::SAvlTree => "AvlTree".into(),
         SigmaType::SContext => "Context".into(),
+        // The top type's source spelling is `Any` — `SAny` parses as an
+        // ordinary identifier (a type VARIABLE named "SAny"), which
+        // serializes as a named STypeVar instead of the SAny type byte.
+        SigmaType::SAny => "Any".into(),
         SigmaType::SHeader => "Header".into(),
         SigmaType::SPreHeader => "PreHeader".into(),
         SigmaType::SUnsignedBigInt => "UnsignedBigInt".into(),

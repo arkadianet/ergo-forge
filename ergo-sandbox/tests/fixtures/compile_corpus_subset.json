@@ -283,6 +283,12 @@
   },
   {
     "network": "testnet",
+    "source": "sigmaProp((-(0 + 2147483647) - 2) < 0)",
+    "tree": "100304feffffffffffffffff0104040400d18f99f0730073017302",
+    "treeVersion": 3
+  },
+  {
+    "network": "testnet",
     "source": "sigmaProp((5.toByte.bitwiseOr(3.toByte)) == 7.toByte)",
     "tree": "10010101d17300",
     "treeVersion": 3
