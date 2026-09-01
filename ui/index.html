@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ergo-web — ErgoScript reader</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>ErgoScript reader</h1>
+    <p>Paste a contract address or ErgoTree hex. Get the contract back as
+       readable ErgoScript, plus static audit findings about the code that
+       will actually execute. Everything runs locally — nothing leaves this host.</p>
+  </header>
+
+  <main>
+    <section class="input-row">
+      <input id="input" type="text" spellcheck="false"
+             placeholder="Address or ErgoTree hex, e.g. 1001040ad191e4c6a704047300">
+      <select id="network" aria-label="network">
+        <option value="mainnet" selected>mainnet</option>
+        <option value="testnet">testnet</option>
+      </select>
+      <button id="read">Read</button>
+    </section>
+
+    <p id="status" class="status" hidden></p>
+    <div id="partial-banner" class="banner" hidden>
+      <strong>Part of this contract could not be decompiled.</strong>
+      <span id="partial-detail"></span>
+      Findings below are incomplete; no findings does not mean clean.
+    </div>
+
+    <section id="result" hidden>
+      <h2>Source</h2>
+      <pre id="source"></pre>
+
+      <h2>Findings</h2>
+      <ul id="findings"></ul>
+      <p id="no-findings" hidden>No findings. (If the banner above is showing,
+         that does <em>not</em> mean the contract is clean.)</p>
+
+      <h2>Wire form</h2>
+      <dl class="wire">
+        <dt>tree hex</dt><dd><code id="tree-hex"></code></dd>
+        <dt>address</dt><dd><code id="address"></code></dd>
+      </dl>
+    </section>
+  </main>
+
+  <footer>ergo-web <span id="api-version">v1</span> — source and findings are
+    computed from the ErgoTree bytes; no node or explorer is contacted.</footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
