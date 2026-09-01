@@ -1,0 +1,5 @@
+
+# Implementation plans are not committed — see docs/superpowers/specs/ for design
+# rationale, which is. Plans are execution scaffolding: they go stale on execution
+# and embed code snippets that can be wrong (P3a shipped a lint bug copied from one).
+docs/superpowers/plans/
