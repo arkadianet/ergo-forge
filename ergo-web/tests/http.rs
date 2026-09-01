@@ -89,3 +89,38 @@ async fn oversized_body_is_a_413() {
         .unwrap();
     assert_eq!(r.status(), 413, "status: {}", r.status());
 }
+
+/// The stack-budget proof: a ~60-level contract needs ~3 MiB of recursion;
+/// tokio threads default to 2 MiB. The handler must run the decompile on a
+/// `spawn_blocking` thread wrapped in `with_large_stack`, or this test
+/// aborts the whole test process. (Removing `with_large_stack` while keeping
+/// `spawn_blocking` was verified to abort — see the commit message.)
+#[tokio::test]
+async fn a_deeply_nested_contract_does_not_kill_the_server() {
+    let mut src = String::from("1");
+    for _ in 0..60 {
+        src = format!("({src} + 1)");
+    }
+    let src = format!("sigmaProp({src} > 0)");
+    // The COMPILER also recurses ~3 MiB deep at this nesting — more than the
+    // 2 MiB test thread. Build the fixture on a large stack; the thing under
+    // test is the server's handling of the resulting bytes.
+    let bytes = ergo_sandbox::decompile::with_large_stack(move || {
+        ergo_sandbox::compile_source(&src, 3, ergo_ser::address::NetworkPrefix::Mainnet)
+            .expect("compile")
+            .tree_bytes
+    });
+
+    let base = spawn().await;
+    let r = reqwest::Client::new()
+        .post(format!("{base}/api/v1/inspect"))
+        .json(&serde_json::json!({ "input": hex::encode(&bytes) }))
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(r.status(), 200, "status: {}", r.status());
+
+    // The server must still be alive afterwards.
+    let h = reqwest::get(format!("{base}/api/v1/health")).await.unwrap();
+    assert_eq!(h.status(), 200, "server died on a deep contract");
+}
