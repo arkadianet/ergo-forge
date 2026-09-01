@@ -147,6 +147,15 @@ Still missing (the actual build list):
    what consensus will actually execute. A `Raw` placeholder in the tree is a
    confidence signal: an audit over a tree containing one degrades its verdict
    rather than reporting clean.
+   - **P3a — static lints: DONE 2026-09-01.** `audit::audit(&Lifted) -> Audit`,
+     lints as `fn(&Node) -> Vec<Finding>` in a const registry. First lint:
+     `unchecked-get` (High). `Completeness` reports when the lift left raw
+     placeholders, so an audit over a partly-lifted tree cannot read as clean.
+     Measured flag rate on mainnet: 13/279 trees flagged (4.7%), 79 findings,
+     75/79 hand-verified real (4 false positives, all the untracked
+     `Filter`-predicate guard pattern).
+   - P3b (scenario fuzz) and P3c (cost hot-spots) are separate — neither
+     depends on the AST.
    - static lints over `Node` (height guards, `anyOf` shadowing, unchecked
      `get()`, trust assumptions)
    - scenario fuzz over the sandbox ("spendable by anyone?" hunts)

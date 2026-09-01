@@ -91,3 +91,37 @@ when the ergo node checkout is present as a sibling.
 debug builds: a 46-level nesting (deeper than any real contract) needs ≈3 MiB.
 `decompile::with_large_stack` runs it with headroom, and the lift is bounded by
 `MAX_LIFT_DEPTH` (128) so it degrades to a placeholder instead of overflowing.
+
+## Audit (P3a)
+
+`ergo_sandbox::audit` runs static lints over the lifted tree
+(`audit::audit(&Lifted) -> Audit`). First lint: `unchecked-get`, severity High —
+`Option.get` with no dominating `isDefined` guard (`&&`-conjunction and
+`if`-condition guards are recognised).
+
+Measured on the oracle-graded corpora (`ergo-es audit --seed | --mainnet`; the
+same corpora as the round-trip bar):
+
+```text
+mainnet  audited: 279 trees   flagged: 13 (4.7%)   findings: 79   partial: 2
+seed     audited: 110 trees   flagged: 15 (13.6%)  findings: 242  partial: 1
+```
+
+Hand verification of ALL 13 flagged mainnet trees (79 findings), each decompiled
+and the flagged expression read in context:
+
+- **75 of 79 findings real (94.9%).** The flagged `get` is genuinely unguarded
+  and throws if the register/context var is empty: oracle-pool templates reading
+  data-input registers R4/R5/R6 unguarded, `getVar(0).get` output-index reads,
+  and CFMM/order contracts asserting required registers via bare `get`.
+- **4 of 79 false positives (5.1%), all in 2 of the 13 trees** (the same
+  template deployed twice): `Option.get` on elements of a collection produced by
+  `Filter` whose predicate demanded `isDefined` on that exact register — the
+  lint does not track filter predicates. This is the guard pattern the analysis
+  is missing (an instance of the documented cross-branch gap).
+- Flag rate 4.7% is under the 20% acceptance gate; findings per flagged tree
+  range 1–17 (the two largest templates account for most of the 79).
+
+Documented gaps (from `lints/unchecked_get.rs`): guards expressed with `||` and
+negation, guards held in an enclosing `val`, and cross-branch reasoning are not
+recognised, so those produce false positives.
