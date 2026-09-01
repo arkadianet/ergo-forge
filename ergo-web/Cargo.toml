@@ -1,0 +1,33 @@
+[package]
+name        = "ergo-web"
+description = "HTTP service for the ErgoScript workbench: decompile and audit contracts over a JSON API."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish     = false
+
+[lib]
+name = "ergo_web"
+path = "src/lib.rs"
+
+[[bin]]
+name = "ergo-web"
+path = "src/main.rs"
+
+[dependencies]
+ergo-sandbox = { path = "../ergo-sandbox" }
+ergo-ser     = { workspace = true }
+axum         = { workspace = true }
+tokio        = { workspace = true }
+tower        = { workspace = true }
+tower-http   = { workspace = true }
+tracing      = { workspace = true }
+tracing-subscriber = { workspace = true }
+serde        = { workspace = true }
+serde_json   = { workspace = true }
+hex          = { workspace = true }
+
+[dev-dependencies]
+tokio   = { workspace = true, features = ["rt-multi-thread", "macros", "net"] }
+reqwest = { version = "0.12", features = ["json"], default-features = false }
