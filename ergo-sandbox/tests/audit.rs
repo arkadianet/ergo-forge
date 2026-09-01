@@ -82,3 +82,35 @@ fn findings_carry_a_readable_snippet() {
     );
     assert_eq!(a.findings[0].severity, ergo_sandbox::Severity::High);
 }
+
+/// Guard collection is conjunctive-only: an `isDefined` under `||` proves
+/// nothing (`x.isDefined || y.isDefined` can hold with `x` empty), so the
+/// `get` must still be flagged.
+#[test]
+fn is_defined_under_or_does_not_guard_the_get() {
+    assert_eq!(
+        lints_of(
+            "sigmaProp((SELF.R4[Int].isDefined || SELF.R5[Int].isDefined) && SELF.R4[Int].get > 5)"
+        ),
+        vec!["unchecked-get"]
+    );
+}
+
+/// `!x.isDefined` asserts the OPPOSITE — walking into it must not guard.
+#[test]
+fn negated_is_defined_does_not_guard_the_get() {
+    assert_eq!(
+        lints_of("sigmaProp(!(SELF.R4[Int].isDefined) && SELF.R4[Int].get > 5)"),
+        vec!["unchecked-get"]
+    );
+}
+
+/// The conjunctive descent that replaced the arbitrary walk still guards
+/// through nested `&&` chains.
+#[test]
+fn is_defined_nested_in_conjunction_still_guards() {
+    assert!(lints_of(
+        "sigmaProp((HEIGHT > 100 && SELF.R4[Int].isDefined) && SELF.R4[Int].get > 5)"
+    )
+    .is_empty());
+}

@@ -106,7 +106,7 @@ pub fn snippet(n: &Node) -> String {
         s = s.split_whitespace().collect::<Vec<_>>().join(" ");
     }
     if s.chars().count() > SNIPPET_MAX {
-        s = s.chars().take(SNIPPET_MAX).collect::<String>() + "…";
+        s = s.chars().take(SNIPPET_MAX - 1).collect::<String>() + "…";
     }
     s
 }
@@ -460,14 +460,26 @@ fn as_option_get(n: &Node) -> Option<&Node> {
 }
 
 /// Receivers this expression proves non-empty, as rendered source text.
+///
+/// Only conjunctive structure proves anything: a direct `isDefined`, the
+/// operands of nested `&&`, and the content of a `sigmaProp(…)` wrapper
+/// (the lift's rendering of BoolToSigmaProp — definitionally transparent).
+/// `isDefined` under `||` or negation proves nothing, so those subtrees are
+/// not entered — the documented gaps stay false positives, never false
+/// negatives.
 fn proves_defined(n: &Node, out: &mut Vec<String>) {
-    if let NodeKind::Method(recv, name, args) = &n.kind {
-        if name == "isDefined" && args.is_empty() {
+    match &n.kind {
+        NodeKind::Method(recv, name, args) if name == "isDefined" && args.is_empty() => {
             out.push(crate::decompile::print(recv));
         }
-    }
-    for c in children(n) {
-        proves_defined(c, out);
+        NodeKind::Global(name, args) if name == "sigmaProp" && args.len() == 1 => {
+            proves_defined(&args[0], out);
+        }
+        NodeKind::Infix(op, a, b) if *op == "&&" => {
+            proves_defined(a, out);
+            proves_defined(b, out);
+        }
+        _ => {}
     }
 }
 
@@ -645,7 +657,7 @@ git commit -m "feat(cli): ergo-es audit <tree-hex>"
 
 - [ ] **Step 1: Add corpus mode to `cmd_audit`**
 
-Support `--seed` and `--mainnet` by reusing the corpus loaders `cmd_roundtrip` already uses (`mainnet_trees` at line 460, and the seed loader beside it — read lines 252–310 and mirror the pattern). Print only a tally:
+Support `--seed` and `--mainnet` by reusing the corpus loaders `cmd_roundtrip` already uses (`mainnet_trees` at line 460, and the seed loader beside it — read lines 252–310 and mirror the pattern). Print only a tally (the numbers below are ILLUSTRATIVE of the format — the measured values live in `ergo-sandbox/README.md`):
 
 ```
 audited: 279 trees

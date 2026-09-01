@@ -55,7 +55,7 @@ pub fn snippet(n: &Node) -> String {
         s = s.split_whitespace().collect::<Vec<_>>().join(" ");
     }
     if s.chars().count() > SNIPPET_MAX {
-        s = s.chars().take(SNIPPET_MAX).collect::<String>() + "…";
+        s = s.chars().take(SNIPPET_MAX - 1).collect::<String>() + "…";
     }
     s
 }

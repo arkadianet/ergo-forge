@@ -55,7 +55,7 @@ New module, `ergo-sandbox/src/audit/`:
 |---|---|
 | `mod.rs` | `audit()`, `Audit`, `Completeness`, the `LINTS` registry |
 | `finding.rs` | `Finding`, `Severity` |
-| `visit.rs` | `visit(&Node, &mut impl FnMut(&Node))` — shared preorder walk |
+| `visit.rs` | `children(&Node) -> Vec<&Node>` — direct-children accessor (as shipped; the one lint needs ancestor context, so a flat preorder `visit()` waits for a lint that wants one — see the plan's deviation note) |
 | `lints/mod.rs` | re-exports the lint fns |
 | `lints/unchecked_get.rs` | the first lint |
 
@@ -264,7 +264,11 @@ mainnet trees and the seed corpus, and record the numbers in
 - how many audited trees were `Partial`.
 
 Then **hand-verify a sample of at least 10 flagged trees**, decompiling each and
-deciding whether the finding is real. Record the verdict per sample.
+deciding whether the finding is real. Record a separate verdict for EVERY
+finding in a sampled tree, including trees carrying multiple findings — the
+stop rule counts FLAGGED TREES (more than 2 of the 10+ trees dominated by false
+positives stops the lint), while the recorded per-finding verdicts give the
+false-positive denominator.
 
 **The gate:** if more than **20%** of mainnet trees are flagged, stop and report
 rather than shipping. At that rate the lint is either wrong or the pattern is so

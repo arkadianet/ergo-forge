@@ -31,14 +31,28 @@ fn as_option_get(n: &Node) -> Option<&Node> {
 }
 
 /// Receivers this expression proves non-empty, as rendered source text.
+///
+/// Only conjunctive structure proves anything: a direct `isDefined`, the
+/// operands of nested `&&` (a `&&` chain that evaluated makes every operand
+/// true), and the content of a `sigmaProp(…)` wrapper — the lift renders
+/// every non-root `BoolToSigmaProp` as `Global("sigmaProp", [x])`, which is
+/// definitionally transparent (it holds iff `x` holds). `isDefined` under
+/// `||` or negation proves nothing — `x.isDefined || y.isDefined` can hold
+/// with `x` empty — so those subtrees are not entered: documented
+/// false-positive gaps stay false positives, never false negatives.
 fn proves_defined(n: &Node, out: &mut Vec<String>) {
-    if let NodeKind::Method(recv, name, args) = &n.kind {
-        if name == "isDefined" && args.is_empty() {
+    match &n.kind {
+        NodeKind::Method(recv, name, args) if name == "isDefined" && args.is_empty() => {
             out.push(crate::decompile::print(recv));
         }
-    }
-    for c in children(n) {
-        proves_defined(c, out);
+        NodeKind::Global(name, args) if name == "sigmaProp" && args.len() == 1 => {
+            proves_defined(&args[0], out);
+        }
+        NodeKind::Infix(op, a, b) if *op == "&&" => {
+            proves_defined(a, out);
+            proves_defined(b, out);
+        }
+        _ => {}
     }
 }
 
