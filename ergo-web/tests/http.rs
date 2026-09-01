@@ -75,3 +75,17 @@ async fn garbage_input_is_a_400() {
     let body: serde_json::Value = r.json().await.unwrap();
     assert_eq!(body["error"]["code"], "invalid_input");
 }
+
+#[tokio::test]
+async fn oversized_body_is_a_413() {
+    let base = spawn().await;
+    let big = "a".repeat(64 * 1024 + 1);
+    let r = reqwest::Client::new()
+        .post(format!("{base}/api/v1/inspect"))
+        .header("content-type", "application/json")
+        .body(big)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(r.status(), 413, "status: {}", r.status());
+}
