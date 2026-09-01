@@ -168,6 +168,21 @@ Still missing (the actual build list):
    iterative rewrite. This is also the point the `ergo-decompile` crate
    extraction pays for itself (browser builds pull decompile without
    `eval`/`scenario`); mechanical once P2.5 has landed the module split.
+   - **P4a — HTTP service + reader UI: DONE 2026-09-01.** `ergo-web` (axum +
+     tokio) exposes `POST /api/v1/inspect` (address or ErgoTree hex →
+     ErgoScript + audit findings) and `GET /api/v1/health`, plus a plain
+     HTML/CSS/JS page — no bundler. Stateless, no outbound calls. The
+     decompile runs inside `spawn_blocking` + `with_large_stack` on every
+     request: measured on the deepest mainnet tree (46 levels), the read path
+     overflows tokio's 2 MiB default and fits in 3 MiB, so the 16 MiB guard
+     carries real load — and a committed test over that real tree aborts if
+     the guard is removed. Note the guard is required despite the engine's
+     depth caps: the caps bound node count, not frame width, and real
+     contracts cost >10× more stack per level than synthetic arithmetic.
+     The API is the stable boundary keeping a future WASM build viable —
+     which stays blocked on `ergo-sigma`'s `panic = "unwind"` requirement
+     (its AVL verifier uses `catch_unwind` to fail closed; `wasm32` is
+     abort-only on stable Rust).
 7. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.
