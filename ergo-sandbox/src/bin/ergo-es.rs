@@ -20,6 +20,7 @@ fn main() -> ExitCode {
     let rest = &args[1..];
     let result = match cmd.as_str() {
         "compile" => cmd_compile(rest),
+        "params" => cmd_params(rest),
         "eval" => cmd_eval(rest),
         "decompile" => cmd_decompile(rest),
         "roundtrip" => cmd_roundtrip(rest),
@@ -50,7 +51,11 @@ fn usage() {
 
 USAGE:
   ergo-es compile <source-file> [--tree-version N] [--network mainnet|testnet]
+                  [--params params.json]
       Compile ErgoScript source to ErgoTree bytes + P2S/P2SH addresses.
+      --params supplies compile-time constants (JSON: name -> {{type, value}}).
+  ergo-es params <source-file>
+      List the $parameters a source needs (with // $name: Type hints).
   ergo-es eval <scenario.json> [--hot-spots]
       Evaluate a scenario: contract (source or tree hex) + spending context
       → verdict, cost, trace. See README scenario schema. --hot-spots ranks
@@ -132,10 +137,45 @@ fn cmd_compile(args: &[String]) -> Result<(), String> {
         Some(n) => parse_network(&n)?,
         None => NetworkPrefix::Mainnet,
     };
-    let out = compile_source(&source, tree_version, network).map_err(|e| e.to_string())?;
+    let out = match flag_value(args, "--params")? {
+        Some(path) => {
+            let text = std::fs::read_to_string(&path).map_err(|e| format!("{path}: {e}"))?;
+            let params: std::collections::BTreeMap<String, ergo_sandbox::TypedValue> =
+                serde_json::from_str(&text).map_err(|e| format!("{path}: {e}"))?;
+            ergo_sandbox::compile::compile_with_params(&source, &params, tree_version, network)
+                .map_err(|e| e.to_string())?
+        }
+        None => compile_source(&source, tree_version, network).map_err(|e| e.to_string())?,
+    };
     println!("tree:     {}", hex::encode(&out.tree_bytes));
     println!("p2s:      {}", out.p2s_address);
     println!("p2sh:     {}", out.p2sh_address);
+    Ok(())
+}
+
+/// `ergo-es params <source-file>` — the $parameters a source needs, as JSON
+/// (name → type hint or null), ready to fill in and pass to `--params`.
+fn cmd_params(args: &[String]) -> Result<(), String> {
+    let Some(src_ref) = args.first() else {
+        return Err("params needs a source file (or - for stdin)".into());
+    };
+    let source = read_input(src_ref)?;
+    let needs = ergo_sandbox::compile::scan_params(&source);
+    let map: serde_json::Map<String, serde_json::Value> = needs
+        .into_iter()
+        .map(|n| {
+            (
+                n.name,
+                n.type_hint
+                    .map(Into::into)
+                    .unwrap_or(serde_json::Value::Null),
+            )
+        })
+        .collect();
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&map).map_err(|e| e.to_string())?
+    );
     Ok(())
 }
 
