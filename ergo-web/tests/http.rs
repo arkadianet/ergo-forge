@@ -174,3 +174,74 @@ async fn a_deeply_nested_contract_does_not_kill_the_server() {
     let h = reqwest::get(format!("{base}/api/v1/health")).await.unwrap();
     assert_eq!(h.status(), 200, "server died on a deep contract");
 }
+
+// ── /api/v1/hunt ────────────────────────────────────────────────────────────
+
+#[tokio::test]
+async fn hunt_reports_a_trivially_true_tree_as_spendable_by_anyone() {
+    let base = spawn().await;
+    // sigmaProp(true), compiled by the pinned compiler.
+    let tree = hex::encode(
+        ergo_sandbox::compile_source(
+            "sigmaProp(true)",
+            3,
+            ergo_ser::address::NetworkPrefix::Mainnet,
+        )
+        .unwrap()
+        .tree_bytes,
+    );
+    let res: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/hunt"))
+        .json(&serde_json::json!({ "input": tree }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(res["verdict"], "spendableByAnyone", "{res}");
+    assert_eq!(res["probes"].as_array().unwrap().len(), 6);
+    assert_eq!(res["selfSynthetic"], true);
+}
+
+#[tokio::test]
+async fn hunt_accepts_a_self_box_and_a_height() {
+    let base = spawn().await;
+    let res: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/hunt"))
+        .json(&serde_json::json!({
+            "input": "1001040ad191e4c6a704047300",
+            "height": 1_234_567,
+            "selfBox": { "value": 1000000, "registers": { "R4": { "type": "Int", "value": 9 } } }
+        }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(res["verdict"], "spendableByAnyone", "{res}");
+    assert_eq!(res["selfSynthetic"], false);
+    assert!(res["probes"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|p| p["height"] == 1_234_567));
+}
+
+#[tokio::test]
+async fn hunt_rejects_a_bad_self_box_as_invalid_input() {
+    let base = spawn().await;
+    let r = reqwest::Client::new()
+        .post(format!("{base}/api/v1/hunt"))
+        .json(&serde_json::json!({
+            "input": "1001040ad191e4c6a704047300",
+            "selfBox": { "registers": { "R4": { "type": "Int", "value": "nope" } } }
+        }))
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(r.status(), 400);
+    let body: serde_json::Value = r.json().await.unwrap();
+    assert_eq!(body["error"]["code"], "invalid_input");
+}

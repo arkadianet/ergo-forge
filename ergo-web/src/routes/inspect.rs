@@ -9,7 +9,7 @@ use crate::{dto, error::ApiError, extract::ApiJson, input};
 /// Parse the optional `network` field. Absent means mainnet; anything other
 /// than the two exact spellings is an input error rather than a silent
 /// mainnet default — a wrong network yields a wrong address, not a failure.
-fn parse_network(raw: Option<&str>) -> Result<NetworkPrefix, ApiError> {
+pub(crate) fn parse_network(raw: Option<&str>) -> Result<NetworkPrefix, ApiError> {
     match raw {
         None | Some("mainnet") => Ok(NetworkPrefix::Mainnet),
         Some("testnet") => Ok(NetworkPrefix::Testnet),

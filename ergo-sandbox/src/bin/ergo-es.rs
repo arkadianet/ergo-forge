@@ -24,6 +24,7 @@ fn main() -> ExitCode {
         "decompile" => cmd_decompile(rest),
         "roundtrip" => cmd_roundtrip(rest),
         "audit" => cmd_audit(rest),
+        "hunt" => cmd_hunt(rest),
         "help" | "--help" | "-h" => {
             usage();
             return ExitCode::SUCCESS;
@@ -64,6 +65,10 @@ USAGE:
   ergo-es audit <hex | --seed | --mainnet>
       Static lints over the lifted tree. Single trees print findings;
       corpora print a summary tally.
+  ergo-es hunt <hex | --mainnet [N]> [--height H] [--self-box file.json]
+      Spend hunt: can anyone spend this box with no key? Six probes (three
+      heights x attacker/preserve output) on the consensus reducer.
+      --mainnet tallies the corpus; hits go to stderr for hand checks.
 "
     );
 }
@@ -590,5 +595,142 @@ fn cmd_audit(args: &[String]) -> Result<(), String> {
             Ok(())
         }
         None => Err("audit needs tree hex, --seed, or --mainnet [N]".into()),
+    }
+}
+
+/// `ergo-es hunt <tree-hex> [--height H] [--self-box file] | --mainnet [N]`
+/// — the spend hunt over the sandbox (P3b).
+fn cmd_hunt(args: &[String]) -> Result<(), String> {
+    use ergo_sandbox::hunt::{hunt, HuntOptions, HuntVerdict};
+
+    let height = flag_value(args, "--height")?
+        .map(|h| h.parse::<u32>().map_err(|e| format!("bad --height: {e}")))
+        .transpose()?;
+    let self_box = flag_value(args, "--self-box")?
+        .map(|path| -> Result<ergo_sandbox::ScenarioBox, String> {
+            let text = std::fs::read_to_string(&path).map_err(|e| format!("{path}: {e}"))?;
+            serde_json::from_str(&text).map_err(|e| format!("{path}: {e}"))
+        })
+        .transpose()?;
+    let opts = HuntOptions {
+        height,
+        self_box,
+        network: None,
+    };
+
+    match args.first().map(String::as_str) {
+        Some("--mainnet") => {
+            // The corpus limit is the first positional AFTER --mainnet that is
+            // not a flag or a flag's value (`--height 123` must not become 123).
+            let limit = positional_after_flags(&args[1..], &["--height", "--self-box"]);
+            let trees = mainnet_trees(limit)?;
+            let mut tally = std::collections::BTreeMap::<&str, usize>::new();
+            let mut all_errored = 0usize;
+            let mut parse_errors = 0usize;
+            for h in &trees {
+                let bytes = hex::decode(h).map_err(|e| e.to_string())?;
+                let result = ergo_sandbox::decompile::with_large_stack({
+                    let opts = opts.clone();
+                    move || hunt(&bytes, &opts)
+                });
+                let r = match result {
+                    Ok(r) => r,
+                    Err(_) => {
+                        parse_errors += 1;
+                        continue;
+                    }
+                };
+                let key = hunt_verdict_str(r.verdict);
+                *tally.entry(key).or_default() += 1;
+                if r.self_synthetic
+                    && r.verdict == HuntVerdict::NotUnderProbes
+                    && r.probes.iter().all(|p| p.error.is_some())
+                {
+                    // Every probe raised — with a synthetic SELF that is
+                    // almost always a register read, i.e. undetermined, not
+                    // guarded. Reported separately so the tally is honest.
+                    all_errored += 1;
+                }
+                if matches!(
+                    r.verdict,
+                    HuntVerdict::SpendableByAnyone | HuntVerdict::MovableByAnyone
+                ) {
+                    eprintln!("{key}: {h}");
+                }
+            }
+            let hunted = trees.len() - parse_errors;
+            println!("hunted: {hunted} trees");
+            for (k, n) in &tally {
+                println!(
+                    "  {k}: {n} ({:.1}%)",
+                    100.0 * *n as f64 / hunted.max(1) as f64
+                );
+                if *k == hunt_verdict_str(HuntVerdict::NotUnderProbes) && all_errored > 0 {
+                    println!("    of which every probe errored (synthetic SELF): {all_errored}");
+                }
+            }
+            if parse_errors > 0 {
+                println!("  parse-errors: {parse_errors}");
+            }
+            Ok(())
+        }
+        Some(hex_arg) if !hex_arg.starts_with("--") => {
+            let bytes = hex::decode(hex_arg.trim()).map_err(|e| format!("bad hex: {e}"))?;
+            let r = ergo_sandbox::decompile::with_large_stack(move || hunt(&bytes, &opts))
+                .map_err(|e| e.to_string())?;
+            println!("hunt: {}", hunt_verdict_str(r.verdict));
+            if r.self_synthetic {
+                println!(
+                    "  SELF is synthetic (no registers, value 0) — pass --self-box for a real box"
+                );
+            }
+            for res in &r.residuals {
+                println!("  requires: {res}");
+            }
+            println!("  probes:");
+            for p in &r.probes {
+                let shape = match p.output {
+                    ergo_sandbox::hunt::OutputShape::Attacker => "attacker",
+                    ergo_sandbox::hunt::OutputShape::Preserve => "preserve",
+                };
+                let detail = match (&p.error, &p.reduced_to, p.verdict) {
+                    (Some(e), _, _) => format!("  error: {e}"),
+                    (None, Some(r), Verdict::NeedsProof) => format!("  -> {r}"),
+                    _ => String::new(),
+                };
+                println!(
+                    "    height {:>8}  {shape:<8}  {:<11}cost {}{detail}",
+                    p.height,
+                    verdict_str(p.verdict),
+                    p.cost
+                );
+            }
+            Ok(())
+        }
+        _ => Err("hunt needs tree hex or --mainnet [N]".into()),
+    }
+}
+
+/// First positional argument, skipping `--flag value` pairs for the named
+/// value-taking flags.
+fn positional_after_flags<'a>(args: &'a [String], value_flags: &[&str]) -> Option<&'a String> {
+    let mut it = args.iter();
+    while let Some(a) = it.next() {
+        if value_flags.contains(&a.as_str()) {
+            it.next();
+        } else if !a.starts_with("--") {
+            return Some(a);
+        }
+    }
+    None
+}
+
+fn hunt_verdict_str(v: ergo_sandbox::hunt::HuntVerdict) -> &'static str {
+    use ergo_sandbox::hunt::HuntVerdict::*;
+    match v {
+        SpendableByAnyone => "spendable by anyone",
+        MovableByAnyone => "movable by anyone",
+        RequiresProof => "requires proof",
+        NotUnderProbes => "not under probes",
     }
 }

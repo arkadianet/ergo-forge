@@ -154,8 +154,23 @@ Still missing (the actual build list):
      Measured flag rate on mainnet: 13/279 trees flagged (4.7%), 79 findings,
      75/79 hand-verified real (4 false positives, all the untracked
      `Filter`-predicate guard pattern).
-   - P3b (scenario fuzz) and P3c (cost hot-spots) are separate — neither
-     depends on the AST.
+   - **P3b — spend hunt: DONE 2026-09-02** (design:
+     `docs/superpowers/specs/2026-09-02-p3b-spend-hunt-design.md`).
+     `hunt::hunt(tree_bytes, &opts) -> Hunt`: six probes (heights `base`,
+     `base+1M`, `1` × attacker/preserve output), each a full consensus
+     reduction with no proof and no context vars, through `eval_scenario` —
+     no new evaluator entry. Verdicts `spendableByAnyone` / `movableByAnyone`
+     / `requiresProof` (+ distinct residual propositions) / `notUnderProbes`;
+     a synthetic SELF is reported so an errored register read cannot read as
+     safe. Surfaces: `ergo-es hunt`, `POST /api/v1/hunt`, the UI's
+     Spendability section (with a paste-the-box form, since the shell makes no
+     outbound calls). **Measured on mainnet (279 trees): 0 spendable or
+     movable by anyone, 259 require proof, 20 not under probes — 17 of those
+     with every probe erroring on a register read against the synthetic SELF,
+     3 genuinely failing on non-key conditions.** Deferred, recorded in the
+     spec: register/context-var fuzzing, data-input probes, key → address
+     presentation.
+   - P3c (cost hot-spots) is separate — it does not depend on the AST.
    - static lints over `Node` (height guards, `anyOf` shadowing, unchecked
      `get()`, trust assumptions)
    - scenario fuzz over the sandbox ("spendable by anyone?" hunts)

@@ -118,3 +118,42 @@ h2 { font-size: 1.05rem; margin: 1.75rem 0 0.5rem; color: var(--accent); }
 code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.85rem; }
 
 footer { margin-top: 3rem; color: var(--dim); font-size: 0.85rem; }
+
+/* ── spendability ── */
+.hint { color: var(--dim); font-size: 0.9rem; margin: 0.25rem 0; }
+.hunt-verdict { font-weight: 600; margin: 0.5rem 0; }
+.hunt-verdict.bad { color: var(--high); }
+.hunt-verdict.warn { color: var(--medium); }
+.hunt-verdict.ok { color: var(--low); }
+.hunt-verdict.neutral { color: var(--dim); }
+.residuals { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.9rem; }
+.probes { border-collapse: collapse; font-size: 0.9rem; margin: 0.5rem 0; }
+.probes th, .probes td { text-align: left; padding: 0.2rem 0.6rem; border-bottom: 1px solid var(--line); }
+.probes th { color: var(--dim); font-weight: 500; }
+.probes tr[data-verdict="pass"] td:nth-child(3) { color: var(--high); font-weight: 600; }
+.probes tr[data-verdict="needsProof"] td:nth-child(3) { color: var(--low); }
+details { margin: 0.5rem 0; }
+details summary { cursor: pointer; }
+details label { display: block; margin-top: 0.5rem; font-size: 0.9rem; color: var(--dim); }
+#self-box, #height {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 0.25rem;
+  padding: 0.45rem 0.6rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.9rem;
+}
+#rehunt {
+  margin-top: 0.6rem;
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+}

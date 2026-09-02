@@ -73,6 +73,45 @@ curl -s -X POST http://127.0.0.1:8080/api/v1/inspect \
 The guarded variant (`1001040ad801d601c6a70404d1ede6720191e472017300`) returns
 `"findings": []`.
 
+### `POST /api/v1/hunt`
+
+The spend hunt: **can someone with no key spend this box?** Same `input` /
+`network` as inspect, plus optional `height` (base spending height, default
+near the mainnet tip) and `selfBox` (the spent box in the scenario-JSON box
+shape: `value`, `tokens`, `registers`, `creationHeight`). Six probes — three
+heights × an attacker output that takes the funds / a preserve output that
+copies SELF — each a full consensus reduction with no proof and no context
+variables.
+
+```bash
+curl -s -X POST http://127.0.0.1:8080/api/v1/hunt \
+  -H 'content-type: application/json' \
+  -d '{"input":"1001040ad191e4c6a704047300",
+       "selfBox":{"value":1000000,"registers":{"R4":{"type":"Int","value":9}}}}'
+```
+
+```json
+{
+  "treeHex": "1001040ad191e4c6a704047300",
+  "address": "8NJuqcG7SdhX7cFKGBmfAkXn",
+  "verdict": "spendableByAnyone",
+  "residuals": [],
+  "selfSynthetic": false,
+  "probes": [
+    {"height":1500000,"output":"attacker","verdict":"pass","reducedTo":"true","error":null,"cost":…},
+    …
+  ]
+}
+```
+
+`verdict` is one of `spendableByAnyone` (an attacker probe passed — a hit is
+a transaction anyone can build), `movableByAnyone` (only preserve probes
+passed: anyone can re-spend the box back into the same contract),
+`requiresProof` (`residuals` lists the distinct sigma propositions — who can
+spend), or `notUnderProbes` (every probe failed or errored; **not** a safety
+claim). Without `selfBox`, `selfSynthetic` is true and any register read
+errors out — supply the real box before concluding anything.
+
 Errors: `{"error":{"code":"invalid_input","message":"…"}}` — `invalid_input`
 (400, including malformed JSON and unknown `network`), `too_large` (413),
 `internal` (500). Every error, including the extractor's own rejections, uses
@@ -80,10 +119,11 @@ this envelope. Panics never reach the client. An `invalid_input` message for a
 bad tree carries the parser's reason (offset, opcode): it describes the
 caller's own bytes, not server state, and is the useful part of the reply.
 
-Limits: request bodies capped at 64 KiB; at most 64 inspect requests in
-flight, with the rest queued. The limit is scoped to `/api/v1/inspect` so the
-health check and the static UI stay answerable while inspection is saturated;
-it also bounds the number of large-stack threads alive at once. Per-IP rate
+Limits: request bodies capped at 64 KiB; at most 64 engine requests (inspect
+and hunt together, one shared semaphore) in flight, with the rest queued. The
+limit is scoped to the engine routes so the health check and the static UI
+stay answerable while the engine is saturated; it also bounds the number of
+large-stack threads alive at once. Per-IP rate
 limiting is deliberately left to the reverse proxy.
 
 ## The stack budget — why every decompile runs on a big stack
@@ -122,7 +162,8 @@ cargo test -p ergo-web
 
 Integration tests start a real server on an ephemeral port: both fixtures,
 garbage-input / malformed-JSON / unknown-network 400s (all JSON), an
-oversized-body 413 (JSON), the testnet address prefix, and the deep-contract
-test above.
+oversized-body 413 (JSON), the testnet address prefix, the deep-contract
+test above, and the hunt endpoint (spendable-by-anyone, selfBox + height
+accepted, bad selfBox → 400).
 `cargo test -p ergo-sandbox` must stay at its baseline (39 passed) — the engine
 is not modified by this crate.
