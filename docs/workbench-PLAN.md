@@ -170,7 +170,16 @@ Still missing (the actual build list):
      3 genuinely failing on non-key conditions.** Deferred, recorded in the
      spec: register/context-var fuzzing, data-input probes, key → address
      presentation.
-   - P3c (cost hot-spots) is separate — it does not depend on the AST.
+   - **P3c — cost hot-spots: DONE 2026-09-02.** `hot_spots::hot_spots(&[CostLine])`
+     folds the `cost-trace` per-step trace into rows per operation (named
+     via `inspect::opcode_name`, evaluator detail kept), ranked by JIT units
+     with count and share; `ergo-es eval --hot-spots` prints the table.
+     Pure fold, feature-free; the trace itself stays behind `cost-trace`
+     (thread-local recorder, so per-evaluation safe). Carried limitation:
+     labels are opcodes, not source spans — attributing cost to AST nodes
+     needs the evaluator to tag steps with IR ids (node-side, alongside
+     P5-B's preorder map). Not surfaced in ergo-web until then: an
+     opcode histogram is a developer view, not a reader view.
    - static lints over `Node` (height guards, `anyOf` shadowing, unchecked
      `get()`, trust assumptions)
    - scenario fuzz over the sandbox ("spendable by anyone?" hunts)

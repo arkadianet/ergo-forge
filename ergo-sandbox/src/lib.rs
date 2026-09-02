@@ -46,6 +46,7 @@ pub mod box_build;
 pub mod compile;
 pub mod decompile;
 pub mod eval;
+pub mod hot_spots;
 pub mod hunt;
 pub mod inspect;
 pub mod method_names;
