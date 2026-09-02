@@ -15,18 +15,36 @@
 //! - anything else (`SELF`, `OUTPUTS(0)`, a `val`) can be an unmovable fact
 //!   about the box: High.
 //!
+//! Guards held in a `val` are followed: a block statement `val ok = …` whose
+//! expression proves receivers defined makes `ok` prove the same receivers
+//! wherever it appears in a guard position after its definition. (Single-use
+//! vals are inlined by the compiler; this is for the multi-use ones that
+//! survive to the tree.)
+//!
 //! Known gaps (deliberate — see the P3a spec): guards expressed with `||`
-//! and negation, guards held in an enclosing `val`, and cross-branch
-//! reasoning are not recognised, so those produce false positives.
+//! and negation, and cross-branch reasoning are not recognised, so those
+//! produce false positives.
+
+use std::collections::HashMap;
 
 use crate::audit::{children, snippet, Finding, Severity};
+use crate::decompile::Stmt;
 use crate::{Node, NodeKind};
+
+/// Boolean `val`s in scope that prove receivers defined, by name.
+type GuardVals = HashMap<String, Vec<String>>;
 
 /// Report every unguarded `Option.get` in `root`.
 #[must_use]
 pub fn unchecked_get(root: &Node) -> Vec<Finding> {
     let mut out = Vec::new();
-    walk(root, &mut Vec::new(), &mut Vec::new(), &mut out);
+    walk(
+        root,
+        &mut Vec::new(),
+        &mut Vec::new(),
+        &mut GuardVals::new(),
+        &mut out,
+    );
     out
 }
 
@@ -51,17 +69,22 @@ fn as_option_get(n: &Node) -> Option<&Node> {
 /// `||` or negation proves nothing — `x.isDefined || y.isDefined` can hold
 /// with `x` empty — so those subtrees are not entered: documented
 /// false-positive gaps stay false positives, never false negatives.
-fn proves_defined(n: &Node, out: &mut Vec<String>) {
+fn proves_defined(n: &Node, vals: &GuardVals, out: &mut Vec<String>) {
     match &n.kind {
         NodeKind::Method(recv, name, args) if name == "isDefined" && args.is_empty() => {
             out.push(crate::decompile::print(recv));
         }
         NodeKind::Global(name, args) if name == "sigmaProp" && args.len() == 1 => {
-            proves_defined(&args[0], out);
+            proves_defined(&args[0], vals, out);
         }
         NodeKind::Infix(op, a, b) if *op == "&&" => {
-            proves_defined(a, out);
-            proves_defined(b, out);
+            proves_defined(a, vals, out);
+            proves_defined(b, vals, out);
+        }
+        NodeKind::Val(name) => {
+            if let Some(rs) = vals.get(name) {
+                out.extend(rs.iter().cloned());
+            }
         }
         _ => {}
     }
@@ -108,25 +131,31 @@ fn classify(recv: &Node, params: &[String]) -> (Severity, String) {
     }
 }
 
-fn walk(n: &Node, guarded: &mut Vec<String>, params: &mut Vec<String>, out: &mut Vec<Finding>) {
+fn walk(
+    n: &Node,
+    guarded: &mut Vec<String>,
+    params: &mut Vec<String>,
+    vals: &mut GuardVals,
+    out: &mut Vec<Finding>,
+) {
     // Scope-introducing shapes: everything the left/condition proves is
     // available to the right/then branch.
     match &n.kind {
         NodeKind::Infix(op, lhs, rhs) if *op == "&&" => {
-            walk(lhs, guarded, params, out);
+            walk(lhs, guarded, params, vals, out);
             let depth = guarded.len();
-            proves_defined(lhs, guarded);
-            walk(rhs, guarded, params, out);
+            proves_defined(lhs, vals, guarded);
+            walk(rhs, guarded, params, vals, out);
             guarded.truncate(depth);
             return;
         }
         NodeKind::If(cond, then_b, else_b) => {
-            walk(cond, guarded, params, out);
+            walk(cond, guarded, params, vals, out);
             let depth = guarded.len();
-            proves_defined(cond, guarded);
-            walk(then_b, guarded, params, out);
+            proves_defined(cond, vals, guarded);
+            walk(then_b, guarded, params, vals, out);
             guarded.truncate(depth);
-            walk(else_b, guarded, params, out);
+            walk(else_b, guarded, params, vals, out);
             return;
         }
         NodeKind::Lambda(names, body) => {
@@ -137,8 +166,29 @@ fn walk(n: &Node, guarded: &mut Vec<String>, params: &mut Vec<String>, out: &mut
                     .iter()
                     .map(|p| p.split(':').next().unwrap_or(p).trim().to_string()),
             );
-            walk(body, guarded, params, out);
+            walk(body, guarded, params, vals, out);
             params.truncate(depth);
+            return;
+        }
+        NodeKind::Block(stmts, result) => {
+            // Statements bind in order: a val is a guard for everything
+            // after its definition in this block, and nothing before.
+            let mut added: Vec<String> = Vec::new();
+            for st in stmts {
+                let (name, expr) = match st {
+                    Stmt::Val(n, e) | Stmt::Def(n, e) => (n, e),
+                };
+                walk(expr, guarded, params, vals, out);
+                let mut proves = Vec::new();
+                proves_defined(expr, vals, &mut proves);
+                if !proves.is_empty() && vals.insert(name.clone(), proves).is_none() {
+                    added.push(name.clone());
+                }
+            }
+            walk(result, guarded, params, vals, out);
+            for name in added {
+                vals.remove(&name);
+            }
             return;
         }
         _ => {}
@@ -158,6 +208,6 @@ fn walk(n: &Node, guarded: &mut Vec<String>, params: &mut Vec<String>, out: &mut
     }
 
     for c in children(n) {
-        walk(c, guarded, params, out);
+        walk(c, guarded, params, vals, out);
     }
 }

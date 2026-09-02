@@ -173,3 +173,55 @@ fn a_get_through_an_element_property_chain_is_medium() {
     assert_eq!(f.len(), 1, "{f:?}");
     assert_eq!(f[0].severity, ergo_sandbox::Severity::Medium);
 }
+
+// ── guards held in a val ───────────────────────────────────────────────────
+//
+// A single-use `val` is inlined by the compiler, so only multi-use guards
+// survive to the tree (as `val v2 = v.isDefined; … v2 && … && v2`). The
+// lint must follow the binding.
+
+#[test]
+fn a_guard_bound_to_a_val_clears_the_get_under_and() {
+    assert!(findings_of(
+        "{ val ok = SELF.R4[Int].isDefined; sigmaProp(ok && SELF.R4[Int].get > 5 && ok) }"
+    )
+    .is_empty());
+}
+
+#[test]
+fn a_guard_bound_to_a_val_clears_the_get_in_the_then_branch() {
+    assert!(findings_of(
+        "{ val ok = SELF.R4[Int].isDefined && HEIGHT > 10; sigmaProp(if (ok) SELF.R4[Int].get > 5 else ok) }"
+    )
+    .is_empty());
+}
+
+#[test]
+fn a_val_guard_under_or_still_proves_nothing() {
+    assert_eq!(
+        findings_of(
+            "{ val ok = SELF.R4[Int].isDefined || SELF.R5[Int].isDefined; sigmaProp(ok && SELF.R4[Int].get > 5 && ok) }"
+        )
+        .len(),
+        1
+    );
+}
+
+#[test]
+fn a_val_guard_does_not_clear_a_get_outside_its_scope() {
+    assert_eq!(
+        findings_of(
+            "{ val ok = SELF.R4[Int].isDefined; sigmaProp(SELF.R4[Int].get > 5 && ok && ok) }"
+        )
+        .len(),
+        1
+    );
+}
+
+#[test]
+fn a_val_guard_composed_of_two_guards_clears_both_gets() {
+    assert!(findings_of(
+        "{ val ok = SELF.R4[Int].isDefined && SELF.R5[Long].isDefined; sigmaProp(ok && SELF.R4[Int].get > 5 && SELF.R5[Long].get > 1L && ok) }"
+    )
+    .is_empty());
+}
