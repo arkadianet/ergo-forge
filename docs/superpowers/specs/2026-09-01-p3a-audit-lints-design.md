@@ -210,7 +210,8 @@ Stated here so the gaps are documented rather than discovered:
   unequal; two syntactically identical reads of *different* boxes would compare
   equal (not possible today, since receivers carry their index).
 
-Cross-branch reasoning is the one remaining source of **false positives**,
+Cross-branch reasoning and semantic receiver equality remain as sources of
+**false positives** (the former is the only one observed in the corpora),
 which is why the corpus measurement below is a gate rather than a report.
 
 ### Severity
