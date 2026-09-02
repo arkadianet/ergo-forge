@@ -36,6 +36,9 @@ The image runs the release binary as an unprivileged user, binds `0.0.0.0:8080`
 inside the container, and carries a health check against `/api/v1/health`.
 Put TLS and per-IP rate limiting in front of it. Roughly 86 MB.
 
+Pushing a `v*` tag builds and publishes the image to
+`ghcr.io/arkadianet/ergo-web:<version>` (`.github/workflows/release-image.yml`).
+
 ## API
 
 Versioned under `/api/v1/`. All responses and errors are JSON; every field is camelCase.
