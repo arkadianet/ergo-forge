@@ -350,3 +350,22 @@ async fn eval_rejects_a_scenario_with_neither_tree_nor_source() {
     let r = post_eval(&base, serde_json::json!({ "height": 5 })).await;
     assert_eq!(r.status(), 400);
 }
+
+/// One wire convention across the API: every field is camelCase.
+#[tokio::test]
+async fn inspect_fields_are_camel_case_like_the_other_endpoints() {
+    let base = spawn().await;
+    let res: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/inspect"))
+        .json(&serde_json::json!({ "input": "1001040ad191e4c6a704047300" }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert!(res.get("treeHex").is_some(), "{res}");
+    assert!(res.get("rawPlaceholders").is_some(), "{res}");
+    assert!(res.get("tree_hex").is_none(), "{res}");
+    assert!(res["findings"][0].get("nodeId").is_some(), "{res}");
+}

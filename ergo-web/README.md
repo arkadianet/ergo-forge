@@ -38,7 +38,7 @@ Put TLS and per-IP rate limiting in front of it. Roughly 86 MB.
 
 ## API
 
-Versioned under `/api/v1/`. All responses and errors are JSON.
+Versioned under `/api/v1/`. All responses and errors are JSON; every field is camelCase.
 
 ### `GET /api/v1/health`
 
@@ -63,17 +63,17 @@ curl -s -X POST http://127.0.0.1:8080/api/v1/inspect \
 
 ```json
 {
-  "tree_hex": "1001040ad191e4c6a704047300",
+  "treeHex": "1001040ad191e4c6a704047300",
   "address": "8NJuqcG7SdhX7cFKGBmfAkXn",
   "source": "SELF.R4[Int].get > 5",
   "completeness": "complete",
-  "raw_placeholders": 0,
+  "rawPlaceholders": 0,
   "truncated": false,
   "findings": [
     {
       "lint": "unchecked-get",
       "severity": "high",
-      "node_id": 2,
+      "nodeId": 2,
       "message": "Option.get with no isDefined guard — …",
       "snippet": "SELF.R4[Int].get"
     }

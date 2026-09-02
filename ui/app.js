@@ -54,14 +54,14 @@ async function read() {
 
 function render(r) {
   $("source").textContent = r.source;
-  $("tree-hex").textContent = r.tree_hex;
+  $("tree-hex").textContent = r.treeHex;
   $("address").textContent = r.address;
 
   const banner = $("partial-banner");
   if (r.completeness === "partial") {
     const bits = [];
-    if (r.raw_placeholders > 0) {
-      bits.push(`${r.raw_placeholders} unreadable section(s)`);
+    if (r.rawPlaceholders > 0) {
+      bits.push(`${r.rawPlaceholders} unreadable section(s)`);
     }
     if (r.truncated) {
       bits.push("depth limit hit");
