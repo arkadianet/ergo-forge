@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["ergo-sandbox"]
+members = ["ergo-sandbox", "ergo-web"]
 
 [workspace.package]
 version    = "0.1.0"
@@ -23,3 +23,9 @@ hex        = "0.4"
 indexmap   = { version = "2", features = ["serde"] }
 num-bigint = "0.4"
 bs58       = "0.5"
+axum       = "0.8"
+tokio      = { version = "1", features = ["rt-multi-thread", "macros", "signal"] }
+tower      = { version = "0.5", features = ["limit"] }
+tower-http = { version = "0.7", features = ["fs", "trace"] }
+tracing    = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
