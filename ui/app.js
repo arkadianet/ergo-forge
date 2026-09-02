@@ -190,6 +190,74 @@ function renderHunt(h) {
   }
 }
 
+// ── scenario eval ────────────────────────────────────────────────────────
+
+const EVAL_VERDICTS = {
+  pass: ["PASS — spendable in this context", "bad"],
+  fail: ["FAIL — not spendable in this context", "ok"],
+  error: ["ERROR — the script threw", "warn"],
+  needsProof: ["NEEDS PROOF — a signature is required", "ok"],
+  proofAccepted: ["PROOF ACCEPTED", "bad"],
+  proofRejected: ["PROOF REJECTED", "ok"],
+};
+
+let evalInFlight = false;
+
+async function runScenario() {
+  if (evalInFlight) return;
+  const status = $("eval-status");
+  const result = $("eval-result");
+  let scenario;
+  try {
+    scenario = JSON.parse($("scenario").value);
+  } catch (e) {
+    status.textContent = `Scenario JSON does not parse: ${e.message}`;
+    status.hidden = false;
+    return;
+  }
+  evalInFlight = true;
+  $("run").disabled = true;
+  status.textContent = "Evaluating…";
+  status.hidden = false;
+  result.hidden = true;
+  try {
+    const res = await fetch("/api/v1/eval", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(scenario),
+    });
+    const body = await res.json();
+    if (!res.ok) {
+      status.textContent = `Error: ${(body.error && body.error.message) || res.status}`;
+      return;
+    }
+    const [label, cls] = EVAL_VERDICTS[body.verdict] || [body.verdict, "neutral"];
+    const v = $("eval-verdict");
+    v.textContent = label;
+    v.className = `hunt-verdict ${cls}`;
+    $("eval-cost").textContent = `${body.cost} / ${body.costLimit} block units`;
+    $("eval-reduced").textContent = body.reducedTo || "—";
+    $("eval-error").textContent = body.error || "—";
+    $("eval-address").textContent = body.address;
+    const list = $("eval-trace");
+    list.textContent = "";
+    for (const t of body.trace) {
+      const li = document.createElement("li");
+      li.textContent = `${t.label} = ${t.value}`;
+      list.appendChild(li);
+    }
+    status.hidden = true;
+    result.hidden = false;
+  } catch (e) {
+    status.textContent = `Request failed: ${e}`;
+  } finally {
+    evalInFlight = false;
+    $("run").disabled = false;
+  }
+}
+
+$("run").addEventListener("click", runScenario);
+
 $("rehunt").addEventListener("click", () => {
   const input = $("input").value.trim();
   if (input) huntFor(input, $("network").value);

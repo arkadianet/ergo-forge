@@ -12,7 +12,7 @@ use tower_http::trace::TraceLayer;
 /// Largest accepted request body. Real inputs are a few KiB.
 pub const MAX_BODY_BYTES: usize = 64 * 1024;
 
-/// Engine requests (inspect + hunt) in flight at once, one shared budget.
+/// Engine requests (inspect, hunt, eval) in flight at once, one shared budget.
 /// Each one holds a large-stack thread, so this is also the bound on those
 /// threads. Excess requests queue rather than fail. Scoped to the engine
 /// routes only: health checks and the static UI must stay answerable while
@@ -33,7 +33,11 @@ pub fn router() -> Router {
         )
         .route(
             "/api/v1/hunt",
-            post(crate::routes::hunt::hunt_route).layer(engine_limit),
+            post(crate::routes::hunt::hunt_route).layer(engine_limit.clone()),
+        )
+        .route(
+            "/api/v1/eval",
+            post(crate::routes::eval::eval_route).layer(engine_limit),
         )
         .fallback_service(ServeDir::new(
             std::env::var("UI_DIR").unwrap_or_else(|_| "ui".into()),

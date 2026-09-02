@@ -206,6 +206,11 @@ Still missing (the actual build list):
      the guard is removed. Note the guard is required despite the engine's
      depth caps: the caps bound node count, not frame width, and real
      contracts cost >10× more stack per level than synthetic arithmetic.
+     **Extended 2026-09-02:** `POST /api/v1/hunt` (P3b) and `POST
+     /api/v1/eval` — the scenario loop over HTTP, body = the `ergo-es eval`
+     scenario JSON, response = verdict / cost / residual / trace — plus a
+     Scenario panel in the reader, which closes the thesis' first row (dApp
+     devs: compile → address → test scenarios) for the browser shell.
      The API is the stable boundary keeping a future WASM build viable —
      which stays blocked on `ergo-sigma`'s `panic = "unwind"` requirement
      (its AVL verifier uses `catch_unwind` to fail closed; `wasm32` is

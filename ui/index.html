@@ -76,6 +76,30 @@
     </section>
   </main>
 
+  <section class="scenario">
+    <h2>Scenario</h2>
+    <p class="hint">Test a contract against a spending context on the consensus
+       reducer: source or tree hex, height, boxes, context variables. See the
+       sandbox README for the schema.</p>
+    <label for="scenario">Scenario JSON</label>
+    <textarea id="scenario" rows="6" spellcheck="false">{ "source": "sigmaProp(HEIGHT > 100)", "height": 200 }</textarea>
+    <button id="run">Run</button>
+    <p id="eval-status" class="status" hidden></p>
+    <div id="eval-result" hidden>
+      <p id="eval-verdict" class="hunt-verdict"></p>
+      <dl class="wire">
+        <dt>cost</dt><dd><code id="eval-cost"></code></dd>
+        <dt>reduced to</dt><dd><code id="eval-reduced"></code></dd>
+        <dt>error</dt><dd><code id="eval-error"></code></dd>
+        <dt>address</dt><dd><code id="eval-address"></code></dd>
+      </dl>
+      <details>
+        <summary>Trace</summary>
+        <ul id="eval-trace" class="residuals"></ul>
+      </details>
+    </div>
+  </section>
+
   <footer>ergo-web <span id="api-version">v1</span> — source and findings are
     computed from the ErgoTree bytes; no node or explorer is contacted.</footer>
 

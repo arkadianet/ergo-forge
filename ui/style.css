@@ -157,3 +157,30 @@ details label { display: block; margin-top: 0.5rem; font-size: 0.9rem; color: va
   font-weight: 600;
   cursor: pointer;
 }
+
+/* ── scenario ── */
+.scenario { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+.scenario label { display: block; margin-top: 0.5rem; font-size: 0.9rem; color: var(--dim); }
+#scenario {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 0.25rem;
+  padding: 0.45rem 0.6rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.9rem;
+}
+#run {
+  margin-top: 0.6rem;
+  padding: 0.45rem 1.2rem;
+  border: 0;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #06222e;
+  font-weight: 600;
+  cursor: pointer;
+}
+#run:disabled { opacity: 0.5; cursor: wait; }
