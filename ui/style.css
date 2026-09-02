@@ -190,3 +190,40 @@ details label { display: block; margin-top: 0.5rem; font-size: 0.9rem; color: va
 #source mark { background: #5a4300; color: var(--text); border-radius: 3px; padding: 0 2px; }
 #findings li { cursor: pointer; }
 #findings li.active { outline: 1px solid var(--accent); }
+
+/* ── modes and write pane ── */
+.modes { display: flex; gap: 0.25rem; margin-top: 1.25rem; border-bottom: 1px solid var(--line); }
+.mode {
+  padding: 0.5rem 1rem; border: 0; background: transparent; color: var(--dim);
+  font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent;
+}
+.mode.active { color: var(--accent); border-bottom-color: var(--accent); }
+.pane { margin-top: 1rem; }
+.write-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+#example-pick, #write-network {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px; color: var(--text); padding: 0.4rem;
+}
+#example-pick { flex: 1; }
+#compile {
+  padding: 0.55rem 1.2rem; border: 0; border-radius: 6px; background: var(--accent);
+  color: #06222e; font-weight: 600; cursor: pointer;
+}
+#compile:disabled { opacity: 0.5; cursor: wait; }
+#editor {
+  width: 100%; box-sizing: border-box; margin-top: 0.25rem; padding: 0.6rem 0.7rem;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px; color: var(--text);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.9rem; line-height: 1.4;
+  tab-size: 2;
+}
+.caret {
+  margin: 0.25rem 0; padding: 0.4rem 0.7rem; background: #2b0605; border: 1px solid var(--high);
+  border-radius: 6px; color: var(--text); font-size: 0.85rem; white-space: pre;
+}
+.params { border-collapse: collapse; margin: 0.5rem 0; width: 100%; }
+.params td { padding: 0.25rem 0.5rem; border-bottom: 1px solid var(--line); }
+.params select, .params input {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px; color: var(--text);
+  padding: 0.3rem 0.5rem; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.85rem;
+}
+.params input { width: 100%; box-sizing: border-box; }
+#c-source { white-space: pre-wrap; }

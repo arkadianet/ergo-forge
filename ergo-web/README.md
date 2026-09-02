@@ -21,6 +21,7 @@ Configuration is environment-only, no config file:
 |------------|------------------|-----------------------------------------------------|
 | `BIND_ADDR`| `127.0.0.1:8080` | Socket the server binds                             |
 | `UI_DIR`   | `ui`             | Static folder served for non-API paths (repo root's `ui/` when run from the workspace root) |
+| `EXAMPLES_DIR` | `examples/contracts` | Example `.es` files for the gallery |
 | `RUST_LOG` | `info`           | `tracing` filter (method, path, status, duration are logged; never request bodies) |
 
 Shutdown is graceful on SIGTERM/Ctrl-C so deploys do not cut live requests.
@@ -127,6 +128,35 @@ passed: anyone can re-spend the box back into the same contract),
 spend), or `notUnderProbes` (every probe failed or errored; **not** a safety
 claim). Without `selfBox`, `selfSynthetic` is true and any register read
 errors out — supply the real box before concluding anything.
+
+### `POST /api/v1/compile`
+
+The write side of the playground: source (+ compile-time parameters) →
+tree, addresses, the tree decompiled back to source, and findings.
+
+```bash
+curl -s -X POST http://127.0.0.1:8080/api/v1/compile \
+  -H 'content-type: application/json' \
+  -d '{"source":"sigmaProp(HEIGHT > $minHeight)",
+       "params":{"minHeight":{"type":"Int","value":100}}}'
+```
+
+`params` map a name to a typed value (the scenario typed-value shape).
+`$name` and bare identifiers resolve through the compiler's environment;
+`"$name"` and all-caps tokens inside string literals are substituted
+textually (`String` params as given, `Coll[Byte]` as hex). The response
+lists every parameter the source uses with `supplied: true/false`.
+
+Errors: `missing_params` (400, with `missingParams: [{name, typeHint}]` so
+a form can be built), `compile_error` (400, with `offset` into the source).
+
+### `GET /api/v1/examples`, `GET /api/v1/examples/{id}`
+
+The gallery: `[{id, group, name}]`, then `{id, group, name, source, params,
+template}` for one. Files under `EXAMPLES_DIR` (default `examples/contracts`;
+86 files — 7 basics plus the node corpus's 79 real deployed contracts, see
+`examples/contracts/ORIGIN.md`). `template` marks EIP-5 `@contract def`
+sources, which cannot be parameterised yet.
 
 ### `POST /api/v1/eval`
 
