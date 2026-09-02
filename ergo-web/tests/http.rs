@@ -77,7 +77,62 @@ async fn garbage_input_is_a_400() {
 }
 
 #[tokio::test]
-async fn oversized_body_is_a_413() {
+async fn malformed_json_body_is_a_json_400() {
+    let base = spawn().await;
+    let r = reqwest::Client::new()
+        .post(format!("{base}/api/v1/inspect"))
+        .header("content-type", "application/json")
+        .body("{not json")
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(r.status(), 400);
+    let body: serde_json::Value = r.json().await.expect("400 body must be JSON");
+    assert_eq!(body["error"]["code"], "invalid_input");
+}
+
+#[tokio::test]
+async fn unknown_network_is_a_400() {
+    let base = spawn().await;
+    for bad in ["testnet ", "Mainnet", "regtest", ""] {
+        let r = reqwest::Client::new()
+            .post(format!("{base}/api/v1/inspect"))
+            .json(&serde_json::json!({ "input": "1001040ad191e4c6a704047300", "network": bad }))
+            .send()
+            .await
+            .unwrap();
+        assert_eq!(r.status(), 400, "network {bad:?} was accepted");
+        let body: serde_json::Value = r.json().await.unwrap();
+        assert_eq!(body["error"]["code"], "invalid_input");
+    }
+}
+
+#[tokio::test]
+async fn testnet_network_encodes_a_testnet_address() {
+    let base = spawn().await;
+    let res: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/inspect"))
+        .json(&serde_json::json!({ "input": "1001040ad191e4c6a704047300", "network": "testnet" }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    let mainnet: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/inspect"))
+        .json(&serde_json::json!({ "input": "1001040ad191e4c6a704047300" }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_ne!(res["address"], mainnet["address"]);
+}
+
+#[tokio::test]
+async fn oversized_body_413_is_json() {
     let base = spawn().await;
     let big = "a".repeat(64 * 1024 + 1);
     let r = reqwest::Client::new()
@@ -87,7 +142,9 @@ async fn oversized_body_is_a_413() {
         .send()
         .await
         .unwrap();
-    assert_eq!(r.status(), 413, "status: {}", r.status());
+    assert_eq!(r.status(), 413);
+    let body: serde_json::Value = r.json().await.expect("413 body must be JSON");
+    assert_eq!(body["error"]["code"], "too_large");
 }
 
 /// The stack-budget proof, measured on a REAL contract. This tree is the

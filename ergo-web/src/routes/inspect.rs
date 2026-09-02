@@ -4,23 +4,34 @@ use axum::Json;
 use ergo_sandbox::audit;
 use ergo_ser::address::NetworkPrefix;
 
-use crate::{dto, error::ApiError, input};
+use crate::{dto, error::ApiError, extract::ApiJson, input};
+
+/// Parse the optional `network` field. Absent means mainnet; anything other
+/// than the two exact spellings is an input error rather than a silent
+/// mainnet default — a wrong network yields a wrong address, not a failure.
+fn parse_network(raw: Option<&str>) -> Result<NetworkPrefix, ApiError> {
+    match raw {
+        None | Some("mainnet") => Ok(NetworkPrefix::Mainnet),
+        Some("testnet") => Ok(NetworkPrefix::Testnet),
+        Some(other) => Err(ApiError::InvalidInput(format!(
+            "unknown network {other:?}; expected \"mainnet\" or \"testnet\""
+        ))),
+    }
+}
 
 pub async fn inspect(
-    Json(req): Json<dto::InspectRequest>,
+    ApiJson(req): ApiJson<dto::InspectRequest>,
 ) -> Result<Json<dto::InspectResponse>, ApiError> {
-    let testnet = matches!(req.network.as_deref(), Some("testnet"));
-    let network = if testnet {
-        NetworkPrefix::Testnet
-    } else {
-        NetworkPrefix::Mainnet
-    };
+    let network = parse_network(req.network.as_deref())?;
+    let testnet = network == NetworkPrefix::Testnet;
 
     let bytes = input::resolve(&req.input, network)?;
     let tree_hex = hex::encode(&bytes);
 
     // The lift recurses ~3 MiB deep; tokio workers have 2 MiB. Never run it on
-    // a runtime worker — a deep contract would abort the process.
+    // a runtime worker — a deep contract would abort the process. Concurrency
+    // is bounded by the limit layer on this route (see `app.rs`), so the
+    // number of large-stack threads alive at once is bounded too.
     let bytes_for_task = bytes.clone();
     let result = tokio::task::spawn_blocking(move || {
         ergo_sandbox::decompile::with_large_stack(move || {
@@ -34,6 +45,8 @@ pub async fn inspect(
     .await
     .map_err(|_| ApiError::Internal)?;
 
+    // The parser's message describes the caller's own bytes (offset, opcode),
+    // not server state — it is the useful part of a 400, so it is passed on.
     let (source, report) = result.map_err(|e| ApiError::InvalidInput(e.to_string()))?;
     let (completeness, raw_placeholders, truncated) = dto::completeness_parts(&report);
 
@@ -50,4 +63,25 @@ pub async fn inspect(
             .map(dto::FindingDto::from_engine)
             .collect(),
     }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn absent_network_is_mainnet() {
+        assert_eq!(parse_network(None).unwrap(), NetworkPrefix::Mainnet);
+    }
+
+    #[test]
+    fn only_exact_spellings_are_accepted() {
+        assert_eq!(
+            parse_network(Some("testnet")).unwrap(),
+            NetworkPrefix::Testnet
+        );
+        for bad in ["testnet ", "Testnet", "MAINNET", ""] {
+            assert!(parse_network(Some(bad)).is_err(), "{bad:?} accepted");
+        }
+    }
 }

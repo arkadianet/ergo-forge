@@ -38,7 +38,9 @@ Versioned under `/api/v1/`. All responses and errors are JSON.
 ### `POST /api/v1/inspect`
 
 `input` accepts a P2S address or raw ErgoTree hex (hex is tried first; the two
-cannot collide). `network` is optional, default `mainnet`.
+cannot collide). `network` is optional: absent means `mainnet`; the only
+accepted values are exactly `mainnet` and `testnet`, anything else is a 400
+(a silently defaulted network would produce a wrong address, not an error).
 
 Real example against a known fixture — an unguarded register read:
 
@@ -72,10 +74,17 @@ The guarded variant (`1001040ad801d601c6a70404d1ede6720191e472017300`) returns
 `"findings": []`.
 
 Errors: `{"error":{"code":"invalid_input","message":"…"}}` — `invalid_input`
-(400), `too_large` (413), `internal` (500). Panics never reach the client.
+(400, including malformed JSON and unknown `network`), `too_large` (413),
+`internal` (500). Every error, including the extractor's own rejections, uses
+this envelope. Panics never reach the client. An `invalid_input` message for a
+bad tree carries the parser's reason (offset, opcode): it describes the
+caller's own bytes, not server state, and is the useful part of the reply.
 
-Limits: request bodies capped at 64 KiB, concurrency capped at 64 in-flight
-requests. Per-IP rate limiting is deliberately left to the reverse proxy.
+Limits: request bodies capped at 64 KiB; at most 64 inspect requests in
+flight, with the rest queued. The limit is scoped to `/api/v1/inspect` so the
+health check and the static UI stay answerable while inspection is saturated;
+it also bounds the number of large-stack threads alive at once. Per-IP rate
+limiting is deliberately left to the reverse proxy.
 
 ## The stack budget — why every decompile runs on a big stack
 
@@ -111,7 +120,9 @@ Two properties keep this safe rather than fragile:
 cargo test -p ergo-web
 ```
 
-Integration tests start a real server on an ephemeral port: both fixtures, a
-garbage-input 400, an oversized-body 413, and the deep-contract test above.
+Integration tests start a real server on an ephemeral port: both fixtures,
+garbage-input / malformed-JSON / unknown-network 400s (all JSON), an
+oversized-body 413 (JSON), the testnet address prefix, and the deep-contract
+test above.
 `cargo test -p ergo-sandbox` must stay at its baseline (39 passed) — the engine
 is not modified by this crate.

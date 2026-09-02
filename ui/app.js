@@ -3,7 +3,11 @@
 
 const $ = (id) => document.getElementById(id);
 
+// One inspection at a time: Enter in the input box and the button share this.
+let inFlight = false;
+
 async function read() {
+  if (inFlight) return;
   const input = $("input").value.trim();
   const network = $("network").value;
   const status = $("status");
@@ -16,6 +20,7 @@ async function read() {
     return;
   }
 
+  inFlight = true;
   $("read").disabled = true;
   status.textContent = "Reading contract…";
   status.hidden = false;
@@ -38,6 +43,7 @@ async function read() {
   } catch (e) {
     status.textContent = `Request failed: ${e}`;
   } finally {
+    inFlight = false;
     $("read").disabled = false;
   }
 }
