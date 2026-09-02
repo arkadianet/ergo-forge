@@ -42,6 +42,32 @@
       <p id="no-findings" hidden>No findings. (If the banner above is showing,
          that does <em>not</em> mean the contract is clean.)</p>
 
+      <h2>Spendability</h2>
+      <p class="hint">Can someone with no key spend this box? Six probes on the
+         consensus reducer, no proof, no context variables. A hit is real; a
+         miss only means "not under these probes".</p>
+      <p id="hunt-verdict" class="hunt-verdict"></p>
+      <p id="hunt-synthetic" class="hint" hidden>SELF was synthetic (no
+         registers, value 0) — register reads error out. Describe the real box
+         below and re-run for a real answer.</p>
+      <ul id="hunt-residuals" class="residuals"></ul>
+      <details>
+        <summary>Probes</summary>
+        <table class="probes">
+          <thead><tr><th>height</th><th>outputs</th><th>verdict</th><th>detail</th></tr></thead>
+          <tbody id="hunt-probes"></tbody>
+        </table>
+      </details>
+      <details>
+        <summary>Describe the spent box (optional)</summary>
+        <label for="self-box">Box JSON — value, tokens, registers, creationHeight; see the sandbox README scenario schema</label>
+        <textarea id="self-box" rows="4" spellcheck="false"
+          placeholder='{"value": 1000000, "registers": {"R4": {"type": "Int", "value": 5}}}'></textarea>
+        <label for="height">Spending height</label>
+        <input id="height" type="number" min="1" placeholder="default: 1500000">
+        <button id="rehunt">Re-run hunt</button>
+      </details>
+
       <h2>Wire form</h2>
       <dl class="wire">
         <dt>tree hex</dt><dd><code id="tree-hex"></code></dd>

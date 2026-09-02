@@ -2,6 +2,7 @@
 //! versioned contract and the engine must stay free to change.
 
 use ergo_sandbox::audit::{Audit, Completeness};
+use ergo_sandbox::hunt::{Hunt, HuntVerdict, OutputShape};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize)]
@@ -55,5 +56,81 @@ pub fn completeness_parts(a: &Audit) -> (&'static str, usize, bool) {
             raw_placeholders,
             truncated,
         } => ("partial", raw_placeholders, truncated),
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct HuntRequest {
+    pub input: String,
+    #[serde(default)]
+    pub network: Option<String>,
+    /// Base spending height; default near the mainnet tip.
+    #[serde(default)]
+    pub height: Option<u32>,
+    /// The box being spent, in the scenario-JSON box shape. Without it SELF
+    /// is synthetic and the response says so.
+    #[serde(default)]
+    pub self_box: Option<ergo_sandbox::ScenarioBox>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProbeDto {
+    pub height: u32,
+    pub output: &'static str,
+    pub verdict: &'static str,
+    pub reduced_to: Option<String>,
+    pub error: Option<String>,
+    pub cost: u64,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct HuntResponse {
+    pub tree_hex: String,
+    pub address: String,
+    pub verdict: &'static str,
+    pub residuals: Vec<String>,
+    pub self_synthetic: bool,
+    pub probes: Vec<ProbeDto>,
+}
+
+impl HuntResponse {
+    pub fn from_engine(tree_hex: String, address: String, h: &Hunt) -> Self {
+        Self {
+            tree_hex,
+            address,
+            verdict: match h.verdict {
+                HuntVerdict::SpendableByAnyone => "spendableByAnyone",
+                HuntVerdict::MovableByAnyone => "movableByAnyone",
+                HuntVerdict::RequiresProof => "requiresProof",
+                HuntVerdict::NotUnderProbes => "notUnderProbes",
+            },
+            residuals: h.residuals.clone(),
+            self_synthetic: h.self_synthetic,
+            probes: h
+                .probes
+                .iter()
+                .map(|p| ProbeDto {
+                    height: p.height,
+                    output: match p.output {
+                        OutputShape::Attacker => "attacker",
+                        OutputShape::Preserve => "preserve",
+                    },
+                    verdict: match p.verdict {
+                        ergo_sandbox::Verdict::Pass => "pass",
+                        ergo_sandbox::Verdict::Fail => "fail",
+                        ergo_sandbox::Verdict::Error => "error",
+                        ergo_sandbox::Verdict::NeedsProof => "needsProof",
+                        ergo_sandbox::Verdict::ProofAccepted => "proofAccepted",
+                        ergo_sandbox::Verdict::ProofRejected => "proofRejected",
+                    },
+                    reduced_to: p.reduced_to.clone(),
+                    error: p.error.clone(),
+                    cost: p.cost,
+                })
+                .collect(),
+        }
     }
 }
