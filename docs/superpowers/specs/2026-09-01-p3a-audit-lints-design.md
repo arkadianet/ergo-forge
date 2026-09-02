@@ -210,8 +210,18 @@ below is a gate rather than a report.
 
 ### Severity
 
-`High`. An unguarded `get` that fails makes the box unspendable through that
-path — the highest-consequence class this lint can produce.
+Tiered by **who controls the receiver** (amended 2026-09-02, after reading
+all 13 flagged mainnet trees). The receiver chain is walked to its root:
+
+| Root | Severity | Why |
+|---|---|---|
+| `getVar[T](n)` — a context variable | Low | Supplied by the spender with the proof. A missing one fails *that* spend; it cannot lock the box. Nine of the 79 mainnet findings. |
+| A lambda parameter — an element of the collection being iterated | Medium | The element is one the spender chose (inputs, outputs, data inputs, or derived). Fragile, not locking — unless the element is SELF, which the message says. Nine of 79. |
+| Anything else (`SELF`, `OUTPUTS(0)`, a `val`) | High | Can be an unmovable fact about the box: the path is unusable. Sixty-one of 79. |
+
+The lint id stays `unchecked-get`; only the tier and the message change. The
+guard logic is unchanged, and a guard inside a lambda body still clears the
+element read (the receiver text matches within that scope).
 
 ## CLI surface
 

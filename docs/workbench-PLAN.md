@@ -153,7 +153,10 @@ Still missing (the actual build list):
      placeholders, so an audit over a partly-lifted tree cannot read as clean.
      Measured flag rate on mainnet: 13/279 trees flagged (4.7%), 79 findings,
      75/79 hand-verified real (4 false positives, all the untracked
-     `Filter`-predicate guard pattern).
+     `Filter`-predicate guard pattern). **Severity tiered 2026-09-02** by the
+     receiver's root: context variable → Low (9/79), lambda element → Medium
+     (9/79), else High (61/79). Same findings, honest alarm level; spec
+     amended.
    - **P3b — spend hunt: DONE 2026-09-02** (design:
      `docs/superpowers/specs/2026-09-02-p3b-spend-hunt-design.md`).
      `hunt::hunt(tree_bytes, &opts) -> Hunt`: six probes (heights `base`,

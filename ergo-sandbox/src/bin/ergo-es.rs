@@ -548,6 +548,7 @@ fn cmd_audit(args: &[String]) -> Result<(), String> {
             };
             let mut flagged = 0usize;
             let mut findings_total = 0usize;
+            let mut by_severity = std::collections::BTreeMap::<&str, usize>::new();
             let mut partial = 0usize;
             let mut parse_errors = 0usize;
             for h in &trees {
@@ -572,6 +573,9 @@ fn cmd_audit(args: &[String]) -> Result<(), String> {
                     eprintln!("flagged {h}");
                 }
                 findings_total += n;
+                for f in &report.findings {
+                    *by_severity.entry(f.severity.label()).or_default() += 1;
+                }
                 if !matches!(
                     report.completeness,
                     ergo_sandbox::audit::Completeness::Complete
@@ -588,6 +592,9 @@ fn cmd_audit(args: &[String]) -> Result<(), String> {
             println!("audited: {audited} trees");
             println!("  flagged: {flagged} ({pct:.1}%)");
             println!("  findings: {findings_total}");
+            for (sev, n) in &by_severity {
+                println!("    {sev}: {n}");
+            }
             println!("  partial: {partial}");
             if parse_errors > 0 {
                 println!("  parse-errors: {parse_errors}");

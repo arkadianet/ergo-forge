@@ -114,3 +114,62 @@ fn is_defined_nested_in_conjunction_still_guards() {
     )
     .is_empty());
 }
+
+// ── severity tiers: who controls the receiver ──────────────────────────────
+
+fn findings_of(src: &str) -> Vec<ergo_sandbox::Finding> {
+    audit::audit(&lifted(src)).findings
+}
+
+/// A context variable is supplied by the spender with the proof; a missing
+/// one fails the spend but cannot lock the box — the spender just supplies it.
+#[test]
+fn a_get_on_a_context_variable_is_low() {
+    let f = findings_of("sigmaProp(getVar[Int](0).get > 5)");
+    assert_eq!(f.len(), 1, "{f:?}");
+    assert_eq!(f[0].lint, "unchecked-get");
+    assert_eq!(f[0].severity, ergo_sandbox::Severity::Low);
+    assert!(
+        f[0].message.contains("context variable 0"),
+        "{}",
+        f[0].message
+    );
+}
+
+/// Inside a lambda over a collection the receiver is an element the spender
+/// chose (inputs, outputs, data inputs) — fragile, not a lock.
+#[test]
+fn a_get_on_a_lambda_element_is_medium() {
+    let f = findings_of("sigmaProp(OUTPUTS.exists { (b: Box) => b.R4[Int].get > 0 })");
+    assert_eq!(f.len(), 1, "{f:?}");
+    assert_eq!(f[0].severity, ergo_sandbox::Severity::Medium);
+    assert!(f[0].message.contains("element"), "{}", f[0].message);
+}
+
+/// A guard inside the lambda body still clears the element read.
+#[test]
+fn a_guarded_lambda_element_get_is_not_flagged() {
+    assert!(findings_of(
+        "sigmaProp(OUTPUTS.exists { (b: Box) => b.R4[Int].isDefined && b.R4[Int].get > 0 })"
+    )
+    .is_empty());
+}
+
+/// SELF inside a lambda body is still SELF — the tier follows the receiver's
+/// root, not the lexical position.
+#[test]
+fn a_self_get_inside_a_lambda_stays_high() {
+    let f = findings_of("sigmaProp(OUTPUTS.exists { (b: Box) => b.value > SELF.R4[Long].get })");
+    assert_eq!(f.len(), 1, "{f:?}");
+    assert_eq!(f[0].severity, ergo_sandbox::Severity::High);
+}
+
+/// A get whose receiver is indexed off a lambda element is still the element's.
+#[test]
+fn a_get_through_an_element_property_chain_is_medium() {
+    let f = findings_of(
+        "sigmaProp(INPUTS.forall { (b: Box) => b.tokens(0)._1 == SELF.id && b.R5[Long].get > 0L })",
+    );
+    assert_eq!(f.len(), 1, "{f:?}");
+    assert_eq!(f[0].severity, ergo_sandbox::Severity::Medium);
+}
