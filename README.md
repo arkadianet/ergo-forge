@@ -20,8 +20,27 @@ cargo run -p ergo-sandbox --bin ergo-es -- eval scenario.json
 cargo run -p ergo-sandbox --bin ergo-es -- decompile 100104c801d191a37300
 # decompile → recompile → byte-compare (add -v for every failure reason)
 cargo run -p ergo-sandbox --bin ergo-es -- roundtrip 100104c801d191a37300
-cargo run -p ergo-sandbox --features cost-trace --bin ergo-es -- eval scenario.json
+cargo run -p ergo-sandbox --bin ergo-es -- audit 1001040ad191e4c6a704047300
+cargo run -p ergo-sandbox --bin ergo-es -- hunt 1001040ad191e4c6a704047300
+cargo run -p ergo-sandbox --features cost-trace --bin ergo-es -- eval scenario.json --hot-spots
+
+cargo run -p ergo-web --bin ergo-web        # http://127.0.0.1:8080 — the reader
+docker build -t ergo-web . && docker run --rm -p 127.0.0.1:8080:8080 ergo-web
 ```
+
+## What it answers
+
+| Question | Where |
+|---|---|
+| What does this on-chain contract say? | `ergo-es decompile`, `POST /api/v1/inspect`, the reader |
+| Is the code fragile? (unguarded `Option.get`, tiered by who controls the value) | `ergo-es audit`, inspect findings |
+| Can someone with **no key** spend this box? | `ergo-es hunt`, `POST /api/v1/hunt`, the reader's Spendability section |
+| Does my contract pass in *this* spending context, and what does it cost? | `ergo-es eval`, `POST /api/v1/eval`, the reader's Scenario panel |
+| Where does the cost go? | `ergo-es eval --hot-spots` (cost-trace build) |
+
+Every answer comes from the node's own compiler and reducer. Verification
+bars are measured on real corpora and pinned in CI (byte-exact round-trip
+floors, lint flag rates, the hunt tally, the stack budget).
 
 Example scenario (`sigmaProp(HEIGHT > 100)` failing at height 99):
 
@@ -35,10 +54,14 @@ schema, verdicts, and the Rust API.
 ## Status
 
 Done: P0 (decompiler recon), P1 (sandbox engine + CLI), P2 (decompiler v1),
-P2.5 (public lifted AST), P3a (static audit lints), P4a (HTTP service + reader
-UI). Next in the plan: P3b (scenario fuzz — "spendable by anyone?"), more
-lints, P3c (cost hot-spots). CI enforces the verification bars on every PR,
-including the whole-corpus round-trip floors against the pinned node checkout.
+P2.5 (public lifted AST), P3a (static audit lints, severity-tiered, val/`||`
+guards followed), P3b (spend hunt with self-box and data-input probes), P3c
+(cost hot-spots), P4a (HTTP service: inspect / hunt / eval, reader UI,
+container image). Remaining: register fuzzing for the hunt, cross-branch
+reasoning in the lint, and P5-B (node-side source positions) so findings and
+cost can cite source spans. CI enforces the verification bars on every PR,
+including the whole-corpus round-trip floors against the pinned node checkout;
+a `v*` tag publishes the image to GHCR.
 
 Engine crates are consumed from `arkadianet/ergo` via pinned git
 revisions (`Cargo.toml`) — bump deliberately, the node is the oracle.
