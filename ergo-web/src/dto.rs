@@ -13,6 +13,7 @@ pub struct InspectRequest {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FindingDto {
     pub lint: &'static str,
     pub severity: &'static str,
@@ -22,6 +23,7 @@ pub struct FindingDto {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct InspectResponse {
     pub tree_hex: String,
     pub address: String,
