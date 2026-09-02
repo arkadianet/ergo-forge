@@ -88,8 +88,10 @@ The guarded variant (`1001040ad801d601c6a70404d1ede6720191e472017300`) returns
 
 The spend hunt: **can someone with no key spend this box?** Same `input` /
 `network` as inspect, plus optional `height` (base spending height, default
-near the mainnet tip) and `selfBox` (the spent box in the scenario-JSON box
-shape: `value`, `tokens`, `registers`, `creationHeight`). Six probes — three
+near the mainnet tip), `selfBox` (the spent box in the scenario-JSON box
+shape: `value`, `tokens`, `registers`, `creationHeight`) and `dataInputs`
+(an array of boxes, each with an `ergoTree` — the oracle boxes a contract
+reads; on-chain facts, so supplying them keeps the "anyone" question honest). Six probes — three
 heights × an attacker output that takes the funds / a preserve output that
 copies SELF — each a full consensus reduction with no proof and no context
 variables.

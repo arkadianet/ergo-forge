@@ -67,6 +67,7 @@ USAGE:
       Static lints over the lifted tree. Single trees print findings;
       corpora print a summary tally.
   ergo-es hunt <hex | --mainnet [N]> [--height H] [--self-box file.json]
+               [--data-inputs file.json]
       Spend hunt: can anyone spend this box with no key? Six probes (three
       heights x attacker/preserve output) on the consensus reducer.
       --mainnet tallies the corpus; hits go to stderr for hand checks.
@@ -652,17 +653,26 @@ fn cmd_hunt(args: &[String]) -> Result<(), String> {
             serde_json::from_str(&text).map_err(|e| format!("{path}: {e}"))
         })
         .transpose()?;
+    let data_inputs = flag_value(args, "--data-inputs")?
+        .map(|path| -> Result<Vec<ergo_sandbox::ScenarioBox>, String> {
+            let text = std::fs::read_to_string(&path).map_err(|e| format!("{path}: {e}"))?;
+            serde_json::from_str(&text).map_err(|e| format!("{path}: {e}"))
+        })
+        .transpose()?
+        .unwrap_or_default();
     let opts = HuntOptions {
         height,
         self_box,
         network: None,
+        data_inputs,
     };
 
     match args.first().map(String::as_str) {
         Some("--mainnet") => {
             // The corpus limit is the first positional AFTER --mainnet that is
             // not a flag or a flag's value (`--height 123` must not become 123).
-            let limit = positional_after_flags(&args[1..], &["--height", "--self-box"]);
+            let limit =
+                positional_after_flags(&args[1..], &["--height", "--self-box", "--data-inputs"]);
             let trees = mainnet_trees(limit)?;
             let mut tally = std::collections::BTreeMap::<&str, usize>::new();
             let mut all_errored = 0usize;

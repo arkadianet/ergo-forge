@@ -18,6 +18,7 @@ pub async fn hunt_route(
         height: req.height,
         self_box: req.self_box,
         network: Some(network),
+        data_inputs: req.data_inputs,
     };
 
     // The reducer recurses like the lift does; same large-stack blocking task.

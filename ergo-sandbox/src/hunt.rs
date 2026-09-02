@@ -48,6 +48,10 @@ pub struct HuntOptions {
     pub self_box: Option<ScenarioBox>,
     /// Network for address rendering in outcomes (default mainnet).
     pub network: Option<NetworkPrefix>,
+    /// Read-only data inputs (`CONTEXT.dataInputs`). On-chain facts, not
+    /// spender secrets, so supplying them keeps the "anyone" question
+    /// honest; contracts that read an oracle box error out without them.
+    pub data_inputs: Vec<ScenarioBox>,
 }
 
 /// One probe: its context and what the reducer said.
@@ -178,7 +182,7 @@ pub fn hunt(tree_bytes: &[u8], opts: &HuntOptions) -> Result<Hunt, SandboxError>
                 self_box: Some(self_box.clone()),
                 inputs: Vec::new(),
                 outputs: vec![out.clone()],
-                data_inputs: Vec::new(),
+                data_inputs: opts.data_inputs.clone(),
                 context_vars: Default::default(),
                 miner_pubkey: None,
                 pre_header: None,

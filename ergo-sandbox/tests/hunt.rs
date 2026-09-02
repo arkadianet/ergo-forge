@@ -160,3 +160,33 @@ fn the_supplied_self_creation_height_reaches_the_script() {
     let h = hunt(&tree("sigmaProp(SELF.creationInfo._1 == 4242)"), &opts).unwrap();
     assert_eq!(h.verdict, HuntVerdict::SpendableByAnyone, "{h:?}");
 }
+
+// ── data inputs ─────────────────────────────────────────────────────────────
+
+/// Contracts that read an oracle box error out without data inputs; the
+/// caller can supply them (they are on-chain facts, not spender secrets).
+#[test]
+fn supplied_data_inputs_reach_the_script() {
+    let src = "sigmaProp(CONTEXT.dataInputs(0).R4[Long].get > 100L)";
+    let without = run(src);
+    assert_eq!(without.verdict, HuntVerdict::NotUnderProbes, "{without:?}");
+
+    let json = r#"[{"value": 1, "ergoTree": "10010101", "registers": {"R4": {"type": "Long", "value": 500}}}]"#;
+    let data_inputs: Vec<ScenarioBox> = serde_json::from_str(json).unwrap();
+    let opts = HuntOptions {
+        data_inputs,
+        ..HuntOptions::default()
+    };
+    let with = hunt(&tree(src), &opts).unwrap();
+    assert_eq!(with.verdict, HuntVerdict::SpendableByAnyone, "{with:?}");
+}
+
+#[test]
+fn a_data_input_without_a_tree_is_a_marshalling_error() {
+    let data_inputs: Vec<ScenarioBox> = serde_json::from_str(r#"[{"value": 1}]"#).unwrap();
+    let opts = HuntOptions {
+        data_inputs,
+        ..HuntOptions::default()
+    };
+    assert!(hunt(&tree("sigmaProp(true)"), &opts).is_err());
+}

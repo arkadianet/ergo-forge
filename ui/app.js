@@ -133,6 +133,19 @@ async function huntFor(input, network) {
       return;
     }
   }
+  const dataRaw = $("data-inputs").value.trim();
+  if (dataRaw) {
+    try {
+      req.dataInputs = JSON.parse(dataRaw);
+    } catch (e) {
+      verdictEl.textContent = `Data inputs JSON does not parse: ${e.message}`;
+      return;
+    }
+    if (!Array.isArray(req.dataInputs)) {
+      verdictEl.textContent = "Data inputs must be a JSON array of boxes.";
+      return;
+    }
+  }
   const generation = ++huntGeneration;
   try {
     const res = await fetch("/api/v1/hunt", {
