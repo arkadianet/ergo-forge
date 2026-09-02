@@ -158,7 +158,8 @@ Still missing (the actual build list):
      (9/79), else High (61/79). Same findings, honest alarm level; spec
      amended. **Val-held guards followed 2026-09-02** (multi-use `val ok =
      x.isDefined` — single-use vals are compiler-inlined): seed 242 → 236
-     findings, mainnet unchanged.
+     findings, mainnet unchanged. **`||`/negation closed 2026-09-03** by the
+     falsity rule (right operand of `||`, else branch); corpora unchanged.
    - **P3b — spend hunt: DONE 2026-09-02** (design:
      `docs/superpowers/specs/2026-09-02-p3b-spend-hunt-design.md`).
      `hunt::hunt(tree_bytes, &opts) -> Hunt`: six probes (heights `base`,

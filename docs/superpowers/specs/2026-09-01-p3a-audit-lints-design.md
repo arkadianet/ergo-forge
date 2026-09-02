@@ -195,8 +195,11 @@ Receiver identity is **syntactic equality of the rendered receiver** — compare
 
 Stated here so the gaps are documented rather than discovered:
 
-- **`||` and negation.** `!x.isDefined || x.get > 5` is safe but will be
-  reported. Rarer than the `&&` form; adding it means real boolean reasoning.
+- ~~**`||` and negation.**~~ **Closed 2026-09-03.** The dual rule: the right
+  operand of `a || b` and the else branch of `if (c)` run only when `a` / `c`
+  is false, so what their *falsity* proves guards there — falsity of `!(e)`
+  proves what `e` proves, falsity of `a || b` proves what both sides' falsity
+  proves. Neither corpus contains the pattern (tallies unchanged).
 - ~~**Guards through a `val` in an enclosing block.**~~ **Closed 2026-09-02.**
   A block `val` whose expression proves receivers (by the same conjunctive
   rule) makes its name prove them after the definition. Only multi-use vals
@@ -207,8 +210,8 @@ Stated here so the gaps are documented rather than discovered:
   unequal; two syntactically identical reads of *different* boxes would compare
   equal (not possible today, since receivers carry their index).
 
-The `||`/negation gap produces **false positives**, which is why the corpus
-measurement below is a gate rather than a report.
+Cross-branch reasoning is the one remaining source of **false positives**,
+which is why the corpus measurement below is a gate rather than a report.
 
 ### Severity
 

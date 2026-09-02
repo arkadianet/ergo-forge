@@ -225,3 +225,54 @@ fn a_val_guard_composed_of_two_guards_clears_both_gets() {
     )
     .is_empty());
 }
+
+// ── guards through || and negation ────────────────────────────────────────
+//
+// `!x.isDefined || x.get > 5` runs the right operand only when x is defined;
+// `if (!x.isDefined) a else x.get` reaches the else branch the same way.
+
+#[test]
+fn a_negated_guard_under_or_clears_the_right_operand() {
+    assert!(findings_of("sigmaProp(!(SELF.R4[Int].isDefined) || SELF.R4[Int].get > 5)").is_empty());
+}
+
+#[test]
+fn a_negated_guard_condition_clears_the_else_branch() {
+    assert!(findings_of(
+        "sigmaProp(if (!(SELF.R4[Int].isDefined)) false else SELF.R4[Int].get > 5)"
+    )
+    .is_empty());
+}
+
+#[test]
+fn a_negated_guard_condition_does_not_clear_the_then_branch() {
+    assert_eq!(
+        findings_of("sigmaProp(if (!(SELF.R4[Int].isDefined)) SELF.R4[Int].get > 5 else false)")
+            .len(),
+        1
+    );
+}
+
+#[test]
+fn an_or_chain_of_negated_guards_clears_the_tail() {
+    assert!(findings_of(
+        "sigmaProp(!(SELF.R4[Int].isDefined) || !(SELF.R5[Long].isDefined) || SELF.R4[Int].get > 5 && SELF.R5[Long].get > 1L)"
+    )
+    .is_empty());
+}
+
+#[test]
+fn a_positive_guard_under_or_still_proves_nothing_for_the_right_operand() {
+    assert_eq!(
+        findings_of("sigmaProp(SELF.R4[Int].isDefined || SELF.R4[Int].get > 5)").len(),
+        1
+    );
+}
+
+#[test]
+fn a_negated_val_guard_under_or_clears_the_right_operand() {
+    assert!(findings_of(
+        "{ val ok = SELF.R4[Int].isDefined; sigmaProp(!ok || SELF.R4[Int].get > 5 && ok) }"
+    )
+    .is_empty());
+}
