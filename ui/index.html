@@ -3,18 +3,70 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ergo-web — ErgoScript reader</title>
+  <title>ergo-web — ErgoScript playground</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>ErgoScript reader</h1>
-    <p>Paste a contract address or ErgoTree hex. Get the contract back as
-       readable ErgoScript, plus static audit findings about the code that
-       will actually execute. Everything runs locally — nothing leaves this host.</p>
+    <h1>ErgoScript playground</h1>
+    <p>Write a contract and compile it on the node's own compiler, or paste an
+       address and read what is on chain. Findings, spendability, and scenarios
+       run on the consensus reducer. Everything runs locally — nothing leaves
+       this host.</p>
   </header>
 
   <main>
+    <nav class="modes" role="tablist">
+      <button id="mode-write" class="mode active" role="tab" aria-selected="true">Write</button>
+      <button id="mode-read" class="mode" role="tab" aria-selected="false">Read</button>
+    </nav>
+
+    <section id="write" class="pane">
+      <div class="write-row">
+        <select id="example-pick" aria-label="examples">
+          <option value="">examples…</option>
+        </select>
+        <select id="write-network" aria-label="network">
+          <option value="mainnet" selected>mainnet</option>
+          <option value="testnet">testnet</option>
+        </select>
+        <button id="compile">Compile</button>
+      </div>
+      <label for="editor" class="hint">ErgoScript source. <code>$name</code> constants become a form below.</label>
+      <textarea id="editor" rows="14" spellcheck="false">// Funds unlock after a block height.
+// $unlockHeight: Int
+sigmaProp(HEIGHT > $unlockHeight)</textarea>
+      <pre id="caret" class="caret" hidden></pre>
+      <p id="compile-status" class="status" hidden></p>
+
+      <div id="params-panel" hidden>
+        <h2>Parameters</h2>
+        <p class="hint">Compile-time constants this source needs. Type from the
+           <code>// $name: Type</code> hint when present; <code>String</code> is
+           substituted textually inside string literals.</p>
+        <table class="params"><tbody id="params-rows"></tbody></table>
+      </div>
+
+      <div id="compiled" hidden>
+        <h2>Compiled</h2>
+        <dl class="wire">
+          <dt>tree hex</dt><dd><code id="c-tree"></code></dd>
+          <dt>P2S</dt><dd><code id="c-p2s"></code></dd>
+          <dt>P2SH</dt><dd><code id="c-p2sh"></code></dd>
+        </dl>
+        <h2>What consensus will run</h2>
+        <p class="hint">The tree decompiled back to source: constants inlined, sugar gone.</p>
+        <pre id="c-source"></pre>
+        <h2>Findings</h2>
+        <ul id="c-findings"></ul>
+        <p id="c-no-findings" hidden>No findings.</p>
+        <h2>Spendability</h2>
+        <p id="c-hunt" class="hunt-verdict"></p>
+        <p class="hint">Six probes with no key. Use the Scenario panel below for a specific context.</p>
+      </div>
+    </section>
+
+    <section id="read" class="pane" hidden>
     <section class="input-row">
       <input id="input" type="text" spellcheck="false"
              aria-label="Contract address or ErgoTree hex"
@@ -86,15 +138,17 @@
         <dt>address</dt><dd><code id="address"></code></dd>
       </dl>
     </section>
+    </section>
   </main>
 
   <section class="scenario">
     <h2>Scenario</h2>
     <p class="hint">Test a contract against a spending context on the consensus
-       reducer: source or tree hex, height, boxes, context variables. See the
-       sandbox README for the schema.</p>
+       reducer. A scenario without <code>source</code> or <code>tree</code>
+       uses the editor's compiled tree. Height, boxes, context variables: see
+       the sandbox README for the schema.</p>
     <label for="scenario">Scenario JSON</label>
-    <textarea id="scenario" rows="6" spellcheck="false">{ "source": "sigmaProp(HEIGHT > 100)", "height": 200 }</textarea>
+    <textarea id="scenario" rows="6" spellcheck="false">{ "height": 200 }</textarea>
     <button id="run">Run</button>
     <p id="eval-status" class="status" hidden></p>
     <div id="eval-result" hidden>

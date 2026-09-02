@@ -187,3 +187,61 @@ impl EvalResponse {
         }
     }
 }
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CompileRequest {
+    pub source: String,
+    #[serde(default)]
+    pub network: Option<String>,
+    /// Tree version for compilation (default 3).
+    #[serde(default)]
+    pub tree_version: Option<u8>,
+    /// Compile-time constants: name → typed value.
+    #[serde(default)]
+    pub params: std::collections::BTreeMap<String, ergo_sandbox::TypedValue>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ParamStatus {
+    pub name: String,
+    pub type_hint: Option<String>,
+    pub supplied: bool,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CompileResponse {
+    pub tree_hex: String,
+    pub p2s: String,
+    pub p2sh: String,
+    /// The tree decompiled back to source: what consensus will run.
+    pub source: String,
+    pub completeness: &'static str,
+    pub raw_placeholders: usize,
+    pub truncated: bool,
+    pub findings: Vec<FindingDto>,
+    pub params: Vec<ParamStatus>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ExampleSummary {
+    pub id: String,
+    pub group: String,
+    pub name: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ExampleDto {
+    pub id: String,
+    pub group: String,
+    pub name: String,
+    pub source: String,
+    pub params: Vec<ergo_sandbox::compile::ParamNeed>,
+    /// True for EIP-5 `@contract def` templates, which the playground cannot
+    /// parameterise yet.
+    pub template: bool,
+}

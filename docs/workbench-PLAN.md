@@ -218,7 +218,22 @@ Still missing (the actual build list):
      which stays blocked on `ergo-sigma`'s `panic = "unwind"` requirement
      (its AVL verifier uses `catch_unwind` to fail closed; `wasm32` is
      abort-only on stable Rust).
-7. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
+7. **P4b — the playground: DONE 2026-09-03** (design:
+   `docs/superpowers/specs/2026-09-03-playground-design.md`). Write mode:
+   editor → `POST /api/v1/compile` with **compile-time parameters** —
+   `$name`/bare identifiers through the compiler's `ScriptEnv`, `"$name"`
+   and all-caps tokens inside string literals by substitution — with a
+   params form generated from `compile::scan_params` (and `// $name: Type`
+   hints). Outputs: tree, addresses, the decompiled round-trip, findings,
+   spendability, caret on positioned errors. Examples gallery: 86 files, of
+   which 79 are the node corpus's real deployed contracts. **Measured:**
+   19/79 corpus contracts compile with an empty env, 58/79 with auto-filled
+   params (rest: 8 EIP-5 templates, 4 reference-parser rejects, wrong-type
+   guesses). **Live mainnet** (344 unique trees from the newest 60 blocks):
+   2 spendable by anyone, 312 require proof, 30 not under probes; 25 flagged
+   / 201 findings; 332/344 round-trip byte-exact. Deferred: EIP-5 template
+   parameterisation (needs the compiler to expose placeholder application).
+8. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.
    - **A — DONE 2026-08-31** (`compiler/source-positions`, `8479a58`): every

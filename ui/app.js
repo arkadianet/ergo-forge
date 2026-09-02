@@ -253,6 +253,232 @@ function renderHunt(h) {
   }
 }
 
+// ── write mode: editor, params, compile ─────────────────────────────────
+
+let lastCompiled = null; // { treeHex } for the scenario panel
+const paramTypes = ["Int", "Long", "Coll[Byte]", "SigmaProp", "GroupElement", "Boolean", "Byte", "Short", "BigInt", "Coll[Long]", "String"];
+
+function setMode(mode) {
+  const write = mode === "write";
+  $("write").hidden = !write;
+  $("read").hidden = write;
+  $("mode-write").classList.toggle("active", write);
+  $("mode-read").classList.toggle("active", !write);
+  $("mode-write").setAttribute("aria-selected", String(write));
+  $("mode-read").setAttribute("aria-selected", String(!write));
+}
+$("mode-write").addEventListener("click", () => setMode("write"));
+$("mode-read").addEventListener("click", () => setMode("read"));
+
+/// Current parameter values from the form, in the API's typed-value shape.
+function collectParams() {
+  const out = {};
+  for (const tr of $("params-rows").children) {
+    const name = tr.dataset.name;
+    const type = tr.querySelector("select").value;
+    const raw = tr.querySelector("input").value.trim();
+    if (!raw) continue;
+    let value = raw;
+    if (["Int", "Long", "Short", "Byte"].includes(type)) value = Number(raw);
+    else if (type === "Boolean") value = raw === "true";
+    else if (type === "Coll[Long]") value = raw.split(",").map((x) => Number(x.trim()));
+    out[name] = { type, value };
+  }
+  return out;
+}
+
+/// Build (or extend) the params form from [{name, typeHint}], keeping any
+/// values already typed in.
+function renderParams(needs) {
+  const rows = $("params-rows");
+  const existing = new Map([...rows.children].map((tr) => [tr.dataset.name, tr]));
+  for (const n of needs) {
+    if (existing.has(n.name)) continue;
+    const tr = document.createElement("tr");
+    tr.dataset.name = n.name;
+    const td1 = document.createElement("td");
+    td1.innerHTML = "<code>$" + n.name + "</code>";
+    const td2 = document.createElement("td");
+    const sel = document.createElement("select");
+    for (const t of paramTypes) {
+      const o = document.createElement("option");
+      o.value = t; o.textContent = t;
+      sel.appendChild(o);
+    }
+    sel.value = paramTypes.includes(n.typeHint) ? n.typeHint : guessType(n.name);
+    td2.appendChild(sel);
+    const td3 = document.createElement("td");
+    const inp = document.createElement("input");
+    inp.type = "text"; inp.placeholder = placeholderFor(sel.value);
+    inp.setAttribute("aria-label", "value of " + n.name);
+    sel.addEventListener("change", () => { inp.placeholder = placeholderFor(sel.value); });
+    td3.appendChild(inp);
+    tr.append(td1, td2, td3);
+    rows.appendChild(tr);
+  }
+  $("params-panel").hidden = rows.children.length === 0;
+}
+
+function guessType(name) {
+  const n = name.toLowerCase();
+  if (/nft|id|hash|bytes|script|tree|token/.test(n)) return "Coll[Byte]";
+  if (/address|base58|base64/.test(n)) return "String";
+  if (/^[A-Z][A-Z0-9_]+$/.test(name)) return "String";
+  return "Long";
+}
+function placeholderFor(type) {
+  return { "Coll[Byte]": "hex bytes", SigmaProp: "33-byte pubkey hex", GroupElement: "33-byte point hex",
+           String: "text substituted inside the string", Boolean: "true / false", BigInt: "decimal",
+           "Coll[Long]": "1, 2, 3" }[type] || "number";
+}
+
+/// Show a caret under the editor at a byte offset.
+function showCaret(offset) {
+  const src = $("editor").value;
+  const caret = $("caret");
+  if (offset == null || offset > src.length) { caret.hidden = true; return; }
+  const before = src.slice(0, offset);
+  const line = before.split("\n").length;
+  const col = offset - before.lastIndexOf("\n") - 1;
+  const text = src.split("\n")[line - 1] || "";
+  caret.textContent = `line ${line}, col ${col + 1}\n${text}\n${" ".repeat(col)}^`;
+  caret.hidden = false;
+}
+
+let compileInFlight = false;
+async function compile() {
+  if (compileInFlight) return;
+  const status = $("compile-status");
+  const source = $("editor").value;
+  compileInFlight = true;
+  $("compile").disabled = true;
+  status.textContent = "Compiling…";
+  status.hidden = false;
+  $("caret").hidden = true;
+  try {
+    const res = await fetch("/api/v1/compile", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ source, network: $("write-network").value, params: collectParams() }),
+    });
+    const body = await res.json();
+    if (!res.ok) {
+      const e = body.error || {};
+      if (e.code === "missing_params") {
+        renderParams(e.missingParams || []);
+        status.textContent = "Fill in the parameters below, then compile again.";
+        $("params-rows").querySelector("input")?.focus();
+      } else {
+        status.textContent = `Error: ${e.message || res.status}`;
+        if (e.offset != null) showCaret(e.offset);
+      }
+      $("compiled").hidden = true;
+      return;
+    }
+    renderParams(body.params.map((p) => ({ name: p.name, typeHint: p.typeHint })));
+    renderCompiled(body);
+    status.hidden = true;
+    lastCompiled = body;
+    huntTree(body.treeHex, $("write-network").value);
+  } catch (e) {
+    status.textContent = `Request failed: ${e}`;
+  } finally {
+    compileInFlight = false;
+    $("compile").disabled = false;
+  }
+}
+
+function renderCompiled(c) {
+  $("c-tree").textContent = c.treeHex;
+  $("c-p2s").textContent = c.p2s;
+  $("c-p2sh").textContent = c.p2sh;
+  $("c-source").textContent = c.source;
+  const list = $("c-findings");
+  list.textContent = "";
+  for (const f of c.findings) {
+    const li = document.createElement("li");
+    li.dataset.severity = f.severity;
+    const chip = document.createElement("span");
+    chip.className = `chip ${f.severity}`; chip.textContent = f.severity.toUpperCase();
+    const lint = document.createElement("span"); lint.className = "lint"; lint.textContent = f.lint;
+    const msg = document.createElement("div"); msg.textContent = f.message;
+    const snip = document.createElement("code"); snip.className = "snippet"; snip.textContent = f.snippet;
+    li.append(chip, lint, msg, snip);
+    list.appendChild(li);
+  }
+  $("c-no-findings").hidden = c.findings.length > 0;
+  $("c-hunt").textContent = "Hunting…";
+  $("c-hunt").className = "hunt-verdict";
+  $("compiled").hidden = false;
+}
+
+async function huntTree(treeHex, network) {
+  try {
+    const res = await fetch("/api/v1/hunt", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ input: treeHex, network }),
+    });
+    const h = await res.json();
+    const [label, cls] = HUNT_VERDICTS[h.verdict] || [h.verdict, "neutral"];
+    const el = $("c-hunt");
+    el.textContent = label + (h.selfSynthetic && h.verdict === "notUnderProbes" ? " — SELF was synthetic; use Read mode with a real box for more" : "");
+    el.className = `hunt-verdict ${cls}`;
+    if (h.residuals && h.residuals.length) el.textContent += ` · requires: ${h.residuals.join(" | ")}`;
+  } catch (e) {
+    $("c-hunt").textContent = `Hunt failed: ${e}`;
+  }
+}
+
+async function loadExamples() {
+  try {
+    const res = await fetch("/api/v1/examples");
+    const items = await res.json();
+    const pick = $("example-pick");
+    let group = null, og = null;
+    for (const it of items) {
+      if (it.group !== group) {
+        group = it.group;
+        og = document.createElement("optgroup");
+        og.label = group || "misc";
+        pick.appendChild(og);
+      }
+      const o = document.createElement("option");
+      o.value = it.id; o.textContent = it.name;
+      og.appendChild(o);
+    }
+  } catch (e) { /* the gallery is optional */ }
+}
+
+$("example-pick").addEventListener("change", async (e) => {
+  const id = e.target.value;
+  if (!id) return;
+  const res = await fetch(`/api/v1/examples/${id}`);
+  if (!res.ok) return;
+  const ex = await res.json();
+  $("editor").value = ex.source;
+  $("params-rows").textContent = "";
+  $("compiled").hidden = true;
+  $("caret").hidden = true;
+  renderParams(ex.params);
+  const status = $("compile-status");
+  if (ex.template) {
+    status.textContent = "This is an EIP-5 @contract template; the playground cannot parameterise templates yet.";
+    status.hidden = false;
+  } else if (ex.params.length) {
+    status.textContent = `Needs ${ex.params.length} parameter(s) — fill them in and compile.`;
+    status.hidden = false;
+  } else {
+    status.hidden = true;
+  }
+  e.target.value = "";
+});
+
+$("compile").addEventListener("click", compile);
+$("editor").addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") compile();
+});
+loadExamples();
+
 // ── scenario eval ────────────────────────────────────────────────────────
 
 const EVAL_VERDICTS = {
@@ -277,6 +503,14 @@ async function runScenario() {
     status.textContent = `Scenario JSON does not parse: ${e.message}`;
     status.hidden = false;
     return;
+  }
+  if (scenario && typeof scenario === "object" && scenario.source == null && scenario.tree == null) {
+    if (!lastCompiled) {
+      status.textContent = "Compile something in Write mode first, or give the scenario a source or tree.";
+      status.hidden = false;
+      return;
+    }
+    scenario.tree = lastCompiled.treeHex;
   }
   evalInFlight = true;
   $("run").disabled = true;

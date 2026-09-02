@@ -20,6 +20,7 @@ fn main() -> ExitCode {
     let rest = &args[1..];
     let result = match cmd.as_str() {
         "compile" => cmd_compile(rest),
+        "params" => cmd_params(rest),
         "eval" => cmd_eval(rest),
         "decompile" => cmd_decompile(rest),
         "roundtrip" => cmd_roundtrip(rest),
@@ -50,7 +51,11 @@ fn usage() {
 
 USAGE:
   ergo-es compile <source-file> [--tree-version N] [--network mainnet|testnet]
+                  [--params params.json]
       Compile ErgoScript source to ErgoTree bytes + P2S/P2SH addresses.
+      --params supplies compile-time constants (JSON: name -> {{type, value}}).
+  ergo-es params <source-file>
+      List the $parameters a source needs (with // $name: Type hints).
   ergo-es eval <scenario.json> [--hot-spots]
       Evaluate a scenario: contract (source or tree hex) + spending context
       → verdict, cost, trace. See README scenario schema. --hot-spots ranks
@@ -63,10 +68,10 @@ USAGE:
       Decompile → recompile → byte-compare. Single trees accept --network
       (default mainnet); -v prints every failure reason. Corpora paths
       resolve against the ergo node checkout (sibling of this repo).
-  ergo-es audit <hex | --seed | --mainnet>
+  ergo-es audit <hex | --seed | --mainnet | --trees file.json>
       Static lints over the lifted tree. Single trees print findings;
       corpora print a summary tally.
-  ergo-es hunt <hex | --mainnet [N]> [--height H] [--self-box file.json]
+  ergo-es hunt <hex | --mainnet [N] | --trees file.json> [--height H] [--self-box file.json]
                [--data-inputs file.json]
       Spend hunt: can anyone spend this box with no key? Six probes (three
       heights x attacker/preserve output) on the consensus reducer.
@@ -132,10 +137,45 @@ fn cmd_compile(args: &[String]) -> Result<(), String> {
         Some(n) => parse_network(&n)?,
         None => NetworkPrefix::Mainnet,
     };
-    let out = compile_source(&source, tree_version, network).map_err(|e| e.to_string())?;
+    let out = match flag_value(args, "--params")? {
+        Some(path) => {
+            let text = std::fs::read_to_string(&path).map_err(|e| format!("{path}: {e}"))?;
+            let params: std::collections::BTreeMap<String, ergo_sandbox::TypedValue> =
+                serde_json::from_str(&text).map_err(|e| format!("{path}: {e}"))?;
+            ergo_sandbox::compile::compile_with_params(&source, &params, tree_version, network)
+                .map_err(|e| e.to_string())?
+        }
+        None => compile_source(&source, tree_version, network).map_err(|e| e.to_string())?,
+    };
     println!("tree:     {}", hex::encode(&out.tree_bytes));
     println!("p2s:      {}", out.p2s_address);
     println!("p2sh:     {}", out.p2sh_address);
+    Ok(())
+}
+
+/// `ergo-es params <source-file>` — the $parameters a source needs, as JSON
+/// (name → type hint or null), ready to fill in and pass to `--params`.
+fn cmd_params(args: &[String]) -> Result<(), String> {
+    let Some(src_ref) = args.first() else {
+        return Err("params needs a source file (or - for stdin)".into());
+    };
+    let source = read_input(src_ref)?;
+    let needs = ergo_sandbox::compile::scan_params(&source);
+    let map: serde_json::Map<String, serde_json::Value> = needs
+        .into_iter()
+        .map(|n| {
+            (
+                n.name,
+                n.type_hint
+                    .map(Into::into)
+                    .unwrap_or(serde_json::Value::Null),
+            )
+        })
+        .collect();
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&map).map_err(|e| e.to_string())?
+    );
     Ok(())
 }
 
@@ -521,6 +561,14 @@ fn mainnet_trees(limit: Option<&String>) -> Result<Vec<String>, String> {
     Ok(trees)
 }
 
+/// A JSON array of tree hex strings — any ad-hoc corpus, e.g. trees pulled
+/// from the explorer.
+fn trees_file(path: Option<&String>) -> Result<Vec<String>, String> {
+    let path = path.ok_or("--trees needs a file path")?;
+    let text = std::fs::read_to_string(path).map_err(|e| format!("{path}: {e}"))?;
+    serde_json::from_str(&text).map_err(|e| format!("{path}: {e}"))
+}
+
 fn workspace_root() -> std::path::PathBuf {
     // Corpus recon modes expect the ergo node checkout sibling to this repo
     // (arkadianet/ergo · test-vectors/). Only used by `--seed` / `--mainnet`.
@@ -540,10 +588,12 @@ fn corpus_err(path: &std::path::Path, e: std::io::Error) -> String {
 /// the lifted tree.
 fn cmd_audit(args: &[String]) -> Result<(), String> {
     match args.first().map(String::as_str) {
-        Some("--seed") | Some("--mainnet") => {
+        Some("--seed") | Some("--mainnet") | Some("--trees") => {
             let is_seed = args[0] == "--seed";
             let (testnet, trees): (bool, Vec<String>) = if is_seed {
                 (true, seed_vectors()?.into_iter().map(|(t, _)| t).collect())
+            } else if args[0] == "--trees" {
+                (false, trees_file(args.get(1))?)
             } else {
                 (false, mainnet_trees(first_positional(args))?)
             };
@@ -668,12 +718,18 @@ fn cmd_hunt(args: &[String]) -> Result<(), String> {
     };
 
     match args.first().map(String::as_str) {
-        Some("--mainnet") => {
-            // The corpus limit is the first positional AFTER --mainnet that is
-            // not a flag or a flag's value (`--height 123` must not become 123).
-            let limit =
-                positional_after_flags(&args[1..], &["--height", "--self-box", "--data-inputs"]);
-            let trees = mainnet_trees(limit)?;
+        Some("--mainnet") | Some("--trees") => {
+            let trees = if args[0] == "--trees" {
+                trees_file(args.get(1))?
+            } else {
+                // The corpus limit is the first positional AFTER --mainnet that
+                // is not a flag or a flag's value (`--height 123` ≠ limit 123).
+                let limit = positional_after_flags(
+                    &args[1..],
+                    &["--height", "--self-box", "--data-inputs"],
+                );
+                mainnet_trees(limit)?
+            };
             let mut tally = std::collections::BTreeMap::<&str, usize>::new();
             let mut all_errored = 0usize;
             let mut parse_errors = 0usize;
