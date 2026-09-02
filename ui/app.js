@@ -52,8 +52,48 @@ async function read() {
   }
 }
 
+/// Rebuild the source pane, wrapping the first occurrence of `snippet` (if
+/// any) in a <mark>. Snippets are whitespace-collapsed to one line and may
+/// be cut with a trailing ellipsis, so match on a collapsed copy of the
+/// source and map the hit back to original offsets.
+function showSource(source, snippet) {
+  const pre = $("source");
+  pre.textContent = "";
+  const needle = snippet ? snippet.replace(/…$/, "") : "";
+  let at = -1, len = 0;
+  if (needle) {
+    // collapsed[i] came from source[map[i]].
+    let collapsed = "";
+    const map = [];
+    let inWs = false;
+    for (let i = 0; i < source.length; i++) {
+      if (/\s/.test(source[i])) {
+        if (!inWs) { collapsed += " "; map.push(i); inWs = true; }
+      } else { collapsed += source[i]; map.push(i); inWs = false; }
+    }
+    const ci = collapsed.indexOf(needle);
+    if (ci >= 0) {
+      at = map[ci];
+      len = map[ci + needle.length - 1] + 1 - at;
+    }
+  }
+  if (at < 0) {
+    pre.textContent = source;
+    return;
+  }
+  pre.appendChild(document.createTextNode(source.slice(0, at)));
+  const m = document.createElement("mark");
+  m.textContent = source.slice(at, at + len);
+  pre.appendChild(m);
+  pre.appendChild(document.createTextNode(source.slice(at + len)));
+  m.scrollIntoView({ block: "nearest" });
+}
+
+let currentSource = "";
+
 function render(r) {
-  $("source").textContent = r.source;
+  currentSource = r.source;
+  showSource(r.source, "");
   $("tree-hex").textContent = r.treeHex;
   $("address").textContent = r.address;
 
@@ -96,6 +136,16 @@ function render(r) {
     snip.className = "snippet";
     snip.textContent = f.snippet;
     li.appendChild(snip);
+
+    li.tabIndex = 0;
+    li.title = "Click to highlight in the source";
+    const focus = () => {
+      for (const other of list.children) other.classList.remove("active");
+      li.classList.add("active");
+      showSource(currentSource, f.snippet);
+    };
+    li.addEventListener("click", focus);
+    li.addEventListener("keydown", (e) => { if (e.key === "Enter") focus(); });
 
     list.appendChild(li);
   }
@@ -274,6 +324,13 @@ $("run").addEventListener("click", runScenario);
 $("rehunt").addEventListener("click", () => {
   const input = $("input").value.trim();
   if (input) huntFor(input, $("network").value);
+});
+$("examples").addEventListener("change", (e) => {
+  if (!e.target.value) return;
+  $("input").value = e.target.value;
+  $("network").value = "mainnet";
+  e.target.value = "";
+  read();
 });
 $("read").addEventListener("click", read);
 $("input").addEventListener("keydown", (e) => {

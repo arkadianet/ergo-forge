@@ -38,6 +38,7 @@ h2 { font-size: 1.05rem; margin: 1.75rem 0 0.5rem; color: var(--accent); }
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   font-size: 0.9rem;
 }
+#examples,
 #network {
   background: var(--panel);
   border: 1px solid var(--line);
@@ -184,3 +185,8 @@ details label { display: block; margin-top: 0.5rem; font-size: 0.9rem; color: va
   cursor: pointer;
 }
 #run:disabled { opacity: 0.5; cursor: wait; }
+
+/* ── finding ↔ source ── */
+#source mark { background: #5a4300; color: var(--text); border-radius: 3px; padding: 0 2px; }
+#findings li { cursor: pointer; }
+#findings li.active { outline: 1px solid var(--accent); }
