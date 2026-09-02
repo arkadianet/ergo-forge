@@ -112,6 +112,37 @@ spend), or `notUnderProbes` (every probe failed or errored; **not** a safety
 claim). Without `selfBox`, `selfSynthetic` is true and any register read
 errors out — supply the real box before concluding anything.
 
+### `POST /api/v1/eval`
+
+Run a scenario — contract plus spending context — on the consensus reducer.
+The body is the scenario JSON itself (the `ergo-es eval` schema in the sandbox
+README): `source` or `tree`, `height`, optional `selfBox` / `inputs` /
+`outputs` / `dataInputs` / `contextVars` / `proof` / `costLimit` / `network`.
+
+```bash
+curl -s -X POST http://127.0.0.1:8080/api/v1/eval \
+  -H 'content-type: application/json' \
+  -d '{"source":"sigmaProp(HEIGHT > 100)","height":200}'
+```
+
+```json
+{
+  "verdict": "pass",
+  "error": null,
+  "cost": 4,
+  "costLimit": 8001091,
+  "reducedTo": "true",
+  "trace": [],
+  "treeHex": "100104c801d191a37300",
+  "address": "…"
+}
+```
+
+`verdict` is `pass` / `fail` / `error` (the script threw; `error` says why) /
+`needsProof` (`reducedTo` is the residual proposition) / `proofAccepted` /
+`proofRejected`. A script that ran and failed is a 200 with that verdict;
+only marshalling and compile errors are 400s, with the compiler's message.
+
 Errors: `{"error":{"code":"invalid_input","message":"…"}}` — `invalid_input`
 (400, including malformed JSON and unknown `network`), `too_large` (413),
 `internal` (500). Every error, including the extractor's own rejections, uses
@@ -119,8 +150,8 @@ this envelope. Panics never reach the client. An `invalid_input` message for a
 bad tree carries the parser's reason (offset, opcode): it describes the
 caller's own bytes, not server state, and is the useful part of the reply.
 
-Limits: request bodies capped at 64 KiB; at most 64 engine requests (inspect
-and hunt together, one shared semaphore) in flight, with the rest queued. The
+Limits: request bodies capped at 64 KiB; at most 64 engine requests (inspect,
+hunt and eval together, one shared semaphore) in flight, with the rest queued. The
 limit is scoped to the engine routes so the health check and the static UI
 stay answerable while the engine is saturated; it also bounds the number of
 large-stack threads alive at once. Per-IP rate
@@ -163,7 +194,8 @@ cargo test -p ergo-web
 Integration tests start a real server on an ephemeral port: both fixtures,
 garbage-input / malformed-JSON / unknown-network 400s (all JSON), an
 oversized-body 413 (JSON), the testnet address prefix, the deep-contract
-test above, and the hunt endpoint (spendable-by-anyone, selfBox + height
-accepted, bad selfBox → 400).
+test above, the hunt endpoint (spendable-by-anyone, selfBox + height
+accepted, bad selfBox → 400), and the eval endpoint (pass / fail / error /
+needsProof verdicts, compile error → 400, empty scenario → 400).
 `cargo test -p ergo-sandbox` must stay at its baseline (39 passed) — the engine
 is not modified by this crate.

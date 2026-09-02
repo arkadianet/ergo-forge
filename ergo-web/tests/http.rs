@@ -245,3 +245,108 @@ async fn hunt_rejects_a_bad_self_box_as_invalid_input() {
     let body: serde_json::Value = r.json().await.unwrap();
     assert_eq!(body["error"]["code"], "invalid_input");
 }
+
+// ── /api/v1/eval ────────────────────────────────────────────────────────────
+
+async fn post_eval(base: &str, body: serde_json::Value) -> reqwest::Response {
+    reqwest::Client::new()
+        .post(format!("{base}/api/v1/eval"))
+        .json(&body)
+        .send()
+        .await
+        .unwrap()
+}
+
+#[tokio::test]
+async fn eval_runs_a_source_scenario_to_a_verdict() {
+    let base = spawn().await;
+    let res: serde_json::Value = post_eval(
+        &base,
+        serde_json::json!({ "source": "sigmaProp(HEIGHT > 100)", "height": 200 }),
+    )
+    .await
+    .json()
+    .await
+    .unwrap();
+    assert_eq!(res["verdict"], "pass", "{res}");
+    assert!(res["cost"].as_u64().unwrap() > 0);
+    assert!(res["costLimit"].as_u64().unwrap() > 0);
+    assert_eq!(res["reducedTo"], "true");
+    assert!(res["treeHex"].as_str().unwrap().starts_with("10"));
+    assert!(res["address"].as_str().is_some());
+}
+
+#[tokio::test]
+async fn eval_reports_a_failing_scenario_as_a_verdict_not_an_error() {
+    let base = spawn().await;
+    let res: serde_json::Value = post_eval(
+        &base,
+        serde_json::json!({ "source": "sigmaProp(HEIGHT > 100)", "height": 50 }),
+    )
+    .await
+    .json()
+    .await
+    .unwrap();
+    assert_eq!(res["verdict"], "fail", "{res}");
+}
+
+#[tokio::test]
+async fn eval_keeps_a_runtime_exception_as_an_error_verdict() {
+    let base = spawn().await;
+    let r = post_eval(
+        &base,
+        serde_json::json!({ "source": "sigmaProp(SELF.R4[Int].get > 0)", "height": 50 }),
+    )
+    .await;
+    assert_eq!(r.status(), 200);
+    let res: serde_json::Value = r.json().await.unwrap();
+    assert_eq!(res["verdict"], "error", "{res}");
+    assert!(res["error"].as_str().unwrap().contains("None"), "{res}");
+}
+
+#[tokio::test]
+async fn eval_returns_the_trace_and_a_p2pk_residual() {
+    let base = spawn().await;
+    let res: serde_json::Value = post_eval(
+        &base,
+        serde_json::json!({
+            "source": "PK(\"3WwbzW6u8hKWBcL1W7kNVMr25s2UHfSBnYtwSHvrRQt7DdPuoXrt\") && sigmaProp(HEIGHT > 1)",
+            "network": "testnet",
+            "height": 5
+        }),
+    )
+    .await
+    .json()
+    .await
+    .unwrap();
+    assert_eq!(res["verdict"], "needsProof", "{res}");
+    assert!(res["reducedTo"].as_str().unwrap().contains("ProveDlog"));
+    assert!(res["trace"].is_array());
+}
+
+#[tokio::test]
+async fn eval_compile_errors_are_invalid_input_with_the_reason() {
+    let base = spawn().await;
+    let r = post_eval(
+        &base,
+        serde_json::json!({ "source": "sigmaProp(HEIGHT >", "height": 5 }),
+    )
+    .await;
+    assert_eq!(r.status(), 400);
+    let body: serde_json::Value = r.json().await.unwrap();
+    assert_eq!(body["error"]["code"], "invalid_input");
+    assert!(
+        body["error"]["message"]
+            .as_str()
+            .unwrap()
+            .contains("compile"),
+        "{body}"
+    );
+}
+
+#[tokio::test]
+async fn eval_rejects_a_scenario_with_neither_tree_nor_source() {
+    let base = spawn().await;
+    let r = post_eval(&base, serde_json::json!({ "height": 5 })).await;
+    assert_eq!(r.status(), 400);
+}

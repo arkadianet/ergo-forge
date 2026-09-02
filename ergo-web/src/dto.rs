@@ -118,19 +118,67 @@ impl HuntResponse {
                         OutputShape::Attacker => "attacker",
                         OutputShape::Preserve => "preserve",
                     },
-                    verdict: match p.verdict {
-                        ergo_sandbox::Verdict::Pass => "pass",
-                        ergo_sandbox::Verdict::Fail => "fail",
-                        ergo_sandbox::Verdict::Error => "error",
-                        ergo_sandbox::Verdict::NeedsProof => "needsProof",
-                        ergo_sandbox::Verdict::ProofAccepted => "proofAccepted",
-                        ergo_sandbox::Verdict::ProofRejected => "proofRejected",
-                    },
+                    verdict: verdict_str(p.verdict),
                     reduced_to: p.reduced_to.clone(),
                     error: p.error.clone(),
                     cost: p.cost,
                 })
                 .collect(),
+        }
+    }
+}
+
+/// `POST /api/v1/eval` response: the sandbox outcome in wire form. The
+/// request body is the scenario JSON itself (`ergo_sandbox::Scenario`),
+/// which is already the workbench's wire model.
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct EvalResponse {
+    pub verdict: &'static str,
+    pub error: Option<String>,
+    pub cost: u64,
+    pub cost_limit: u64,
+    pub reduced_to: Option<String>,
+    pub trace: Vec<TraceDto>,
+    pub tree_hex: String,
+    pub address: String,
+}
+
+#[derive(Serialize)]
+pub struct TraceDto {
+    pub label: String,
+    pub value: String,
+}
+
+pub fn verdict_str(v: ergo_sandbox::Verdict) -> &'static str {
+    match v {
+        ergo_sandbox::Verdict::Pass => "pass",
+        ergo_sandbox::Verdict::Fail => "fail",
+        ergo_sandbox::Verdict::Error => "error",
+        ergo_sandbox::Verdict::NeedsProof => "needsProof",
+        ergo_sandbox::Verdict::ProofAccepted => "proofAccepted",
+        ergo_sandbox::Verdict::ProofRejected => "proofRejected",
+    }
+}
+
+impl EvalResponse {
+    pub fn from_engine(o: ergo_sandbox::EvalOutcome) -> Self {
+        Self {
+            verdict: verdict_str(o.verdict),
+            error: o.error,
+            cost: o.cost,
+            cost_limit: o.cost_limit,
+            reduced_to: o.reduced_to,
+            trace: o
+                .trace
+                .into_iter()
+                .map(|t| TraceDto {
+                    label: t.label,
+                    value: t.value,
+                })
+                .collect(),
+            tree_hex: o.tree_hex,
+            address: o.p2s_address,
         }
     }
 }
