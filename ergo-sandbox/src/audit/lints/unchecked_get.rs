@@ -21,9 +21,14 @@
 //! vals are inlined by the compiler; this is for the multi-use ones that
 //! survive to the tree.)
 //!
-//! Known gaps (deliberate — see the P3a spec): guards expressed with `||`
-//! and negation, and cross-branch reasoning are not recognised, so those
-//! produce false positives.
+//! `||` and negation are handled by the dual rule: the right operand of
+//! `a || b` runs only when `a` is false, and the else branch of `if (c)`
+//! runs only when `c` is false — so what `a`'s (or `c`'s) *falsity* proves
+//! defined guards there. Falsity of `!(e)` proves what `e` proves; falsity
+//! of `a || b` proves what both sides' falsity proves.
+//!
+//! Known gap (deliberate — see the P3a spec): cross-branch reasoning (an
+//! earlier `if` that already returned) is not recognised.
 
 use std::collections::HashMap;
 
@@ -90,6 +95,23 @@ fn proves_defined(n: &Node, vals: &GuardVals, out: &mut Vec<String>) {
     }
 }
 
+/// Receivers proven non-empty by this expression being **false** — the
+/// guard set for the right operand of `||` and the else branch of `if`.
+fn falsity_proves_defined(n: &Node, vals: &GuardVals, out: &mut Vec<String>) {
+    match &n.kind {
+        NodeKind::Unary(op, inner) if *op == "!" => proves_defined(inner, vals, out),
+        NodeKind::Global(name, args) if name == "sigmaProp" && args.len() == 1 => {
+            falsity_proves_defined(&args[0], vals, out);
+        }
+        // `a || b` false ⇒ both false.
+        NodeKind::Infix(op, a, b) if *op == "||" => {
+            falsity_proves_defined(a, vals, out);
+            falsity_proves_defined(b, vals, out);
+        }
+        _ => {}
+    }
+}
+
 /// The leaf a receiver chain bottoms out in, looking through method calls,
 /// properties, indexing and dynamic register reads.
 fn receiver_root(n: &Node) -> &Node {
@@ -149,13 +171,23 @@ fn walk(
             guarded.truncate(depth);
             return;
         }
+        NodeKind::Infix(op, lhs, rhs) if *op == "||" => {
+            walk(lhs, guarded, params, vals, out);
+            let depth = guarded.len();
+            falsity_proves_defined(lhs, vals, guarded);
+            walk(rhs, guarded, params, vals, out);
+            guarded.truncate(depth);
+            return;
+        }
         NodeKind::If(cond, then_b, else_b) => {
             walk(cond, guarded, params, vals, out);
             let depth = guarded.len();
             proves_defined(cond, vals, guarded);
             walk(then_b, guarded, params, vals, out);
             guarded.truncate(depth);
+            falsity_proves_defined(cond, vals, guarded);
             walk(else_b, guarded, params, vals, out);
+            guarded.truncate(depth);
             return;
         }
         NodeKind::Lambda(names, body) => {
