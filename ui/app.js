@@ -5,6 +5,9 @@ const $ = (id) => document.getElementById(id);
 
 // One inspection at a time: Enter in the input box and the button share this.
 let inFlight = false;
+// Hunt requests can overlap (re-run while one is pending); only the latest
+// response may render.
+let huntGeneration = 0;
 
 async function read() {
   if (inFlight) return;
@@ -113,7 +116,14 @@ async function huntFor(input, network) {
   verdictEl.className = "hunt-verdict";
   const req = { input, network };
   const heightRaw = $("height").value.trim();
-  if (heightRaw) req.height = Number(heightRaw);
+  if (heightRaw) {
+    const height = Number(heightRaw);
+    if (!Number.isInteger(height) || height < 1 || height > 0xffffffff) {
+      verdictEl.textContent = "Height must be an integer from 1 through 4294967295.";
+      return;
+    }
+    req.height = height;
+  }
   const boxRaw = $("self-box").value.trim();
   if (boxRaw) {
     try {
@@ -123,6 +133,7 @@ async function huntFor(input, network) {
       return;
     }
   }
+  const generation = ++huntGeneration;
   try {
     const res = await fetch("/api/v1/hunt", {
       method: "POST",
@@ -130,12 +141,14 @@ async function huntFor(input, network) {
       body: JSON.stringify(req),
     });
     const body = await res.json();
+    if (generation !== huntGeneration) return; // a newer hunt owns the panel
     if (!res.ok) {
       verdictEl.textContent = `Hunt error: ${(body.error && body.error.message) || res.status}`;
       return;
     }
     renderHunt(body);
   } catch (e) {
+    if (generation !== huntGeneration) return;
     verdictEl.textContent = `Hunt request failed: ${e}`;
   }
 }

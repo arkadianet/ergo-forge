@@ -120,6 +120,23 @@ pub fn hunt(tree_bytes: &[u8], opts: &HuntOptions) -> Result<Hunt, SandboxError>
     crate::inspect::parse_tree(tree_bytes)?;
 
     let tree_hex = hex::encode(tree_bytes);
+    // A supplied box may name its tree, but it must be the tree under test:
+    // the evaluator pins SELF's script to `tree_bytes`, so a different
+    // `ergoTree` would be silently ignored rather than honoured.
+    if let Some(named) = opts
+        .self_box
+        .as_ref()
+        .and_then(|b| b.ergo_tree.as_deref())
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+    {
+        if !named.eq_ignore_ascii_case(&tree_hex) {
+            return Err(SandboxError::Scenario(
+                "selfBox.ergoTree differs from the tree under test; omit it or make it match"
+                    .into(),
+            ));
+        }
+    }
     let base = opts.height.unwrap_or(DEFAULT_BASE_HEIGHT);
     let self_synthetic = opts.self_box.is_none();
     let self_box = opts.self_box.clone().unwrap_or_default();

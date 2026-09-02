@@ -57,3 +57,15 @@ fn hunt_warns_when_self_is_synthetic_and_probes_error() {
     assert!(out.contains("not under probes"), "stdout: {out}");
     assert!(out.contains("synthetic"), "stdout: {out}");
 }
+
+#[test]
+fn hunt_mainnet_does_not_read_a_flag_value_as_the_corpus_limit() {
+    // With no node checkout as a sibling this errors either way; the check
+    // is that the error is about the corpus, never a limit parse of "123".
+    let (_, out, err) = ergo_es(&["hunt", "--mainnet", "--height", "123"]);
+    let all = format!("{out}{err}");
+    assert!(
+        !all.contains("hunted: 123") && !all.contains("invalid limit"),
+        "{all}"
+    );
+}

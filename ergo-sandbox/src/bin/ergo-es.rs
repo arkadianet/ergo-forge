@@ -620,7 +620,10 @@ fn cmd_hunt(args: &[String]) -> Result<(), String> {
 
     match args.first().map(String::as_str) {
         Some("--mainnet") => {
-            let trees = mainnet_trees(first_positional(&args[1..]))?;
+            // The corpus limit is the first positional AFTER --mainnet that is
+            // not a flag or a flag's value (`--height 123` must not become 123).
+            let limit = positional_after_flags(&args[1..], &["--height", "--self-box"]);
+            let trees = mainnet_trees(limit)?;
             let mut tally = std::collections::BTreeMap::<&str, usize>::new();
             let mut all_errored = 0usize;
             let mut parse_errors = 0usize;
@@ -639,7 +642,8 @@ fn cmd_hunt(args: &[String]) -> Result<(), String> {
                 };
                 let key = hunt_verdict_str(r.verdict);
                 *tally.entry(key).or_default() += 1;
-                if r.verdict == HuntVerdict::NotUnderProbes
+                if r.self_synthetic
+                    && r.verdict == HuntVerdict::NotUnderProbes
                     && r.probes.iter().all(|p| p.error.is_some())
                 {
                     // Every probe raised — with a synthetic SELF that is
@@ -705,6 +709,20 @@ fn cmd_hunt(args: &[String]) -> Result<(), String> {
         }
         _ => Err("hunt needs tree hex or --mainnet [N]".into()),
     }
+}
+
+/// First positional argument, skipping `--flag value` pairs for the named
+/// value-taking flags.
+fn positional_after_flags<'a>(args: &'a [String], value_flags: &[&str]) -> Option<&'a String> {
+    let mut it = args.iter();
+    while let Some(a) = it.next() {
+        if value_flags.contains(&a.as_str()) {
+            it.next();
+        } else if !a.starts_with("--") {
+            return Some(a);
+        }
+    }
+    None
 }
 
 fn hunt_verdict_str(v: ergo_sandbox::hunt::HuntVerdict) -> &'static str {
