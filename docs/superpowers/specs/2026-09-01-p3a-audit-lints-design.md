@@ -197,16 +197,18 @@ Stated here so the gaps are documented rather than discovered:
 
 - **`||` and negation.** `!x.isDefined || x.get > 5` is safe but will be
   reported. Rarer than the `&&` form; adding it means real boolean reasoning.
-- **Guards through a `val` in an enclosing block.** `val ok = x.isDefined`
-  followed by `ok && x.get` — the guard is behind a binding the lint does not
-  follow.
+- ~~**Guards through a `val` in an enclosing block.**~~ **Closed 2026-09-02.**
+  A block `val` whose expression proves receivers (by the same conjunctive
+  rule) makes its name prove them after the definition. Only multi-use vals
+  reach the tree — single-use ones are inlined by the compiler. Seed corpus:
+  242 → 236 findings; mainnet unchanged at 79.
 - **Cross-branch reasoning**, e.g. an earlier `if` that already returned.
 - **Semantic receiver equality.** Two spellings of the same box read compare
   unequal; two syntactically identical reads of *different* boxes would compare
   equal (not possible today, since receivers carry their index).
 
-The first two produce **false positives**, which is why the corpus measurement
-below is a gate rather than a report.
+The `||`/negation gap produces **false positives**, which is why the corpus
+measurement below is a gate rather than a report.
 
 ### Severity
 
