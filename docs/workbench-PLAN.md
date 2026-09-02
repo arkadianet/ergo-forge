@@ -214,7 +214,9 @@ Still missing (the actual build list):
   module split makes extracting it mechanical when that day comes.
 - CLI shell: `ergo-sandbox/src/bin/ergo-es.rs` (`compile` / `eval` /
   `decompile` / `roundtrip`).
-- Web: separate repo later; consumes WASM builds of ergo-sandbox.
+- Web: `ergo-web` (workspace member, P4a) — axum service over `ergo-sandbox`
+  plus the no-bundler UI in `ui/`. The WASM build originally planned here is
+  blocked (see P4); the HTTP API is the stable boundary in the meantime.
 
 ## Open decisions
 

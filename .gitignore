@@ -3,3 +3,6 @@
 # (the P3a plan carried a lint bug that the implementation copied verbatim).
 # Design rationale IS committed — see docs/superpowers/specs/.
 docs/superpowers/plans/
+
+# The ergo-explorer MCP server writes its logs into the working directory.
+logs/
