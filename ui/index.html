@@ -63,6 +63,9 @@
         <label for="self-box">Box JSON — value, tokens, registers, creationHeight; see the sandbox README scenario schema</label>
         <textarea id="self-box" rows="4" spellcheck="false"
           placeholder='{"value": 1000000, "registers": {"R4": {"type": "Int", "value": 5}}}'></textarea>
+        <label for="data-inputs">Data inputs JSON — an array of boxes, each with an ergoTree (oracle boxes the contract reads)</label>
+        <textarea id="data-inputs" rows="3" spellcheck="false"
+          placeholder='[{"value": 1, "ergoTree": "…", "registers": {"R4": {"type": "Long", "value": 500}}}]'></textarea>
         <label for="height">Spending height</label>
         <input id="height" type="number" min="1" placeholder="default: 1500000">
         <button id="rehunt">Re-run hunt</button>

@@ -369,3 +369,31 @@ async fn inspect_fields_are_camel_case_like_the_other_endpoints() {
     assert!(res.get("tree_hex").is_none(), "{res}");
     assert!(res["findings"][0].get("nodeId").is_some(), "{res}");
 }
+
+#[tokio::test]
+async fn hunt_accepts_data_inputs() {
+    let base = spawn().await;
+    let tree = hex::encode(
+        ergo_sandbox::compile_source(
+            "sigmaProp(CONTEXT.dataInputs(0).R4[Long].get > 100L)",
+            3,
+            ergo_ser::address::NetworkPrefix::Mainnet,
+        )
+        .unwrap()
+        .tree_bytes,
+    );
+    let res: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/hunt"))
+        .json(&serde_json::json!({
+            "input": tree,
+            "dataInputs": [{ "value": 1, "ergoTree": "10010101",
+                             "registers": { "R4": { "type": "Long", "value": 500 } } }]
+        }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(res["verdict"], "spendableByAnyone", "{res}");
+}

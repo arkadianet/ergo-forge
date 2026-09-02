@@ -135,7 +135,7 @@ footer { margin-top: 3rem; color: var(--dim); font-size: 0.85rem; }
 details { margin: 0.5rem 0; }
 details summary { cursor: pointer; }
 details label { display: block; margin-top: 0.5rem; font-size: 0.9rem; color: var(--dim); }
-#self-box, #height {
+#self-box, #data-inputs, #height {
   width: 100%;
   box-sizing: border-box;
   margin-top: 0.25rem;

@@ -74,6 +74,9 @@ pub struct HuntRequest {
     /// is synthetic and the response says so.
     #[serde(default)]
     pub self_box: Option<ergo_sandbox::ScenarioBox>,
+    /// Read-only data inputs, scenario-JSON box shape (each needs `ergoTree`).
+    #[serde(default)]
+    pub data_inputs: Vec<ergo_sandbox::ScenarioBox>,
 }
 
 #[derive(Serialize)]

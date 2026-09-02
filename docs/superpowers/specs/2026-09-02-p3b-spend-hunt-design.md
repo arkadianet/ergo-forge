@@ -96,8 +96,8 @@ under a synthetic SELF is the signal to supply the real box.
 
 - Register/context-var fuzzing (random typed values). Needs type information
   from the lifted tree to be non-trivial; a later increment.
-- Data-input probes. Real contracts read oracle boxes; without explorer access
-  the user would have to paste them. The `ScenarioBox` model already supports
-  it — the API can grow `dataInputs` without a redesign.
+- ~~Data-input probes.~~ **Added 2026-09-02:** `dataInputs` on the options,
+  the request, the CLI (`--data-inputs file.json`) and the UI form. Supplied
+  verbatim to every probe; they are on-chain facts, not spender secrets.
 - "Which key" beyond the residual proposition: mapping `ProveDlog` bytes to a
   P2PK address is presentation, belongs in the UI when it is wanted.
