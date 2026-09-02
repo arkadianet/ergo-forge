@@ -35,7 +35,15 @@ cargo run -p ergo-sandbox --bin ergo-es -- eval scenario.json
 cargo run -p ergo-sandbox --bin ergo-es -- decompile 100104c801d191a37300
 cargo run -p ergo-sandbox --bin ergo-es -- roundtrip 100104c801d191a37300
 cargo run -p ergo-sandbox --features cost-trace --bin ergo-es -- eval scenario.json
+cargo run -p ergo-sandbox --features cost-trace --bin ergo-es -- eval scenario.json --hot-spots
 ```
+
+`--hot-spots` folds the per-step cost trace into one row per operation,
+ranked by JIT units (`ergo_sandbox::hot_spots`): where a scenario's budget
+actually goes. Labels are opcode names with their byte and any evaluator
+detail (`Exists (0xAE) n=8`). Needs the `cost-trace` build; the trace is a
+thread-local recorder in `ergo-sigma`, so it is safe per evaluation but is a
+diagnostic build, never a consensus path.
 
 ## Decompile (P2)
 

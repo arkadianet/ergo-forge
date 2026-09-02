@@ -51,9 +51,10 @@ fn usage() {
 USAGE:
   ergo-es compile <source-file> [--tree-version N] [--network mainnet|testnet]
       Compile ErgoScript source to ErgoTree bytes + P2S/P2SH addresses.
-  ergo-es eval <scenario.json>
+  ergo-es eval <scenario.json> [--hot-spots]
       Evaluate a scenario: contract (source or tree hex) + spending context
-      → verdict, cost, trace. See README scenario schema.
+      → verdict, cost, trace. See README scenario schema. --hot-spots ranks
+      the operations by cost (needs a --features cost-trace build).
   ergo-es decompile <hex | file | --seed | --mainnet [N]>
       Print the structural view of ErgoTree bytes (--seed / --mainnet run
       the bundled corpora instead).
@@ -140,9 +141,13 @@ fn cmd_compile(args: &[String]) -> Result<(), String> {
 // ── eval ─────────────────────────────────────────────────────────────────────
 
 fn cmd_eval(args: &[String]) -> Result<(), String> {
-    let Some(path) = args.first() else {
+    let want_hot_spots = args.iter().any(|a| a == "--hot-spots");
+    let Some(path) = args.iter().find(|a| !a.starts_with("--")) else {
         return Err("eval needs a scenario JSON file (or - for stdin)".into());
     };
+    if want_hot_spots && !cfg!(feature = "cost-trace") {
+        return Err("--hot-spots needs a `--features cost-trace` build".into());
+    }
     let text = read_input(path)?;
     let scenario: Scenario =
         serde_json::from_str(&text).map_err(|e| format!("scenario JSON: {e}"))?;
@@ -164,10 +169,38 @@ fn cmd_eval(args: &[String]) -> Result<(), String> {
         println!("  trace: {} = {}", t.label, t.value);
     }
     #[cfg(feature = "cost-trace")]
-    for c in &outcome.cost_breakdown {
-        println!("  cost {:>6} {} (total {})", c.delta, c.label, c.total);
+    {
+        if want_hot_spots {
+            print_hot_spots(&outcome.cost_breakdown);
+        } else {
+            for c in &outcome.cost_breakdown {
+                println!("  cost {:>6} {} (total {})", c.delta, c.label, c.total);
+            }
+        }
     }
     Ok(())
+}
+
+/// Ranked cost view: one row per operation, highest first.
+#[cfg(feature = "cost-trace")]
+fn print_hot_spots(lines: &[ergo_sandbox::eval::CostLine]) {
+    let rows = ergo_sandbox::hot_spots::hot_spots(lines);
+    let jit_total: u64 = lines.iter().map(|l| l.delta).sum();
+    println!(
+        "hot spots ({} JIT units over {} steps):",
+        jit_total,
+        lines.len()
+    );
+    println!("  {:>6}  {:>5}  {:>5}  operation", "jit", "steps", "share");
+    for r in &rows {
+        println!(
+            "  {:>6}  {:>5}  {:>4.0}%  {}",
+            r.jit,
+            r.count,
+            r.share * 100.0,
+            r.label
+        );
+    }
 }
 
 fn verdict_str(v: Verdict) -> &'static str {
