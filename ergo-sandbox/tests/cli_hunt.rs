@@ -1,0 +1,59 @@
+//! `ergo-es hunt` — the CLI face of the spend hunt.
+
+use std::process::Command;
+
+fn ergo_es(args: &[&str]) -> (bool, String, String) {
+    let out = Command::new(env!("CARGO_BIN_EXE_ergo-es"))
+        .args(args)
+        .output()
+        .expect("run ergo-es");
+    (
+        out.status.success(),
+        String::from_utf8_lossy(&out.stdout).into_owned(),
+        String::from_utf8_lossy(&out.stderr).into_owned(),
+    )
+}
+
+fn tree_hex(src: &str) -> String {
+    hex::encode(
+        ergo_sandbox::compile_source(src, 3, ergo_ser::address::NetworkPrefix::Testnet)
+            .unwrap()
+            .tree_bytes,
+    )
+}
+
+#[test]
+fn hunt_reports_a_trivially_true_tree_as_spendable_by_anyone() {
+    let (ok, out, err) = ergo_es(&["hunt", &tree_hex("sigmaProp(true)")]);
+    assert!(ok, "stderr: {err}");
+    assert!(out.contains("spendable by anyone"), "stdout: {out}");
+    // One line per probe with height, shape, and verdict.
+    assert_eq!(out.matches("PASS").count(), 6, "stdout: {out}");
+}
+
+#[test]
+fn hunt_reports_the_residual_key_for_p2pk() {
+    let tree = tree_hex("PK(\"3WwbzW6u8hKWBcL1W7kNVMr25s2UHfSBnYtwSHvrRQt7DdPuoXrt\")");
+    let (ok, out, _) = ergo_es(&["hunt", &tree]);
+    assert!(ok);
+    assert!(out.contains("requires proof"), "stdout: {out}");
+    assert!(out.contains("ProveDlog"), "stdout: {out}");
+}
+
+#[test]
+fn hunt_honours_a_caller_height() {
+    let tree = tree_hex("sigmaProp(HEIGHT > 3000000)");
+    let (ok, out, _) = ergo_es(&["hunt", &tree, "--height", "3000001"]);
+    assert!(ok);
+    assert!(out.contains("spendable by anyone"), "stdout: {out}");
+    assert!(out.contains("3000001"), "stdout: {out}");
+}
+
+#[test]
+fn hunt_warns_when_self_is_synthetic_and_probes_error() {
+    let tree = tree_hex("sigmaProp(SELF.R4[Int].get > 0)");
+    let (ok, out, _) = ergo_es(&["hunt", &tree]);
+    assert!(ok);
+    assert!(out.contains("not under probes"), "stdout: {out}");
+    assert!(out.contains("synthetic"), "stdout: {out}");
+}
