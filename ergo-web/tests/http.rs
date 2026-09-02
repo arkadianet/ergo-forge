@@ -397,3 +397,114 @@ async fn hunt_accepts_data_inputs() {
         .unwrap();
     assert_eq!(res["verdict"], "spendableByAnyone", "{res}");
 }
+
+// ── /api/v1/compile and examples ────────────────────────────────────────────
+
+async fn post_compile(base: &str, body: serde_json::Value) -> reqwest::Response {
+    reqwest::Client::new()
+        .post(format!("{base}/api/v1/compile"))
+        .json(&body)
+        .send()
+        .await
+        .unwrap()
+}
+
+#[tokio::test]
+async fn compile_returns_tree_addresses_roundtrip_and_findings() {
+    let base = spawn().await;
+    let res: serde_json::Value = post_compile(
+        &base,
+        serde_json::json!({ "source": "sigmaProp(SELF.R4[Int].get > 5)" }),
+    )
+    .await
+    .json()
+    .await
+    .unwrap();
+    assert_eq!(res["treeHex"], "1001040ad191e4c6a704047300", "{res}");
+    assert!(res["p2s"].as_str().is_some() && res["p2sh"].as_str().is_some());
+    assert_eq!(res["source"], "SELF.R4[Int].get > 5");
+    assert_eq!(res["findings"].as_array().unwrap().len(), 1);
+    assert_eq!(res["params"].as_array().unwrap().len(), 0);
+}
+
+#[tokio::test]
+async fn compile_with_params_fills_the_environment() {
+    let base = spawn().await;
+    let res: serde_json::Value = post_compile(
+        &base,
+        serde_json::json!({
+            "source": "sigmaProp(HEIGHT > $minHeight)",
+            "params": { "minHeight": { "type": "Int", "value": 100 } }
+        }),
+    )
+    .await
+    .json()
+    .await
+    .unwrap();
+    assert_eq!(res["treeHex"], "100104c801d191a37300", "{res}");
+    assert_eq!(res["params"][0]["name"], "minHeight");
+    assert_eq!(res["params"][0]["supplied"], true);
+}
+
+#[tokio::test]
+async fn compile_missing_params_is_a_structured_400() {
+    let base = spawn().await;
+    let r = post_compile(
+        &base,
+        serde_json::json!({ "source": "// $oracleNFT: Coll[Byte]\nsigmaProp(SELF.tokens(0)._1 == $oracleNFT)" }),
+    )
+    .await;
+    assert_eq!(r.status(), 400);
+    let body: serde_json::Value = r.json().await.unwrap();
+    assert_eq!(body["error"]["code"], "missing_params", "{body}");
+    assert_eq!(body["error"]["missingParams"][0]["name"], "oracleNFT");
+    assert_eq!(body["error"]["missingParams"][0]["typeHint"], "Coll[Byte]");
+}
+
+#[tokio::test]
+async fn compile_errors_carry_an_offset() {
+    let base = spawn().await;
+    let r = post_compile(&base, serde_json::json!({ "source": "sigmaProp(HEIGHT >" })).await;
+    assert_eq!(r.status(), 400);
+    let body: serde_json::Value = r.json().await.unwrap();
+    assert_eq!(body["error"]["code"], "compile_error", "{body}");
+    assert!(body["error"]["offset"].as_u64().is_some(), "{body}");
+}
+
+#[tokio::test]
+async fn examples_list_and_fetch() {
+    let base = spawn().await;
+    let list: serde_json::Value = reqwest::get(format!("{base}/api/v1/examples"))
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    let items = list.as_array().unwrap();
+    assert!(items.len() >= 10, "{list}");
+    let first = &items[0];
+    for k in ["id", "group", "name"] {
+        assert!(first[k].as_str().is_some(), "{first}");
+    }
+    let id = first["id"].as_str().unwrap();
+    let one: serde_json::Value = reqwest::get(format!("{base}/api/v1/examples/{id}"))
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(one["id"], id);
+    assert!(one["source"].as_str().unwrap().len() > 10);
+    assert!(one["params"].is_array());
+}
+
+#[tokio::test]
+async fn an_unknown_example_is_a_404_in_the_error_envelope() {
+    let base = spawn().await;
+    let r = reqwest::get(format!("{base}/api/v1/examples/does-not-exist"))
+        .await
+        .unwrap();
+    assert_eq!(r.status(), 404);
+    let body: serde_json::Value = r.json().await.unwrap();
+    assert_eq!(body["error"]["code"], "not_found");
+}

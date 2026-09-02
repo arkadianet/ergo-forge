@@ -37,7 +37,16 @@ pub fn router() -> Router {
         )
         .route(
             "/api/v1/eval",
-            post(crate::routes::eval::eval_route).layer(engine_limit),
+            post(crate::routes::eval::eval_route).layer(engine_limit.clone()),
+        )
+        .route(
+            "/api/v1/compile",
+            post(crate::routes::compile::compile_route).layer(engine_limit),
+        )
+        .route("/api/v1/examples", get(crate::routes::examples::list))
+        .route(
+            "/api/v1/examples/{*id}",
+            get(crate::routes::examples::fetch),
         )
         .fallback_service(ServeDir::new(
             std::env::var("UI_DIR").unwrap_or_else(|_| "ui".into()),

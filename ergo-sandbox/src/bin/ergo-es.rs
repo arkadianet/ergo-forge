@@ -68,10 +68,10 @@ USAGE:
       Decompile → recompile → byte-compare. Single trees accept --network
       (default mainnet); -v prints every failure reason. Corpora paths
       resolve against the ergo node checkout (sibling of this repo).
-  ergo-es audit <hex | --seed | --mainnet>
+  ergo-es audit <hex | --seed | --mainnet | --trees file.json>
       Static lints over the lifted tree. Single trees print findings;
       corpora print a summary tally.
-  ergo-es hunt <hex | --mainnet [N]> [--height H] [--self-box file.json]
+  ergo-es hunt <hex | --mainnet [N] | --trees file.json> [--height H] [--self-box file.json]
                [--data-inputs file.json]
       Spend hunt: can anyone spend this box with no key? Six probes (three
       heights x attacker/preserve output) on the consensus reducer.
@@ -561,6 +561,14 @@ fn mainnet_trees(limit: Option<&String>) -> Result<Vec<String>, String> {
     Ok(trees)
 }
 
+/// A JSON array of tree hex strings — any ad-hoc corpus, e.g. trees pulled
+/// from the explorer.
+fn trees_file(path: Option<&String>) -> Result<Vec<String>, String> {
+    let path = path.ok_or("--trees needs a file path")?;
+    let text = std::fs::read_to_string(path).map_err(|e| format!("{path}: {e}"))?;
+    serde_json::from_str(&text).map_err(|e| format!("{path}: {e}"))
+}
+
 fn workspace_root() -> std::path::PathBuf {
     // Corpus recon modes expect the ergo node checkout sibling to this repo
     // (arkadianet/ergo · test-vectors/). Only used by `--seed` / `--mainnet`.
@@ -580,10 +588,12 @@ fn corpus_err(path: &std::path::Path, e: std::io::Error) -> String {
 /// the lifted tree.
 fn cmd_audit(args: &[String]) -> Result<(), String> {
     match args.first().map(String::as_str) {
-        Some("--seed") | Some("--mainnet") => {
+        Some("--seed") | Some("--mainnet") | Some("--trees") => {
             let is_seed = args[0] == "--seed";
             let (testnet, trees): (bool, Vec<String>) = if is_seed {
                 (true, seed_vectors()?.into_iter().map(|(t, _)| t).collect())
+            } else if args[0] == "--trees" {
+                (false, trees_file(args.get(1))?)
             } else {
                 (false, mainnet_trees(first_positional(args))?)
             };
@@ -708,12 +718,18 @@ fn cmd_hunt(args: &[String]) -> Result<(), String> {
     };
 
     match args.first().map(String::as_str) {
-        Some("--mainnet") => {
-            // The corpus limit is the first positional AFTER --mainnet that is
-            // not a flag or a flag's value (`--height 123` must not become 123).
-            let limit =
-                positional_after_flags(&args[1..], &["--height", "--self-box", "--data-inputs"]);
-            let trees = mainnet_trees(limit)?;
+        Some("--mainnet") | Some("--trees") => {
+            let trees = if args[0] == "--trees" {
+                trees_file(args.get(1))?
+            } else {
+                // The corpus limit is the first positional AFTER --mainnet that
+                // is not a flag or a flag's value (`--height 123` ≠ limit 123).
+                let limit = positional_after_flags(
+                    &args[1..],
+                    &["--height", "--self-box", "--data-inputs"],
+                );
+                mainnet_trees(limit)?
+            };
             let mut tally = std::collections::BTreeMap::<&str, usize>::new();
             let mut all_errored = 0usize;
             let mut parse_errors = 0usize;
