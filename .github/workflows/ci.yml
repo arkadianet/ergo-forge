@@ -1,0 +1,69 @@
+# The verification bar, enforced. Everything the plan calls a "floor" or a
+# "bar" runs here: fmt, clippy with warnings denied (with and without
+# `cost-trace`), the workspace tests, and — because the node checkout is laid
+# out as a sibling at the exact rev the workspace pins — the whole-corpus
+# round-trip floors that would otherwise only run on a developer machine.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ergo-forge
+        uses: actions/checkout@v4
+        with:
+          path: ergo-forge
+
+      - name: Read the pinned engine rev
+        id: pin
+        working-directory: ergo-forge
+        run: |
+          rev=$(grep -m1 -oE 'ergo-sigma *= *\{[^}]*rev *= *"[0-9a-f]+"' Cargo.toml | grep -oE '[0-9a-f]{40}')
+          test -n "$rev"
+          echo "rev=$rev" >> "$GITHUB_OUTPUT"
+
+      # The corpus tests look for `../../ergo` relative to ergo-sandbox, i.e. a
+      # sibling of this repo. Same rev as the crates, so the corpora match.
+      - name: Checkout the node as a sibling (test corpora)
+        uses: actions/checkout@v4
+        with:
+          repository: arkadianet/ergo
+          ref: ${{ steps.pin.outputs.rev }}
+          path: ergo
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ergo-forge
+
+      - name: fmt
+        working-directory: ergo-forge
+        run: cargo fmt --all -- --check
+
+      - name: clippy
+        working-directory: ergo-forge
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: clippy (cost-trace)
+        working-directory: ergo-forge
+        run: cargo clippy -p ergo-sandbox --all-targets --features cost-trace -- -D warnings
+
+      - name: test
+        working-directory: ergo-forge
+        run: cargo test --workspace
+
+      - name: test (cost-trace)
+        working-directory: ergo-forge
+        run: cargo test -p ergo-sandbox --features cost-trace
