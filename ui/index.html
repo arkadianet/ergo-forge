@@ -19,6 +19,15 @@
       <input id="input" type="text" spellcheck="false"
              aria-label="Contract address or ErgoTree hex"
              placeholder="Address or ErgoTree hex, e.g. 1001040ad191e4c6a704047300">
+      <select id="examples" aria-label="examples">
+        <option value="">examples…</option>
+        <option value="1001040ad191e4c6a704047300">unguarded register read</option>
+        <option value="1001040ad801d601c6a70404d1ede6720191e472017300">guarded register read</option>
+        <option value="100104d48db701d191a37300">height lock</option>
+        <option value="10010400d193c2b2a5730000c2a7">self-preserving (movable by anyone)</option>
+        <option value="0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197">pay-to-public-key</option>
+        <option value="1014040004000e208c27dd9d8a35aac1e3167d58858c0a8b4059b277da790552e37eba22df9b903504000400040204020101040205a0c21e040204080500040c040204a0c21e0402050a05c8010402d806d601b2a5730000d602b5db6501fed9010263ed93e4c67202050ec5a7938cb2db63087202730100017302d603b17202d604e4c6b272027303000605d605d90105049590720573047204e4c6b272029972057305000605d606b07202860273067307d901063c400163d803d6088c720601d6098c720801d60a8c72060286029a72097308ededed8c72080293c2b2a5720900d0cde4c6720a040792c1b2a5720900730992da720501997209730ae4c6720a0605ea02d1ededededededed93cbc27201e4c6a7060e927203730b93db63087201db6308a793e4c6720104059db07202730cd9010741639a8c720701e4c68c72070206057e72030593e4c6720105049ae4c6a70504730d92c1720199c1a77e9c9a7203730e730f058c72060292da720501998c72060173109972049d9c720473117312b2ad7202d9010763cde4c672070407e4c6b2a5731300040400">oracle pool (mainnet)</option>
+      </select>
       <select id="network" aria-label="network">
         <option value="mainnet" selected>mainnet</option>
         <option value="testnet">testnet</option>
