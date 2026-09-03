@@ -1,0 +1,2893 @@
+{
+  "source": "// A constant-product liquidity pool between ERG and one token (the shape\n// of Spectrum's N2T pool, in one script). The pool box holds:\n//   value      the ERG reserve (X)\n//   tokens(0)  the pool NFT, which identifies this pool\n//   tokens(1)  LP tokens not yet in circulation\n//   tokens(2)  the token reserve (Y)\n// Every spend must rebuild the box as OUTPUTS(0) with the same script, the\n// same NFT and token ids, and do exactly one of: swap (LP unchanged, the\n// product of the reserves may not fall after the fee), deposit (LP minted\n// is at most the proportional share of what was added), redeem (what is\n// taken out is at most the proportional share of the LP burned). The pool\n// is bootstrapped by creating the box with its first liquidity and the\n// matching LP already in circulation; the script never sees supply zero.\n// Price protection for the trader lives in the order contract, not here.\n//\n// $lpSupply: Long  -- LP tokens minted at bootstrap: circulating = lpSupply - tokens(1)\n// $feeNum: Int     -- 997 with feeDenom 1000 is a 0.3% fee\n// $feeDenom: Int\n{\n  val wellFormed = OUTPUTS.size > 0 && OUTPUTS(0).tokens.size == 3 && SELF.tokens.size == 3\n  if (!wellFormed) sigmaProp(false) else {\n    val successor = OUTPUTS(0)\n    val nftIn = SELF.tokens(0)\n    val lpIn = SELF.tokens(1)\n    val yIn = SELF.tokens(2)\n    val nftOut = successor.tokens(0)\n    val lpOut = successor.tokens(1)\n    val yOut = successor.tokens(2)\n    val preserved = successor.propositionBytes == SELF.propositionBytes &&\n      nftOut == nftIn && lpOut._1 == lpIn._1 && yOut._1 == yIn._1\n\n    val supplyIn = $lpSupply - lpIn._2\n    val reservesXIn = SELF.value\n    val reservesYIn = yIn._2\n    val deltaSupply = lpIn._2 - lpOut._2\n    val deltaX = successor.value - reservesXIn\n    val deltaY = yOut._2 - reservesYIn\n\n    val validSwap = deltaSupply == 0L && (\n      if (deltaX > 0L)\n        reservesYIn.toBigInt * deltaX.toBigInt * $feeNum.toBigInt >= -deltaY.toBigInt * (reservesXIn.toBigInt * $feeDenom.toBigInt + deltaX.toBigInt * $feeNum.toBigInt)\n      else\n        reservesXIn.toBigInt * deltaY.toBigInt * $feeNum.toBigInt >= -deltaX.toBigInt * (reservesYIn.toBigInt * $feeDenom.toBigInt + deltaY.toBigInt * $feeNum.toBigInt)\n    )\n    val validDeposit = deltaSupply > 0L && deltaX > 0L && deltaY > 0L &&\n      deltaSupply.toBigInt * reservesXIn.toBigInt <= deltaX.toBigInt * supplyIn.toBigInt &&\n      deltaSupply.toBigInt * reservesYIn.toBigInt <= deltaY.toBigInt * supplyIn.toBigInt\n    val validRedeem = deltaSupply < 0L && deltaX < 0L && deltaY < 0L &&\n      (-deltaX).toBigInt * supplyIn.toBigInt <= (-deltaSupply).toBigInt * reservesXIn.toBigInt &&\n      (-deltaY).toBigInt * supplyIn.toBigInt <= (-deltaSupply).toBigInt * reservesYIn.toBigInt\n\n    sigmaProp(preserved && (validSwap || validDeposit || validRedeem))\n  }\n}\n",
+  "params": {
+    "lpSupply": {
+      "type": "Long",
+      "value": 1000000000000
+    },
+    "feeNum": {
+      "type": "Int",
+      "value": 997
+    },
+    "feeDenom": {
+      "type": "Int",
+      "value": 1000
+    }
+  },
+  "scenarios": [
+    {
+      "name": "swap 215.496 ERG in, the most Y the curve allows out (884264762)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1215496257079,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4115735238
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 215.496 ERG in, one unit of Y too many out",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1215496257079,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4115735237
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 28.666 ERG in, the most Y the curve allows out (138927268)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1028665546064,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4861072732
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 28.666 ERG in, one unit of Y too many out",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1028665546064,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4861072731
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 53.941 ERG in, the most Y the curve allows out (255173809)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1053941203243,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4744826191
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 53.941 ERG in, one unit of Y too many out",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1053941203243,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4744826190
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 319.498 ERG in, the most Y the curve allows out (1207926107)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1319498201848,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 3792073893
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 319.498 ERG in, one unit of Y too many out",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1319498201848,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 3792073892
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 118.244 ERG in, the most Y the curve allows out (527283239)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1118243536885,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4472716761
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 118.244 ERG in, one unit of Y too many out",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1118243536885,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4472716760
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 47.506 ERG in, the most Y the curve allows out (226106700)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1047505682904,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4773893300
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 47.506 ERG in, one unit of Y too many out",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1047505682904,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4773893299
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 229.596 ERG in, the most Y the curve allows out (931343781)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1229595760730,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4068656219
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 229.596 ERG in, one unit of Y too many out",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1229595760730,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4068656218
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 129.249 ERG in, the most Y the curve allows out (570757889)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1129249045647,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4429242111
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 129.249 ERG in, one unit of Y too many out",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1129249045647,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4429242110
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 195804716 Y in, the most ERG the curve allows out (37.576350)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 962423650349,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5195804716
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 195804716 Y in, one nanoERG too many out",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 962423650348,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5195804716
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 1184364967 Y in, the most ERG the curve allows out (191.044784)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 808955215507,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 6184364967
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 1184364967 Y in, one nanoERG too many out",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 808955215506,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 6184364967
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 912648019 Y in, the most ERG the curve allows out (153.963438)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 846036561741,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5912648019
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 912648019 Y in, one nanoERG too many out",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 846036561740,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5912648019
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 127938843 Y in, the most ERG the curve allows out (24.876384)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 975123616264,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5127938843
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 127938843 Y in, one nanoERG too many out",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 975123616263,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5127938843
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 1215302567 Y in, the most ERG the curve allows out (195.061757)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 804938243410,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 6215302567
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 1215302567 Y in, one nanoERG too many out",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 804938243409,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 6215302567
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 266862673 Y in, the most ERG the curve allows out (50.523917)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 949476082757,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5266862673
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 266862673 Y in, one nanoERG too many out",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 949476082756,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5266862673
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 480402028 Y in, the most ERG the curve allows out (87.418187)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 912581812960,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5480402028
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 480402028 Y in, one nanoERG too many out",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 912581812959,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5480402028
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 1355258844 Y in, the most ERG the curve allows out (212.746338)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 787253661932,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 6355258844
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "swap 1355258844 Y in, one nanoERG too many out",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 787253661931,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 6355258844
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "deposit 321.52 ERG + 266695473 Y, the proportional LP minted (53339094)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1321522385077,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 998946660906
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5266695473
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "deposit 321.52 ERG + 266695473 Y, one LP too many minted",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1321522385077,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 998946660905
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5266695473
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "deposit 321.31 ERG + 1704729684 Y, the proportional LP minted (321306218)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1321306218191,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 998678693782
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 6704729684
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "deposit 321.31 ERG + 1704729684 Y, one LP too many minted",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1321306218191,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 998678693781
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 6704729684
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "deposit 23.42 ERG + 2391857534 Y, the proportional LP minted (23424375)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1023424375696,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 998976575625
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 7391857534
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "deposit 23.42 ERG + 2391857534 Y, one LP too many minted",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1023424375696,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 998976575624
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 7391857534
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "deposit 77.70 ERG + 1244862422 Y, the proportional LP minted (77701537)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1077701537995,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 998922298463
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 6244862422
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "deposit 77.70 ERG + 1244862422 Y, one LP too many minted",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1077701537995,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 998922298462
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 6244862422
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "deposit 80.11 ERG + 2323228204 Y, the proportional LP minted (80109599)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1080109599810,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 998919890401
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 7323228204
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "deposit 80.11 ERG + 2323228204 Y, one LP too many minted",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1080109599810,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 998919890400
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 7323228204
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "deposit 315.04 ERG + 1325919352 Y, the proportional LP minted (265183870)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1315038526400,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 998734816130
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 6325919352
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "deposit 315.04 ERG + 1325919352 Y, one LP too many minted",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1315038526400,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 998734816129
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 6325919352
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 301785835 LP for the proportional reserves (301.7858 ERG, 1508929175 Y)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 698214165000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999301785835
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 3491070825
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 301785835 LP taking one nanoERG too many",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 698214164999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999301785835
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 3491070825
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 301785835 LP taking one Y too many",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 698214165000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999301785835
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 3491070824
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 439154501 LP for the proportional reserves (439.1545 ERG, 2195772505 Y)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 560845499000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999439154501
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 2804227495
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 439154501 LP taking one nanoERG too many",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 560845498999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999439154501
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 2804227495
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 439154501 LP taking one Y too many",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 560845499000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999439154501
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 2804227494
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 367147410 LP for the proportional reserves (367.1474 ERG, 1835737050 Y)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 632852590000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999367147410
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 3164262950
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 367147410 LP taking one nanoERG too many",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 632852589999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999367147410
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 3164262950
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 367147410 LP taking one Y too many",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 632852590000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999367147410
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 3164262949
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 98026737 LP for the proportional reserves (98.0267 ERG, 490133685 Y)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 901973263000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999098026737
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4509866315
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 98026737 LP taking one nanoERG too many",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 901973262999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999098026737
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4509866315
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 98026737 LP taking one Y too many",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 901973263000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999098026737
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4509866314
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 56327612 LP for the proportional reserves (56.3276 ERG, 281638060 Y)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 943672388000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999056327612
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4718361940
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 56327612 LP taking one nanoERG too many",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 943672387999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999056327612
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4718361940
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 56327612 LP taking one Y too many",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 943672388000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999056327612
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4718361939
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 313244210 LP for the proportional reserves (313.2442 ERG, 1566221050 Y)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 686755790000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999313244210
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 3433778950
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 313244210 LP taking one nanoERG too many",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 686755789999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999313244210
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 3433778950
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "redeem 313244210 LP taking one Y too many",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 686755790000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999313244210
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 3433778949
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "a fair swap that also mints LP for free",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1010000000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 998999999999
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4950642099
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "a fair swap into a box under another script",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1010000000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4950642099
+            }
+          ],
+          "ergoTree": "10010101d17300"
+        }
+      ]
+    },
+    {
+      "name": "a fair swap that swaps the NFT for another token",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1010000000000,
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4950642099
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "a fair swap that changes the LP token id",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1010000000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 4950642099
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "a successor with only two tokens",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 1010000000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "a deposit that takes ERG out",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 999999999999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 998999999999
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5001000000
+            }
+          ],
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "no outputs at all",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999000000000
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 5000000000
+          }
+        ]
+      }
+    }
+  ]
+}
