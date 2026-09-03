@@ -12,7 +12,7 @@ use ergo_ser::address::NetworkPrefix;
 use ergo_ser::sigma_type::SigmaType;
 use ergo_ser::sigma_value::{CollValue, SigmaBoolean, SigmaValue};
 use num_bigint::BigInt;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::SandboxError;
 
@@ -23,7 +23,7 @@ use crate::SandboxError;
 ///
 /// Field names are camelCase (`creationHeight`, `contextVars`, …) to match
 /// the tooling-API request shapes (`ergoscript-tooling-api.md` §4.3).
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Scenario {
     /// ErgoTree wire bytes, hex. Mutually exclusive with `source`.
@@ -108,7 +108,7 @@ where
 }
 
 /// Pre-header fields (SPreHeader). All optional; defaults are zero.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PreHeader {
     /// Block version byte.
@@ -131,7 +131,7 @@ pub struct PreHeader {
 /// A box as the scenario describes it. Registers are the R4–R9 block;
 /// the mandatory R0–R3 (value, ergoTree, tokens, creationInfo) are
 /// populated from their dedicated fields.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ScenarioBox {
     /// Box value in nanoErg (R0).
@@ -157,7 +157,7 @@ pub struct ScenarioBox {
 }
 
 /// A (token id, amount) pair.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TokenAmount {
     /// 32-byte token id, hex.
@@ -168,7 +168,7 @@ pub struct TokenAmount {
 
 /// A user-supplied typed value: a type name plus a JSON value of the
 /// matching shape.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct TypedValue {
     /// Type name, e.g. `Int`, `Long`, `BigInt`, `SigmaProp`,
     /// `GroupElement`, `Coll[Byte]`, `Coll[Int]`, `Coll[Coll[Byte]]`.

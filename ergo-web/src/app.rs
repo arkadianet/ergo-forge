@@ -97,6 +97,10 @@ pub fn router_with(cfg: AppConfig) -> Router {
             post(crate::routes::compile::compile_route),
         )
         .route("/api/v1/test", post(crate::routes::test::test_route))
+        .route(
+            "/api/v1/compose",
+            post(crate::routes::compose::compose_route),
+        )
         .route("/api/v1/examples", get(crate::routes::examples::list))
         .route(
             "/api/v1/examples/{*id}",

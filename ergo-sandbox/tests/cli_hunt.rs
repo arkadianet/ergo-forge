@@ -128,3 +128,34 @@ fn validate_tx_command_reports_each_input_and_exits_nonzero_when_invalid() {
     );
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+// ----- ergo-es compose -----
+
+#[test]
+fn compose_command_prints_source_and_writes_a_suite_with_params() {
+    let dir = std::env::temp_dir().join(format!("ergo-es-compose-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let spec = dir.join("spec.json");
+    std::fs::write(&spec, r#"{ "paths": [ { "name": "owner later", "who": { "anyOf": ["owner"] }, "conditions": [ { "after": "h" } ] } ] }"#).unwrap();
+    let (ok, out, err) = ergo_es(&["compose", spec.to_str().unwrap()]);
+    assert!(ok, "{err}");
+    assert!(
+        out.contains("$owner") && out.contains("HEIGHT >= $h"),
+        "{out}"
+    );
+    let params = dir.join("params.json");
+    std::fs::write(&params, r#"{ "owner": { "type": "SigmaProp", "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197" }, "h": { "type": "Int", "value": 100 } }"#).unwrap();
+    let suite = dir.join("contract.test.json");
+    let (ok, _, err) = ergo_es(&[
+        "compose",
+        spec.to_str().unwrap(),
+        "--params",
+        params.to_str().unwrap(),
+        "--suite",
+        suite.to_str().unwrap(),
+    ]);
+    assert!(ok, "{err}");
+    let (ok, out, _) = ergo_es(&["test", suite.to_str().unwrap()]);
+    assert!(ok, "generated suite must pass\n{out}");
+    let _ = std::fs::remove_dir_all(&dir);
+}

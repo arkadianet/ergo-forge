@@ -586,8 +586,7 @@ let built = null;         // last compile result for the wizard
 const BLOCK_SECONDS = 120;
 
 function buildStep(n) {
-  for (const k of [1, 2, 3]) $(`build-step-${k}`).hidden = k !== n;
-  window.scrollTo({ top: $("build").offsetTop - 12, behavior: "smooth" });
+  buildStepEl(`build-step-${n}`);
 }
 
 async function loadRecipes() {
@@ -611,7 +610,19 @@ async function loadRecipes() {
       card.addEventListener("click", () => startRecipe(ex));
       box.appendChild(card);
     }
+    const custom = document.createElement("button");
+    custom.type = "button"; custom.className = "recipe custom";
+    const t = document.createElement("strong"); t.textContent = "Combine rules yourself";
+    const d = document.createElement("span"); d.textContent = "Who may spend, under what conditions — as many ways to spend as you need.";
+    custom.append(t, d);
+    custom.addEventListener("click", startComposer);
+    box.appendChild(custom);
   } catch (e) { /* no gallery, no build mode */ }
+}
+
+function buildStepEl(id) {
+  for (const k of ["build-step-1", "build-compose", "build-step-2", "build-step-3"]) $(k).hidden = k !== id;
+  window.scrollTo({ top: $("build").offsetTop - 12, behavior: "smooth" });
 }
 
 const RECIPE_TITLES = {
@@ -848,6 +859,7 @@ $("wizard").addEventListener("submit", async (e) => {
       return;
     }
     built = { ...body, params, network };
+    renderChecks(null);
     $("build-rent").textContent = rentSentence(body.rent, { forBurn: recipe.name === "burn", withHeight: false });
     $("build-summary").textContent = describeBuild(params);
     $("build-address").textContent = body.p2s;
@@ -902,8 +914,217 @@ $("build-share").addEventListener("click", () => {
 });
 $("build-project").addEventListener("click", () => {
   if (!built) return;
+  if (composedContract && recipe && recipe.name === "custom" && composedContract.suite) {
+    $("tests").value = JSON.stringify(composedContract.suite.scenarios, null, 2);
+  }
   downloadProject(recipe.source, built.params, built.network, `${recipe.doc ? recipe.doc.name : "contract"}`);
 });
+
+// ── composer: ways to spend → spec → compose → compile ───────────────────
+
+const WHO_KINDS = [
+  ["anyOf", "one person (or any of several)"],
+  ["allOf", "all of these people together"],
+  ["kOf", "some of these people (k of n)"],
+  ["anyOne", "anyone — no signature needed"],
+];
+const COND_KINDS = [
+  ["after", "only from a date"],
+  ["before", "only until a date"],
+  ["payTo", "must pay someone"],
+  ["keepHere", "must keep funds in this contract"],
+  ["oracleAbove", "only while an oracle price is at or above a floor"],
+];
+let composedContract = null; // the spec-derived source + answers, for step 3
+
+function startComposer() {
+  recipe = null; built = null;
+  $("paths").textContent = "";
+  addPath();
+  $("compose-status").hidden = true;
+  buildStepEl("build-compose");
+}
+
+function addPath() {
+  const n = $("paths").children.length + 1;
+  const box = document.createElement("div");
+  box.className = "path";
+  box.innerHTML = `
+    <div class="path-head"><strong>Way to spend ${n}</strong> <button type="button" class="secondary tiny path-remove">remove</button></div>
+    <div class="field"><label>Who may spend this way?</label><select class="who-kind"></select></div>
+    <div class="who-keys"></div>
+    <div class="field"><label>Under what conditions?</label><div class="conds"></div>
+      <button type="button" class="secondary tiny cond-add">+ add a condition</button></div>`;
+  const whoSel = box.querySelector(".who-kind");
+  for (const [v, l] of WHO_KINDS) { const o = document.createElement("option"); o.value = v; o.textContent = l; whoSel.appendChild(o); }
+  const renderKeys = () => {
+    const keys = box.querySelector(".who-keys");
+    const kind = whoSel.value;
+    keys.textContent = "";
+    if (kind === "anyOne") return;
+    const count = keys.dataset.count ? Number(keys.dataset.count) : (kind === "anyOf" ? 1 : 2);
+    keys.dataset.count = String(count);
+    if (kind === "kOf") {
+      const f = document.createElement("div"); f.className = "field";
+      f.innerHTML = `<label>How many of them must agree?</label><input class="kof" type="number" min="1" value="2">`;
+      keys.appendChild(f);
+    }
+    for (let i = 0; i < count; i++) {
+      const f = document.createElement("div"); f.className = "field";
+      f.innerHTML = `<label>Address ${i + 1}</label><input class="key" placeholder="${$("compose-network").value === "testnet" ? "3…" : "9…"}" spellcheck="false"><span class="problem" hidden></span>`;
+      const inp = f.querySelector("input");
+      inp.addEventListener("input", () => { const m = fieldProblem("address", inp.value, $("compose-network").value); const pr = f.querySelector(".problem"); pr.textContent = m; pr.hidden = !m; inp.classList.toggle("invalid", !!m); });
+      keys.appendChild(f);
+    }
+    const more = document.createElement("button"); more.type = "button"; more.className = "secondary tiny";
+    more.textContent = "+ another address";
+    more.addEventListener("click", () => { keys.dataset.count = String(count + 1); renderKeys(); });
+    keys.appendChild(more);
+  };
+  whoSel.addEventListener("change", () => { box.querySelector(".who-keys").dataset.count = ""; renderKeys(); });
+  renderKeys();
+  box.querySelector(".cond-add").addEventListener("click", () => addCond(box.querySelector(".conds")));
+  box.querySelector(".path-remove").addEventListener("click", () => { box.remove(); renumberPaths(); });
+  $("paths").appendChild(box);
+}
+
+function renumberPaths() {
+  [...$("paths").children].forEach((b, i) => { b.querySelector(".path-head strong").textContent = `Way to spend ${i + 1}`; });
+}
+
+function addCond(container) {
+  const row = document.createElement("div");
+  row.className = "cond";
+  const sel = document.createElement("select"); sel.className = "cond-kind";
+  for (const [v, l] of COND_KINDS) { const o = document.createElement("option"); o.value = v; o.textContent = l; sel.appendChild(o); }
+  const inputs = document.createElement("div"); inputs.className = "cond-inputs";
+  const rm = document.createElement("button"); rm.type = "button"; rm.className = "secondary tiny"; rm.textContent = "remove";
+  rm.addEventListener("click", () => row.remove());
+  const render = () => {
+    inputs.textContent = "";
+    const mk = (cls, label, attrs) => {
+      const f = document.createElement("div"); f.className = "field";
+      const l = document.createElement("label"); l.textContent = label;
+      const i = document.createElement("input"); i.className = cls; Object.assign(i, attrs || {});
+      f.append(l, i); inputs.appendChild(f); return i;
+    };
+    const dates = datesAvailableFor($("compose-network").value);
+    switch (sel.value) {
+      case "after": mk("c-height", dates ? "From when?" : "From which block height?", dates ? { type: "datetime-local" } : { type: "number", min: "1" }); break;
+      case "before": mk("c-height", dates ? "Until when?" : "Until which block height?", dates ? { type: "datetime-local" } : { type: "number", min: "1" }); break;
+      case "payTo": mk("c-key", "Who must be paid? (address)", { spellcheck: false }); mk("c-erg", "At least how much, in ERG?", { type: "number", step: "0.000000001" }); break;
+      case "keepHere": mk("c-erg", "At least how much must stay, in ERG?", { type: "number", step: "0.000000001" }); break;
+      case "oracleAbove": mk("c-token", "Oracle token id (64 hex characters)", { spellcheck: false }); mk("c-num", "Minimum price, in the oracle's units", { type: "number" }); break;
+    }
+  };
+  sel.addEventListener("change", render);
+  render();
+  row.append(sel, inputs, rm);
+  container.appendChild(row);
+}
+
+function datesAvailableFor(network) { return chainHeight != null && chainNetwork === network; }
+
+/// Read the composer UI into a spec plus typed values. Parameter names are
+/// generated (`key1`, `after1`, …) so the source stays readable.
+function readComposer() {
+  const network = $("compose-network").value;
+  const spec = { paths: [] };
+  const values = {};
+  let keyN = 0, condN = 0;
+  const addKey = (addr) => { const p = fieldProblem("address", addr, network); if (!addr.trim()) throw new Error("An address is missing."); if (p) throw new Error(p); keyN++; const name = `key${keyN}`; values[name] = { type: "SigmaProp", value: addr.trim() }; return name; };
+  const heightOf = (inp) => {
+    const raw = inp.value.trim(); if (!raw) throw new Error("A date or height is missing.");
+    if (inp.type === "datetime-local") { const t = new Date(raw).getTime(); if (Number.isNaN(t)) throw new Error("That date does not parse."); const now = heightNow(); const h = now + Math.ceil((t - Date.now()) / 1000 / BLOCK_SECONDS); if (h <= now) throw new Error("Dates must be in the future."); return h; }
+    const h = Number(raw); if (!Number.isInteger(h) || h < 1) throw new Error("A block height is a whole number."); return h;
+  };
+  for (const box of $("paths").children) {
+    const kind = box.querySelector(".who-kind").value;
+    const keys = [...box.querySelectorAll(".who-keys .key")].map((i) => addKey(i.value));
+    let who;
+    if (kind === "anyOne") who = { anyOne: true };
+    else if (kind === "anyOf") who = { anyOf: keys };
+    else if (kind === "allOf") who = { allOf: keys };
+    else { const k = Number(box.querySelector(".kof").value); if (!(k >= 1 && k <= keys.length)) throw new Error(`"How many must agree" must be between 1 and ${keys.length}.`); who = { kOf: k, keys }; }
+    const conditions = [];
+    for (const row of box.querySelectorAll(".cond")) {
+      condN++;
+      const ck = row.querySelector(".cond-kind").value;
+      if (ck === "after" || ck === "before") { const name = `${ck}${condN}`; values[name] = { type: "Int", value: heightOf(row.querySelector(".c-height")) }; conditions.push({ [ck]: name }); }
+      else if (ck === "payTo") { const key = addKey(row.querySelector(".c-key").value); const erg = Number(row.querySelector(".c-erg").value); if (!(erg > 0)) throw new Error("A payment amount in ERG is missing."); const amt = `amount${condN}`; values[amt] = { type: "Long", value: Math.round(erg * 1e9) }; conditions.push({ payTo: { key, amount: amt } }); }
+      else if (ck === "keepHere") { const erg = Number(row.querySelector(".c-erg").value); if (!(erg >= 0)) throw new Error("A keep amount in ERG is missing."); const n = `keep${condN}`; values[n] = { type: "Long", value: Math.round(erg * 1e9) }; conditions.push({ keepHere: { atLeast: n } }); }
+      else if (ck === "oracleAbove") { const tok = row.querySelector(".c-token").value.trim(); if (!/^[0-9a-fA-F]{64}$/.test(tok)) throw new Error("A token id is 64 hex characters."); const n1 = `oracle${condN}`, n2 = `floor${condN}`; values[n1] = { type: "Coll[Byte]", value: tok.toLowerCase() }; values[n2] = { type: "Long", value: Number(row.querySelector(".c-num").value || 0) }; conditions.push({ oracleAbove: { nft: n1, floor: n2 } }); }
+    }
+    spec.paths.push({ name: `way ${spec.paths.length + 1}`, who, conditions });
+  }
+  return { spec, values, network };
+}
+
+$("path-add").addEventListener("click", addPath);
+$("compose-back").addEventListener("click", () => buildStep(1));
+$("compose-network").addEventListener("change", () => { for (const r of $("paths").querySelectorAll(".cond")) r.querySelector(".cond-kind").dispatchEvent(new Event("change")); });
+$("compose-create").addEventListener("click", async () => {
+  const status = $("compose-status");
+  let read;
+  try { read = readComposer(); } catch (e) { status.textContent = e.message; status.hidden = false; return; }
+  status.textContent = "Creating and checking…"; status.hidden = false;
+  $("compose-create").disabled = true;
+  try {
+    const cres = await fetch("/api/v1/compose", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ spec: read.spec, params: read.values, run: true }) });
+    const composed = await cres.json();
+    if (!cres.ok) { status.textContent = `Could not build that: ${(composed.error && composed.error.message) || cres.status}`; return; }
+    const res = await fetch("/api/v1/compile", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ source: composed.source, network: read.network, params: read.values }) });
+    const body = await res.json();
+    if (!res.ok) { status.textContent = `Could not create the contract: ${(body.error && body.error.message) || res.status}`; return; }
+    composedContract = { source: composed.source, params: read.values, network: read.network, suite: composed.suite };
+    built = { ...body, params: read.values, network: read.network };
+    recipe = { name: "custom", source: composed.source, params: composed.params, doc: { name: "custom", description: "" } };
+    $("build-rent").textContent = rentSentence(body.rent, { withHeight: false });
+    $("build-summary").textContent = read.spec.paths.map((p, i) => `Way ${i + 1}: ${describeWho(p.who, read.values)}${p.conditions.length ? ", " + p.conditions.map((c) => describeCond(c, read.values)).join(", ") : ""}.`).join("\n");
+    $("build-address").textContent = body.p2s;
+    $("build-tree").textContent = body.treeHex;
+    renderQr(body.p2s);
+    renderChecks(composed.results);
+    $("build-hunt").textContent = body.findings.length ? `Note: ${body.findings.length} finding(s) in the compiled code — open in Write to see them.` : "";
+    status.hidden = true;
+    buildStep(3);
+  } catch (err) {
+    status.textContent = `Something went wrong: ${err}`;
+  } finally {
+    $("compose-create").disabled = false;
+  }
+});
+
+function describeWho(who, values) {
+  const a = (k) => shortAddr(values[k] ? values[k].value : k);
+  if (who.anyOne) return "anyone";
+  if (who.anyOf) return who.anyOf.length === 1 ? a(who.anyOf[0]) : `any of ${who.anyOf.map(a).join(", ")}`;
+  if (who.allOf) return `all of ${who.allOf.map(a).join(", ")}`;
+  return `${who.kOf} of ${who.keys.map(a).join(", ")}`;
+}
+function describeCond(c, values) {
+  const v = (n) => values[n] ? values[n].value : n;
+  if (c.after) return `from block ${v(c.after)}`;
+  if (c.before) return `until block ${v(c.before)}`;
+  if (c.payTo) return `paying ${shortAddr(v(c.payTo.key))} at least ${v(c.payTo.amount) / 1e9} ERG`;
+  if (c.keepHere) return `keeping at least ${v(c.keepHere.atLeast) / 1e9} ERG here`;
+  if (c.oracleAbove) return `oracle price ≥ ${v(c.oracleAbove.floor)}`;
+  return "";
+}
+
+function renderChecks(results) {
+  const box = $("build-checks");
+  if (!results) { box.hidden = true; return; }
+  const tb = $("build-checks-rows"); tb.textContent = "";
+  for (const c of results.cases) {
+    const tr = document.createElement("tr");
+    tr.dataset.verdict = c.passed ? "ok" : "fail";
+    const outcome = { pass: "spendable by anyone", needsProof: "needs the named signature(s)", fail: "refused", error: "refused (script error)" }[c.actual] || c.actual;
+    for (const cell of [c.passed ? "✓" : "✗", c.name, outcome]) { const td = document.createElement("td"); td.textContent = cell; tr.appendChild(td); }
+    tb.appendChild(tr);
+  }
+  box.hidden = false;
+}
 
 // ── files: open .es / project files, save a project zip ──────────────────
 

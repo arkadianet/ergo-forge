@@ -272,7 +272,17 @@ Still missing (the actual build list):
     count as signatures needed. `ergo-es validate-tx`, `POST
     /api/v1/validate-tx` (missing boxes fetched from the explorer when
     configured), a Validate section in Read.
-12. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
+12. **P4g — the composer: DONE 2026-09-03.** `compose::compose(spec,
+    values)`: spending paths (who: anyOne/anyOf/allOf/kOf; conditions:
+    after/before/payTo/keepHere/oracleAbove) → readable ErgoScript with
+    `$name` params; with values, a generated suite whose expectations come
+    from the composer's own model (satisfied paths → pass / needsProof
+    with residual assertions / fail), so running it checks the assembly
+    against the evaluator. Surfaces: `ergo-es compose`, `POST
+    /api/v1/compose`, and "Combine rules yourself" in Build with a checks
+    table on the result. Thirteen recipes precede it as the tested clause
+    library.
+13. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.
    - **A — DONE 2026-08-31** (`compiler/source-positions`, `8479a58`): every

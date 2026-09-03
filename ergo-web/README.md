@@ -215,6 +215,20 @@ an input reducing to a sigma proposition counts as `needsProof` and does not
 invalidate. Response: `{valid, signaturesNeeded, inputs[], problems[],
 ergIn, ergOut, height}`.
 
+### `POST /api/v1/compose`
+
+`{spec, params?, run?}` → `{source, params, suite?, results?}`. A `spec` is a
+list of spending paths, each `who` (`{anyOne: true}`, `{anyOf: [names]}`,
+`{allOf: [names]}`, `{kOf: k, keys: [names]}`) plus `conditions`
+(`{after: name}`, `{before: name}`, `{payTo: {key, amount}}`,
+`{keepHere: {atLeast: name}}`, `{oracleAbove: {nft, floor}}`); names are
+parameter names. Paths are OR-ed, a path's conditions AND-ed. The source is
+readable ErgoScript with `$name` params. With `params` values, a test suite
+is generated whose expected verdicts come from the composer's own model of
+the rules — running it (`run: true`, or `ergo-es test`) checks that the
+assembled ErgoScript means what the spec says. A path that anyone may take
+with no conditions is refused.
+
 ### `POST /api/v1/test`
 
 Run a contract test suite: the contract (`source` + `params`, or `tree`) and
