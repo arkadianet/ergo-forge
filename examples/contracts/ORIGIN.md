@@ -1,6 +1,9 @@
 # Example contracts
 
-`basics/` and `recipes/` are written for this playground. `recipes/` are
+`basics/`, `recipes/` and `protocols/` are written for this playground.
+`protocols/` are multi-box systems (an AMM pool with a swap order, a
+reserve-backed stablecoin bank) with property-style suites generated from
+independent models in `examples/tests/gen/`; see `protocols/README.md`. `recipes/` are
 EIP-5 `@contract def` templates whose doc block and `@param` lines are
 written as questions for non-technical users: the Build mode is a form over
 them. Every recipe with state or more than one spending path ships with a test

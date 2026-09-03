@@ -1,0 +1,3770 @@
+{
+  "source": "// A reserve-backed stablecoin bank (the shape of AgeUSD / SigmaUSD, in one\n// script). The bank box holds:\n//   value      the ERG reserve\n//   tokens(0)  the bank NFT\n//   tokens(1)  stablecoins (SC) not yet in circulation\n//   tokens(2)  reserve coins (RC) not yet in circulation\n//   R4[Long]   SC in circulation      R5[Long]   RC in circulation\n// The oracle box (data input 0, identified by its NFT) reports in R4 the\n// price of one SC unit in nanoERG. A spend rebuilds the bank as OUTPUTS(0)\n// and does exactly one of: mint SC, redeem SC, mint RC, redeem RC, paying\n// or receiving the nominal price plus a fee, subject to the reserve ratio\n// after the action: minting SC and redeeming RC need it at or above the\n// minimum; minting RC needs it at or below the maximum; redeeming SC is\n// always allowed. SC price is the oracle rate, capped by what the reserve\n// can cover; RC price is the equity per RC, or a default when there is no\n// equity or no RC.\n//\n// $oracleNft: Coll[Byte]\n// $minRatioPercent: Int     -- 400 in SigmaUSD\n// $maxRatioPercent: Int     -- 800 in SigmaUSD\n// $feePercent: Int          -- 2 in SigmaUSD\n// $rcDefaultPrice: Long     -- nanoERG per RC when the equity says nothing\n{\n  val wellFormed = OUTPUTS.size > 0 && OUTPUTS(0).tokens.size == 3 && SELF.tokens.size == 3 &&\n    CONTEXT.dataInputs.size > 0 && CONTEXT.dataInputs(0).tokens.size > 0 &&\n    CONTEXT.dataInputs(0).tokens(0)._1 == $oracleNft &&\n    CONTEXT.dataInputs(0).R4[Long].isDefined &&\n    SELF.R4[Long].isDefined && SELF.R5[Long].isDefined &&\n    OUTPUTS(0).R4[Long].isDefined && OUTPUTS(0).R5[Long].isDefined\n  if (!wellFormed) sigmaProp(false) else {\n    val successor = OUTPUTS(0)\n    val rate = CONTEXT.dataInputs(0).R4[Long].get\n    val preserved = successor.propositionBytes == SELF.propositionBytes &&\n      successor.tokens(0) == SELF.tokens(0) &&\n      successor.tokens(1)._1 == SELF.tokens(1)._1 &&\n      successor.tokens(2)._1 == SELF.tokens(2)._1\n\n    val reserveIn = SELF.value\n    val reserveOut = successor.value\n    val scCircIn = SELF.R4[Long].get\n    val rcCircIn = SELF.R5[Long].get\n    val scCircOut = successor.R4[Long].get\n    val rcCircOut = successor.R5[Long].get\n    val deltaSc = SELF.tokens(1)._2 - successor.tokens(1)._2\n    val deltaRc = SELF.tokens(2)._2 - successor.tokens(2)._2\n    val tracked = scCircOut == scCircIn + deltaSc && rcCircOut == rcCircIn + deltaRc &&\n      scCircOut >= 0L && rcCircOut >= 0L\n    val oneAction = (deltaSc != 0L && deltaRc == 0L) || (deltaSc == 0L && deltaRc != 0L)\n\n    val scPrice = if (scCircIn == 0L) rate else min(rate, reserveIn / scCircIn)\n    val equity = reserveIn - scCircIn * scPrice\n    val rcPrice = if (rcCircIn > 0L && equity > 0L) equity / rcCircIn else $rcDefaultPrice\n\n    val amount = if (deltaSc != 0L) deltaSc * scPrice else deltaRc * rcPrice\n    val absAmount = if (amount < 0L) -amount else amount\n    val fee = absAmount * $feePercent.toLong / 100L\n    val deltaReserve = reserveOut - reserveIn\n    val minting = amount > 0L\n    val paid = if (minting) deltaReserve >= absAmount + fee else deltaReserve >= -(absAmount - fee)\n\n    // Ratio after, in percent: reserveOut * 100 / (scCircOut * rate); no SC\n    // out means \"at the maximum\" so RC can still be minted.\n    val ratioOk =\n      if (deltaSc > 0L) reserveOut.toBigInt * 100L.toBigInt >= scCircOut.toBigInt * rate.toBigInt * $minRatioPercent.toBigInt\n      else if (deltaSc < 0L) true\n      else if (deltaRc > 0L) scCircOut == 0L || reserveOut.toBigInt * 100L.toBigInt <= scCircOut.toBigInt * rate.toBigInt * $maxRatioPercent.toBigInt\n      else scCircOut == 0L || reserveOut.toBigInt * 100L.toBigInt >= scCircOut.toBigInt * rate.toBigInt * $minRatioPercent.toBigInt\n\n    sigmaProp(preserved && tracked && oneAction && paid && ratioOk)\n  }\n}\n",
+  "params": {
+    "oracleNft": {
+      "type": "Coll[Byte]",
+      "value": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    },
+    "minRatioPercent": {
+      "type": "Int",
+      "value": 400
+    },
+    "maxRatioPercent": {
+      "type": "Int",
+      "value": 800
+    },
+    "feePercent": {
+      "type": "Int",
+      "value": 2
+    },
+    "rcDefaultPrice": {
+      "type": "Long",
+      "value": 1000000
+    }
+  },
+  "scenarios": [
+    {
+      "name": "ERG at rate 12000000, ratio 277%: redeem 3791244 RC for equity share minus fee",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 5244263526400,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999998791244
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 1208756
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 12000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 12000000, ratio 277%: redeem 3791244 RC taking one nanoERG too much",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 5244263526399,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999998791244
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 1208756
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 12000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 20000000, ratio 166%: redeem 97815 SC for price minus fee",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 8082826000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999797815
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 202185
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 20000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 20000000, ratio 166%: redeem 97815 SC taking one nanoERG too much",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 8082825999999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999797815
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 202185
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 20000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 20000000, ratio 166%: redeem 1562738 RC for equity share minus fee",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 8774813408000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999996562738
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 3437262
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 20000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 20000000, ratio 166%: redeem 1562738 RC taking one nanoERG too much",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 8774813407999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999996562738
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 3437262
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 20000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 4000000, ratio 833%: redeem 2546114 RC for equity share minus fee",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 5608462572800,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999997546114
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 2453886
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 4000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 4000000, ratio 833%: redeem 2546114 RC taking one nanoERG too much",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 5608462572799,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999997546114
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 2453886
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 4000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 6666667, ratio 499%: mint 142215 SC paying price+fee",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10967062048353,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999557785
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 442215
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 6666667
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 6666667, ratio 499%: mint 142215 SC one nanoERG short",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10967062048352,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999557785
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 442215
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 6666667
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 40000000, ratio 83%: mint 157090 SC paying price+fee",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 15341059946589,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999542910
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 457090
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 40000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 40000000, ratio 83%: mint 157090 SC one nanoERG short",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 15341059946588,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999542910
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 457090
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 40000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 12000000, ratio 277%: redeem 1322156 RC for equity share minus fee",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 8341487513600,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999996322156
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 3677844
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 12000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 12000000, ratio 277%: redeem 1322156 RC taking one nanoERG too much",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 8341487513599,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999996322156
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 3677844
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 12000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 20000000, ratio 166%: mint 139511 SC paying price+fee",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 12846024400000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999560489
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 439511
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 20000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 20000000, ratio 166%: mint 139511 SC one nanoERG short",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 12846024399999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999560489
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 439511
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 20000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 4000000, ratio 833%: mint 10346 SC paying price+fee",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10042211680000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999689654
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 310346
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 4000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 4000000, ratio 833%: mint 10346 SC one nanoERG short",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10042211679999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999689654
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 310346
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 4000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 6666667, ratio 499%: redeem 16771 SC for price minus fee",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 9890429461188,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999716771
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 283229
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 6666667
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 6666667, ratio 499%: redeem 16771 SC taking one nanoERG too much",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 9890429461187,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999716771
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 283229
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 6666667
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 12000000, ratio 277%: mint 924860 RC paying price+fee",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 11207497216000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999994075140
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5924860
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 12000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 12000000, ratio 277%: mint 924860 RC one nanoERG short",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 11207497215999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999994075140
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5924860
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 12000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 20000000, ratio 166%: redeem 273170 SC for price minus fee",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 4645868000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999973170
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 26830
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 20000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 20000000, ratio 166%: redeem 273170 SC taking one nanoERG too much",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 4645867999999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999973170
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 26830
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 20000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 6666667, ratio 499%: mint 1049100 RC paying price+fee",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 11712130129918,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999993950900
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 6049100
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 6666667
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 6666667, ratio 499%: mint 1049100 RC one nanoERG short",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 11712130129917,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999993950900
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 6049100
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 6666667
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 4000000, ratio 833%: mint 120886 SC paying price+fee",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10493214880000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999579114
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 420886
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 4000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 4000000, ratio 833%: mint 120886 SC one nanoERG short",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10493214879999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999579114
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 420886
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 4000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 40000000, ratio 83%: mint 854076 RC paying price+fee",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10000000000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999994145924
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5854076
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 40000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 40000000, ratio 83%: mint 854076 RC one nanoERG short",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 9999999999999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999994145924
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5854076
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 40000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 20000000, ratio 166%: mint 186548 SC paying price+fee",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 13805579200000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999513452
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 486548
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 20000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 20000000, ratio 166%: mint 186548 SC one nanoERG short",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 13805579199999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999513452
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 486548
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 20000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 8000000, ratio 416%: mint 1590620 RC paying price+fee",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 12466097248000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999993409380
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 6590620
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 8000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 8000000, ratio 416%: mint 1590620 RC one nanoERG short",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 12466097247999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999993409380
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 6590620
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 8000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 6666667, ratio 499%: mint 63394 RC paying price+fee",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10103458943338,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999994936606
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5063394
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 6666667
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERG at rate 6666667, ratio 499%: mint 63394 RC one nanoERG short",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10103458943337,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999994936606
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5063394
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 6666667
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "registers not updated for the SC minted",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10006800000340,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 6666667
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "minting SC and RC in one action",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10008399999340,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999699000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999994999000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 301000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5001000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 6666667
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "oracle box with the wrong NFT",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10006800000340,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999699000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 301000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 6666667
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "no oracle box at all",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10006800000340,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999699000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 301000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": []
+    },
+    {
+      "name": "bank rebuilt under another script",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 10000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10006800000340,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999699000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 301000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "10010101d17300"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 6666667
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "under-collateralised (ratio below minimum): minting SC is refused even when fully paid",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 1003399999660,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999699000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 301000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 40000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "under-collateralised: SC redeem at the capped price (reserve per SC, not the oracle rate)",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 983666668300,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999705000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995000000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 295000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5000000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 40000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "under-collateralised: RC minted at the default price (no equity) recapitalises",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 1000000000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999994999000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5001000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 40000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "under-collateralised: RC redeem is refused",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 1000000000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995001000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 4999000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 40000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "over-collateralised (ratio above maximum): minting RC is refused",
+      "expect": "fail",
+      "height": 1,
+      "selfBox": {
+        "value": 100000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 100019991998980,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999994999000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 5001000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 6666667
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "over-collateralised: redeeming RC is allowed",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 100000000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          },
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 999999700000
+          },
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 999995000000
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 300000
+          },
+          "R5": {
+            "type": "Long",
+            "value": 5000000
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 99980792000980,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 999999700000
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999995001000
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 300000
+            },
+            "R5": {
+              "type": "Long",
+              "value": 4999000
+            }
+          },
+          "ergoTree": "$self"
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 6666667
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

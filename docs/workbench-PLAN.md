@@ -306,7 +306,18 @@ Still missing (the actual build list):
       the first input (EIP-4). Still outside the composer: AVL-tree
       proofs, arbitrary arithmetic and folds beyond sums, sigma protocols
       beyond keys — Write mode.
-13. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
+13. **P4h — protocol templates: DONE 2026-09-03.** Multi-box systems in
+    the shape of deployed contracts, validated by property-style suites
+    whose expectations come from an independent Python model of the rules
+    (`examples/tests/gen/`), swept over prices/amounts and pinned at the
+    one-unit boundaries, run through the node's reducer in CI. AMM: a
+    constant-product ERG/token pool (Spectrum N2T shape, one script) — 69
+    cases; a swap order — 6. Bank: AgeUSD/SigmaUSD shape with oracle data
+    input, fee, reserve-ratio window — 47 cases across six ERG prices,
+    under- and over-collateralised states. Both models and both scripts
+    agree on every case; the boundaries (one unit over the curve, one
+    nanoERG short of price plus fee) are the teeth.
+14. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.
    - **A — DONE 2026-08-31** (`compiler/source-positions`, `8479a58`): every

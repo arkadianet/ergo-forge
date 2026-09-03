@@ -1,0 +1,352 @@
+{
+  "source": "// A swap order: ERG locked here may be exchanged against the pool named by\n// its NFT, as long as the trader receives at least the minimum amount of\n// the token. The pool script keeps the product of the reserves; this\n// script keeps the trader from a bad fill. The trader can cancel any time.\n//\n// $trader: SigmaProp    -- who placed the order and receives the tokens\n// $poolNft: Coll[Byte]  -- the pool this order may trade against\n// $tokenY: Coll[Byte]   -- the token being bought\n// $minOutput: Long      -- the least amount of tokenY the trader accepts\n{\n  val poolIn = INPUTS(0)\n  val executed = INPUTS.size > 1 && OUTPUTS.size > 1 &&\n    poolIn.tokens.size > 0 && poolIn.tokens(0)._1 == $poolNft &&\n    OUTPUTS(1).propositionBytes == $trader.propBytes &&\n    OUTPUTS(1).tokens.size > 0 && OUTPUTS(1).tokens(0)._1 == $tokenY &&\n    OUTPUTS(1).tokens(0)._2 >= $minOutput\n  $trader || sigmaProp(executed)\n}\n",
+  "params": {
+    "trader": {
+      "type": "SigmaProp",
+      "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+    },
+    "poolNft": {
+      "type": "Coll[Byte]",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "tokenY": {
+      "type": "Coll[Byte]",
+      "value": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    "minOutput": {
+      "type": "Long",
+      "value": 100
+    }
+  },
+  "scenarios": [
+    {
+      "name": "filled at the minimum: no key needed",
+      "expect": "pass",
+      "height": 1,
+      "selfIndex": 1,
+      "inputs": [
+        {
+          "value": 1000000000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5000000000
+            }
+          ]
+        },
+        {
+          "value": 1000000000
+        }
+      ],
+      "outputs": [
+        {
+          "value": 1000000000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5000000000
+            }
+          ]
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197",
+          "tokens": [
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 100
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "filled above the minimum",
+      "expect": "pass",
+      "height": 1,
+      "selfIndex": 1,
+      "inputs": [
+        {
+          "value": 1000000000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5000000000
+            }
+          ]
+        },
+        {
+          "value": 1000000000
+        }
+      ],
+      "outputs": [
+        {
+          "value": 1000000000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5000000000
+            }
+          ]
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197",
+          "tokens": [
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 150
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "one unit short: only the trader could sign that",
+      "expect": "needsProof",
+      "height": 1,
+      "selfIndex": 1,
+      "inputs": [
+        {
+          "value": 1000000000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5000000000
+            }
+          ]
+        },
+        {
+          "value": 1000000000
+        }
+      ],
+      "outputs": [
+        {
+          "value": 1000000000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5000000000
+            }
+          ]
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197",
+          "tokens": [
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 99
+            }
+          ]
+        }
+      ],
+      "expectResidual": "028333f9"
+    },
+    {
+      "name": "paid in the wrong token",
+      "expect": "needsProof",
+      "height": 1,
+      "selfIndex": 1,
+      "inputs": [
+        {
+          "value": 1000000000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5000000000
+            }
+          ]
+        },
+        {
+          "value": 1000000000
+        }
+      ],
+      "outputs": [
+        {
+          "value": 1000000000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5000000000
+            }
+          ]
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197",
+          "tokens": [
+            {
+              "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "amount": 100
+            }
+          ]
+        }
+      ],
+      "expectResidual": "028333f9"
+    },
+    {
+      "name": "against a box that is not the pool (no NFT)",
+      "expect": "needsProof",
+      "height": 1,
+      "selfIndex": 1,
+      "inputs": [
+        {
+          "value": 1000000000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5000000000
+            }
+          ]
+        },
+        {
+          "value": 1000000000
+        }
+      ],
+      "outputs": [
+        {
+          "value": 1000000000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5000000000
+            }
+          ]
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197",
+          "tokens": [
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 100
+            }
+          ]
+        }
+      ],
+      "expectResidual": "028333f9"
+    },
+    {
+      "name": "the trader cancels",
+      "expect": "needsProof",
+      "height": 1,
+      "selfIndex": 1,
+      "inputs": [
+        {
+          "value": 1000000000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 999000000000
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 5000000000
+            }
+          ]
+        },
+        {
+          "value": 1000000000
+        }
+      ],
+      "outputs": [],
+      "expectResidual": "028333f9"
+    }
+  ]
+}
