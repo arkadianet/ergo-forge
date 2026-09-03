@@ -20,7 +20,14 @@
 
 use std::collections::BTreeMap;
 
-use ergo_compiler::{CompileError, CompileResult, EnvValue, NetworkPrefix, ScriptEnv};
+use ergo_compiler::{
+    compile_contract, ApplyError, CompileError, CompileResult, ContractError, EnvValue,
+    NetworkPrefix, ScriptEnv,
+};
+use ergo_primitives::writer::VlqWriter;
+use ergo_ser::address::{encode_p2s, encode_p2sh};
+use ergo_ser::ergo_tree::write_ergo_tree;
+use ergo_ser::opcode::{write_expr, Expr, IrNode, Payload};
 use ergo_ser::sigma_type::SigmaType;
 use ergo_ser::sigma_value::{CollValue, SigmaBoolean, SigmaValue};
 use serde::Serialize;
@@ -87,13 +94,61 @@ pub enum ParamError {
     Compile(#[from] CompileError),
 }
 
-/// Compile with named compile-time parameters (see the module doc).
+/// The compiler's P5-B source map for a (non-template) source compiled with
+/// `params`, or `None` when the compile fails. Offsets are into the source
+/// AFTER string-literal substitution; substituted text has the same length
+/// as the placeholder only by accident, so callers cite against the source
+/// they submitted knowing offsets inside a substituted literal may drift —
+/// everything before the first substituted literal is exact.
+pub fn source_map_for(
+    source: &str,
+    params: &BTreeMap<String, TypedValue>,
+    tree_version: u8,
+    network: NetworkPrefix,
+) -> Option<ergo_compiler::SourceMap> {
+    if is_template(source) {
+        return None;
+    }
+    let (env, substituted) = env_and_source(source, params).ok()?;
+    ergo_compiler::compile_with_source_map(&env, &substituted, tree_version, network)
+        .ok()
+        .map(|(_, m)| m)
+}
+
+/// `true` for an EIP-5 `@contract def` template source.
+pub fn is_template(source: &str) -> bool {
+    source.contains("@contract")
+}
+
+/// Compile with named compile-time parameters (see the module doc). An
+/// EIP-5 `@contract def` source takes the template path: the template is
+/// compiled, then instantiated with the parameters (declared defaults fill
+/// the gaps) through `ContractTemplate::apply`.
 pub fn compile_with_params(
     source: &str,
     params: &BTreeMap<String, TypedValue>,
     tree_version: u8,
     network: NetworkPrefix,
 ) -> Result<CompileOutput, ParamError> {
+    if is_template(source) {
+        return compile_template(source, params, tree_version, network);
+    }
+    let (env, substituted) = env_and_source(source, params)?;
+    match compile_env(&env, &substituted, tree_version, network) {
+        Ok(out) => Ok(out),
+        Err(e) => match missing_env_name(&e) {
+            Some(name) => Err(ParamError::Missing(vec![name])),
+            None => Err(ParamError::Compile(e)),
+        },
+    }
+}
+
+/// The environment and the string-substituted source for a non-template
+/// compile (see the module doc for the two mechanisms).
+fn env_and_source(
+    source: &str,
+    params: &BTreeMap<String, TypedValue>,
+) -> Result<(ScriptEnv, String), ParamError> {
     let needed = scan_params(source);
     let missing: Vec<String> = needed
         .iter()
@@ -138,14 +193,7 @@ pub fn compile_with_params(
         }
     }
 
-    let substituted = substitute_in_strings(source, &text_subs);
-    match compile_env(&env, &substituted, tree_version, network) {
-        Ok(out) => Ok(out),
-        Err(e) => match missing_env_name(&e) {
-            Some(name) => Err(ParamError::Missing(vec![name])),
-            None => Err(ParamError::Compile(e)),
-        },
-    }
+    Ok((env, substitute_in_strings(source, &text_subs)))
 }
 
 /// The typer reports an unbound identifier as
@@ -157,6 +205,175 @@ fn missing_env_name(e: &CompileError) -> Option<String> {
     let name = rest.split('\'').next()?;
     msg.contains("not found in env")
         .then(|| name.trim_start_matches('$').to_string())
+}
+
+fn compile_template(
+    source: &str,
+    params: &BTreeMap<String, TypedValue>,
+    tree_version: u8,
+    network: NetworkPrefix,
+) -> Result<CompileOutput, ParamError> {
+    let ct = compile_contract(source, tree_version.max(3), network).map_err(|e| match e {
+        ContractError::Compile(c) => ParamError::Compile(c),
+        other => ParamError::Value {
+            name: "<template>".into(),
+            reason: other.to_string(),
+        },
+    })?;
+    let mut values = BTreeMap::new();
+    for (name, tv) in params {
+        let pair = parse_typed_value(&tv.r#type, &tv.value).map_err(|e| ParamError::Value {
+            name: name.clone(),
+            reason: e.to_string(),
+        })?;
+        values.insert(name.clone(), pair);
+    }
+    let tree = match ct.apply(tree_version, &values) {
+        Ok(t) => t,
+        Err(ApplyError::MissingParameter { name }) => return Err(ParamError::Missing(vec![name])),
+        Err(e) => {
+            return Err(ParamError::Value {
+                name: "<template>".into(),
+                reason: e.to_string(),
+            })
+        }
+    };
+    let mut w = VlqWriter::new();
+    write_ergo_tree(&mut w, &tree).map_err(|e| ParamError::Value {
+        name: "<template>".into(),
+        reason: format!("tree does not serialize: {e:?}"),
+    })?;
+    let tree_bytes = w.result();
+    let mut pw = VlqWriter::new();
+    write_expr(
+        &mut pw,
+        &inline_placeholders(&tree.body, &tree.constants),
+        false,
+    )
+    .map_err(|e| ParamError::Value {
+        name: "<template>".into(),
+        reason: format!("proposition does not serialize: {e:?}"),
+    })?;
+    Ok(CompileOutput {
+        p2s_address: encode_p2s(network, &tree_bytes),
+        p2sh_address: encode_p2sh(network, &pw.result()),
+        tree_bytes,
+        ergo_tree: tree,
+    })
+}
+
+/// The proposition with every `ConstPlaceholder(i)` replaced by
+/// `constants[i]` — what P2SH hashes (Scala `toProposition(replaceConstants
+/// = true)`).
+fn inline_placeholders(e: &Expr, constants: &[(SigmaType, SigmaValue)]) -> Expr {
+    let node = match e {
+        Expr::Op(n) => n,
+        other => return other.clone(),
+    };
+    let r = |x: &Expr| Box::new(inline_placeholders(x, constants));
+    let rv = |xs: &[Expr]| {
+        xs.iter()
+            .map(|x| inline_placeholders(x, constants))
+            .collect()
+    };
+    let payload = match &node.payload {
+        Payload::ConstPlaceholder { index } => {
+            return match constants.get(*index as usize) {
+                Some((tpe, val)) => Expr::Const {
+                    tpe: tpe.clone(),
+                    val: val.clone(),
+                },
+                None => e.clone(),
+            }
+        }
+        Payload::One(a) => Payload::One(r(a)),
+        Payload::Two(a, b) => Payload::Two(r(a), r(b)),
+        Payload::Three(a, b, c) => Payload::Three(r(a), r(b), r(c)),
+        Payload::Four(a, b, c, d) => Payload::Four(r(a), r(b), r(c), r(d)),
+        Payload::ValDef { id, tpe, rhs } => Payload::ValDef {
+            id: *id,
+            tpe: tpe.clone(),
+            rhs: r(rhs),
+        },
+        Payload::FunDef {
+            id,
+            tpe,
+            tpe_args,
+            rhs,
+        } => Payload::FunDef {
+            id: *id,
+            tpe: tpe.clone(),
+            tpe_args: tpe_args.clone(),
+            rhs: r(rhs),
+        },
+        Payload::BlockValue { items, result } => Payload::BlockValue {
+            items: rv(items),
+            result: r(result),
+        },
+        Payload::FuncValue { args, body } => Payload::FuncValue {
+            args: args.clone(),
+            body: r(body),
+        },
+        Payload::MethodCall {
+            type_id,
+            method_id,
+            obj,
+            args,
+            type_args,
+        } => Payload::MethodCall {
+            type_id: *type_id,
+            method_id: *method_id,
+            obj: r(obj),
+            args: rv(args),
+            type_args: type_args.clone(),
+        },
+        Payload::ConcreteCollection { elem_type, items } => Payload::ConcreteCollection {
+            elem_type: elem_type.clone(),
+            items: rv(items),
+        },
+        Payload::Tuple { items } => Payload::Tuple { items: rv(items) },
+        Payload::SigmaCollection { items } => Payload::SigmaCollection { items: rv(items) },
+        Payload::SelectField { input, field_idx } => Payload::SelectField {
+            input: r(input),
+            field_idx: *field_idx,
+        },
+        Payload::ExtractRegisterAs { input, reg_id, tpe } => Payload::ExtractRegisterAs {
+            input: r(input),
+            reg_id: *reg_id,
+            tpe: tpe.clone(),
+        },
+        Payload::NumericCast { input, tpe } => Payload::NumericCast {
+            input: r(input),
+            tpe: tpe.clone(),
+        },
+        Payload::DeserializeRegister {
+            reg_id,
+            tpe,
+            default,
+        } => Payload::DeserializeRegister {
+            reg_id: *reg_id,
+            tpe: tpe.clone(),
+            default: default.as_deref().map(r),
+        },
+        Payload::ByIndex {
+            input,
+            index,
+            default,
+        } => Payload::ByIndex {
+            input: r(input),
+            index: r(index),
+            default: default.as_deref().map(r),
+        },
+        Payload::FuncApply { func, args } => Payload::FuncApply {
+            func: r(func),
+            args: rv(args),
+        },
+        leaf => leaf.clone(),
+    };
+    Expr::Op(IrNode {
+        opcode: node.opcode,
+        payload,
+    })
 }
 
 /// Text used when a parameter is referenced inside a string literal.
@@ -243,8 +460,12 @@ fn substitute_in_strings(source: &str, subs: &[(String, String)]) -> String {
 pub struct ParamNeed {
     /// The name without the `$`.
     pub name: String,
-    /// Type from a `// $name: Type` comment, when the source carries one.
+    /// Type from a `// $name: Type` comment, when the source carries one;
+    /// the declared type for an EIP-5 template parameter.
     pub type_hint: Option<String>,
+    /// An EIP-5 template parameter's declared default, rendered as the
+    /// JSON value a caller would pass (so a form can prefill it).
+    pub default: Option<String>,
 }
 
 /// List the parameters a source uses (outside comments, first use order):
@@ -252,6 +473,9 @@ pub struct ParamNeed {
 /// all-caps tokens that make up an entire string literal (`"RWT_REPO_NFT"`,
 /// the deploy-script substitution style), hinted as `String`.
 pub fn scan_params(source: &str) -> Vec<ParamNeed> {
+    if is_template(source) {
+        return scan_template_params(source);
+    }
     let (code, hints) = strip_comments(source);
     let mut out: Vec<ParamNeed> = Vec::new();
     let mut push = |name: &str, hint: Option<String>| {
@@ -259,6 +483,7 @@ pub fn scan_params(source: &str) -> Vec<ParamNeed> {
             out.push(ParamNeed {
                 name: name.to_string(),
                 type_hint: hint,
+                default: None,
             });
         }
     };
@@ -295,6 +520,45 @@ pub fn scan_params(source: &str) -> Vec<ParamNeed> {
         }
     }
     out
+}
+
+/// EIP-5 template parameters: declared types (from the compiled template's
+/// constant table, rendered as source type names) and defaults.
+fn scan_template_params(source: &str) -> Vec<ParamNeed> {
+    let Ok(ct) = compile_contract(source, 3, NetworkPrefix::Mainnet) else {
+        return Vec::new();
+    };
+    ct.parameters
+        .iter()
+        .map(|p| {
+            let i = p.constant_index as usize;
+            let default = ct
+                .const_values
+                .as_ref()
+                .and_then(|cv| cv.get(i))
+                .and_then(|d| d.as_ref())
+                .map(|(tpe, val)| default_text(tpe, val));
+            ParamNeed {
+                name: p.name.clone(),
+                type_hint: ct.const_types.get(i).map(crate::inspect::type_str),
+                default,
+            }
+        })
+        .collect()
+}
+
+/// A default's value in the form a caller passes for that type.
+fn default_text(tpe: &SigmaType, val: &SigmaValue) -> String {
+    match (tpe, val) {
+        (_, SigmaValue::Boolean(b)) => b.to_string(),
+        (_, SigmaValue::Byte(x)) => x.to_string(),
+        (_, SigmaValue::Short(x)) => x.to_string(),
+        (_, SigmaValue::Int(x)) => x.to_string(),
+        (_, SigmaValue::Long(x)) => x.to_string(),
+        (_, SigmaValue::BigInt(x)) => x.to_string(),
+        (_, SigmaValue::Coll(CollValue::Bytes(b))) => hex::encode(b),
+        (_, other) => format!("{other:?}"),
+    }
 }
 
 /// `RWT_REPO_NFT`-shaped: upper-case letters, digits and underscores, at

@@ -141,7 +141,18 @@ curl -s -X POST http://127.0.0.1:8080/api/v1/compile \
        "params":{"minHeight":{"type":"Int","value":100}}}'
 ```
 
-`params` map a name to a typed value (the scenario typed-value shape).
+`params` map a name to a typed value (the scenario typed-value shape). An
+EIP-5 `@contract def` template source takes the template path: it is
+compiled and instantiated through the compiler's `ContractTemplate::apply`,
+declared defaults filling any parameter not given (`template: true` in the
+response; `params[].default` carries the declared default).
+
+Findings on the compile route carry `offset`, `line` and `col` into the
+submitted source when the compiler's source map (P5-B) aligned with the
+tree (`positioned: true`). Templates are not positioned yet. Offsets inside
+a string literal that was substituted may drift by the substitution's
+length difference; everything before the first substituted literal is
+exact.
 `$name` and bare identifiers resolve through the compiler's environment;
 `"$name"` and all-caps tokens inside string literals are substituted
 textually (`String` params as given, `Coll[Byte]` as hex). The response

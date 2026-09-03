@@ -276,3 +276,15 @@ fn a_negated_val_guard_under_or_clears_the_right_operand() {
     )
     .is_empty());
 }
+
+// ----- findings cite IR nodes -----
+
+#[test]
+fn a_finding_carries_the_ir_id_of_its_node() {
+    let a = audit::audit(&lifted("sigmaProp(SELF.R4[Int].get > 5)"));
+    assert_eq!(a.findings.len(), 1);
+    let f = &a.findings[0];
+    assert!(f.ir_id.is_some(), "{f:?}");
+    // The `.get` is IR node 2: D1(0) → GT(1) → OptionGet(2) → ExtractRegisterAs(3) → SELF(4).
+    assert_eq!(f.ir_id, Some(2));
+}

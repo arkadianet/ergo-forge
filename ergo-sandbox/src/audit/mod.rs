@@ -43,6 +43,9 @@ pub struct Audit {
 #[must_use]
 pub fn audit(lifted: &Lifted) -> Audit {
     let mut findings: Vec<Finding> = LINTS.iter().flat_map(|lint| lint(&lifted.node)).collect();
+    for f in &mut findings {
+        f.ir_id = lifted.ir_ids.get(&f.node_id).copied();
+    }
     findings.sort_by_key(|f| (f.severity, f.node_id));
     Audit {
         findings,

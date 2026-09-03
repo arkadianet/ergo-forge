@@ -40,6 +40,10 @@ pub struct Finding {
     pub severity: Severity,
     /// `Node::id` of the offending node. Lift-local — see `ast::Node::id`.
     pub node_id: u64,
+    /// The offending node's id in the shared IR walk
+    /// (`ergo_ser::opcode::preorder`), when it stands for an IR node. This is
+    /// what a compiler `SourceMap` is keyed by. Filled by `audit()`.
+    pub ir_id: Option<u64>,
     /// One sentence, specific to this occurrence.
     pub message: String,
     /// The offending subtree rendered back to source, so the finding reads

@@ -1,12 +1,25 @@
 //! `POST /api/v1/compile` — source (+ parameters) → tree, addresses, the
 //! decompiled round-trip, and findings. The write side of the playground.
+//!
+//! Findings are positioned in the authored source through the compiler's
+//! P5-B source map and the lift's shared IR ids, when the map aligns with
+//! the tree (`SourceMap::aligns_with`). Templates have no map yet.
 
 use axum::Json;
 use ergo_sandbox::audit;
-use ergo_sandbox::compile::{compile_with_params, scan_params, ParamError};
+use ergo_sandbox::compile::{compile_with_params, is_template, scan_params, ParamError};
 
 use crate::routes::inspect::parse_network;
 use crate::{dto, error::ApiError, extract::ApiJson};
+
+type Compiled = (
+    ergo_sandbox::compile::CompileOutput,
+    String,
+    audit::Audit,
+    Vec<dto::FindingDto>,
+    Vec<dto::ParamStatus>,
+    bool,
+);
 
 pub async fn compile_route(
     ApiJson(req): ApiJson<dto::CompileRequest>,
@@ -21,6 +34,7 @@ pub async fn compile_route(
     let source = req.source;
     let needs_for_error = scan_params(&source);
     let params = req.params;
+    let template = is_template(&source);
     let result = tokio::task::spawn_blocking(move || {
         ergo_sandbox::decompile::with_large_stack(move || {
             let needs = scan_params(&source);
@@ -34,33 +48,57 @@ pub async fn compile_route(
             let lifted = ergo_sandbox::lift_tree(&tree, testnet);
             let roundtrip = ergo_sandbox::decompile::print(&lifted.node);
             let report = audit::audit(&lifted);
+
+            let map =
+                ergo_sandbox::compile::source_map_for(&source, &params, tree_version, network);
+            let walk: Vec<u8> = ergo_ser::opcode::preorder(&tree.body)
+                .map(|(_, e)| ergo_ser::opcode::node_opcode(e))
+                .collect();
+            let map = map.filter(|m| m.aligns_with(walk.iter().copied()));
+            let positioned = map.is_some();
+            let findings: Vec<dto::FindingDto> = report
+                .findings
+                .iter()
+                .map(|f| {
+                    let d = dto::FindingDto::from_engine(f);
+                    match (map.as_ref(), f.ir_id) {
+                        (Some(m), Some(ir)) => match m.offset(ir) {
+                            Some(off) => d.with_position(&source, off),
+                            None => d,
+                        },
+                        _ => d,
+                    }
+                })
+                .collect();
             let statuses = needs
                 .into_iter()
                 .map(|n| dto::ParamStatus {
                     supplied: params.contains_key(&n.name),
                     name: n.name,
                     type_hint: n.type_hint,
+                    default: n.default,
                 })
                 .collect();
-            Ok::<_, ParamError>((out, roundtrip, report, statuses))
+            Ok::<Compiled, ParamError>((out, roundtrip, report, findings, statuses, positioned))
         })
     })
     .await
     .map_err(|_| ApiError::Internal)?;
 
-    let (out, roundtrip, report, statuses) = match result {
+    let (out, roundtrip, report, findings, statuses, positioned) = match result {
         Ok(v) => v,
         Err(ParamError::Missing(names)) => {
-            // Carry the scan's type hints so the UI can build the form.
+            // Carry the scan's type hints and defaults so the UI can build the form.
             return Err(ApiError::MissingParams(
                 names
                     .into_iter()
-                    .map(|name| ergo_sandbox::compile::ParamNeed {
-                        type_hint: needs_for_error
-                            .iter()
-                            .find(|n| n.name == name)
-                            .and_then(|n| n.type_hint.clone()),
-                        name,
+                    .map(|name| {
+                        let hint = needs_for_error.iter().find(|n| n.name == name);
+                        ergo_sandbox::compile::ParamNeed {
+                            type_hint: hint.and_then(|n| n.type_hint.clone()),
+                            default: hint.and_then(|n| n.default.clone()),
+                            name,
+                        }
                     })
                     .collect(),
             ));
@@ -86,11 +124,9 @@ pub async fn compile_route(
         completeness,
         raw_placeholders,
         truncated,
-        findings: report
-            .findings
-            .iter()
-            .map(dto::FindingDto::from_engine)
-            .collect(),
+        findings,
         params: statuses,
+        template,
+        positioned,
     }))
 }

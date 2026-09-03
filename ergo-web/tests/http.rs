@@ -508,3 +508,37 @@ async fn an_unknown_example_is_a_404_in_the_error_envelope() {
     let body: serde_json::Value = r.json().await.unwrap();
     assert_eq!(body["error"]["code"], "not_found");
 }
+
+#[tokio::test]
+async fn compile_findings_carry_source_offsets() {
+    let base = spawn().await;
+    let src = "sigmaProp(SELF.R4[Int].get > 5)";
+    let res: serde_json::Value = post_compile(&base, serde_json::json!({ "source": src }))
+        .await
+        .json()
+        .await
+        .unwrap();
+    let f = &res["findings"][0];
+    let off = f["offset"].as_u64().expect("offset") as usize;
+    assert!(off < src.len(), "{f}");
+    assert_eq!(f["line"], 1);
+    assert_eq!(f["col"].as_u64().unwrap() as usize, off + 1);
+}
+
+#[tokio::test]
+async fn compile_accepts_an_eip5_template_with_params() {
+    let base = spawn().await;
+    let res: serde_json::Value = post_compile(
+        &base,
+        serde_json::json!({
+            "source": "/** Height lock.\n * @param threshold the minimum height\n */\n@contract def heightLock(threshold: Int) = sigmaProp(HEIGHT > threshold)",
+            "params": { "threshold": { "type": "Int", "value": 100 } }
+        }),
+    )
+    .await
+    .json()
+    .await
+    .unwrap();
+    assert_eq!(res["source"], "HEIGHT > 100", "{res}");
+    assert_eq!(res["template"], true);
+}

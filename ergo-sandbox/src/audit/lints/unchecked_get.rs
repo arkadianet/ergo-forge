@@ -233,6 +233,7 @@ fn walk(
                 lint: "unchecked-get",
                 severity,
                 node_id: n.id,
+                ir_id: None,
                 message,
                 snippet: snippet(n),
             });
