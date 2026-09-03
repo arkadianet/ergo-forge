@@ -94,30 +94,55 @@ pub enum ParamError {
     Compile(#[from] CompileError),
 }
 
-/// The compiler's P5-B source map for a (non-template) source compiled with
-/// `params`, or `None` when the compile fails. Offsets are into the source
-/// AFTER string-literal substitution; substituted text has the same length
-/// as the placeholder only by accident, so callers cite against the source
-/// they submitted knowing offsets inside a substituted literal may drift —
-/// everything before the first substituted literal is exact.
-pub fn source_map_for(
-    source: &str,
-    params: &BTreeMap<String, TypedValue>,
-    tree_version: u8,
-    network: NetworkPrefix,
-) -> Option<ergo_compiler::SourceMap> {
-    if is_template(source) {
-        return None;
+/// `true` for an EIP-5 `@contract def` template source: the marker must
+/// appear in code (not in a comment or a string literal) and be followed by
+/// the `def` keyword.
+pub fn is_template(source: &str) -> bool {
+    let (code, _) = strip_comments(source);
+    let code = blank_strings(&code);
+    let mut rest = code.as_str();
+    while let Some(i) = rest.find("@contract") {
+        let after = &rest[i + "@contract".len()..];
+        let trimmed = after.trim_start();
+        if trimmed.len() < after.len()
+            && trimmed.starts_with("def")
+            && !trimmed[3..].starts_with(|c: char| c.is_ascii_alphanumeric() || c == '_')
+        {
+            return true;
+        }
+        rest = after;
     }
-    let (env, substituted) = env_and_source(source, params).ok()?;
-    ergo_compiler::compile_with_source_map(&env, &substituted, tree_version, network)
-        .ok()
-        .map(|(_, m)| m)
+    false
 }
 
-/// `true` for an EIP-5 `@contract def` template source.
-pub fn is_template(source: &str) -> bool {
-    source.contains("@contract")
+/// Replace the contents of every string literal with spaces (same length),
+/// so a scan cannot mistake text inside a string for code.
+fn blank_strings(code: &str) -> String {
+    let mut out = String::with_capacity(code.len());
+    let mut in_str = false;
+    let mut escaped = false;
+    for c in code.chars() {
+        if in_str {
+            if escaped {
+                escaped = false;
+                out.push(' ');
+            } else if c == '\\' {
+                escaped = true;
+                out.push(' ');
+            } else if c == '"' {
+                in_str = false;
+                out.push('"');
+            } else {
+                out.push(if c == '\n' { '\n' } else { ' ' });
+            }
+        } else {
+            if c == '"' {
+                in_str = true;
+            }
+            out.push(c);
+        }
+    }
+    out
 }
 
 /// Compile with named compile-time parameters (see the module doc). An
@@ -130,12 +155,42 @@ pub fn compile_with_params(
     tree_version: u8,
     network: NetworkPrefix,
 ) -> Result<CompileOutput, ParamError> {
+    compile_with_params_and_map(source, params, tree_version, network).map(|(o, _)| o)
+}
+
+/// [`compile_with_params`] plus the compiler's P5-B source map, from the
+/// same single compile pass. Templates have no map (`None`). Offsets are
+/// into the source AFTER string-literal substitution: everything before
+/// the first substituted literal is exact; inside or after one, offsets
+/// may drift by the substitution's length difference.
+pub fn compile_with_params_and_map(
+    source: &str,
+    params: &BTreeMap<String, TypedValue>,
+    tree_version: u8,
+    network: NetworkPrefix,
+) -> Result<(CompileOutput, Option<ergo_compiler::SourceMap>), ParamError> {
     if is_template(source) {
-        return compile_template(source, params, tree_version, network);
+        return compile_template(source, params, tree_version, network).map(|o| (o, None));
     }
     let (env, substituted) = env_and_source(source, params)?;
-    match compile_env(&env, &substituted, tree_version, network) {
-        Ok(out) => Ok(out),
+    match ergo_compiler::compile_with_source_map(&env, &substituted, tree_version, network) {
+        Ok((result, map)) => {
+            let CompileResult {
+                tree_bytes,
+                ergo_tree,
+                p2s_address,
+                p2sh_address,
+            } = result;
+            Ok((
+                CompileOutput {
+                    tree_bytes,
+                    ergo_tree,
+                    p2s_address,
+                    p2sh_address,
+                },
+                Some(map),
+            ))
+        }
         Err(e) => match missing_env_name(&e) {
             Some(name) => Err(ParamError::Missing(vec![name])),
             None => Err(ParamError::Compile(e)),
@@ -537,7 +592,7 @@ fn scan_template_params(source: &str) -> Vec<ParamNeed> {
                 .as_ref()
                 .and_then(|cv| cv.get(i))
                 .and_then(|d| d.as_ref())
-                .map(|(tpe, val)| default_text(tpe, val));
+                .and_then(|(tpe, val)| default_text(tpe, val));
             ParamNeed {
                 name: p.name.clone(),
                 type_hint: ct.const_types.get(i).map(crate::inspect::type_str),
@@ -547,9 +602,11 @@ fn scan_template_params(source: &str) -> Vec<ParamNeed> {
         .collect()
 }
 
-/// A default's value in the form a caller passes for that type.
-fn default_text(tpe: &SigmaType, val: &SigmaValue) -> String {
-    match (tpe, val) {
+/// A default's value in the exact text `parse_typed_value` accepts for its
+/// type, or `None` when there is no such text (a form must not prefill a
+/// value the parser would then reject).
+fn default_text(tpe: &SigmaType, val: &SigmaValue) -> Option<String> {
+    Some(match (tpe, val) {
         (_, SigmaValue::Boolean(b)) => b.to_string(),
         (_, SigmaValue::Byte(x)) => x.to_string(),
         (_, SigmaValue::Short(x)) => x.to_string(),
@@ -557,8 +614,11 @@ fn default_text(tpe: &SigmaType, val: &SigmaValue) -> String {
         (_, SigmaValue::Long(x)) => x.to_string(),
         (_, SigmaValue::BigInt(x)) => x.to_string(),
         (_, SigmaValue::Coll(CollValue::Bytes(b))) => hex::encode(b),
-        (_, other) => format!("{other:?}"),
-    }
+        (_, SigmaValue::GroupElement(g)) => hex::encode(g.as_bytes()),
+        (_, SigmaValue::SigmaProp(SigmaBoolean::ProveDlog(pk))) => hex::encode(pk.as_bytes()),
+        (_, SigmaValue::SigmaProp(SigmaBoolean::TrivialProp(b))) => b.to_string(),
+        _ => return None,
+    })
 }
 
 /// `RWT_REPO_NFT`-shaped: upper-case letters, digits and underscores, at
@@ -636,5 +696,24 @@ impl From<ParamError> for SandboxError {
             ParamError::Compile(c) => SandboxError::Compile(c),
             other => SandboxError::Scenario(other.to_string()),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn default_text_is_none_for_values_without_a_parser_form() {
+        // A nested collection has no typed-value text form a form could hold.
+        let v = SigmaValue::Coll(CollValue::Values(vec![SigmaValue::Int(1)]));
+        assert_eq!(
+            default_text(&SigmaType::SColl(Box::new(SigmaType::SInt)), &v),
+            None
+        );
+        assert_eq!(
+            default_text(&SigmaType::SInt, &SigmaValue::Int(7)).as_deref(),
+            Some("7")
+        );
     }
 }

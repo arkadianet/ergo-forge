@@ -393,9 +393,23 @@ async function compile() {
 /// offset (a caret), which for a property read sits on the field name; the
 /// snippet is the whole expression. Prefer the snippet occurrence that
 /// contains the offset, else the identifier at the offset.
-function selectInEditor(offset, snippet) {
+/// UTF-8 byte offset (what the compiler cites) → UTF-16 code-unit index
+/// (what the textarea uses). Equal for ASCII; diverges after any non-ASCII.
+function byteOffsetToIndex(src, byteOffset) {
+  let bytes = 0;
+  for (let i = 0; i < src.length; i++) {
+    if (bytes >= byteOffset) return i;
+    const cp = src.codePointAt(i);
+    bytes += cp < 0x80 ? 1 : cp < 0x800 ? 2 : cp < 0x10000 ? 3 : 4;
+    if (cp >= 0x10000) i++; // surrogate pair: two code units
+  }
+  return src.length;
+}
+
+function selectInEditor(byteOffset, snippet) {
   const ed = $("editor");
   const src = ed.value;
+  const offset = byteOffsetToIndex(src, byteOffset);
   const text = snippet.replace(/…$/, "");
   let start = -1, end = -1;
   if (text) {

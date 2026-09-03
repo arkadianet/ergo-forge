@@ -189,3 +189,51 @@ fn scan_lists_eip5_parameters_with_types_and_defaults() {
     assert_eq!(needs[1].name, "delta");
     assert_eq!(needs[1].default.as_deref(), Some("5"));
 }
+
+// ----- review regressions (PR #22) -----
+
+#[test]
+fn a_contract_marker_in_a_comment_or_string_is_not_a_template() {
+    use ergo_sandbox::compile::is_template;
+    assert!(!is_template("// @contract def x\nsigmaProp(true)"));
+    assert!(!is_template("/* @contract def x */ sigmaProp(true)"));
+    assert!(!is_template(
+        "sigmaProp(SELF.R4[Coll[Byte]].get == fromBase16(\"@contract def\"))"
+    ));
+    assert!(!is_template("@contractdef x"));
+    assert!(is_template(
+        "/** doc */\n@contract def x(a: Int) = sigmaProp(a > 0)"
+    ));
+    assert!(is_template(
+        "/** doc */\n@contract   def x() = sigmaProp(true)"
+    ));
+}
+
+#[test]
+fn scan_does_not_route_a_commented_marker_to_the_template_path() {
+    let needs = scan_params("// @contract def x\nsigmaProp(HEIGHT > $h)");
+    assert_eq!(needs.len(), 1);
+    assert_eq!(needs[0].name, "h");
+}
+
+#[test]
+fn compile_with_map_returns_the_map_for_plain_sources_and_none_for_templates() {
+    use ergo_sandbox::compile::compile_with_params_and_map;
+    let (out, map) = compile_with_params_and_map(
+        "sigmaProp(HEIGHT > 100)",
+        &BTreeMap::new(),
+        3,
+        NetworkPrefix::Testnet,
+    )
+    .unwrap();
+    assert!(map.is_some());
+    assert_eq!(hex::encode(&out.tree_bytes), "100104c801d191a37300");
+    let (_, map) = compile_with_params_and_map(
+        "/** doc */\n@contract def h(t: Int = 1) = sigmaProp(HEIGHT > t)",
+        &BTreeMap::new(),
+        3,
+        NetworkPrefix::Testnet,
+    )
+    .unwrap();
+    assert!(map.is_none());
+}

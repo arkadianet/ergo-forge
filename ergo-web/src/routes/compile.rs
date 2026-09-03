@@ -7,7 +7,7 @@
 
 use axum::Json;
 use ergo_sandbox::audit;
-use ergo_sandbox::compile::{compile_with_params, is_template, scan_params, ParamError};
+use ergo_sandbox::compile::{compile_with_params_and_map, is_template, scan_params, ParamError};
 
 use crate::routes::inspect::parse_network;
 use crate::{dto, error::ApiError, extract::ApiJson};
@@ -38,7 +38,7 @@ pub async fn compile_route(
     let result = tokio::task::spawn_blocking(move || {
         ergo_sandbox::decompile::with_large_stack(move || {
             let needs = scan_params(&source);
-            let out = compile_with_params(&source, &params, tree_version, network)?;
+            let (out, map) = compile_with_params_and_map(&source, &params, tree_version, network)?;
             let tree = ergo_sandbox::inspect::parse_tree(&out.tree_bytes).map_err(|e| {
                 ParamError::Value {
                     name: "<tree>".into(),
@@ -48,9 +48,6 @@ pub async fn compile_route(
             let lifted = ergo_sandbox::lift_tree(&tree, testnet);
             let roundtrip = ergo_sandbox::decompile::print(&lifted.node);
             let report = audit::audit(&lifted);
-
-            let map =
-                ergo_sandbox::compile::source_map_for(&source, &params, tree_version, network);
             let walk: Vec<u8> = ergo_ser::opcode::preorder(&tree.body)
                 .map(|(_, e)| ergo_ser::opcode::node_opcode(e))
                 .collect();
