@@ -12,7 +12,7 @@ use std::sync::Arc;
 use axum::{extract::State, Json};
 use serde::{Deserialize, Serialize};
 
-use crate::app::AppConfig;
+use crate::app::AppState;
 use crate::{error::ApiError, extract::ApiJson};
 
 #[derive(Serialize)]
@@ -21,9 +21,9 @@ pub struct ConfigDto {
     pub explorer: bool,
 }
 
-pub async fn config(State(cfg): State<Arc<AppConfig>>) -> Json<ConfigDto> {
+pub async fn config(State(state): State<Arc<AppState>>) -> Json<ConfigDto> {
     Json(ConfigDto {
-        explorer: cfg.explorer_url.is_some(),
+        explorer: state.cfg.explorer_url.is_some(),
     })
 }
 
@@ -47,10 +47,10 @@ pub struct LookupResponse {
 }
 
 pub async fn lookup(
-    State(cfg): State<Arc<AppConfig>>,
+    State(state): State<Arc<AppState>>,
     ApiJson(req): ApiJson<LookupRequest>,
 ) -> Result<Json<LookupResponse>, ApiError> {
-    let Some(base) = cfg.explorer_url.as_deref() else {
+    let Some(base) = state.cfg.explorer_url.as_deref() else {
         return Err(ApiError::NotConfigured(
             "chain lookups need EXPLORER_URL; this instance makes no outbound calls".into(),
         ));

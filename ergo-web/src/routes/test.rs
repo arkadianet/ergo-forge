@@ -2,17 +2,21 @@
 //! scenarios with expected verdicts). Body is the suite; the response is
 //! the per-case table.
 
-use axum::Json;
+use axum::{extract::State, Json};
 use ergo_sandbox::testsuite::{run, Suite, SuiteError, SuiteResult};
 
+use crate::app::AppState;
 use crate::{error::ApiError, extract::ApiJson};
 
-pub async fn test_route(ApiJson(suite): ApiJson<Suite>) -> Result<Json<SuiteResult>, ApiError> {
-    let result = tokio::task::spawn_blocking(move || {
-        ergo_sandbox::decompile::with_large_stack(move || run(&suite))
-    })
-    .await
-    .map_err(|_| ApiError::Internal)?;
+pub async fn test_route(
+    State(state): State<std::sync::Arc<AppState>>,
+    ApiJson(suite): ApiJson<Suite>,
+) -> Result<Json<SuiteResult>, ApiError> {
+    let result = state
+        .engine
+        .run(move || run(&suite))
+        .await
+        .ok_or(ApiError::Internal)?;
     match result {
         Ok(r) => Ok(Json(r)),
         Err(SuiteError::Compile(ergo_sandbox::compile::ParamError::Compile(e))) => {
