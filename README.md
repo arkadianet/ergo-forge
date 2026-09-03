@@ -34,7 +34,7 @@ docker build -t ergo-web . && docker run --rm -p 127.0.0.1:8080:8080 ergo-web
 
 | Question | Where |
 |---|---|
-| I want a contract that does X, and I don't write code | **Build** mode: pick a recipe (time lock, inheritance, 2-of-3, refundable payment, price gate, burn), answer its questions in plain terms (addresses, dates, amounts), get an address |
+| I want a contract that does X, and I don't write code | **Build** mode: pick a recipe (time lock, inheritance, 2-of-3, refundable payment, vesting, token sale, price gate, burn), answer its questions in plain terms (addresses, dates, amounts), get an address |
 | What does this on-chain contract say? | `ergo-es decompile`, `POST /api/v1/inspect`, the reader |
 | Is the code fragile? (unguarded `Option.get`, tiered by who controls the value) | `ergo-es audit`, inspect findings |
 | Can someone with **no key** spend this box? | `ergo-es hunt`, `POST /api/v1/hunt`, the reader's Spendability section |

@@ -160,6 +160,22 @@ pub fn run(suite: &Suite) -> Result<SuiteResult, SuiteError> {
         }
         let mut sc = case.scenario.clone();
         sc.tree = Some(tree_hex.clone());
+        // "$self" as a box's ergoTree = the contract under test.
+        let fill = |boxes: &mut Vec<crate::scenario::ScenarioBox>| {
+            for b in boxes.iter_mut() {
+                if b.ergo_tree.as_deref().map(str::trim) == Some("$self") {
+                    b.ergo_tree = Some(tree_hex.clone());
+                }
+            }
+        };
+        fill(&mut sc.inputs);
+        fill(&mut sc.outputs);
+        fill(&mut sc.data_inputs);
+        if let Some(sb) = sc.self_box.as_mut() {
+            if sb.ergo_tree.as_deref().map(str::trim) == Some("$self") {
+                sb.ergo_tree = None;
+            }
+        }
         sc.network = Some(if network == NetworkPrefix::Testnet {
             "testnet".into()
         } else {
