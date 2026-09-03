@@ -45,6 +45,13 @@ detail (`Exists (0xAE) n=8`). Needs the `cost-trace` build; the trace is a
 thread-local recorder in `ergo-sigma`, so it is safe per evaluation but is a
 diagnostic build, never a consensus path.
 
+### `selfIndex`
+
+Instead of `selfBox`, a scenario may name `selfIndex`: SELF is
+`inputs[selfIndex]` and `inputs` is the whole input list in transaction
+order — how a real transaction is validated. That input may omit its
+`ergoTree`.
+
 ### Raw register values
 
 A register (or context variable) value may be given as the serialized

@@ -845,3 +845,67 @@ async fn config_reports_the_chain_height_when_an_explorer_is_configured() {
         .unwrap();
     assert_eq!(cfg["height"], 1864624, "{cfg}");
 }
+
+// ── /api/v1/validate-tx ─────────────────────────────────────────────────────
+
+#[tokio::test]
+async fn validate_tx_runs_every_input_script_and_reports_balances() {
+    let base = spawn().await;
+    let a = "aa".repeat(32);
+    let res: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/validate-tx"))
+        .json(&serde_json::json!({
+            "height": 1000,
+            "tx": { "inputs": [ { "boxId": a } ], "dataInputs": [],
+                    "outputs": [ { "value": 100, "ergoTree": "10010101d17300", "assets": [], "additionalRegisters": {}, "creationHeight": 1000 } ] },
+            "boxes": [ { "boxId": a, "value": 100, "ergoTree": "10010101d17300", "assets": [], "additionalRegisters": {}, "creationHeight": 1 } ]
+        }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(res["valid"], true, "{res}");
+    assert_eq!(res["inputs"][0]["verdict"], "pass");
+    assert_eq!(res["ergIn"], 100);
+}
+
+#[tokio::test]
+async fn validate_tx_fetches_missing_boxes_from_the_explorer_when_configured() {
+    let explorer = spawn_fake_explorer().await;
+    let base = spawn_with_explorer(Some(explorer)).await;
+    let id = "605c7844b5ce4eab8eee077c5c15bad9e67535597a75715929502eab8118e9a3";
+    let res: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/validate-tx"))
+        .json(&serde_json::json!({
+            "tx": { "inputs": [ { "boxId": id } ], "dataInputs": [],
+                    "outputs": [ { "value": 180000000, "ergoTree": "10010101d17300", "assets": [ { "tokenId": "e5abaf1f0a9442123104cdf4d2d56ddd8065803e842bc6d433e712601133a9bc", "amount": 1 } ], "additionalRegisters": {}, "creationHeight": 1864624 } ] }
+        }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    // The fetched box's script is SELF.R4[Int].get > 5 with R4 = 9: passes.
+    assert_eq!(res["inputs"][0]["verdict"], "pass", "{res}");
+    assert_eq!(res["valid"], true, "{res}");
+    assert_eq!(res["height"], 1864624);
+}
+
+#[tokio::test]
+async fn validate_tx_without_boxes_and_without_an_explorer_reports_missing() {
+    let base = spawn().await;
+    let res: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/validate-tx"))
+        .json(&serde_json::json!({ "tx": { "inputs": [ { "boxId": "aa".repeat(32) } ], "dataInputs": [], "outputs": [] } }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(res["valid"], false);
+    assert_eq!(res["inputs"][0]["verdict"], "missing");
+}

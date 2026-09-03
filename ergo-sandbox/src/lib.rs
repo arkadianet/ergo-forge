@@ -52,6 +52,7 @@ pub mod inspect;
 pub mod method_names;
 pub mod scenario;
 pub mod testsuite;
+pub mod txcheck;
 
 pub use audit::{Finding, Severity};
 pub use compile::{compile_source, CompileOutput};

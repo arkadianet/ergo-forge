@@ -6,3 +6,4 @@ pub mod hunt;
 pub mod inspect;
 pub mod lookup;
 pub mod test;
+pub mod validate;

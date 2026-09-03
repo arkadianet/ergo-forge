@@ -203,6 +203,28 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
   </main>
 
   <section class="scenario">
+    <h2>Validate a transaction</h2>
+    <p class="hint">Will this unsigned transaction validate? Paste the node-format
+       transaction (<code>inputs</code>, <code>dataInputs</code>,
+       <code>outputs</code>). Every input's script runs in the real context
+       and ERG/token conservation is checked. Boxes are fetched from the
+       explorer when one is configured; otherwise add them under
+       <code>boxes</code>.</p>
+    <label for="txjson">Request JSON — <code>{ "tx": {...}, "boxes": [...], "height": n }</code> or just the transaction</label>
+    <textarea id="txjson" rows="6" spellcheck="false" placeholder='{ "inputs": [ { "boxId": "…" } ], "dataInputs": [], "outputs": [ { "value": 1000000, "ergoTree": "…", "assets": [], "additionalRegisters": {}, "creationHeight": 1000000 } ] }'></textarea>
+    <div class="write-row"><button id="validate-tx">Validate</button></div>
+    <p id="vtx-status" class="status" hidden></p>
+    <div id="vtx-result" hidden>
+      <p id="vtx-verdict" class="hunt-verdict"></p>
+      <ul id="vtx-problems" class="residuals"></ul>
+      <table class="probes">
+        <thead><tr><th>input</th><th>address</th><th>verdict</th><th>detail</th></tr></thead>
+        <tbody id="vtx-rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="scenario">
     <h2>Tests</h2>
     <p class="hint">Named scenarios with the verdict each must produce, run
        against the editor's compiled contract. Save the whole thing as

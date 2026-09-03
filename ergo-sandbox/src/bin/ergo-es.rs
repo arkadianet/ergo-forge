@@ -27,6 +27,7 @@ fn main() -> ExitCode {
         "audit" => cmd_audit(rest),
         "hunt" => cmd_hunt(rest),
         "test" => cmd_test(rest),
+        "validate-tx" => cmd_validate_tx(rest),
         "help" | "--help" | "-h" => {
             usage();
             return ExitCode::SUCCESS;
@@ -58,6 +59,10 @@ USAGE:
   ergo-es test <contract.test.json>
       Run a contract test suite (source or tree + named scenarios with
       expected verdicts); one line per case, non-zero exit on any failure.
+  ergo-es validate-tx <request.json>
+      Will this unsigned transaction validate? {{tx, boxes, height?}}: every
+      input's script runs in the real context; ERG/token conservation is
+      checked. Non-zero exit when the transaction would be rejected.
   ergo-es params <source-file>
       List the $parameters a source needs (with // $name: Type hints).
   ergo-es eval <scenario.json> [--hot-spots]
@@ -876,5 +881,42 @@ fn cmd_test(args: &[String]) -> Result<(), String> {
         Err(format!("{} case(s) failed", r.failed))
     } else {
         Ok(())
+    }
+}
+
+/// `ergo-es validate-tx <request.json>` — the check right before signing.
+fn cmd_validate_tx(args: &[String]) -> Result<(), String> {
+    let Some(path) = args.first() else {
+        return Err("validate-tx needs a request JSON file (or - for stdin)".into());
+    };
+    let text = read_input(path)?;
+    let req: ergo_sandbox::txcheck::TxRequest =
+        serde_json::from_str(&text).map_err(|e| format!("request JSON: {e}"))?;
+    let r = ergo_sandbox::decompile::with_large_stack(move || ergo_sandbox::txcheck::check(&req))
+        .map_err(|e| e.to_string())?;
+    println!("height:   {}", r.height);
+    println!("ERG:      in {}  out {}", r.erg_in, r.erg_out);
+    for i in &r.inputs {
+        let detail = match (&i.error, &i.reduced_to) {
+            (Some(e), _) => format!("  ({e})"),
+            (None, Some(red)) if i.verdict == "needsProof" => format!("  -> {red}"),
+            _ => String::new(),
+        };
+        println!(
+            "  input {}  {:<11} {}{detail}",
+            i.index,
+            i.verdict,
+            i.address.as_deref().unwrap_or(&i.box_id)
+        );
+    }
+    for p in &r.problems {
+        println!("  problem: {p}");
+    }
+    if r.valid {
+        println!("valid: yes ({} signature(s) needed)", r.signatures_needed);
+        Ok(())
+    } else {
+        println!("valid: NO");
+        Err(format!("{} problem(s)", r.problems.len()))
     }
 }
