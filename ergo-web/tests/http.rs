@@ -794,3 +794,54 @@ async fn engine_requests_over_the_per_ip_budget_get_a_json_429() {
     let h = reqwest::get(format!("{base}/api/v1/health")).await.unwrap();
     assert_eq!(h.status(), 200);
 }
+
+// ── recipes, raw .es, chain height ──────────────────────────────────────────
+
+#[tokio::test]
+async fn examples_serve_raw_es_files_and_recipe_docs() {
+    let base = spawn().await;
+    let r = reqwest::get(format!("{base}/api/v1/examples/recipes/time-lock.es"))
+        .await
+        .unwrap();
+    assert_eq!(r.status(), 200);
+    assert!(r
+        .headers()
+        .get("content-type")
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .starts_with("text/plain"));
+    assert!(r.text().await.unwrap().contains("@contract def timeLock"));
+    let one: serde_json::Value = reqwest::get(format!("{base}/api/v1/examples/recipes/time-lock"))
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(one["template"], true);
+    assert!(
+        one["doc"]["description"]
+            .as_str()
+            .unwrap()
+            .contains("Lock funds"),
+        "{one}"
+    );
+    assert_eq!(one["params"][0]["name"], "owner");
+    assert!(one["params"][0]["description"]
+        .as_str()
+        .unwrap()
+        .contains("spend"));
+}
+
+#[tokio::test]
+async fn config_reports_the_chain_height_when_an_explorer_is_configured() {
+    let explorer = spawn_fake_explorer().await;
+    let base = spawn_with_explorer(Some(explorer)).await;
+    let cfg: serde_json::Value = reqwest::get(format!("{base}/api/v1/config"))
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(cfg["height"], 1864624, "{cfg}");
+}

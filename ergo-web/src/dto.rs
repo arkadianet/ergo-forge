@@ -268,7 +268,8 @@ pub struct ExampleDto {
     pub name: String,
     pub source: String,
     pub params: Vec<ergo_sandbox::compile::ParamNeed>,
-    /// True for EIP-5 `@contract def` templates, which the playground cannot
-    /// parameterise yet.
+    /// True for EIP-5 `@contract def` templates.
     pub template: bool,
+    /// The template's name and doc-block description (templates only).
+    pub doc: Option<ergo_sandbox::compile::TemplateDoc>,
 }

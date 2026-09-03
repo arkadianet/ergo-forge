@@ -237,3 +237,56 @@ fn compile_with_map_returns_the_map_for_plain_sources_and_none_for_templates() {
     .unwrap();
     assert!(map.is_none());
 }
+
+// ----- recipes: docs as questions, addresses as keys -----
+
+#[test]
+fn scan_carries_the_template_param_descriptions_and_the_contract_doc() {
+    let src = "/**\n * Lock funds until a height.\n * @param owner who may spend\n * @param unlockHeight when\n */\n@contract def timeLock(owner: SigmaProp, unlockHeight: Int) = owner && sigmaProp(HEIGHT >= unlockHeight)";
+    let needs = scan_params(src);
+    assert_eq!(needs[0].description.as_deref(), Some("who may spend"));
+    assert_eq!(needs[1].description.as_deref(), Some("when"));
+    let doc = ergo_sandbox::compile::template_doc(src).expect("doc");
+    assert_eq!(doc.name, "timeLock");
+    assert!(
+        doc.description.starts_with("Lock funds until a height."),
+        "{}",
+        doc.description
+    );
+}
+
+#[test]
+fn a_sigma_prop_parameter_accepts_a_p2pk_address() {
+    use ergo_sandbox::parse_typed_value;
+    // Mainnet P2PK address for pubkey 028333…9197 (testnet form 3Wwbz…).
+    let pk = "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197";
+    let pk_bytes: [u8; 33] = hex::decode(pk).unwrap().try_into().unwrap();
+    let addr =
+        ergo_ser::address::encode_p2pk_from_pubkey(NetworkPrefix::Mainnet, &pk_bytes).unwrap();
+    let (_, from_addr) = parse_typed_value("SigmaProp", &serde_json::json!(addr)).unwrap();
+    let (_, from_hex) = parse_typed_value("SigmaProp", &serde_json::json!(pk)).unwrap();
+    assert_eq!(from_addr, from_hex);
+    // A P2S (script) address is not a key.
+    assert!(
+        parse_typed_value("SigmaProp", &serde_json::json!("8NJuqcG7SdhX7cFKGBmfAkXn")).is_err()
+    );
+}
+
+#[test]
+fn a_pubkey_with_surrounding_whitespace_is_still_a_pubkey() {
+    use ergo_sandbox::parse_typed_value;
+    let pk = " 028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197 ";
+    assert!(parse_typed_value("SigmaProp", &serde_json::json!(pk)).is_ok());
+}
+
+#[test]
+fn integer_types_accept_exact_decimal_strings() {
+    use ergo_sandbox::parse_typed_value;
+    use ergo_ser::sigma_value::SigmaValue;
+    let (_, v) = parse_typed_value("Long", &serde_json::json!("9007199254740993")).unwrap();
+    assert_eq!(v, SigmaValue::Long(9007199254740993));
+    let (_, v) = parse_typed_value("Int", &serde_json::json!("-5")).unwrap();
+    assert_eq!(v, SigmaValue::Int(-5));
+    assert!(parse_typed_value("Int", &serde_json::json!("2147483648")).is_err());
+    assert!(parse_typed_value("Long", &serde_json::json!("1.5")).is_err());
+}

@@ -96,6 +96,7 @@ pub async fn compile_route(
                         ergo_sandbox::compile::ParamNeed {
                             type_hint: hint.and_then(|n| n.type_hint.clone()),
                             default: hint.and_then(|n| n.default.clone()),
+                            description: hint.and_then(|n| n.description.clone()),
                             name,
                         }
                     })

@@ -19,11 +19,37 @@ use crate::{error::ApiError, extract::ApiJson};
 pub struct ConfigDto {
     /// True when `/api/v1/lookup` can fetch chain data.
     pub explorer: bool,
+    /// Current chain height when an explorer is configured and answers —
+    /// what a date-to-height conversion in a form needs.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub height: Option<u32>,
+    /// The network the explorer (and so `height`) belongs to.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub network: Option<String>,
 }
 
 pub async fn config(State(state): State<Arc<AppState>>) -> Json<ConfigDto> {
+    let mut height = None;
+    if let Some(base) = state.cfg.explorer_url.as_deref() {
+        if let Ok(client) = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(5))
+            .build()
+        {
+            height = fetch(&client, &format!("{base}/api/v1/networkState"))
+                .await
+                .ok()
+                .and_then(|v| v.get("height").and_then(|h| h.as_u64()))
+                .map(|h| h as u32);
+        }
+    }
     Json(ConfigDto {
         explorer: state.cfg.explorer_url.is_some(),
+        height,
+        network: state
+            .cfg
+            .explorer_url
+            .as_ref()
+            .map(|_| state.cfg.explorer_network.clone()),
     })
 }
 

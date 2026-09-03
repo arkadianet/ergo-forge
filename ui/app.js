@@ -276,14 +276,15 @@ let lastCompiled = null; // { treeHex } for the scenario panel
 const paramTypes = ["Int", "Long", "Coll[Byte]", "SigmaProp", "GroupElement", "Boolean", "Byte", "Short", "BigInt", "Coll[Long]", "String"];
 
 function setMode(mode) {
-  const write = mode === "write";
-  $("write").hidden = !write;
-  $("read").hidden = write;
-  $("mode-write").classList.toggle("active", write);
-  $("mode-read").classList.toggle("active", !write);
-  $("mode-write").setAttribute("aria-selected", String(write));
-  $("mode-read").setAttribute("aria-selected", String(!write));
+  for (const m of ["build", "write", "read"]) {
+    const on = m === mode;
+    $(m).hidden = !on;
+    $(`mode-${m}`).classList.toggle("active", on);
+    $(`mode-${m}`).setAttribute("aria-selected", String(on));
+  }
+  if (mode === "write") editor.refresh();
 }
+$("mode-build").addEventListener("click", () => setMode("build"));
 $("mode-write").addEventListener("click", () => setMode("write"));
 $("mode-read").addEventListener("click", () => setMode("read"));
 
@@ -571,6 +572,331 @@ $("example-pick").addEventListener("change", async (e) => {
 $("compile").addEventListener("click", compile);
 loadExamples();
 
+// ── build mode: recipes → questions → address ────────────────────────────
+
+let chainHeight = null;   // from /api/v1/config when an explorer is configured
+let chainHeightAt = 0;    // when that height was observed (ms)
+let chainNetwork = null;  // which network the height belongs to
+let recipe = null;      // { id, name, doc, params, source }
+let built = null;       // last compile result for the wizard
+
+const BLOCK_SECONDS = 120;
+
+async function loadRecipes() {
+  try {
+    const items = await (await fetch("/api/v1/examples")).json();
+    const box = $("recipes");
+    // Simplest first; anything not listed goes after, alphabetically.
+    const order = ["time-lock", "inheritance", "two-of-three", "refundable-payment", "price-gate", "burn"];
+    const rank = (id) => { const i = order.indexOf(id.split("/").pop()); return i < 0 ? order.length : i; };
+    const recipes = items.filter((i) => i.group === "recipes").sort((a, b) => rank(a.id) - rank(b.id) || a.id.localeCompare(b.id));
+    for (const it of recipes) {
+      const ex = await (await fetch(`/api/v1/examples/${it.id}`)).json();
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "recipe";
+      const title = document.createElement("strong");
+      title.textContent = (ex.doc && ex.doc.name) ? humanize(ex.doc.name) : it.name;
+      const desc = document.createElement("span");
+      desc.textContent = (ex.doc && ex.doc.description.split("\n")[0]) || "";
+      card.append(title, desc);
+      card.addEventListener("click", () => startRecipe(ex));
+      box.appendChild(card);
+    }
+  } catch (e) { /* no gallery, no build mode */ }
+}
+
+function humanize(name) {
+  return name.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, (c) => c.toUpperCase());
+}
+
+/// Date→height conversion is only honest for the explorer's own network.
+function datesAvailable() {
+  return chainHeight != null && chainNetwork === $("build-network").value;
+}
+/// The chain height now, extrapolated from the observation at ~2 min/block.
+function heightNow() {
+  return chainHeight + Math.floor((Date.now() - chainHeightAt) / 1000 / BLOCK_SECONDS);
+}
+
+/// Which input to show for a template parameter, from its type and name.
+function fieldKind(p) {
+  const t = p.typeHint || "";
+  const n = p.name.toLowerCase();
+  if (t === "SigmaProp") return "address";
+  if ((t === "Int" || t === "Long") && /height|deadline|expiry|unlock|until|after/.test(n)) return "height";
+  if (t === "Coll[Byte]" && /nft|token|id/.test(n)) return "tokenId";
+  if (t === "Long" && /erg|value|amount|fee/.test(n)) return "erg";
+  if (t === "Boolean") return "bool";
+  return "text";
+}
+
+function startRecipe(ex) {
+  recipe = ex;
+  built = null;
+  $("wizard-title").textContent = ex.doc ? humanize(ex.doc.name) : ex.name;
+  $("wizard-desc").textContent = ex.doc ? ex.doc.description : "";
+  const fields = $("wizard-fields");
+  fields.textContent = "";
+  for (const p of ex.params) {
+    const kind = fieldKind(p);
+    const row = document.createElement("div");
+    row.className = "field";
+    row.dataset.name = p.name;
+    row.dataset.kind = kind;
+    row.dataset.type = p.typeHint || "Long";
+    const label = document.createElement("label");
+    label.htmlFor = `f-${p.name}`;
+    label.textContent = p.description || p.name;
+    const inp = document.createElement("input");
+    inp.id = `f-${p.name}`;
+    inp.required = true;
+    if (kind === "address") { inp.placeholder = "an Ergo address (9… on mainnet)"; inp.spellcheck = false; }
+    else if (kind === "height") {
+      inp.type = datesAvailable() ? "datetime-local" : "number";
+      inp.placeholder = datesAvailable() ? "" : "block height";
+      inp.min = "1";
+    }
+    else if (kind === "tokenId") { inp.placeholder = "token id (64 hex characters)"; inp.spellcheck = false; }
+    else if (kind === "erg") { inp.type = "number"; inp.step = "0.000000001"; inp.placeholder = "amount in ERG"; }
+    else if (kind === "bool") { inp.type = "checkbox"; inp.required = false; }
+    else { inp.placeholder = p.typeHint || ""; }
+    if (p.default != null && kind !== "height") inp.value = p.default;
+    row.append(label, inp);
+    if (kind === "height") {
+      const note = document.createElement("span");
+      note.className = "hint";
+      note.textContent = datesAvailable()
+        ? `Converted to a block height from the current ${chainNetwork} height (${heightNow()}) at ~2 minutes per block.`
+        : "Block height (about 2 minutes per block). Dates are offered when an explorer for this network is configured.";
+      row.appendChild(note);
+    }
+    fields.appendChild(row);
+  }
+  $("wizard").hidden = false;
+  $("build-network").onchange = () => startRecipe(recipe);
+  $("build-result").hidden = true;
+  $("build-status").hidden = true;
+  $("wizard").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/// The wizard's answers as typed parameters, or an error message.
+function wizardParams() {
+  const out = {};
+  for (const row of $("wizard-fields").children) {
+    const name = row.dataset.name, kind = row.dataset.kind, type = row.dataset.type;
+    const inp = row.querySelector("input");
+    const raw = (inp.value || "").trim();
+    if (kind === "bool") { out[name] = { type: "Boolean", value: inp.checked }; continue; }
+    if (!raw) return { error: `Please fill in: ${row.querySelector("label").textContent}` };
+    if (kind === "address") out[name] = { type: "SigmaProp", value: raw };
+    else if (kind === "height") {
+      let h;
+      if (inp.type === "datetime-local") {
+        const t = new Date(raw).getTime();
+        if (Number.isNaN(t)) return { error: "That date does not parse." };
+        const now = heightNow();
+        h = now + Math.ceil((t - Date.now()) / 1000 / BLOCK_SECONDS);
+        if (h <= now) return { error: "The date must be in the future." };
+      } else {
+        h = Number(raw);
+        if (!Number.isInteger(h) || h < 1) return { error: "Height must be a whole number." };
+      }
+      out[name] = { type, value: h };
+    }
+    else if (kind === "tokenId") {
+      if (!/^[0-9a-fA-F]{64}$/.test(raw)) return { error: "A token id is 64 hex characters." };
+      out[name] = { type: "Coll[Byte]", value: raw.toLowerCase() };
+    }
+    else if (kind === "erg") {
+      const n = Number(raw);
+      if (!(n >= 0)) return { error: "Amount must be a number of ERG." };
+      out[name] = { type: "Long", value: Math.round(n * 1e9) };
+    }
+    else if (type === "Int" || type === "Long" || type === "Short" || type === "Byte") {
+      if (!/^-?\d+$/.test(raw)) return { error: `${name} must be a whole number.` };
+      // Exact: beyond the safe-integer range a JSON number would round, so
+      // send the decimal string (the API accepts it for integer types).
+      const big = BigInt(raw);
+      const safe = big <= BigInt(Number.MAX_SAFE_INTEGER) && big >= -BigInt(Number.MAX_SAFE_INTEGER);
+      out[name] = { type, value: safe ? Number(raw) : raw };
+    }
+    else out[name] = { type, value: raw };
+  }
+  return { params: out };
+}
+
+/// Plain-language summary: the recipe's description with each answer named.
+function describeBuild(params) {
+  const lines = [];
+  for (const row of $("wizard-fields").children) {
+    const name = row.dataset.name, kind = row.dataset.kind;
+    const label = row.querySelector("label").textContent;
+    const v = params[name] && params[name].value;
+    let shown = String(v);
+    if (kind === "height" && datesAvailable()) {
+      const when = new Date(Date.now() + (v - heightNow()) * BLOCK_SECONDS * 1000);
+      shown = `block ${v} (about ${when.toLocaleString()})`;
+    } else if (kind === "erg") shown = `${v / 1e9} ERG`;
+    else if (kind === "address") shown = `${String(v).slice(0, 10)}…${String(v).slice(-6)}`;
+    lines.push(`${label}: ${shown}`);
+  }
+  return `${recipe.doc ? recipe.doc.description.split("\n")[0] : ""}\n${lines.join("\n")}`;
+}
+
+$("wizard").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!recipe) return;
+  const status = $("build-status");
+  const { params, error } = wizardParams();
+  if (error) { status.textContent = error; status.hidden = false; return; }
+  status.textContent = "Compiling…"; status.hidden = false;
+  $("build-create").disabled = true;
+  try {
+    const network = $("build-network").value;
+    const res = await fetch("/api/v1/compile", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ source: recipe.source, network, params }),
+    });
+    const body = await res.json();
+    if (!res.ok) { status.textContent = `Could not create the contract: ${(body.error && body.error.message) || res.status}`; return; }
+    built = { ...body, params, network };
+    $("build-summary").textContent = describeBuild(params);
+    $("build-address").textContent = body.p2s;
+    $("build-tree").textContent = body.treeHex;
+    $("build-hunt").textContent = "checking…";
+    $("build-result").hidden = false;
+    status.hidden = true;
+    $("build-result").scrollIntoView({ behavior: "smooth", block: "start" });
+    const hunt = await (await fetch("/api/v1/hunt", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ input: body.treeHex, network }),
+    })).json();
+    const [label] = HUNT_VERDICTS[hunt.verdict] || [hunt.verdict];
+    $("build-hunt").textContent = hunt.verdict === "requiresProof"
+      ? `Requires a signature (${hunt.residuals.length} key path${hunt.residuals.length === 1 ? "" : "s"} found) — nobody can spend it without one.`
+      : label;
+  } catch (err) {
+    status.textContent = `Could not create the contract: ${err}`;
+  } finally {
+    $("build-create").disabled = false;
+  }
+});
+
+$("build-open-write").addEventListener("click", () => {
+  if (!recipe) return;
+  setEditorValue(recipe.source);
+  $("params-rows").textContent = "";
+  const { params } = wizardParams();
+  renderParams(recipe.params.map((p) => ({ name: p.name, typeHint: p.typeHint, default: params && params[p.name] != null ? String(params[p.name].value) : p.default })));
+  $("write-network").value = $("build-network").value;
+  setMode("write");
+});
+$("build-copy").addEventListener("click", () => copyText($("build-address").textContent, "Address copied."));
+$("build-share").addEventListener("click", () => {
+  if (!built) return;
+  const state = { s: recipe.source, p: built.params, n: built.network };
+  const bytes = new TextEncoder().encode(JSON.stringify(state));
+  let bin = ""; for (const b of bytes) bin += String.fromCharCode(b);
+  const frag = btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  copyText(`${location.origin}${location.pathname}#s=${frag}`, "Share link copied.");
+});
+$("build-project").addEventListener("click", () => {
+  if (!built) return;
+  downloadProject(recipe.source, built.params, built.network, `${recipe.doc ? recipe.doc.name : "contract"}`);
+});
+
+// ── files: open .es / project files, save a project zip ──────────────────
+
+$("open-file").addEventListener("click", () => $("file-input").click());
+$("file-input").addEventListener("change", async (e) => {
+  for (const f of e.target.files) {
+    const text = await f.text();
+    if (f.name.endsWith(".es")) { setEditorValue(text); $("params-rows").textContent = ""; renderParams(scanLocal(text)); }
+    else if (/params\.json$/.test(f.name)) {
+      try {
+        const p = JSON.parse(text);
+        $("params-rows").textContent = "";
+        renderParams(Object.entries(p).map(([name, tv]) => ({ name, typeHint: tv.type, default: typeof tv.value === "object" ? JSON.stringify(tv.value) : String(tv.value) })));
+      } catch (err) { /* ignore a bad params file */ }
+    }
+    else if (/test\.json$/.test(f.name)) {
+      try {
+        const suite = JSON.parse(text);
+        if (Array.isArray(suite)) $("tests").value = JSON.stringify(suite, null, 2);
+        else if (suite && Array.isArray(suite.scenarios)) {
+          $("tests").value = JSON.stringify(suite.scenarios, null, 2);
+          if (typeof suite.source === "string") setEditorValue(suite.source);
+          if (suite.params) { $("params-rows").textContent = ""; renderParams(Object.entries(suite.params).map(([name, tv]) => ({ name, typeHint: tv.type, default: String(tv.value) }))); }
+        }
+      } catch (err) { /* ignore */ }
+    }
+  }
+  e.target.value = "";
+  setMode("write");
+});
+
+/// Cheap client-side scan of `$names` so an opened file gets its form
+/// before the first compile (the server's scan is authoritative).
+function scanLocal(src) {
+  const seen = new Set(), out = [];
+  const hints = {};
+  for (const m of src.matchAll(/\/\/\s*\$([A-Za-z_][A-Za-z0-9_]*)\s*:\s*([A-Za-z\[\]]+)/g)) hints[m[1]] = m[2];
+  const code = src.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/\/\/.*$/gm, " ");
+  for (const m of code.matchAll(/\$([A-Za-z_][A-Za-z0-9_]*)/g)) {
+    if (!seen.has(m[1])) { seen.add(m[1]); out.push({ name: m[1], typeHint: hints[m[1]] || null }); }
+  }
+  return out;
+}
+
+$("save-project").addEventListener("click", () => {
+  downloadProject(editorValue(), collectParams(), $("write-network").value, "contract");
+});
+
+/// contract.es + params.json + contract.test.json, zipped (STORE, no
+/// compression — a few KB) so the whole project is one download that the
+/// CLI runs unchanged: `ergo-es test contract.test.json`.
+function downloadProject(source, params, network, baseName) {
+  let scenarios = [];
+  try { const t = JSON.parse($("tests").value); if (Array.isArray(t)) scenarios = t; } catch (e) { /* none */ }
+  const files = [
+    ["contract.es", source],
+    ["params.json", JSON.stringify(params, null, 2) + "\n"],
+    ["contract.test.json", JSON.stringify({ source, params, network, scenarios }, null, 2) + "\n"],
+    ["README.md", `# ${baseName}\n\nCompiled and tested with ergo-forge.\n\n    ergo-es compile contract.es --params params.json --network ${network}\n    ergo-es test contract.test.json\n`],
+  ];
+  const blob = new Blob([zipStore(files)], { type: "application/zip" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `${baseName}.zip`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+/// Minimal ZIP writer (method 0 = STORE). Enough for a handful of text files.
+function zipStore(files) {
+  const enc = new TextEncoder();
+  const table = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  const crc32 = (buf) => { let c = 0xffffffff; for (const b of buf) c = table[(c ^ b) & 0xff] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+  const parts = [], central = [];
+  let offset = 0;
+  const u16 = (n) => [n & 0xff, (n >>> 8) & 0xff];
+  const u32 = (n) => [n & 0xff, (n >>> 8) & 0xff, (n >>> 16) & 0xff, (n >>> 24) & 0xff];
+  for (const [name, text] of files) {
+    const nameB = enc.encode(name), data = enc.encode(text), crc = crc32(data);
+    const local = new Uint8Array([...u32(0x04034b50), ...u16(20), ...u16(0), ...u16(0), ...u16(0), ...u16(0), ...u32(crc), ...u32(data.length), ...u32(data.length), ...u16(nameB.length), ...u16(0), ...nameB]);
+    parts.push(local, data);
+    central.push(new Uint8Array([...u32(0x02014b50), ...u16(20), ...u16(20), ...u16(0), ...u16(0), ...u16(0), ...u16(0), ...u32(crc), ...u32(data.length), ...u32(data.length), ...u16(nameB.length), ...u16(0), ...u16(0), ...u16(0), ...u16(0), ...u32(0), ...u32(offset), ...nameB]));
+    offset += local.length + data.length;
+  }
+  const cdSize = central.reduce((n, c) => n + c.length, 0);
+  const end = new Uint8Array([...u32(0x06054b50), ...u16(0), ...u16(0), ...u16(files.length), ...u16(files.length), ...u32(cdSize), ...u32(offset), ...u16(0)]);
+  const total = parts.concat(central, [end]);
+  const out = new Uint8Array(total.reduce((n, p) => n + p.length, 0));
+  let pos = 0; for (const p of total) { out.set(p, pos); pos += p.length; }
+  return out;
+}
+
 // ── export: share link, SDK snippets ─────────────────────────────────────
 
 /// The editor state as a URL fragment: base64url of {source, params, network}.
@@ -657,7 +983,10 @@ val contract: ErgoContract = ErgoTreeContract.fromErgoTree(
   copyText(code, "appkit snippet copied.");
 });
 
+let firstVisit = true;
+try { firstVisit = !localStorage.getItem("ergo-forge-seen"); localStorage.setItem("ergo-forge-seen", "1"); } catch (e) { /* storage blocked: treat as a first visit */ }
 if (location.hash.startsWith("#s=")) loadShared(location.hash.slice(3));
+else if (location.hash === "#build" || firstVisit) setMode("build");
 
 // ── contract tests ───────────────────────────────────────────────────────
 
@@ -824,6 +1153,7 @@ let fetchedBoxes = [];
 async function loadConfig() {
   try {
     const cfg = await (await fetch("/api/v1/config")).json();
+    if (cfg.height) { chainHeight = cfg.height; chainHeightAt = Date.now(); chainNetwork = cfg.network || "mainnet"; }
     if (cfg.explorer) {
       $("chain-panel").hidden = false;
       $("footer-note").textContent =
@@ -875,7 +1205,7 @@ $("chain-fetch").addEventListener("click", async () => {
   }
 });
 $("chain-boxes").addEventListener("change", (e) => useFetchedBox(Number(e.target.value)));
-loadConfig();
+loadConfig().then(loadRecipes);
 
 $("rehunt").addEventListener("click", () => {
   const input = $("input").value.trim();

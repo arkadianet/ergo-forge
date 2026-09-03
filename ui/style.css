@@ -289,3 +289,27 @@ button.secondary {
 .cm-finding-high { text-decoration: underline wavy var(--high); text-underline-offset: 3px; }
 .cm-finding-medium { text-decoration: underline wavy var(--medium); text-underline-offset: 3px; }
 .cm-finding-low { text-decoration: underline dotted var(--low); text-underline-offset: 3px; }
+
+/* ── build mode ── */
+.recipes { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 0.6rem; margin: 0.75rem 0; }
+.recipe {
+  text-align: left; padding: 0.8rem 0.9rem; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 8px; color: var(--text); cursor: pointer; display: flex; flex-direction: column; gap: 0.3rem;
+}
+.recipe:hover { border-color: var(--accent); }
+.recipe strong { color: var(--accent); }
+.recipe span { color: var(--dim); font-size: 0.9rem; }
+.field { margin: 0.6rem 0; }
+.field label { display: block; margin-bottom: 0.25rem; }
+.field input[type="text"], .field input:not([type]), .field input[type="number"], .field input[type="datetime-local"] {
+  width: 100%; box-sizing: border-box; padding: 0.5rem 0.6rem; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 6px; color: var(--text); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.9rem;
+}
+.field .hint { display: block; margin-top: 0.2rem; }
+#build-network { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; color: var(--text); padding: 0.4rem; }
+#build-create {
+  padding: 0.55rem 1.2rem; border: 0; border-radius: 6px; background: var(--accent); color: #06222e; font-weight: 600; cursor: pointer;
+}
+.summary { white-space: pre-line; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 0.7rem 0.9rem; }
+button.tiny { padding: 0.1rem 0.5rem; margin: 0 0 0 0.4rem; font-size: 0.8rem; }
+#open-file, #save-project { margin-top: 0; }
