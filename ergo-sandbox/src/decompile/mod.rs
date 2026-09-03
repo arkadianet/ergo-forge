@@ -140,6 +140,12 @@ pub struct Lifted {
     pub raw_placeholders: usize,
     /// Set when the lift hit [`MAX_LIFT_DEPTH`].
     pub truncated: bool,
+    /// Lift id (`Node::id`) → IR id from `ergo_ser::opcode::preorder`, for
+    /// every lifted node that stands for an IR node. This is the shared
+    /// node identity the compiler's `SourceMap` is keyed by; a finding's
+    /// `ir_id` comes from here. The lifted root stands for the node under
+    /// the stripped `sigmaProp` wrapper when there is one.
+    pub ir_ids: std::collections::HashMap<u64, u64>,
 }
 
 /// Lift a parsed tree to the AST, without rendering it.
@@ -149,19 +155,26 @@ pub fn lift_tree(tree: &ergo_ser::ergo_tree::ErgoTree, testnet: bool) -> Lifted 
         testnet,
         ..LiftCtx::new()
     };
+    cx.ir_ptr_ids = ergo_ser::opcode::preorder(&tree.body)
+        .map(|(id, e)| (e as *const Expr as usize, id))
+        .collect();
     let node = match &tree.body {
         Expr::Op(n) if n.opcode == 0xD1 => {
             let id = cx.alloc_id_pub();
-            Node {
+            let node = Node {
                 id,
                 kind: lift_op_inner(n, &mut cx, &tree.constants, true),
-            }
+            };
+            // The wrapper is stripped: the lifted root stands for its operand.
+            cx.ir_ids.insert(id, 1);
+            node
         }
         other => lift(other, &mut cx, &tree.constants),
     };
     Lifted {
         raw_placeholders: count_raw(&node),
         truncated: cx.truncated,
+        ir_ids: std::mem::take(&mut cx.ir_ids),
         node,
     }
 }

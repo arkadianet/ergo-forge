@@ -18,6 +18,7 @@ path = "src/main.rs"
 [dependencies]
 ergo-sandbox = { path = "../ergo-sandbox" }
 ergo-ser     = { workspace = true }
+ergo-compiler = { workspace = true }
 axum         = { workspace = true }
 tokio        = { workspace = true }
 tower        = { workspace = true }

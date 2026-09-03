@@ -11,10 +11,10 @@ repository = "https://github.com/arkadianet/ergo-forge"
 [workspace.dependencies]
 # Engine crates — consumed from the Rust Ergo node (arkadianet/ergo).
 # Pinned to a main rev for reproducible builds; bump deliberately.
-ergo-primitives = { git = "https://github.com/arkadianet/ergo", rev = "5ac1e92a6946ac91fd4120533f5b48cf27feac97" }
-ergo-ser        = { git = "https://github.com/arkadianet/ergo", rev = "5ac1e92a6946ac91fd4120533f5b48cf27feac97" }
-ergo-sigma      = { git = "https://github.com/arkadianet/ergo", rev = "5ac1e92a6946ac91fd4120533f5b48cf27feac97" }
-ergo-compiler   = { git = "https://github.com/arkadianet/ergo", rev = "5ac1e92a6946ac91fd4120533f5b48cf27feac97" }
+ergo-primitives = { git = "https://github.com/arkadianet/ergo", rev = "36c88bb794af4be35d584ed77d8c35358ffd1e8b" }
+ergo-ser        = { git = "https://github.com/arkadianet/ergo", rev = "36c88bb794af4be35d584ed77d8c35358ffd1e8b" }
+ergo-sigma      = { git = "https://github.com/arkadianet/ergo", rev = "36c88bb794af4be35d584ed77d8c35358ffd1e8b" }
+ergo-compiler   = { git = "https://github.com/arkadianet/ergo", rev = "36c88bb794af4be35d584ed77d8c35358ffd1e8b" }
 
 thiserror  = "2"
 serde      = { version = "1", features = ["derive"] }

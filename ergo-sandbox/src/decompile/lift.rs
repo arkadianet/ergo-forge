@@ -80,6 +80,11 @@ pub(crate) struct LiftCtx {
     pub(crate) truncated: bool,
     /// Next lift-local node id. See `ast::Node::id`.
     pub(crate) next_id: u64,
+    /// IR node address → its id in `ergo_ser::opcode::preorder` — the walk
+    /// the compiler's source map is keyed by (P5-B consumer contract).
+    pub(crate) ir_ptr_ids: std::collections::HashMap<usize, u64>,
+    /// Lift id → IR id, for every lifted node that stands for an IR node.
+    pub(crate) ir_ids: std::collections::HashMap<u64, u64>,
 }
 
 impl LiftCtx {
@@ -92,6 +97,8 @@ impl LiftCtx {
             depth: 0,
             truncated: false,
             next_id: 0,
+            ir_ptr_ids: std::collections::HashMap::new(),
+            ir_ids: std::collections::HashMap::new(),
         }
     }
 
@@ -148,7 +155,18 @@ impl LiftCtx {
 }
 
 /// Lift a wire expression into the printer AST.
+/// Lift one IR node. The node returned stands for `e`, so it takes `e`'s
+/// shared preorder id (recorded on the context, not on the node: findings
+/// look it up by lift id).
 pub(crate) fn lift(e: &Expr, cx: &mut LiftCtx, constants: &[(SigmaType, SigmaValue)]) -> Node {
+    let node = lift_inner(e, cx, constants);
+    if let Some(&ir) = cx.ir_ptr_ids.get(&(e as *const Expr as usize)) {
+        cx.ir_ids.insert(node.id, ir);
+    }
+    node
+}
+
+fn lift_inner(e: &Expr, cx: &mut LiftCtx, constants: &[(SigmaType, SigmaValue)]) -> Node {
     let id = cx.alloc_id();
     // Bounded recursion: past the ceiling we degrade to a raw placeholder
     // rather than growing the stack. See [`MAX_LIFT_DEPTH`].

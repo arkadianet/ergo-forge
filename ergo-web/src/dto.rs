@@ -20,6 +20,14 @@ pub struct FindingDto {
     pub node_id: u64,
     pub message: String,
     pub snippet: String,
+    /// Byte offset into the authored source (compile route only, when the
+    /// compiler's source map cites the node). Absent for on-chain reads.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub offset: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub line: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub col: Option<u32>,
 }
 
 #[derive(Serialize)]
@@ -46,7 +54,19 @@ impl FindingDto {
             node_id: f.node_id,
             message: f.message.clone(),
             snippet: f.snippet.clone(),
+            offset: None,
+            line: None,
+            col: None,
         }
+    }
+
+    /// Attach a source position from the compiler's map.
+    pub fn with_position(mut self, source: &str, offset: u32) -> Self {
+        let (line, col) = ergo_compiler::span::line_col(source, offset);
+        self.offset = Some(offset);
+        self.line = Some(line);
+        self.col = Some(col);
+        self
     }
 }
 
@@ -207,6 +227,7 @@ pub struct CompileRequest {
 pub struct ParamStatus {
     pub name: String,
     pub type_hint: Option<String>,
+    pub default: Option<String>,
     pub supplied: bool,
 }
 
@@ -223,6 +244,12 @@ pub struct CompileResponse {
     pub truncated: bool,
     pub findings: Vec<FindingDto>,
     pub params: Vec<ParamStatus>,
+    /// True when the source was an EIP-5 `@contract def` template,
+    /// instantiated with the given parameters.
+    pub template: bool,
+    /// True when the compiler's source map aligned with the tree and
+    /// findings could be positioned. False for templates (no map yet).
+    pub positioned: bool,
 }
 
 #[derive(Serialize)]

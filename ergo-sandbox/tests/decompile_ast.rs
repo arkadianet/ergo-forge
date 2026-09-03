@@ -113,3 +113,27 @@ fn deeply_nested_constant_truncates_instead_of_overflowing() {
         "rendered: {rendered}"
     );
 }
+
+// ----- shared IR ids (P5-B consumer contract) -----
+
+/// Every lifted node that stands for an IR node carries that node's id from
+/// `ergo_ser::opcode::preorder` — the same walk the compiler's source map is
+/// keyed by — in `Lifted::ir_ids` (lift id → IR id).
+#[test]
+fn lifted_nodes_carry_shared_preorder_ir_ids() {
+    let bytes = ergo_sandbox::compile_source("sigmaProp(HEIGHT > 100)", 3, NetworkPrefix::Testnet)
+        .unwrap()
+        .tree_bytes;
+    let tree = ergo_sandbox::inspect::parse_tree(&bytes).unwrap();
+    let lifted = ergo_sandbox::lift_tree(&tree, true);
+    let n = ergo_ser::opcode::preorder(&tree.body).count() as u64;
+    // The root D1 wrapper is stripped by the lift, so the lifted root stands
+    // for IR node 1 (the comparison); its children are 2 (HEIGHT) and 3.
+    assert_eq!(lifted.ir_ids.get(&lifted.node.id), Some(&1));
+    let child_ir: Vec<u64> = ergo_sandbox::audit::children(&lifted.node)
+        .iter()
+        .filter_map(|c| lifted.ir_ids.get(&c.id).copied())
+        .collect();
+    assert_eq!(child_ir, vec![2, 3]);
+    assert!(lifted.ir_ids.values().all(|&i| i < n));
+}

@@ -143,3 +143,97 @@ fn an_all_caps_string_token_is_a_string_param() {
     let p = params(&[("RWT_REPO_NFT", "String", serde_json::json!("dd".repeat(32)))]);
     assert!(compile_with_params(src, &p, 3, NetworkPrefix::Mainnet).is_ok());
 }
+
+// ----- EIP-5 templates -----
+
+#[test]
+fn an_eip5_template_compiles_with_its_parameters_applied() {
+    let src = "/** Height lock.\n * @param threshold the minimum height\n */\n@contract def heightLock(threshold: Int) = sigmaProp(HEIGHT > threshold)";
+    let p = params(&[("threshold", "Int", serde_json::json!(100))]);
+    let out = compile_with_params(src, &p, 3, NetworkPrefix::Testnet).unwrap();
+    let plain =
+        ergo_sandbox::compile_source("sigmaProp(HEIGHT > 100)", 3, NetworkPrefix::Testnet).unwrap();
+    // Same proposition; the template tree carries a v3 header, so compare
+    // the decompiled source rather than the header bytes.
+    let t1 = ergo_sandbox::inspect::parse_tree(&out.tree_bytes).unwrap();
+    let t2 = ergo_sandbox::inspect::parse_tree(&plain.tree_bytes).unwrap();
+    assert_eq!(
+        ergo_sandbox::decompile::print(&ergo_sandbox::lift_tree(&t1, true).node),
+        ergo_sandbox::decompile::print(&ergo_sandbox::lift_tree(&t2, true).node)
+    );
+}
+
+#[test]
+fn an_eip5_template_default_fills_a_missing_parameter() {
+    let src = "/** Height lock.\n * @param threshold the minimum height\n */\n@contract def heightLock(threshold: Int = 1000) = sigmaProp(HEIGHT > threshold)";
+    assert!(compile_with_params(src, &BTreeMap::new(), 3, NetworkPrefix::Testnet).is_ok());
+}
+
+#[test]
+fn an_eip5_template_without_a_default_reports_the_missing_parameter() {
+    let src = "/** Height lock.\n * @param threshold the minimum height\n */\n@contract def heightLock(threshold: Int) = sigmaProp(HEIGHT > threshold)";
+    match compile_with_params(src, &BTreeMap::new(), 3, NetworkPrefix::Testnet) {
+        Err(ParamError::Missing(names)) => assert_eq!(names, vec!["threshold".to_string()]),
+        other => panic!("expected Missing, got {other:?}"),
+    }
+}
+
+#[test]
+fn scan_lists_eip5_parameters_with_types_and_defaults() {
+    let src = "/** Mixed.\n * @param base base\n * @param delta delta\n */\n@contract def mixed(base: Long, delta: Long = 5L) = sigmaProp(base + delta > 0L)";
+    let needs = scan_params(src);
+    assert_eq!(needs.len(), 2, "{needs:?}");
+    assert_eq!(needs[0].name, "base");
+    assert_eq!(needs[0].type_hint.as_deref(), Some("Long"));
+    assert_eq!(needs[0].default, None);
+    assert_eq!(needs[1].name, "delta");
+    assert_eq!(needs[1].default.as_deref(), Some("5"));
+}
+
+// ----- review regressions (PR #22) -----
+
+#[test]
+fn a_contract_marker_in_a_comment_or_string_is_not_a_template() {
+    use ergo_sandbox::compile::is_template;
+    assert!(!is_template("// @contract def x\nsigmaProp(true)"));
+    assert!(!is_template("/* @contract def x */ sigmaProp(true)"));
+    assert!(!is_template(
+        "sigmaProp(SELF.R4[Coll[Byte]].get == fromBase16(\"@contract def\"))"
+    ));
+    assert!(!is_template("@contractdef x"));
+    assert!(is_template(
+        "/** doc */\n@contract def x(a: Int) = sigmaProp(a > 0)"
+    ));
+    assert!(is_template(
+        "/** doc */\n@contract   def x() = sigmaProp(true)"
+    ));
+}
+
+#[test]
+fn scan_does_not_route_a_commented_marker_to_the_template_path() {
+    let needs = scan_params("// @contract def x\nsigmaProp(HEIGHT > $h)");
+    assert_eq!(needs.len(), 1);
+    assert_eq!(needs[0].name, "h");
+}
+
+#[test]
+fn compile_with_map_returns_the_map_for_plain_sources_and_none_for_templates() {
+    use ergo_sandbox::compile::compile_with_params_and_map;
+    let (out, map) = compile_with_params_and_map(
+        "sigmaProp(HEIGHT > 100)",
+        &BTreeMap::new(),
+        3,
+        NetworkPrefix::Testnet,
+    )
+    .unwrap();
+    assert!(map.is_some());
+    assert_eq!(hex::encode(&out.tree_bytes), "100104c801d191a37300");
+    let (_, map) = compile_with_params_and_map(
+        "/** doc */\n@contract def h(t: Int = 1) = sigmaProp(HEIGHT > t)",
+        &BTreeMap::new(),
+        3,
+        NetworkPrefix::Testnet,
+    )
+    .unwrap();
+    assert!(map.is_none());
+}

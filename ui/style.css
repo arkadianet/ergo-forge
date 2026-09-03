@@ -227,3 +227,7 @@ details label { display: block; margin-top: 0.5rem; font-size: 0.9rem; color: va
 }
 .params input { width: 100%; box-sizing: border-box; }
 #c-source { white-space: pre-wrap; }
+
+/* ── positioned findings ── */
+#c-findings li .where { display: block; margin-top: 0.25rem; color: var(--dim); font-size: 0.8rem; }
+#c-findings li[title] { cursor: pointer; }

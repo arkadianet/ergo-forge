@@ -311,6 +311,7 @@ function renderParams(needs) {
     const inp = document.createElement("input");
     inp.type = "text"; inp.placeholder = placeholderFor(sel.value);
     inp.setAttribute("aria-label", "value of " + n.name);
+    if (n.default != null) { inp.value = n.default; inp.title = "declared default"; }
     sel.addEventListener("change", () => { inp.placeholder = placeholderFor(sel.value); });
     td3.appendChild(inp);
     tr.append(td1, td2, td3);
@@ -375,7 +376,7 @@ async function compile() {
       $("compiled").hidden = true;
       return;
     }
-    renderParams(body.params.map((p) => ({ name: p.name, typeHint: p.typeHint })));
+    renderParams(body.params.map((p) => ({ name: p.name, typeHint: p.typeHint, default: p.default })));
     renderCompiled(body);
     status.hidden = true;
     lastCompiled = body;
@@ -386,6 +387,47 @@ async function compile() {
     compileInFlight = false;
     $("compile").disabled = false;
   }
+}
+
+/// Select the finding's text in the editor. The compiler cites a start
+/// offset (a caret), which for a property read sits on the field name; the
+/// snippet is the whole expression. Prefer the snippet occurrence that
+/// contains the offset, else the identifier at the offset.
+/// UTF-8 byte offset (what the compiler cites) → UTF-16 code-unit index
+/// (what the textarea uses). Equal for ASCII; diverges after any non-ASCII.
+function byteOffsetToIndex(src, byteOffset) {
+  let bytes = 0;
+  for (let i = 0; i < src.length; i++) {
+    if (bytes >= byteOffset) return i;
+    const cp = src.codePointAt(i);
+    bytes += cp < 0x80 ? 1 : cp < 0x800 ? 2 : cp < 0x10000 ? 3 : 4;
+    if (cp >= 0x10000) i++; // surrogate pair: two code units
+  }
+  return src.length;
+}
+
+function selectInEditor(byteOffset, snippet) {
+  const ed = $("editor");
+  const src = ed.value;
+  const offset = byteOffsetToIndex(src, byteOffset);
+  const text = snippet.replace(/…$/, "");
+  let start = -1, end = -1;
+  if (text) {
+    let i = src.indexOf(text);
+    while (i >= 0) {
+      if (i <= offset && offset < i + text.length) { start = i; end = i + text.length; break; }
+      i = src.indexOf(text, i + 1);
+    }
+  }
+  if (start < 0) {
+    const m = src.slice(offset).match(/^[A-Za-z0-9_$]+/);
+    start = offset; end = offset + (m ? m[0].length : 1);
+  }
+  ed.focus();
+  ed.setSelectionRange(start, Math.min(end, src.length));
+  const line = src.slice(0, start).split("\n").length;
+  const lineHeight = parseFloat(getComputedStyle(ed).lineHeight) || 18;
+  ed.scrollTop = Math.max(0, (line - 3) * lineHeight);
 }
 
 function renderCompiled(c) {
@@ -404,9 +446,21 @@ function renderCompiled(c) {
     const msg = document.createElement("div"); msg.textContent = f.message;
     const snip = document.createElement("code"); snip.className = "snippet"; snip.textContent = f.snippet;
     li.append(chip, lint, msg, snip);
+    if (f.offset != null) {
+      const where = document.createElement("span");
+      where.className = "where";
+      where.textContent = `line ${f.line}, col ${f.col}`;
+      li.appendChild(where);
+      li.tabIndex = 0;
+      li.title = "Click to select in the editor";
+      const select = () => selectInEditor(f.offset, f.snippet);
+      li.addEventListener("click", select);
+      li.addEventListener("keydown", (e) => { if (e.key === "Enter") select(); });
+    }
     list.appendChild(li);
   }
   $("c-no-findings").hidden = c.findings.length > 0;
+  $("c-positioned").hidden = c.positioned || c.findings.length === 0;
   $("c-hunt").textContent = "Hunting…";
   $("c-hunt").className = "hunt-verdict";
   $("compiled").hidden = false;
@@ -462,7 +516,7 @@ $("example-pick").addEventListener("change", async (e) => {
   renderParams(ex.params);
   const status = $("compile-status");
   if (ex.template) {
-    status.textContent = "This is an EIP-5 @contract template; the playground cannot parameterise templates yet.";
+    status.textContent = `EIP-5 @contract template — ${ex.params.length} parameter(s), declared defaults prefilled. Compile to instantiate it.`;
     status.hidden = false;
   } else if (ex.params.length) {
     status.textContent = `Needs ${ex.params.length} parameter(s) — fill them in and compile.`;

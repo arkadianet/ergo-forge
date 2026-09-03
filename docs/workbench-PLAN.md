@@ -231,8 +231,14 @@ Still missing (the actual build list):
    params (rest: 8 EIP-5 templates, 4 reference-parser rejects, wrong-type
    guesses). **Live mainnet** (344 unique trees from the newest 60 blocks):
    2 spendable by anyone, 312 require proof, 30 not under probes; 25 flagged
-   / 201 findings; 332/344 round-trip byte-exact. Deferred: EIP-5 template
-   parameterisation (needs the compiler to expose placeholder application).
+   / 201 findings; 332/344 round-trip byte-exact.
+   **Engine bump 2026-09-03 (node #291 + #292):** EIP-5 templates
+   instantiate through `ContractTemplate::apply` (declared defaults fill
+   gaps; the params form prefills them); the lift takes shared IR ids from
+   `ergo_ser::opcode::preorder` (`Lifted::ir_ids`, `Finding::ir_id`), and
+   the compile route positions findings in the authored source through the
+   compiler's `SourceMap` — the reader selects the cited range in the
+   editor. Positions are start offsets (carets, not ranges) per P5-A.
 8. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.
@@ -242,13 +248,12 @@ Still missing (the actual build list):
      position, and all 1015 `ergo-compiler` tests pass unchanged. Scala *does*
      carry typer positions (`Value._sourceContext`, ~75 cited sites in
      `SigmaTyper.scala`), so the old `0` was a gap, not parity.
-   - **B — designed, not built** (`docs/ergoscript-compiler-source-map-design.md`
-     in the node): emit-time IR-node ↔ source-offset map. **Its keying contract
-     needs one change before implementation** — indices must come from a single
-     shared `ergo_ser::preorder` walk, not be computed independently on each
-     side. Today's lift skips subtrees at `MAX_LIFT_DEPTH`, which would silently
-     misalign every citation after the first deep contract. See the amendment in
-     `docs/superpowers/specs/2026-08-31-lift-target-ast-design.md`.
+   - **B — DONE 2026-09-03** (node PR #292): `compile_with_source_map` +
+     `ergo_ser::opcode::preorder`, the single shared walk both sides take ids
+     from. Implemented as emit-time origin recording resolved by top-down
+     alignment against the final tree (six rewrite passes run after emit;
+     the design doc records the departure). Consumed here: `Lifted::ir_ids`,
+     `Finding::ir_id`, positioned findings on `/api/v1/compile`.
    - Carried limitation: the parser records start offsets only, so P5 yields
      carets, not underlines. Ranges need end-offset capture in `ast.rs` +
      `parse/*` first.
