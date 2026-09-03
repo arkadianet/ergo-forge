@@ -117,6 +117,7 @@ pub async fn compile_route(
     };
     let (completeness, raw_placeholders, truncated) = dto::completeness_parts(&report);
     Ok(Json(dto::CompileResponse {
+        rent: dto::rent_for(&out.tree_bytes, None),
         tree_hex: hex::encode(&out.tree_bytes),
         p2s: out.p2s_address,
         p2sh: out.p2sh_address,

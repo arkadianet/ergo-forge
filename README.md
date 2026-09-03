@@ -119,6 +119,10 @@ to every release alongside the container image.
 - **Positions are carets, not ranges.** Findings point at the start of the
   cited expression; the reader selects the whole expression by matching the
   snippet.
+- **Storage rent applies to every contract.** After about four years a
+  miner may take a size-based fee from any box regardless of its script, and
+  a box holding less than the fee is swept, tokens included. Every answer
+  says so with the estimated fee; a "burn" address is not an exception.
 - **Transaction validation checks scripts and balances, not signatures.** An
   input that reduces to a sigma proposition is reported as a signature
   needed.

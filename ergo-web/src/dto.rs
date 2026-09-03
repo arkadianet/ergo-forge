@@ -33,6 +33,8 @@ pub struct FindingDto {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct InspectResponse {
+    /// Storage rent for a minimal box under this contract.
+    pub rent: ergo_sandbox::rent::RentEstimate,
     pub tree_hex: String,
     pub address: String,
     pub source: String,
@@ -113,6 +115,10 @@ pub struct ProbeDto {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct HuntResponse {
+    /// Storage rent for the box hunted (the supplied `selfBox` when given,
+    /// else a minimal box), with the next collection height when the box's
+    /// creation height is known.
+    pub rent: ergo_sandbox::rent::RentEstimate,
     pub tree_hex: String,
     pub address: String,
     pub verdict: &'static str,
@@ -122,8 +128,14 @@ pub struct HuntResponse {
 }
 
 impl HuntResponse {
-    pub fn from_engine(tree_hex: String, address: String, h: &Hunt) -> Self {
+    pub fn from_engine(
+        tree_hex: String,
+        address: String,
+        h: &Hunt,
+        rent: ergo_sandbox::rent::RentEstimate,
+    ) -> Self {
         Self {
+            rent,
             tree_hex,
             address,
             verdict: match h.verdict {
@@ -234,6 +246,8 @@ pub struct ParamStatus {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CompileResponse {
+    /// Storage rent for a minimal box under this contract.
+    pub rent: ergo_sandbox::rent::RentEstimate,
     pub tree_hex: String,
     pub p2s: String,
     pub p2sh: String,
@@ -272,4 +286,31 @@ pub struct ExampleDto {
     pub template: bool,
     /// The template's name and doc-block description (templates only).
     pub doc: Option<ergo_sandbox::compile::TemplateDoc>,
+}
+
+/// Rent for a scenario box under `tree_bytes` (or a minimal box when none).
+pub fn rent_for(
+    tree_bytes: &[u8],
+    b: Option<&ergo_sandbox::ScenarioBox>,
+) -> ergo_sandbox::rent::RentEstimate {
+    match b {
+        Some(b) => {
+            let amounts: Vec<u64> = b.tokens.iter().map(|t| t.amount).collect();
+            let regs: Vec<Vec<u8>> = b
+                .registers
+                .values()
+                .map(|tv| match (tv.r#type.as_str(), tv.value.as_str()) {
+                    ("raw", Some(h)) => hex::decode(h).unwrap_or_default(),
+                    _ => vec![0; 8],
+                })
+                .collect();
+            let created = if b.creation_height > 0 {
+                Some(b.creation_height)
+            } else {
+                None
+            };
+            ergo_sandbox::rent::estimate(tree_bytes, &amounts, &regs, created)
+        }
+        None => ergo_sandbox::rent::estimate(tree_bytes, &[], &[], None),
+    }
 }

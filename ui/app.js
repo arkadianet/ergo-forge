@@ -226,6 +226,7 @@ function renderHunt(h) {
   // The real box is the fix; put the form in front of the user.
   if (undeterminedOnSynthetic) $("self-box").closest("details").open = true;
 
+  $("hunt-rent").textContent = h.rent ? rentSentence(h.rent) : "";
   const res = $("hunt-residuals");
   res.textContent = "";
   for (const r of h.residuals) {
@@ -503,6 +504,7 @@ function renderCompiled(c) {
   }
   $("c-no-findings").hidden = c.findings.length > 0;
   $("c-positioned").hidden = c.positioned || c.findings.length === 0;
+  $("c-rent").textContent = c.rent ? rentSentence(c.rent, { withHeight: false }) : "";
   markFindings(c.findings);
   $("c-hunt").textContent = "Hunting…";
   $("c-hunt").className = "hunt-verdict";
@@ -790,6 +792,18 @@ function describeBuild(params) {
   return lines.join("\n");
 }
 
+/// Storage rent, in words a non-technical user can act on.
+function rentSentence(r, { forBurn = false, withHeight = true } = {}) {
+  const erg = (r.feeNanoerg / 1e9).toFixed(3);
+  const years = (r.periodBlocks * BLOCK_SECONDS / 86400 / 365.25).toFixed(1);
+  let s = `Every box on Ergo pays storage rent: about every ${years} years a miner may take a fee of roughly ${erg} ERG from a box under this contract (based on its size), leaving the rest locked exactly as before. A box holding less than the fee is taken entirely, tokens included, so keep more than ${erg} ERG in it${forBurn ? "" : " if it must survive"}.`;
+  if (forBurn) s += " For a burn address that means: ERG above the fee stays locked for decades; tokens in a box with little ERG will eventually be swept by a miner, not destroyed.";
+  if (withHeight && r.nextCollectionHeight) {
+    s += datesAvailable() ? ` This box's first rent collection can happen at block ${r.nextCollectionHeight} (about ${dateOfHeight(r.nextCollectionHeight)}).` : ` This box's first rent collection can happen at block ${r.nextCollectionHeight}.`;
+  }
+  return s;
+}
+
 function renderQr(text) {
   const el = $("build-qr");
   el.textContent = "";
@@ -822,6 +836,7 @@ $("wizard").addEventListener("submit", async (e) => {
       return;
     }
     built = { ...body, params, network };
+    $("build-rent").textContent = rentSentence(body.rent, { forBurn: recipe.name === "burn", withHeight: false });
     $("build-summary").textContent = describeBuild(params);
     $("build-address").textContent = body.p2s;
     $("build-tree").textContent = body.treeHex;
@@ -837,7 +852,7 @@ $("wizard").addEventListener("submit", async (e) => {
       requiresProof: "Only the people you named can spend from this address, and only under the rules above. Nobody else can.",
       spendableByAnyone: "Warning: anyone could spend from this address as it stands. Check your answers before sending anything.",
       movableByAnyone: "Anyone can move the funds, but only back into this same contract.",
-      notUnderProbes: recipe.name === "burn" ? "Nobody can ever spend from this address. Anything sent here is gone for good." : "Nobody could spend it in our checks.",
+      notUnderProbes: recipe.name === "burn" ? "No transaction can ever satisfy this contract; only storage rent (below) can ever move anything out of it." : "Nobody could spend it in our checks.",
     }[hunt.verdict] || "";
   } catch (err) {
     status.textContent = `Something went wrong: ${err}`;

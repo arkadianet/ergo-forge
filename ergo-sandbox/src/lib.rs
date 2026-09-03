@@ -50,6 +50,7 @@ pub mod hot_spots;
 pub mod hunt;
 pub mod inspect;
 pub mod method_names;
+pub mod rent;
 pub mod scenario;
 pub mod testsuite;
 pub mod txcheck;

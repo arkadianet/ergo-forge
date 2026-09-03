@@ -66,6 +66,8 @@
         <h3>What you made</h3>
         <p id="build-summary" class="summary"></p>
         <p id="build-hunt" class="lead"></p>
+        <h3>Storage rent — read this once</h3>
+        <p id="build-rent" class="lead"></p>
         <h3>What to do now</h3>
         <ol class="steps">
           <li>Send ERG or tokens from your wallet to the address above. That locks them under this contract.</li>
@@ -130,6 +132,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
           <button id="export-appkit" class="secondary">Copy appkit snippet</button>
         </div>
         <p id="export-status" class="status" hidden></p>
+        <p id="c-rent" class="hint"></p>
         <h2>What consensus will run</h2>
         <p class="hint">The tree decompiled back to source: constants inlined, sugar gone.</p>
         <pre id="c-source"></pre>
@@ -185,6 +188,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
          consensus reducer, no proof, no context variables. A hit is real; a
          miss only means "not under these probes".</p>
       <p id="hunt-verdict" class="hunt-verdict"></p>
+      <p id="hunt-rent" class="hint"></p>
       <p id="hunt-synthetic" class="hint" hidden>SELF was synthetic (no
          registers, value 0) — register reads error out. Describe the real box
          below and re-run for a real answer.</p>
