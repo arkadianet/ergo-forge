@@ -960,12 +960,15 @@ const COND_GROUPS = [
     ["sumPaidTo", "must pay someone in total, across all outputs"],
     ["keepHere", "must keep funds in this contract"],
     ["keepShare", "must keep a percentage of the funds in this contract"],
+    ["keepDrop", "the funds kept here may drop by at most an amount"],
   ]],
   ["Tokens", [
     ["tokenGated", "spender must hold a token (membership)"],
     ["sendToken", "must send a token to someone"],
     ["keepTokens", "this box's tokens must stay with the funds kept here"],
     ["noTokensOut", "no output may carry tokens"],
+    ["tokenConserved", "a token must be passed on in full (none burned, none created)"],
+    ["mint", "must mint a new token to someone"],
   ]],
   ["Outside information (data inputs)", [
     ["oracleAbove", "only while an oracle price is at or above a floor"],
@@ -1005,10 +1008,13 @@ const COND_FIELDS = {
   sumPaidTo: (mk) => { mk("c-key", "Who must be paid? (address)", { spellcheck: false }); mk("c-erg", "At least how much in total, in ERG?", { type: "number", step: "0.000000001" }); },
   keepHere: (mk) => mk("c-erg", "At least how much must stay, in ERG?", { type: "number", step: "0.000000001" }),
   keepShare: (mk) => mk("c-pct", "At least what percentage must stay?", { type: "number", min: "0", max: "100" }),
+  keepDrop: (mk) => mk("c-erg", "At most how much may leave, in ERG?", { type: "number", step: "0.000000001" }),
   tokenGated: (mk) => mk("c-token", "Token id the spender must hold (64 hex characters)", { spellcheck: false }),
   sendToken: (mk) => { mk("c-key", "Who receives the token? (address)", { spellcheck: false }); mk("c-token", "Token id (64 hex characters)", { spellcheck: false }); mk("c-num", "At least how many? (smallest units)", { type: "number", min: "1", value: "1" }); },
   keepTokens: () => {},
   noTokensOut: () => {},
+  tokenConserved: (mk) => mk("c-token", "Token id (64 hex characters)", { spellcheck: false }),
+  mint: (mk) => { mk("c-key", "Who receives the new token? (address)", { spellcheck: false }); mk("c-num", "At least how many units? (optional)", { type: "number", min: "1" }); },
   oracleAbove: (mk) => { mk("c-token", "Oracle token id (64 hex characters)", { spellcheck: false }); mk("c-num", "Minimum price, in the oracle's units", { type: "number" }); },
   oracleBelow: (mk) => { mk("c-token", "Oracle token id (64 hex characters)", { spellcheck: false }); mk("c-num", "Maximum price, in the oracle's units", { type: "number" }); },
   dataToken: (mk) => mk("c-token", "Token id the data input must carry (64 hex characters)", { spellcheck: false }),
@@ -1060,6 +1066,13 @@ const COND_READ = {
   sendToken: (q, c) => ({ box: { which: "output", index: "any", script: { key: c.addKey(q("c-key").value) }, token: { id: c.set("token", "Coll[Byte]", c.tokenId(q("c-token"))), atLeast: c.set("tokenAmount", "Long", c.whole(q("c-num"), 1)) } } }),
   keepTokens: () => ({ box: { which: "output", index: 0, script: "self", keepsSelfTokens: true } }),
   noTokensOut: () => ({ box: { which: "output", index: "all", noTokens: true } }),
+  keepDrop: (q, c) => ({ box: { which: "output", index: 0, script: "self", valueAtLeastSelfMinus: c.set("maxOut", "Long", c.erg(q("c-erg"), "An amount in ERG is missing.", true)) } }),
+  tokenConserved: (q, c) => ({ tokenConserved: { id: c.set("kept", "Coll[Byte]", c.tokenId(q("c-token"))) } }),
+  mint: (q, c) => {
+    const mints = {};
+    if (q("c-num").value.trim()) mints.atLeast = c.set("supply", "Long", c.whole(q("c-num"), 1));
+    return { box: { which: "output", index: "any", script: { key: c.addKey(q("c-key").value) }, mints } };
+  },
   oracleAbove: (q, c) => ({ oracleAbove: { nft: c.set("oracle", "Coll[Byte]", c.tokenId(q("c-token"))), floor: c.set("floor", "Long", c.whole(q("c-num"))) } }),
   oracleBelow: (q, c) => ({ box: { which: "dataInput", index: 0, token: { id: c.set("oracle", "Coll[Byte]", c.tokenId(q("c-token"))) }, registers: [{ reg: "R4", type: "Long", op: "lte", value: c.set("ceiling", "Long", c.whole(q("c-num"))) }] } }),
   dataToken: (q, c) => ({ box: { which: "dataInput", index: "any", token: { id: c.set("dataToken", "Coll[Byte]", c.tokenId(q("c-token"))) } } }),
@@ -1112,6 +1125,7 @@ function describeCond(c, values) {
   if (c.hashPreimage) return "the spender reveals the secret phrase";
   if (c.varEquals) return `the spender attaches ${v(c.varEquals.value)} as variable ${c.varEquals.index}`;
   if (c.minerIs) return `mined by ${String(v(c.minerIs)).slice(0, 10)}…`;
+  if (c.tokenConserved) return `${tok(c.tokenConserved.id)} is passed on in full`;
   if (c.box) {
     const r = c.box;
     const kept = r.which === "output" && r.index === 0 && r.script === "self";
@@ -1123,6 +1137,8 @@ function describeCond(c, values) {
     if (r.token) parts.push(`carries ${tok(r.token.id)}${r.token.atLeast ? ` ×${v(r.token.atLeast)}+` : ""}`);
     if (r.noTokens) parts.push("carries no tokens");
     if (r.keepsSelfTokens) parts.push("carries exactly this box's tokens");
+    if (r.valueAtLeastSelfMinus) parts.push(`may hold at most ${erg(r.valueAtLeastSelfMinus)} less than this box`);
+    if (r.mints) parts.push(`mints a new token${r.mints.atLeast ? ` (at least ${v(r.mints.atLeast)} units)` : ""}`);
     for (const rr of r.registers || []) {
       const op = { eq: "=", ne: "≠", gte: "≥", lte: "≤" }[rr.op];
       parts.push(rr.op === "eqHeight" ? `${rr.reg} records the current height` : rr.op === "eqSelf" ? `${rr.reg} carries over this box's ${rr.reg}` : `${rr.reg} ${op} ${v(rr.value)}`);

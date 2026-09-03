@@ -299,8 +299,13 @@ Still missing (the actual build list):
       refused rather than passing vacuously. The UI's "Combine rules
       yourself" lists 24 conditions in seven plain-language groups plus an
       advanced box-rule form; verified headless (3 paths, 15 checks green).
-      Still outside the composer: AVL-tree proofs, arbitrary arithmetic and
-      folds beyond sums, sigma protocols beyond keys — Write mode.
+      Arithmetic and conservation added the same day: a box may hold at
+      most X less than SELF, a token is conserved across outputs (sum
+      equality via flatMap+fold; a fold nested in a fold lambda does not
+      type-check in the compiler), and an output mints a token named after
+      the first input (EIP-4). Still outside the composer: AVL-tree
+      proofs, arbitrary arithmetic and folds beyond sums, sigma protocols
+      beyond keys — Write mode.
 13. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.

@@ -237,6 +237,7 @@ conditions cover what a script can see of the spending transaction:
 | `{varEquals: {index, type, value}}` | the spender attaches context variable `index` equal to `$value` |
 | `{hashPreimage: {var, hash, algo?}}` | `blake2b256`/`sha256` of context variable `var` equals `$hash` |
 | `{minerIs: m}` | `CONTEXT.minerPubKey == $m` |
+| `{tokenConserved: {id}}` | the outputs carry exactly as much of `$id` as this box does (none burned, none conjured) |
 | `{box: rule}` | a rule on one box, below |
 
 A **box rule** names a box — `which`: `output`, `input`, `dataInput` or
@@ -244,7 +245,10 @@ A **box rule** names a box — `which`: `output`, `input`, `dataInput` or
 with no index takes the next free slot — and requires any of: `script`
 (`"self"` for this same contract, or `{key}`), `valueAtLeast`,
 `valueAtLeastShare: {percent}` (of `SELF.value`), `token: {id, atLeast?}`,
-`noTokens`, `keepsSelfTokens` (`tokens == SELF.tokens`), and `registers`
+`noTokens`, `keepsSelfTokens` (`tokens == SELF.tokens`),
+`valueAtLeastSelfMinus` (`value >= SELF.value - $x`), `mints: {atLeast?}`
+(the box's first token is named after the first input's id, as EIP-4
+requires), and `registers`
 (`[{reg: "R4".."R9", type, op, value?}]` with `op` one of `eq`, `ne`,
 `gte`, `lte`, `eqHeight`, `eqSelf`). Registers are read with
 `.isDefined` guards, so a missing register refuses rather than errors.
