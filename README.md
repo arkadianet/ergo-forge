@@ -33,10 +33,12 @@ docker build -t ergo-web . && docker run --rm -p 127.0.0.1:8080:8080 ergo-web
 
 | Question | Where |
 |---|---|
+| I want a contract that does X, and I don't write code | **Build** mode: pick a recipe (time lock, inheritance, 2-of-3, refundable payment, price gate, burn), answer its questions in plain terms (addresses, dates, amounts), get an address |
 | What does this on-chain contract say? | `ergo-es decompile`, `POST /api/v1/inspect`, the reader |
 | Is the code fragile? (unguarded `Option.get`, tiered by who controls the value) | `ergo-es audit`, inspect findings |
 | Can someone with **no key** spend this box? | `ergo-es hunt`, `POST /api/v1/hunt`, the reader's Spendability section |
 | Does my contract pass in *this* spending context, and what does it cost? | `ergo-es eval`, `POST /api/v1/eval`, the reader's Scenario panel |
+| Can I work with files? | Open `.es`, `params.json`, `contract.test.json`; save a project zip the CLI runs unchanged; raw `.es` at `/api/v1/examples/{id}.es` |
 | Do all my contract's paths still behave after a change? | `ergo-es test contract.test.json` (CI), `POST /api/v1/test`, the Tests panel |
 | Where does the cost go? | `ergo-es eval --hot-spots` (cost-trace build) |
 

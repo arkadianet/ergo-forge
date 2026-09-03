@@ -63,8 +63,26 @@ pub async fn list() -> Json<Vec<dto::ExampleSummary>> {
     Json(out)
 }
 
-pub async fn fetch(AxumPath(id): AxumPath<String>) -> Result<Json<dto::ExampleDto>, ApiError> {
-    // Ids are relative paths; refuse anything that could escape the dir.
+/// `GET /api/v1/examples/{id}` → JSON; `GET /api/v1/examples/{id}.es` → the
+/// raw source as `text/plain`, for curl and for "open in editor" links.
+pub async fn fetch(AxumPath(id): AxumPath<String>) -> Result<axum::response::Response, ApiError> {
+    use axum::response::IntoResponse;
+    if let Some(bare) = id.strip_suffix(".es") {
+        let (_, source) = load(bare)?;
+        return Ok((
+            [(
+                axum::http::header::CONTENT_TYPE,
+                "text/plain; charset=utf-8",
+            )],
+            source,
+        )
+            .into_response());
+    }
+    fetch_json(id).map(IntoResponse::into_response)
+}
+
+/// Read one example by id, refusing ids that could escape the directory.
+fn load(id: &str) -> Result<(String, String), ApiError> {
     if id.is_empty()
         || id
             .split('/')
@@ -76,8 +94,14 @@ pub async fn fetch(AxumPath(id): AxumPath<String>) -> Result<Json<dto::ExampleDt
     let path = examples_dir().join(format!("{id}.es"));
     let source = std::fs::read_to_string(&path)
         .map_err(|_| ApiError::NotFound(format!("no example `{id}`")))?;
+    Ok((id.to_string(), source))
+}
+
+fn fetch_json(id: String) -> Result<Json<dto::ExampleDto>, ApiError> {
+    let (id, source) = load(&id)?;
     let params = ergo_sandbox::compile::scan_params(&source);
-    let template = source.contains("@contract");
+    let template = ergo_sandbox::compile::is_template(&source);
+    let doc = ergo_sandbox::compile::template_doc(&source);
     let (group, name) = match id.rsplit_once('/') {
         Some((g, n)) => (g.split('/').next().unwrap_or(g).to_string(), n.to_string()),
         None => (String::new(), id.clone()),
@@ -89,5 +113,6 @@ pub async fn fetch(AxumPath(id): AxumPath<String>) -> Result<Json<dto::ExampleDt
         source,
         params,
         template,
+        doc,
     }))
 }

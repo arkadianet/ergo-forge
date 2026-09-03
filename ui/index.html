@@ -10,23 +10,64 @@
 <body>
   <header>
     <h1>ErgoScript playground</h1>
-    <p>Write a contract and compile it on the node's own compiler, or paste an
-       address and read what is on chain. Findings, spendability, and scenarios
-       run on the consensus reducer. Everything runs locally — nothing leaves
-       this host.</p>
+    <p><strong>Build</strong> a contract by answering a few questions,
+       <strong>Write</strong> ErgoScript and compile it on the node's own
+       compiler, or <strong>Read</strong> what an on-chain address does.
+       Findings, spendability, and tests run on the consensus reducer.</p>
   </header>
 
   <main>
     <nav class="modes" role="tablist">
+      <button id="mode-build" class="mode" role="tab" aria-selected="false">Build</button>
       <button id="mode-write" class="mode active" role="tab" aria-selected="true">Write</button>
       <button id="mode-read" class="mode" role="tab" aria-selected="false">Read</button>
     </nav>
+
+    <section id="build" class="pane" hidden>
+      <p class="hint">Pick what you want the contract to do, answer a few
+         questions, and get an address. The contract is compiled on the node's
+         own compiler; you can open it in Write to see or change the code.</p>
+      <div id="recipes" class="recipes"></div>
+      <form id="wizard" hidden>
+        <h2 id="wizard-title"></h2>
+        <p id="wizard-desc" class="hint"></p>
+        <div id="wizard-fields"></div>
+        <div class="write-row">
+          <select id="build-network" aria-label="network">
+            <option value="mainnet" selected>mainnet</option>
+            <option value="testnet">testnet</option>
+          </select>
+          <button id="build-create" type="submit">Create contract</button>
+          <button id="build-open-write" type="button" class="secondary">Open in Write</button>
+        </div>
+        <p id="build-status" class="status" hidden></p>
+      </form>
+      <div id="build-result" hidden>
+        <h2>Your contract</h2>
+        <p id="build-summary" class="summary"></p>
+        <dl class="wire">
+          <dt>address</dt><dd><code id="build-address"></code> <button id="build-copy" class="secondary tiny" type="button">Copy</button></dd>
+          <dt>spendability</dt><dd id="build-hunt">—</dd>
+          <dt>tree hex</dt><dd><code id="build-tree"></code></dd>
+        </dl>
+        <p class="hint">Send funds or tokens to the address to lock them under this
+           contract. Keep the parameters: they are what makes this address yours.
+           Anyone can verify the contract by pasting the address into Read.</p>
+        <div class="write-row">
+          <button id="build-share" class="secondary" type="button">Copy share link</button>
+          <button id="build-project" class="secondary" type="button">Download project (.zip)</button>
+        </div>
+      </div>
+    </section>
 
     <section id="write" class="pane">
       <div class="write-row">
         <select id="example-pick" aria-label="examples">
           <option value="">examples…</option>
         </select>
+        <button id="open-file" class="secondary" type="button" title="Open a .es file (or a params.json / contract.test.json)">Open…</button>
+        <input id="file-input" type="file" accept=".es,.json,text/plain,application/json" multiple hidden>
+        <button id="save-project" class="secondary" type="button" title="Download contract.es + params.json + contract.test.json">Save project</button>
         <select id="write-network" aria-label="network">
           <option value="mainnet" selected>mainnet</option>
           <option value="testnet">testnet</option>

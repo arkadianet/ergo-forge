@@ -275,8 +275,14 @@ fn compile_template(
             reason: other.to_string(),
         },
     })?;
+    // Only the template's own parameters reach `apply`; a form may send a
+    // superset (the scan of another source, a shared link) and that is not
+    // an error at this layer.
     let mut values = BTreeMap::new();
     for (name, tv) in params {
+        if !ct.parameters.iter().any(|p| &p.name == name) {
+            continue;
+        }
         let pair = parse_typed_value(&tv.r#type, &tv.value).map_err(|e| ParamError::Value {
             name: name.clone(),
             reason: e.to_string(),
@@ -521,6 +527,29 @@ pub struct ParamNeed {
     /// An EIP-5 template parameter's declared default, rendered as the
     /// JSON value a caller would pass (so a form can prefill it).
     pub default: Option<String>,
+    /// An EIP-5 template parameter's `@param` description — the question a
+    /// form asks for it.
+    pub description: Option<String>,
+}
+
+/// An EIP-5 template's name and doc-block description.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct TemplateDoc {
+    pub name: String,
+    pub description: String,
+}
+
+/// The template's name and description, when `source` is a template that
+/// parses.
+pub fn template_doc(source: &str) -> Option<TemplateDoc> {
+    if !is_template(source) {
+        return None;
+    }
+    let parsed = ergo_compiler::parse_contract(source, 3).ok()?;
+    Some(TemplateDoc {
+        name: parsed.signature.name.clone(),
+        description: parsed.docs.description.trim().to_string(),
+    })
 }
 
 /// List the parameters a source uses (outside comments, first use order):
@@ -539,6 +568,7 @@ pub fn scan_params(source: &str) -> Vec<ParamNeed> {
                 name: name.to_string(),
                 type_hint: hint,
                 default: None,
+                description: None,
             });
         }
     };
@@ -597,6 +627,7 @@ fn scan_template_params(source: &str) -> Vec<ParamNeed> {
                 name: p.name.clone(),
                 type_hint: ct.const_types.get(i).map(crate::inspect::type_str),
                 default,
+                description: Some(p.description.clone()).filter(|d| !d.is_empty()),
             }
         })
         .collect()

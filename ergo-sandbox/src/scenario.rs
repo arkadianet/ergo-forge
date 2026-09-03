@@ -8,6 +8,7 @@
 
 use std::collections::BTreeMap;
 
+use ergo_ser::address::NetworkPrefix;
 use ergo_ser::sigma_type::SigmaType;
 use ergo_ser::sigma_value::{CollValue, SigmaBoolean, SigmaValue};
 use num_bigint::BigInt;
@@ -329,7 +330,31 @@ fn parse_sigma_prop(value: &serde_json::Value) -> Result<(SigmaType, SigmaValue)
             SigmaValue::SigmaProp(SigmaBoolean::TrivialProp(b)),
         ));
     }
-    let bytes = user_hex("SigmaProp", value, 33)?;
+    // A 33-byte pubkey hex, or a P2PK address (mainnet or testnet), whose
+    // tree is `0008cd` + the key. A script address is not a key: refused.
+    let bytes = match value.as_str() {
+        Some(s) if s.len() != 66 || hex::decode(s.trim()).is_err() => {
+            let s = s.trim();
+            let tree = ergo_ser::address::decode_address_to_tree_bytes(s, NetworkPrefix::Mainnet)
+                .or_else(|_| {
+                    ergo_ser::address::decode_address_to_tree_bytes(s, NetworkPrefix::Testnet)
+                })
+                .map_err(|e| {
+                    SandboxError::Scenario(format!(
+                        "`SigmaProp` needs a 33-byte pubkey hex or a P2PK address: {e:?}"
+                    ))
+                })?;
+            match tree.as_slice() {
+                [0x00, 0x08, 0xcd, pk @ ..] if pk.len() == 33 => pk.to_vec(),
+                _ => {
+                    return Err(SandboxError::Scenario(
+                        "`SigmaProp` address is a script (P2S/P2SH) address, not a key".into(),
+                    ))
+                }
+            }
+        }
+        _ => user_hex("SigmaProp", value, 33)?,
+    };
     let mut pk = [0u8; 33];
     pk.copy_from_slice(&bytes);
     Ok((

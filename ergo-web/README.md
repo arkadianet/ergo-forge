@@ -145,7 +145,9 @@ curl -s -X POST http://127.0.0.1:8080/api/v1/compile \
        "params":{"minHeight":{"type":"Int","value":100}}}'
 ```
 
-`params` map a name to a typed value (the scenario typed-value shape). An
+`params` map a name to a typed value (the scenario typed-value shape). A
+`SigmaProp` value may be a 33-byte pubkey hex or a P2PK address (mainnet or
+testnet); a script address is refused, since it is not a key. An
 EIP-5 `@contract def` template source takes the template path: it is
 compiled and instantiated through the compiler's `ContractTemplate::apply`,
 declared defaults filling any parameter not given (`template: true` in the
@@ -168,14 +170,19 @@ a form can be built), `compile_error` (400, with `offset` into the source).
 ### `GET /api/v1/examples`, `GET /api/v1/examples/{id}`
 
 The gallery: `[{id, group, name}]`, then `{id, group, name, source, params,
-template}` for one. Files under `EXAMPLES_DIR` (default `examples/contracts`;
+template, doc}` for one — `params[]` carry `typeHint`, `default` and, for
+templates, the `@param` `description` (the question a form asks); `doc` is
+the template's name and description. `GET /api/v1/examples/{id}.es` returns
+the raw source as `text/plain`. The `recipes/` group is the Build mode's
+library: EIP-5 templates whose docs are written for non-technical users. Files under `EXAMPLES_DIR` (default `examples/contracts`;
 86 files — 7 basics plus the node corpus's 79 real deployed contracts, see
 `examples/contracts/ORIGIN.md`). `template` marks EIP-5 `@contract def`
 sources, which cannot be parameterised yet.
 
 ### `GET /api/v1/config`, `POST /api/v1/lookup`
 
-`config` → `{"explorer": true|false}`. When an explorer is configured,
+`config` → `{"explorer": true|false, "height"?: n}` (`height` is the chain tip
+when an explorer is configured, so a form can turn a date into a height). When an explorer is configured,
 `lookup` `{input, limit?}` fetches a box by id (64 hex) or an address's
 unspent boxes, and the current height, in the scenario box shape — registers
 are passed through as `{"type": "raw", "value": "<serialized constant hex>"}`

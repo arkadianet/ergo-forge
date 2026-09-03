@@ -252,7 +252,18 @@ Still missing (the actual build list):
    box shape, registers as `{"type":"raw"}` serialized constants the engine
    re-parses. The reader's "Fetch from chain" fills SELF and the height and
    re-hunts — the spendability answer for the real box.
-10. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
+10. **P4e — Build mode, recipes, files: DONE 2026-09-03.** A recipe
+    library of EIP-5 templates (`examples/contracts/recipes/`: time lock,
+    inheritance, 2-of-3, refundable payment, price gate, burn) whose docs
+    are the wizard's questions; `scan_params` carries `@param` descriptions
+    and `template_doc` the contract's; a `SigmaProp` parameter accepts a P2PK
+    address; `/api/v1/config` reports the chain height so a date becomes a
+    height client-side. Build mode: pick, answer, get an address with a
+    spendability verdict and a plain-language summary; share link; project
+    zip (`contract.es` + `params.json` + `contract.test.json` + README)
+    that `ergo-es test` runs unchanged; open `.es`/project files into Write.
+    Raw `.es` at `/api/v1/examples/{id}.es`.
+11. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.
    - **A — DONE 2026-08-31** (`compiler/source-positions`, `8479a58`): every
