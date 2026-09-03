@@ -1,16 +1,38 @@
 # ergo-forge
 
-ErgoScript workbench — author, test, and read Ergo contracts on the same
-interpreter and compiler that run the Rust Ergo node
+The ErgoScript playground — build, write, read, audit, and test Ergo
+contracts on the same compiler and interpreter that run the Rust Ergo node
 ([arkadianet/ergo](https://github.com/arkadianet/ergo)). No second
 interpreter, no second compiler: a verdict here is the consensus verdict.
 
-- [`ergo-sandbox/`](ergo-sandbox/) — the engine crate + `ergo-es` CLI
-  (scenario evaluation, cost reporting, compile, decompile, round-trip, audit)
-- [`ergo-web/`](ergo-web/) — HTTP service + one-page reader: paste an address
-  or ErgoTree hex, get readable ErgoScript plus audit findings
-- [`docs/workbench-PLAN.md`](docs/workbench-PLAN.md) — the plan: audiences,
-  phases, verification bar (decompiler v1 = byte-exact recompilation)
+Three ways in, one engine:
+
+- **Build** — for people who don't write code: pick a recipe, answer its
+  questions in plain terms (addresses, dates, amounts), get an address and a
+  plain-language summary of what you made.
+- **Write** — for developers: an editor with an ErgoScript grammar, compile-time
+  parameters as a form, the decompiled round-trip of what consensus will
+  run, findings underlined in your source, spendability, scenarios, and test
+  suites you can run in CI.
+- **Read** — for anyone: paste an address, see the contract as ErgoScript,
+  what's fragile, who can spend it, and whether a transaction you are about
+  to sign would validate.
+
+Layout:
+
+- [`ergo-sandbox/`](ergo-sandbox/) — the engine crate + `ergo-es` CLI:
+  compile (with parameters and EIP-5 templates), decompile, round-trip,
+  audit, spend hunt, scenario eval, test suites, transaction validation,
+  cost hot-spots.
+- [`ergo-web/`](ergo-web/) — the HTTP service and the playground UI
+  (`ui/`, vanilla JS, nothing loaded from a CDN). Optional explorer lookups
+  and per-client rate limiting for a public instance; a container image.
+- [`examples/`](examples/) — 87 contracts (8 recipes and 7 basics written
+  here, 79 real deployed contracts vendored from the node's corpus) and test
+  suites.
+- [`docs/workbench-PLAN.md`](docs/workbench-PLAN.md) — the plan and the
+  measured record of every phase; design records under
+  `docs/superpowers/specs/`.
 
 ## Quick start
 
@@ -26,9 +48,17 @@ cargo run -p ergo-sandbox --bin ergo-es -- test examples/tests/height-lock.test.
 cargo run -p ergo-sandbox --bin ergo-es -- validate-tx request.json   # {tx, boxes, height}
 cargo run -p ergo-sandbox --features cost-trace --bin ergo-es -- eval scenario.json --hot-spots
 
-cargo run -p ergo-web --bin ergo-web        # http://127.0.0.1:8080 — the reader
-docker build -t ergo-web . && docker run --rm -p 127.0.0.1:8080:8080 ergo-web
+cargo run -p ergo-web --bin ergo-web        # http://127.0.0.1:8080 — the playground
+EXPLORER_URL=https://api.ergoplatform.com RATE_LIMIT_PER_MINUTE=60 \
+  cargo run -p ergo-web --bin ergo-web      # with chain lookups, for a public instance
+docker run --rm -p 127.0.0.1:8080:8080 ghcr.io/arkadianet/ergo-web:0.2.0
 ```
+
+Without `EXPLORER_URL` the service makes no outbound calls at all. With it,
+Read can fetch the real box behind an address (so the spend hunt answers for
+that box), Build can turn dates into heights, and transaction validation can
+fetch the boxes it needs. See [`ergo-web/README.md`](ergo-web/README.md) for
+every endpoint and setting.
 
 ## What it answers
 
@@ -74,17 +104,39 @@ table to the job summary:
 Prebuilt `ergo-es` binaries (Linux x86_64/aarch64, macOS arm64) are attached
 to every release alongside the container image.
 
+## How much to trust it
+
+- **Compiler and reducer are the node's own.** The decompiler is graded by
+  byte-exact recompilation: 270 of 279 mainnet trees in the node's corpus,
+  332 of 344 trees from a live sample of recent blocks. Misses degrade to
+  honest `<…>` placeholders and an audit over a partial tree says so.
+- **Real contracts, not toys.** 61 of the 79 deployed contracts in the
+  gallery compile with auto-filled parameters; the rest are EIP-5 templates
+  with non-literal defaults or files the reference parser also rejects.
+- **The spend hunt is a sample, not a proof.** A hit is a transaction anyone
+  can build; a miss says "not under these probes" and names the reason
+  (synthetic SELF, missing data inputs).
+- **Positions are carets, not ranges.** Findings point at the start of the
+  cited expression; the reader selects the whole expression by matching the
+  snippet.
+- **Transaction validation checks scripts and balances, not signatures.** An
+  input that reduces to a sigma proposition is reported as a signature
+  needed.
+
+CI enforces the verification bars on every PR, including the whole-corpus
+round-trip floors against the pinned node checkout. A `v*` tag publishes the
+container image to GHCR and attaches prebuilt `ergo-es` binaries to the
+release.
+
 ## Status
 
-Done: P0 (decompiler recon), P1 (sandbox engine + CLI), P2 (decompiler v1),
-P2.5 (public lifted AST), P3a (static audit lints, severity-tiered, val/`||`
-guards followed), P3b (spend hunt with self-box and data-input probes), P3c
-(cost hot-spots), P4a (HTTP service: inspect / hunt / eval, reader UI,
-container image). Remaining: register fuzzing for the hunt, cross-branch
-reasoning in the lint, and P5-B (node-side source positions) so findings and
-cost can cite source spans. CI enforces the verification bars on every PR,
-including the whole-corpus round-trip floors against the pinned node checkout;
-a `v*` tag publishes the image to GHCR.
+Phases P0–P4f are done (recon, engine, decompiler, public AST, audit lints,
+spend hunt, cost hot-spots, HTTP service and UI, playground with parameters
+and templates, test suites, chain lookups, Build mode, transaction
+validation); the node-side P5-A/P5-B (source positions and the source map)
+landed and are consumed. See the plan for the measured record of each.
+Remaining: register fuzzing for the hunt, cross-branch reasoning in the
+lint, ranges instead of carets, a wallet step in Build.
 
 Engine crates are consumed from `arkadianet/ergo` via pinned git
 revisions (`Cargo.toml`) — bump deliberately, the node is the oracle.
