@@ -913,8 +913,10 @@ async fn validate_tx_without_boxes_and_without_an_explorer_reports_missing() {
 #[tokio::test]
 async fn hunt_rent_grows_with_a_typed_register_of_real_size() {
     let base = spawn().await;
-    let post = |regs: serde_json::Value| async {
-        let r: serde_json::Value = reqwest::Client::new()
+    let post = |regs: serde_json::Value| {
+        let base = base.clone();
+        async move {
+            let r: serde_json::Value = reqwest::Client::new()
             .post(format!("{base}/api/v1/hunt"))
             .json(&serde_json::json!({ "input": "1001040ad191e4c6a704047300", "selfBox": { "value": 1, "registers": regs } }))
             .send()
@@ -923,7 +925,8 @@ async fn hunt_rent_grows_with_a_typed_register_of_real_size() {
             .json()
             .await
             .unwrap();
-        r["rent"]["boxBytes"].as_u64().unwrap()
+            r["rent"]["boxBytes"].as_u64().unwrap()
+        }
     };
     let small = post(serde_json::json!({ "R4": { "type": "Int", "value": 9 } })).await;
     let big =
