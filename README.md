@@ -55,6 +55,23 @@ Example scenario (`sigmaProp(HEIGHT > 100)` failing at height 99):
 See [`ergo-sandbox/README.md`](ergo-sandbox/README.md) for the full scenario
 schema, verdicts, and the Rust API.
 
+## In CI
+
+Run your contract suites on every pull request with the composite action —
+it downloads the prebuilt `ergo-es` from the matching release and posts a
+table to the job summary:
+
+```yaml
+- uses: actions/checkout@v4
+- uses: arkadianet/ergo-forge/.github/actions/test@main
+  with:
+    suites: "contracts/**/contract.test.json"   # default: **/contract.test.json
+    version: latest                             # or a tag, e.g. v0.2.0
+```
+
+Prebuilt `ergo-es` binaries (Linux x86_64/aarch64, macOS arm64) are attached
+to every release alongside the container image.
+
 ## Status
 
 Done: P0 (decompiler recon), P1 (sandbox engine + CLI), P2 (decompiler v1),

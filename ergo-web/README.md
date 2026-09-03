@@ -43,7 +43,7 @@ inside the container, and carries a health check against `/api/v1/health`.
 Put TLS and per-IP rate limiting in front of it. Roughly 86 MB.
 
 Pushing a `v*` tag builds and publishes the image to
-`ghcr.io/arkadianet/ergo-web:<version>` (`.github/workflows/release-image.yml`).
+`ghcr.io/arkadianet/ergo-web:<version>` (`.github/workflows/release.yml`).
 
 ## API
 

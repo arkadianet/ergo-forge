@@ -1,0 +1,70 @@
+name: "ergo-forge contract tests"
+description: "Run ergo-es test on contract.test.json suites: every scenario on the node's own compiler and reducer. Fails the job when any case fails and posts the table to the job summary."
+branding:
+  icon: check-circle
+  color: blue
+inputs:
+  suites:
+    description: "Space-separated paths or globs of contract.test.json files."
+    required: false
+    default: "**/contract.test.json"
+  version:
+    description: "ergo-forge release to use (a tag such as v0.2.0, or 'latest')."
+    required: false
+    default: "latest"
+runs:
+  using: composite
+  steps:
+    - name: Install ergo-es
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        os="$(uname -s | tr '[:upper:]' '[:lower:]')"; arch="$(uname -m)"
+        case "$os-$arch" in
+          linux-x86_64)  asset="ergo-es-linux-x86_64.tar.gz" ;;
+          linux-aarch64) asset="ergo-es-linux-aarch64.tar.gz" ;;
+          darwin-arm64)  asset="ergo-es-macos-arm64.tar.gz" ;;
+          *) echo "no prebuilt ergo-es for $os-$arch"; exit 1 ;;
+        esac
+        mkdir -p "$RUNNER_TEMP/ergo-es"
+        if [ "$VERSION" = "latest" ]; then
+          gh release download --repo arkadianet/ergo-forge --pattern "$asset" --dir "$RUNNER_TEMP/ergo-es"
+        else
+          gh release download "$VERSION" --repo arkadianet/ergo-forge --pattern "$asset" --dir "$RUNNER_TEMP/ergo-es"
+        fi
+        tar -xzf "$RUNNER_TEMP/ergo-es/$asset" -C "$RUNNER_TEMP/ergo-es"
+        chmod +x "$RUNNER_TEMP/ergo-es/ergo-es"
+        echo "$RUNNER_TEMP/ergo-es" >> "$GITHUB_PATH"
+    - name: Run suites
+      shell: bash
+      env:
+        SUITES: ${{ inputs.suites }}
+      run: |
+        set -uo pipefail
+        shopt -s globstar nullglob
+        failed=0; ran=0
+        {
+          echo "## ergo-forge contract tests"
+          echo
+          echo '| suite | result |'
+          echo '|---|---|'
+        } >> "$GITHUB_STEP_SUMMARY"
+        for pattern in $SUITES; do
+          for f in $pattern; do
+            ran=$((ran+1))
+            echo "::group::$f"
+            if out=$(ergo-es test "$f" 2>&1); then
+              echo "$out"; echo "| \`$f\` | ✅ $(echo "$out" | tail -1) |" >> "$GITHUB_STEP_SUMMARY"
+            else
+              rc=$?; echo "$out"; failed=$((failed+1))
+              echo "| \`$f\` | ❌ $(echo "$out" | grep -E 'passed, .* failed' | tail -1) |" >> "$GITHUB_STEP_SUMMARY"
+              echo "$out" | grep '^  FAIL' | sed "s|^|::error file=$f::|"
+            fi
+            echo "::endgroup::"
+          done
+        done
+        if [ "$ran" = "0" ]; then echo "::warning::no suites matched '$SUITES'"; fi
+        exit $failed
