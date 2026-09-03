@@ -1,0 +1,72 @@
+{
+  "source": "/**\n * Swap with someone on another chain (a hashed time lock). You lock funds\n * for a receiver, who can take them only by revealing a secret whose\n * SHA-256 hash you both agreed on \u2014 the same secret unlocks their side of\n * the trade. If they never reveal it, you take the funds back after the\n * deadline.\n * @param receiver Who may claim with the secret? \u2014 Their Ergo address.\n * @param sender Who takes the funds back after the deadline? \u2014 Your own address.\n * @param secretHashSha256 The SHA-256 hash of the secret \u2014 64 hex characters; the secret itself stays private until the claim.\n * @param refundHeight When can you take the funds back? \u2014 Claims stop at this date.\n */\n@contract def htlc(receiver: SigmaProp, sender: SigmaProp, secretHashSha256: Coll[Byte], refundHeight: Int) = {\n  val revealed = getVar[Coll[Byte]](0)\n  val claim = receiver && sigmaProp(revealed.isDefined && sha256(revealed.get) == secretHashSha256 && HEIGHT < refundHeight)\n  val refund = sender && sigmaProp(HEIGHT >= refundHeight)\n  claim || refund\n}\n",
+  "params": {
+    "receiver": {
+      "type": "SigmaProp",
+      "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+    },
+    "sender": {
+      "type": "SigmaProp",
+      "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+    },
+    "secretHashSha256": {
+      "type": "Coll[Byte]",
+      "value": "512a80158f790e78955013c6c2801451cec99a952ab97662f33ac4a39dd78ec0"
+    },
+    "refundHeight": {
+      "type": "Int",
+      "value": 1000
+    }
+  },
+  "scenarios": [
+    {
+      "name": "the receiver claims with the secret before the deadline",
+      "expect": "needsProof",
+      "expectResidual": "0279be66",
+      "expectResidualExcludes": "028333f9",
+      "height": 500,
+      "contextVars": {
+        "0": {
+          "type": "Coll[Byte]",
+          "value": "737761702d736563726574"
+        }
+      }
+    },
+    {
+      "name": "a wrong secret claims nothing",
+      "expect": "fail",
+      "height": 500,
+      "contextVars": {
+        "0": {
+          "type": "Coll[Byte]",
+          "value": "deadbeef"
+        }
+      }
+    },
+    {
+      "name": "no secret at all: nothing before the deadline",
+      "expect": "fail",
+      "height": 500
+    },
+    {
+      "name": "the sender takes the funds back after the deadline",
+      "expect": "needsProof",
+      "expectResidual": "028333f9",
+      "expectResidualExcludes": "0279be66",
+      "height": 1000
+    },
+    {
+      "name": "after the deadline the secret no longer helps the receiver",
+      "expect": "needsProof",
+      "expectResidual": "028333f9",
+      "expectResidualExcludes": "0279be66",
+      "height": 1000,
+      "contextVars": {
+        "0": {
+          "type": "Coll[Byte]",
+          "value": "737761702d736563726574"
+        }
+      }
+    }
+  ]
+}

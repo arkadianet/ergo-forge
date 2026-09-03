@@ -27,7 +27,7 @@ Layout:
 - [`ergo-web/`](ergo-web/) — the HTTP service and the playground UI
   (`ui/`, vanilla JS, nothing loaded from a CDN). Optional explorer lookups
   and per-client rate limiting for a public instance; a container image.
-- [`examples/`](examples/) — 92 contracts (13 recipes and 7 basics written
+- [`examples/`](examples/) — 95 contracts (16 recipes and 7 basics written
   here, 79 real deployed contracts vendored from the node's corpus) and test
   suites.
 - [`docs/workbench-PLAN.md`](docs/workbench-PLAN.md) — the plan and the
@@ -64,7 +64,7 @@ every endpoint and setting.
 
 | Question | Where |
 |---|---|
-| I want a contract that does X, and I don't write code | **Build** mode: pick a recipe (time lock, inheritance, 2-of-3, escrow, refundable payment, savings with a spending limit, subscription, vesting with or without a cliff, token sale, bounty for a secret, price gate, burn), answer its questions in plain terms (addresses, dates, amounts), get an address |
+| I want a contract that does X, and I don't write code | **Build** mode: pick a recipe (time lock, inheritance, 2-of-3, escrow, refundable payment, savings with a spending limit, subscription, vesting with or without a cliff, token sale, NFT sale with a creator royalty, auction to the highest bidder, bounty for a secret, cross-chain swap with a hashed time lock, price gate, burn), answer its questions in plain terms (addresses, dates, amounts), get an address |
 | I want to combine rules: who may spend, under what conditions | **Build → Combine rules yourself**: ways to spend (a key, any/all/k-of-n keys, anyone) with conditions grouped as when (dates, block clock, how long the funds have sat), payments (to someone, in total, kept here, a percentage kept), tokens (spender must hold one, send one, keep this box's, none leave), outside information (oracle floor/ceiling, a data input carrying a token), records (this box's registers, stamping the height, carrying a register over), secrets and attached values and the miner, and the transaction's shape (input/output counts, or a rule on any box); the tool assembles readable ErgoScript and runs generated checks. Also `ergo-es compose spec.json`, `POST /api/v1/compose` |
 | What does this on-chain contract say? | `ergo-es decompile`, `POST /api/v1/inspect`, the reader |
 | Is the code fragile? (unguarded `Option.get`, tiered by who controls the value) | `ergo-es audit`, inspect findings |

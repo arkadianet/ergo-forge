@@ -281,7 +281,10 @@ Still missing (the actual build list):
     against the evaluator. Surfaces: `ergo-es compose`, `POST
     /api/v1/compose`, and "Combine rules yourself" in Build with a checks
     table on the result. Thirteen recipes precede it as the tested clause
-    library.
+    library; three more on 2026-09-03 (auction with bidder refunds, NFT
+    sale with a creator royalty, HTLC with SHA-256 for cross-chain swaps),
+    25 suite cases. Both output-reading recipes first indexed OUTPUTS(0)
+    eagerly and errored on an empty output list; the suites caught it.
     - **Vocabulary widened, 2026-09-03.** The condition set now covers what
       a script can see: block timestamp windows, box age, input/output
       counts, a general box rule (this box / an output / an input / a data

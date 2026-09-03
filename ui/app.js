@@ -594,7 +594,7 @@ async function loadRecipes() {
     const items = await (await fetch("/api/v1/examples")).json();
     const box = $("recipes");
     // Simplest first; anything not listed goes after, alphabetically.
-    const order = ["time-lock", "inheritance", "two-of-three", "escrow", "refundable-payment", "savings-cap", "subscription", "vesting", "cliff-vesting", "token-sale", "bounty", "price-gate", "burn"];
+    const order = ["time-lock", "inheritance", "two-of-three", "escrow", "refundable-payment", "savings-cap", "subscription", "vesting", "cliff-vesting", "token-sale", "nft-sale", "auction", "bounty", "htlc", "price-gate", "burn"];
     const rank = (id) => { const i = order.indexOf(id.split("/").pop()); return i < 0 ? order.length : i; };
     const recipes = items.filter((i) => i.group === "recipes").sort((a, b) => rank(a.id) - rank(b.id) || a.id.localeCompare(b.id));
     for (const it of recipes) {
@@ -639,6 +639,9 @@ const RECIPE_TITLES = {
   "bounty": "Bounty for a secret",
   "price-gate": "Spend only above an oracle price",
   "burn": "Burn address",
+  "auction": "Auction to the highest bidder",
+  "nft-sale": "Sell an NFT with a creator royalty",
+  "htlc": "Swap with another chain (hashed time lock)",
 };
 
 function humanize(name) {
@@ -659,7 +662,9 @@ function fieldKind(p) {
   const t = p.typeHint || "";
   const n = p.name.toLowerCase();
   if (t === "SigmaProp") return "address";
+  if (t === "Coll[Byte]" && /sha256/.test(n)) return "secretSha256";
   if (t === "Coll[Byte]" && /hash/.test(n)) return "secret";
+  if ((t === "Int" || t === "Long") && /percent|pct/.test(n)) return "percent";
   if ((t === "Int" || t === "Long") && /height|deadline|expiry|unlock|until|after/.test(n)) return "height";
   if (t === "Coll[Byte]" && /nft|token|id/.test(n)) return "tokenId";
   if (t === "Long" && /erg|value|amount|fee/.test(n)) return "erg";
@@ -716,7 +721,8 @@ function startRecipe(ex) {
       inp.min = "1";
     }
     else if (kind === "tokenId") { inp.placeholder = "64 hex characters"; inp.spellcheck = false; }
-    else if (kind === "secret") { inp.placeholder = "the secret phrase"; inp.autocomplete = "off"; }
+    else if (kind === "secret" || kind === "secretSha256") { inp.placeholder = "the secret phrase"; inp.autocomplete = "off"; }
+    else if (kind === "percent") { inp.type = "number"; inp.min = "0"; inp.max = "100"; inp.step = "1"; inp.placeholder = "0 to 100"; }
     else if (kind === "erg") { inp.type = "number"; inp.step = "0.000000001"; inp.placeholder = "e.g. 1.5"; }
     else if (kind === "bool") { inp.type = "checkbox"; inp.required = false; }
     else { inp.placeholder = p.typeHint === "Long" || p.typeHint === "Int" ? "a whole number" : (p.typeHint || ""); }
@@ -730,7 +736,7 @@ function startRecipe(ex) {
         : "Enter a block height; there is about one block every 2 minutes. Dates are offered when this instance has an explorer for the chosen network.");
     }
     if (kind === "address" && !help) helpText = "Paste an address from your wallet.";
-    if (kind === "secret") helpText = "Type the secret phrase itself. It is hashed here in your browser; only the hash goes into the contract, and the phrase never leaves this page. Whoever knows the phrase can claim — keep it safe.";
+    if (kind === "secret" || kind === "secretSha256") helpText = "Type the secret phrase itself. It is hashed here in your browser; only the hash goes into the contract, and the phrase never leaves this page. Whoever knows the phrase can claim — keep it safe.";
     helpEl.textContent = helpText;
     const problem = document.createElement("span");
     problem.className = "problem";
@@ -778,6 +784,12 @@ function wizardParams() {
     }
     else if (kind === "tokenId") out[name] = { type: "Coll[Byte]", value: raw.toLowerCase() };
     else if (kind === "secret") out[name] = { type: "Coll[Byte]", value: window.blake2b.blake2bHex(new TextEncoder().encode(raw), null, 32) };
+    else if (kind === "secretSha256") out[name] = { type: "Coll[Byte]", value: window.sha256hex(new TextEncoder().encode(raw)) };
+    else if (kind === "percent") {
+      const n = Number(raw);
+      if (!Number.isInteger(n) || n < 0 || n > 100) return { error: `${label} — a whole number from 0 to 100.` };
+      out[name] = { type, value: n };
+    }
     else if (kind === "erg") out[name] = { type: "Long", value: Math.round(Number(raw) * 1e9) };
     else if (type === "Int" || type === "Long" || type === "Short" || type === "Byte") {
       if (!/^-?\d+$/.test(raw)) return { error: `${label} — a whole number, please.` };
@@ -807,7 +819,8 @@ function describeBuild(params) {
     if (kind === "height") shown = datesAvailable() ? `about ${dateOfHeight(v)} (block ${v})` : `block ${v}`;
     else if (kind === "erg") shown = `${v / 1e9} ERG`;
     else if (kind === "address") shown = shortAddr(v);
-    else if (kind === "secret") shown = `(hash ${String(v).slice(0, 12)}… of the phrase you typed — keep the phrase)`;
+    else if (kind === "secret" || kind === "secretSha256") shown = `(hash ${String(v).slice(0, 12)}… of the phrase you typed — keep the phrase)`;
+    else if (kind === "percent") shown = `${v}%`;
     lines.push(`${label}: ${shown}`);
   }
   return lines.join("\n");
@@ -877,6 +890,9 @@ $("wizard").addEventListener("submit", async (e) => {
     const special = {
       "bounty": "Anyone who knows the secret phrase can claim this before the deadline — no key needed. After the deadline, only the funder can take it back.",
       "price-gate": "Only the owner can spend, and only in a transaction that includes the oracle's box showing a price at or above the floor.",
+      "auction": "Anyone can bid (rebuilding this box with more and refunding the last bidder) until the end date, and anyone can settle after it: you are paid the winning bid and the winner gets the item. You can only take the item back while nobody has bid.",
+      "nft-sale": "Anyone who pays you the price and the creator the royalty in one transaction takes the token — no key needed. Only you can cancel.",
+      "htlc": "The receiver can claim before the deadline by revealing the secret phrase; after it, only you can take the funds back. Share the hash, never the phrase, until the other side of the swap is locked.",
     }[recipe.name];
     $("build-hunt").textContent = special || {
       requiresProof: "Only the people you named can spend from this address, and only under the rules above. Nobody else can.",

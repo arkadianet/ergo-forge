@@ -1,0 +1,570 @@
+{
+  "source": "/**\n * Sell something to the highest bidder. You lock the item (a token) here\n * with a starting price. Anyone can bid by rebuilding this box with a\n * higher amount, which refunds the previous bidder in the same transaction.\n * Once the auction ends, anyone can settle it: you receive the winning bid\n * and the winner receives the item. If nobody bid, you can take the item\n * back.\n * @param seller Who is selling? \u2014 Your Ergo address; it receives the winning bid.\n * @param endHeight When does the auction end? \u2014 Bidding stops at this date; after it the sale settles.\n * @param minBidAmount Starting price? \u2014 The first bid must be at least this.\n * @param minRaiseAmount Minimum raise? \u2014 Each bid must beat the last by at least this.\n */\n@contract def auction(seller: SigmaProp, endHeight: Int, minBidAmount: Long, minRaiseAmount: Long) = {\n  // R4 holds whoever made the current bid; before any bid it is you (or empty).\n  val bidder = SELF.R4[SigmaProp].getOrElse(seller)\n  val noBids = bidder.propBytes == seller.propBytes\n  val floor = if (noBids) minBidAmount else SELF.value + minRaiseAmount\n  val bid = HEIGHT < endHeight && OUTPUTS.size > 1 &&\n    OUTPUTS(0).propositionBytes == SELF.propositionBytes &&\n    OUTPUTS(0).tokens == SELF.tokens &&\n    OUTPUTS(0).value >= floor &&\n    OUTPUTS(0).R4[SigmaProp].isDefined &&\n    OUTPUTS(1).propositionBytes == bidder.propBytes &&\n    OUTPUTS(1).value >= SELF.value\n  val settle = HEIGHT >= endHeight && (!noBids) && OUTPUTS.size > 1 &&\n    OUTPUTS(0).propositionBytes == seller.propBytes &&\n    OUTPUTS(0).value >= SELF.value &&\n    OUTPUTS(1).propositionBytes == bidder.propBytes &&\n    OUTPUTS(1).tokens == SELF.tokens\n  sigmaProp(bid || settle) || (seller && sigmaProp(noBids))\n}\n",
+  "params": {
+    "seller": {
+      "type": "SigmaProp",
+      "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+    },
+    "endHeight": {
+      "type": "Int",
+      "value": 1000
+    },
+    "minBidAmount": {
+      "type": "Long",
+      "value": 1000000000
+    },
+    "minRaiseAmount": {
+      "type": "Long",
+      "value": 100000000
+    }
+  },
+  "scenarios": [
+    {
+      "name": "first bid at the starting price: box rebuilt for the bidder, seed refunded to the seller",
+      "expect": "pass",
+      "height": 500,
+      "selfBox": {
+        "value": 1000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "SigmaProp",
+            "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+          }
+        }
+      },
+      "outputs": [
+        {
+          "ergoTree": "$self",
+          "value": 1000000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "SigmaProp",
+              "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+            }
+          }
+        },
+        {
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197",
+          "value": 1000000
+        }
+      ]
+    },
+    {
+      "name": "a fresh box with no R4 counts as no bids",
+      "expect": "pass",
+      "height": 500,
+      "selfBox": {
+        "value": 1000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "ergoTree": "$self",
+          "value": 1000000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "SigmaProp",
+              "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+            }
+          }
+        },
+        {
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197",
+          "value": 1000000
+        }
+      ]
+    },
+    {
+      "name": "first bid one nanoERG under the starting price: only the seller could sign that",
+      "height": 500,
+      "selfBox": {
+        "value": 1000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "SigmaProp",
+            "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+          }
+        }
+      },
+      "outputs": [
+        {
+          "ergoTree": "$self",
+          "value": 999999999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "SigmaProp",
+              "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+            }
+          }
+        },
+        {
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197",
+          "value": 1000000
+        }
+      ],
+      "expect": "needsProof",
+      "expectResidual": "028333f9",
+      "expectResidualExcludes": "0279be66"
+    },
+    {
+      "name": "a raise by the minimum, refunding the previous bidder",
+      "expect": "pass",
+      "height": 600,
+      "selfBox": {
+        "value": 1000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "SigmaProp",
+            "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+          }
+        }
+      },
+      "outputs": [
+        {
+          "ergoTree": "$self",
+          "value": 1100000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "SigmaProp",
+              "value": "0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+            }
+          }
+        },
+        {
+          "ergoTree": "0008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 1000000000
+        }
+      ]
+    },
+    {
+      "name": "a raise one nanoERG too small",
+      "expect": "fail",
+      "height": 600,
+      "selfBox": {
+        "value": 1000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "SigmaProp",
+            "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+          }
+        }
+      },
+      "outputs": [
+        {
+          "ergoTree": "$self",
+          "value": 1099999999,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "SigmaProp",
+              "value": "0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+            }
+          }
+        },
+        {
+          "ergoTree": "0008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 1000000000
+        }
+      ]
+    },
+    {
+      "name": "a raise that does not refund the previous bidder",
+      "expect": "fail",
+      "height": 600,
+      "selfBox": {
+        "value": 1000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "SigmaProp",
+            "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+          }
+        }
+      },
+      "outputs": [
+        {
+          "ergoTree": "$self",
+          "value": 1100000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "SigmaProp",
+              "value": "0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+            }
+          }
+        },
+        {
+          "ergoTree": "0008cd0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 1000000000
+        }
+      ]
+    },
+    {
+      "name": "a bid that drops the item from the box",
+      "expect": "fail",
+      "height": 600,
+      "selfBox": {
+        "value": 1000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "SigmaProp",
+            "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+          }
+        }
+      },
+      "outputs": [
+        {
+          "ergoTree": "$self",
+          "value": 1100000000,
+          "registers": {
+            "R4": {
+              "type": "SigmaProp",
+              "value": "0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+            }
+          }
+        },
+        {
+          "ergoTree": "0008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 1000000000
+        }
+      ]
+    },
+    {
+      "name": "a bid that forgets to name the bidder in R4",
+      "expect": "fail",
+      "height": 600,
+      "selfBox": {
+        "value": 1000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "SigmaProp",
+            "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+          }
+        }
+      },
+      "outputs": [
+        {
+          "ergoTree": "$self",
+          "value": 1100000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "ergoTree": "0008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 1000000000
+        }
+      ]
+    },
+    {
+      "name": "no bids once the auction has ended",
+      "expect": "fail",
+      "height": 1000,
+      "selfBox": {
+        "value": 1000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "SigmaProp",
+            "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+          }
+        }
+      },
+      "outputs": [
+        {
+          "ergoTree": "$self",
+          "value": 1100000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "SigmaProp",
+              "value": "0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+            }
+          }
+        },
+        {
+          "ergoTree": "0008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 1000000000
+        }
+      ]
+    },
+    {
+      "name": "settle after the end: seller paid the winning bid, winner gets the item, no key needed",
+      "expect": "pass",
+      "height": 1000,
+      "selfBox": {
+        "value": 1100000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "SigmaProp",
+            "value": "0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+          }
+        }
+      },
+      "outputs": [
+        {
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197",
+          "value": 1100000000
+        },
+        {
+          "ergoTree": "0008cd0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 1000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "settling before the end is refused",
+      "expect": "fail",
+      "height": 999,
+      "selfBox": {
+        "value": 1100000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "SigmaProp",
+            "value": "0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+          }
+        }
+      },
+      "outputs": [
+        {
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197",
+          "value": 1100000000
+        },
+        {
+          "ergoTree": "0008cd0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 1000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "settling that shorts the seller",
+      "expect": "fail",
+      "height": 1000,
+      "selfBox": {
+        "value": 1100000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "SigmaProp",
+            "value": "0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+          }
+        }
+      },
+      "outputs": [
+        {
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197",
+          "value": 1099999999
+        },
+        {
+          "ergoTree": "0008cd0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 1000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "settling that sends the item to someone other than the winner",
+      "expect": "fail",
+      "height": 1000,
+      "selfBox": {
+        "value": 1100000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "SigmaProp",
+            "value": "0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+          }
+        }
+      },
+      "outputs": [
+        {
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197",
+          "value": 1100000000
+        },
+        {
+          "ergoTree": "0008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 1000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "with no bids the seller can take the item back (no outputs needed)",
+      "expect": "needsProof",
+      "expectResidual": "028333f9",
+      "height": 50,
+      "selfBox": {
+        "value": 1000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "SigmaProp",
+            "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+          }
+        }
+      }
+    },
+    {
+      "name": "once someone has bid, the seller cannot pull the item",
+      "expect": "fail",
+      "height": 50,
+      "selfBox": {
+        "value": 1000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "SigmaProp",
+            "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+          }
+        }
+      }
+    }
+  ]
+}
