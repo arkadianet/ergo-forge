@@ -1,0 +1,97 @@
+{
+  "witness": {
+    "0": {
+      "type": "Coll[Byte]",
+      "value": "6f70656e20736573616d65"
+    }
+  },
+  "paths": [
+    {
+      "name": "owner ticks the box",
+      "who": {
+        "anyOf": [
+          "owner"
+        ]
+      },
+      "conditions": [
+        {
+          "box": {
+            "which": "output",
+            "index": 0,
+            "script": "self",
+            "keepsSelfTokens": true,
+            "valueAtLeastShare": {
+              "percent": "keepPct"
+            },
+            "registers": [
+              {
+                "reg": "R4",
+                "type": "Int",
+                "op": "eqHeight"
+              },
+              {
+                "reg": "R5",
+                "type": "Coll[Byte]",
+                "op": "eqSelf"
+              }
+            ]
+          }
+        },
+        {
+          "payTo": {
+            "key": "feeTo",
+            "amount": "fee"
+          }
+        },
+        {
+          "boxAge": "cooldown"
+        }
+      ]
+    },
+    {
+      "name": "anyone closes it on a low price with the secret",
+      "who": {
+        "anyOne": true
+      },
+      "conditions": [
+        {
+          "box": {
+            "which": "dataInput",
+            "index": 0,
+            "token": {
+              "id": "oracleNFT"
+            },
+            "registers": [
+              {
+                "reg": "R4",
+                "type": "Long",
+                "op": "lte",
+                "value": "ceiling"
+              }
+            ]
+          }
+        },
+        {
+          "hashPreimage": {
+            "var": 0,
+            "hash": "secretHash"
+          }
+        },
+        {
+          "sumPaidTo": {
+            "key": "owner",
+            "atLeast": "refund"
+          }
+        },
+        {
+          "box": {
+            "which": "output",
+            "index": "all",
+            "noTokens": true
+          }
+        }
+      ]
+    }
+  ],
+  "_comment": "ergo-es compose examples/compose/state-box.json --params examples/compose/state-box.params.json \u2014 a token-carrying state box: the owner may tick it (keeping the token, stamping the height, carrying R5 over, paying a fee, after a cooldown) or anyone may close it once the oracle price is low enough, revealing the secret phrase 'open sesame' and refunding the owner."
+}

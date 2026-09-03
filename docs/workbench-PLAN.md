@@ -282,6 +282,22 @@ Still missing (the actual build list):
     /api/v1/compose`, and "Combine rules yourself" in Build with a checks
     table on the result. Thirteen recipes precede it as the tested clause
     library.
+    - **Vocabulary widened, 2026-09-03.** The condition set now covers what
+      a script can see: block timestamp windows, box age, input/output
+      counts, a general box rule (this box / an output / an input / a data
+      input; by index, any, or all; script, value, share of SELF.value,
+      token with amount, no tokens, tokens preserved, R4..R9 typed
+      comparisons incl. `eqHeight` and `eqSelf`), context variables,
+      hash preimages (blake2b256/sha256, with a `witness` for the checks),
+      token gating over inputs, the miner key, and paid totals via a fold.
+      The model got a real world (self box with tokens/registers/creation
+      height, extra inputs, data inputs, vars, timestamp, miner); violation
+      cases break the most specific requirement; contradictory paths are
+      refused rather than passing vacuously. The UI's "Combine rules
+      yourself" lists 24 conditions in seven plain-language groups plus an
+      advanced box-rule form; verified headless (3 paths, 15 checks green).
+      Still outside the composer: AVL-tree proofs, arbitrary arithmetic and
+      folds beyond sums, sigma protocols beyond keys — Write mode.
 13. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.

@@ -1,0 +1,38 @@
+{
+  "owner": {
+    "type": "SigmaProp",
+    "value": "9fMPy1XY3GW4T6t3LjYofqmzER6x9cV21n5UVJTWmma4Y9mAW6c"
+  },
+  "feeTo": {
+    "type": "SigmaProp",
+    "value": "9fMPy1XY3GW4T6t3LjYofqmzER6x9cV21n5UVJTWmma4Y9mAW6c"
+  },
+  "keepPct": {
+    "type": "Long",
+    "value": 95
+  },
+  "fee": {
+    "type": "Long",
+    "value": 10000000
+  },
+  "cooldown": {
+    "type": "Int",
+    "value": 720
+  },
+  "oracleNFT": {
+    "type": "Coll[Byte]",
+    "value": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+  },
+  "ceiling": {
+    "type": "Long",
+    "value": 500
+  },
+  "secretHash": {
+    "type": "Coll[Byte]",
+    "value": "928db2d7bd4e793d9cc22938b5a960aaf601d4409c2bafb096d95046f61f65ad"
+  },
+  "refund": {
+    "type": "Long",
+    "value": 500000000
+  }
+}
