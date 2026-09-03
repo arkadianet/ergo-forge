@@ -143,6 +143,30 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
   </main>
 
   <section class="scenario">
+    <h2>Tests</h2>
+    <p class="hint">Named scenarios with the verdict each must produce, run
+       against the editor's compiled contract. Save the whole thing as
+       <code>contract.test.json</code> and run <code>ergo-es test</code> in CI.</p>
+    <label for="tests">Scenarios JSON — an array of <code>{ name, expect, ...scenario }</code></label>
+    <textarea id="tests" rows="7" spellcheck="false">[
+  { "name": "locked one block before", "expect": "fail", "height": 1000 },
+  { "name": "unlocked one block after", "expect": "pass", "height": 1001 }
+]</textarea>
+    <div class="write-row">
+      <button id="run-tests">Run tests</button>
+      <button id="export-tests" class="secondary">Copy contract.test.json</button>
+    </div>
+    <p id="tests-status" class="status" hidden></p>
+    <div id="tests-result" hidden>
+      <p id="tests-summary" class="hunt-verdict"></p>
+      <table class="probes">
+        <thead><tr><th></th><th>case</th><th>expected</th><th>got</th><th>cost</th><th>detail</th></tr></thead>
+        <tbody id="tests-rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="scenario">
     <h2>Scenario</h2>
     <p class="hint">Test a contract against a spending context on the consensus
        reducer. A scenario without <code>source</code> or <code>tree</code>

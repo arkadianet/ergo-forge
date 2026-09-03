@@ -169,6 +169,17 @@ template}` for one. Files under `EXAMPLES_DIR` (default `examples/contracts`;
 `examples/contracts/ORIGIN.md`). `template` marks EIP-5 `@contract def`
 sources, which cannot be parameterised yet.
 
+### `POST /api/v1/test`
+
+Run a contract test suite: the contract (`source` + `params`, or `tree`) and
+named `scenarios`, each a scenario with a `name` and the verdict it must
+produce (`expect`: `pass` / `fail` / `error` / `needsProof` / `proofAccepted`
+/ `proofRejected`). The contract compiles once; every case runs against it.
+The response lists each case with expected and actual verdicts, `passed`,
+the error text when the script threw, the residual proposition, and cost,
+plus `passed`/`failed` totals. Same file shape as `ergo-es test` — see
+`examples/tests/*.test.json`.
+
 ### `POST /api/v1/eval`
 
 Run a scenario — contract plus spending context — on the consensus reducer.

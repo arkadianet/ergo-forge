@@ -51,6 +51,7 @@ pub mod hunt;
 pub mod inspect;
 pub mod method_names;
 pub mod scenario;
+pub mod testsuite;
 
 pub use audit::{Finding, Severity};
 pub use compile::{compile_source, CompileOutput};

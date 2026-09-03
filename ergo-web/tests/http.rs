@@ -542,3 +542,41 @@ async fn compile_accepts_an_eip5_template_with_params() {
     assert_eq!(res["source"], "HEIGHT > 100", "{res}");
     assert_eq!(res["template"], true);
 }
+
+// ── /api/v1/test ────────────────────────────────────────────────────────────
+
+#[tokio::test]
+async fn test_endpoint_runs_a_suite_and_reports_each_case() {
+    let base = spawn().await;
+    let r = reqwest::Client::new()
+        .post(format!("{base}/api/v1/test"))
+        .json(&serde_json::json!({
+            "source": "sigmaProp(HEIGHT > $h)",
+            "params": { "h": { "type": "Int", "value": 100 } },
+            "scenarios": [
+                { "name": "before", "expect": "fail", "height": 50 },
+                { "name": "after", "expect": "pass", "height": 150 }
+            ]
+        }))
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(r.status(), 200);
+    let res: serde_json::Value = r.json().await.unwrap();
+    assert_eq!(res["passed"], 2, "{res}");
+    assert_eq!(res["failed"], 0);
+    assert_eq!(res["cases"][1]["actual"], "pass");
+    assert_eq!(res["cases"][1]["passed"], true);
+}
+
+#[tokio::test]
+async fn test_endpoint_reports_a_non_compiling_contract_as_400() {
+    let base = spawn().await;
+    let r = reqwest::Client::new()
+        .post(format!("{base}/api/v1/test"))
+        .json(&serde_json::json!({ "source": "sigmaProp(HEIGHT >", "scenarios": [] }))
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(r.status(), 400);
+}

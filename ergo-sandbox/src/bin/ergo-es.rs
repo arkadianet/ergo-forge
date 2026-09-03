@@ -26,6 +26,7 @@ fn main() -> ExitCode {
         "roundtrip" => cmd_roundtrip(rest),
         "audit" => cmd_audit(rest),
         "hunt" => cmd_hunt(rest),
+        "test" => cmd_test(rest),
         "help" | "--help" | "-h" => {
             usage();
             return ExitCode::SUCCESS;
@@ -54,6 +55,9 @@ USAGE:
                   [--params params.json]
       Compile ErgoScript source to ErgoTree bytes + P2S/P2SH addresses.
       --params supplies compile-time constants (JSON: name -> {{type, value}}).
+  ergo-es test <contract.test.json>
+      Run a contract test suite (source or tree + named scenarios with
+      expected verdicts); one line per case, non-zero exit on any failure.
   ergo-es params <source-file>
       List the $parameters a source needs (with // $name: Type hints).
   ergo-es eval <scenario.json> [--hot-spots]
@@ -838,5 +842,39 @@ fn hunt_verdict_str(v: ergo_sandbox::hunt::HuntVerdict) -> &'static str {
         MovableByAnyone => "movable by anyone",
         RequiresProof => "requires proof",
         NotUnderProbes => "not under probes",
+    }
+}
+
+/// `ergo-es test <suite.json>` — the CI entry point for contract tests.
+fn cmd_test(args: &[String]) -> Result<(), String> {
+    let Some(path) = args.first() else {
+        return Err("test needs a suite JSON file (or - for stdin)".into());
+    };
+    let text = read_input(path)?;
+    let suite: ergo_sandbox::testsuite::Suite =
+        serde_json::from_str(&text).map_err(|e| format!("suite JSON: {e}"))?;
+    let r = ergo_sandbox::decompile::with_large_stack(move || ergo_sandbox::testsuite::run(&suite))
+        .map_err(|e| e.to_string())?;
+    println!("contract: {}", r.address);
+    for c in &r.cases {
+        let mark = if c.passed { "ok  " } else { "FAIL" };
+        let detail = match (&c.error, &c.reduced_to) {
+            (Some(e), _) => format!("  ({e})"),
+            (None, Some(red)) if c.actual == "needsProof" => format!("  -> {red}"),
+            _ => String::new(),
+        };
+        println!(
+            "  {mark}  {:<40} expected {:<13} got {:<13} cost {}{detail}",
+            truncate(&c.name, 40),
+            c.expected,
+            c.actual,
+            c.cost
+        );
+    }
+    println!("{} passed, {} failed", r.passed, r.failed);
+    if r.failed > 0 {
+        Err(format!("{} case(s) failed", r.failed))
+    } else {
+        Ok(())
     }
 }

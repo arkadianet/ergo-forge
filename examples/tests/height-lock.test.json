@@ -1,0 +1,8 @@
+{
+  "source": "// $unlockHeight: Int\nsigmaProp(HEIGHT > $unlockHeight)",
+  "params": { "unlockHeight": { "type": "Int", "value": 1000 } },
+  "scenarios": [
+    { "name": "locked one block before the height", "expect": "fail", "height": 1000 },
+    { "name": "unlocked one block after", "expect": "pass", "height": 1001 }
+  ]
+}
