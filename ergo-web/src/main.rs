@@ -22,9 +22,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Some(u) => tracing::info!("chain lookups enabled via {u}"),
         None => tracing::info!("chain lookups disabled (no EXPLORER_URL); no outbound calls"),
     }
-    axum::serve(listener, ergo_web::app::router_with(cfg))
-        .with_graceful_shutdown(shutdown_signal())
-        .await?;
+    match cfg.rate_limit_per_minute {
+        Some(n) => tracing::info!(
+            "rate limiting engine routes at {n}/min per client (trust_proxy={})",
+            cfg.trust_proxy
+        ),
+        None => tracing::info!("no rate limiting (leave it to the reverse proxy)"),
+    }
+    axum::serve(
+        listener,
+        ergo_web::app::router_with(cfg).into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .with_graceful_shutdown(shutdown_signal())
+    .await?;
     Ok(())
 }
 
