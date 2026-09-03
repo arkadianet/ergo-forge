@@ -3,8 +3,11 @@
 `basics/` and `recipes/` are written for this playground. `recipes/` are
 EIP-5 `@contract def` templates whose doc block and `@param` lines are
 written as questions for non-technical users: the Build mode is a form over
-them. The stateful ones (vesting, token sale) ship with a test suite in
-`examples/tests/` that pins every path — run `ergo-es test` on it.
+them. Every recipe with state or more than one spending path ships with a test
+suite in `examples/tests/` that pins each path — run `ergo-es test` on it.
+Writing those suites is how the recipes were found correct (the
+subscription's last-payment path indexed a second output that need not
+exist until its suite said so).
 
 Every other directory is a **real, deployed ErgoScript source**, vendored
 verbatim from the Ergo node's parser corpus

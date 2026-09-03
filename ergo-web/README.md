@@ -220,7 +220,11 @@ ergIn, ergOut, height}`.
 Run a contract test suite: the contract (`source` + `params`, or `tree`) and
 named `scenarios`, each a scenario with a `name` and the verdict it must
 produce (`expect`: `pass` / `fail` / `error` / `needsProof` / `proofAccepted`
-/ `proofRejected`). The contract compiles once; every case runs against it. In any scenario
+/ `proofRejected`). The contract compiles once; every case runs against it. A case may also assert on
+WHO may spend with `expectResidual` / `expectResidualExcludes` (substrings of
+the reduced sigma proposition, e.g. a key's hex prefix or `OR(`) — the way
+to tell "the receiver may claim" from "only the funder may cancel" when both
+are `needsProof`. In any scenario
 box, `"ergoTree": "$self"` stands for the contract under test (its tree is
 not known when the suite is written) — the way to assert "the rest stays
 under this contract".

@@ -1,0 +1,63 @@
+{
+  "source": "/**\n * Pay whoever can reveal a secret. You lock funds against the hash of a\n * secret phrase; anyone who presents the phrase itself (in their spending\n * transaction) can take the funds. You can reclaim after a deadline if\n * nobody does.\n * @param secretHash The hash of the secret \u2014 blake2b256 of the secret, as 64 hex characters (never the secret itself).\n * @param funder Who may reclaim after the deadline? \u2014 Your own address.\n * @param deadlineHeight Until when can the secret be claimed? \u2014 After this you may take the funds back.\n */\n@contract def bounty(secretHash: Coll[Byte], funder: SigmaProp, deadlineHeight: Int) = {\n  val revealed = getVar[Coll[Byte]](0)\n  val claimed = revealed.isDefined && blake2b256(revealed.get) == secretHash && HEIGHT < deadlineHeight\n  sigmaProp(claimed) || (funder && sigmaProp(HEIGHT >= deadlineHeight))\n}\n",
+  "params": {
+    "secretHash": {
+      "type": "Coll[Byte]",
+      "value": "928db2d7bd4e793d9cc22938b5a960aaf601d4409c2bafb096d95046f61f65ad"
+    },
+    "funder": {
+      "type": "SigmaProp",
+      "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+    },
+    "deadlineHeight": {
+      "type": "Int",
+      "value": 5000
+    }
+  },
+  "scenarios": [
+    {
+      "name": "revealing the secret before the deadline takes the bounty, no key needed",
+      "expect": "pass",
+      "height": 100,
+      "contextVars": {
+        "0": {
+          "type": "raw",
+          "value": "0e0b6f70656e20736573616d65"
+        }
+      }
+    },
+    {
+      "name": "a wrong secret gets nothing before the deadline",
+      "expect": "fail",
+      "height": 100,
+      "contextVars": {
+        "0": {
+          "type": "Coll[Byte]",
+          "value": "deadbeef"
+        }
+      }
+    },
+    {
+      "name": "no secret before the deadline: nothing",
+      "expect": "fail",
+      "height": 100
+    },
+    {
+      "name": "after the deadline the funder may reclaim",
+      "expect": "needsProof",
+      "expectResidual": "0279be",
+      "height": 6000
+    },
+    {
+      "name": "after the deadline the secret no longer works alone",
+      "expect": "needsProof",
+      "height": 6000,
+      "contextVars": {
+        "0": {
+          "type": "raw",
+          "value": "0e0b6f70656e20736573616d65"
+        }
+      }
+    }
+  ]
+}

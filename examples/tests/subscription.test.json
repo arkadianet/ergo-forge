@@ -1,0 +1,159 @@
+{
+  "source": "/**\n * Pay someone a fixed amount at most once every so many blocks, from a\n * pot you fund up front. The receiver claims one payment per period; the\n * rest stays in the pot. You can take back whatever is left at any time.\n * @param receiver Who gets paid? \u2014 Their Ergo address.\n * @param funder Who funded the pot and may cancel? \u2014 Your own address.\n * @param amount How much per payment, in nanoERG \u2014 1 ERG = 1,000,000,000 nanoERG.\n * @param periodBlocks How many blocks between payments? \u2014 About 720 per day, 21,600 per month.\n */\n@contract def subscription(receiver: SigmaProp, funder: SigmaProp, amount: Long, periodBlocks: Int) = {\n  // R4 of the pot records the height of the last claim (absent = never).\n  val lastClaim = SELF.R4[Int].getOrElse(0)\n  val due = HEIGHT >= lastClaim + periodBlocks\n  val payment = OUTPUTS(0)\n  val paidReceiver = payment.propositionBytes == receiver.propBytes && payment.value >= amount\n  val potKept = OUTPUTS.size > 1 &&\n                OUTPUTS(1).propositionBytes == SELF.propositionBytes &&\n                OUTPUTS(1).value >= SELF.value - amount &&\n                OUTPUTS(1).R4[Int].getOrElse(0) == HEIGHT\n  val lastPayment = SELF.value <= amount && payment.propositionBytes == receiver.propBytes && payment.value >= SELF.value\n  funder || (receiver && sigmaProp(due && ((paidReceiver && potKept) || lastPayment)))\n}\n",
+  "params": {
+    "receiver": {
+      "type": "SigmaProp",
+      "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+    },
+    "funder": {
+      "type": "SigmaProp",
+      "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+    },
+    "amount": {
+      "type": "Long",
+      "value": 100
+    },
+    "periodBlocks": {
+      "type": "Int",
+      "value": 720
+    }
+  },
+  "scenarios": [
+    {
+      "name": "first payment once a period has passed, pot keeps the rest and records the claim height",
+      "expect": "needsProof",
+      "expectResidual": "028333",
+      "height": 800,
+      "selfBox": {
+        "value": 1000
+      },
+      "outputs": [
+        {
+          "value": 100,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        },
+        {
+          "value": 900,
+          "ergoTree": "$self",
+          "registers": {
+            "R4": {
+              "type": "Int",
+              "value": 800
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "too early: only the funder could act",
+      "expect": "needsProof",
+      "expectResidualExcludes": "028333",
+      "height": 800,
+      "selfBox": {
+        "value": 1000,
+        "registers": {
+          "R4": {
+            "type": "Int",
+            "value": 500
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 100,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        },
+        {
+          "value": 900,
+          "ergoTree": "$self",
+          "registers": {
+            "R4": {
+              "type": "Int",
+              "value": 800
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "taking more than one payment is refused (funder only)",
+      "expect": "needsProof",
+      "expectResidualExcludes": "028333",
+      "height": 800,
+      "selfBox": {
+        "value": 1000
+      },
+      "outputs": [
+        {
+          "value": 300,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        },
+        {
+          "value": 700,
+          "ergoTree": "$self",
+          "registers": {
+            "R4": {
+              "type": "Int",
+              "value": 800
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "not recording the claim height is refused (funder only)",
+      "expect": "needsProof",
+      "expectResidualExcludes": "028333",
+      "height": 800,
+      "selfBox": {
+        "value": 1000
+      },
+      "outputs": [
+        {
+          "value": 100,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        },
+        {
+          "value": 900,
+          "ergoTree": "$self",
+          "registers": {
+            "R4": {
+              "type": "Int",
+              "value": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "the last payment may empty the pot",
+      "expect": "needsProof",
+      "expectResidual": "028333",
+      "height": 800,
+      "selfBox": {
+        "value": 80
+      },
+      "outputs": [
+        {
+          "value": 80,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        }
+      ]
+    },
+    {
+      "name": "the funder can always cancel",
+      "expect": "needsProof",
+      "expectResidual": "0279be",
+      "height": 10,
+      "selfBox": {
+        "value": 1000
+      },
+      "outputs": [
+        {
+          "value": 1000,
+          "ergoTree": "0008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+        }
+      ]
+    }
+  ]
+}

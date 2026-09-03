@@ -9,13 +9,27 @@ inputs:
     required: false
     default: "**/contract.test.json"
   version:
-    description: "ergo-forge release to use (a tag such as v0.2.0, or 'latest')."
+    description: "ergo-forge release to use (a tag such as v0.2.0, or 'latest'), or 'source' to build ergo-es from the checked-out ergo-forge workspace (for this repo's own suites)."
     required: false
     default: "latest"
 runs:
   using: composite
   steps:
+    - name: Rust toolchain (source builds only)
+      if: ${{ inputs.version == 'source' }}
+      uses: dtolnay/rust-toolchain@stable
+    - name: Cache (source builds only)
+      if: ${{ inputs.version == 'source' }}
+      uses: Swatinem/rust-cache@v2
+    - name: Build ergo-es from source
+      if: ${{ inputs.version == 'source' }}
+      shell: bash
+      run: |
+        set -euo pipefail
+        cargo build --release -p ergo-sandbox --bin ergo-es
+        echo "$PWD/target/release" >> "$GITHUB_PATH"
     - name: Install ergo-es
+      if: ${{ inputs.version != 'source' }}
       shell: bash
       env:
         VERSION: ${{ inputs.version }}

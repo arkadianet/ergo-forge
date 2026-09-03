@@ -63,7 +63,9 @@ pub struct Scenario {
     #[serde(default)]
     pub data_inputs: Vec<ScenarioBox>,
     /// Context variables (the spending proof's extension), keyed by var id.
-    #[serde(default)]
+    /// JSON keys are strings ("0"); accepted as such even where serde's
+    /// `flatten` (test-suite cases) cannot convert integer keys itself.
+    #[serde(default, deserialize_with = "de_var_map")]
     pub context_vars: BTreeMap<u8, TypedValue>,
     /// Miner public key, 33-byte hex (0xAC). Defaults to all-zero.
     #[serde(default)]
@@ -86,6 +88,23 @@ pub struct Scenario {
     /// real spends sign the transaction bytes.
     #[serde(default)]
     pub message: Option<String>,
+}
+
+/// Deserialize `{"0": …, "1": …}` (or integer keys) into a `u8`-keyed map.
+fn de_var_map<'de, D>(d: D) -> Result<BTreeMap<u8, TypedValue>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    use serde::de::Error;
+    let raw: BTreeMap<String, TypedValue> = BTreeMap::deserialize(d)?;
+    raw.into_iter()
+        .map(|(k, v)| {
+            k.trim()
+                .parse::<u8>()
+                .map(|id| (id, v))
+                .map_err(|_| D::Error::custom(format!("context var id `{k}` is not 0..=255")))
+        })
+        .collect()
 }
 
 /// Pre-header fields (SPreHeader). All optional; defaults are zero.

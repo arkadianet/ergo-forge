@@ -37,9 +37,17 @@ pub struct Suite {
 
 /// One case: a scenario plus a name and the verdict it must produce.
 #[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Case {
     pub name: String,
     pub expect: Expect,
+    /// A substring the residual proposition must contain (e.g. a key's hex
+    /// prefix), for `needsProof` cases where WHO may spend is the point.
+    #[serde(default)]
+    pub expect_residual: Option<String>,
+    /// A substring the residual proposition must NOT contain.
+    #[serde(default)]
+    pub expect_residual_excludes: Option<String>,
     #[serde(flatten)]
     pub scenario: Scenario,
 }
@@ -183,15 +191,37 @@ pub fn run(suite: &Suite) -> Result<SuiteResult, SuiteError> {
         });
         let expected = expect_name(case.expect);
         let result = match eval_scenario(&sc) {
-            Ok(o) => CaseResult {
-                name: case.name.clone(),
-                expected,
-                actual: verdict_name(o.verdict),
-                passed: case.expect.matches(o.verdict),
-                error: o.error,
-                reduced_to: o.reduced_to,
-                cost: o.cost,
-            },
+            Ok(o) => {
+                let mut passed = case.expect.matches(o.verdict);
+                let mut error = o.error;
+                let residual = o.reduced_to.clone().unwrap_or_default();
+                if passed {
+                    if let Some(want) = &case.expect_residual {
+                        if !residual.contains(want.as_str()) {
+                            passed = false;
+                            error =
+                                Some(format!("residual `{residual}` does not contain `{want}`"));
+                        }
+                    }
+                }
+                if passed {
+                    if let Some(bad) = &case.expect_residual_excludes {
+                        if residual.contains(bad.as_str()) {
+                            passed = false;
+                            error = Some(format!("residual `{residual}` contains `{bad}`"));
+                        }
+                    }
+                }
+                CaseResult {
+                    name: case.name.clone(),
+                    expected,
+                    actual: verdict_name(o.verdict),
+                    passed,
+                    error,
+                    reduced_to: o.reduced_to,
+                    cost: o.cost,
+                }
+            }
             Err(e) => CaseResult {
                 name: case.name.clone(),
                 expected,

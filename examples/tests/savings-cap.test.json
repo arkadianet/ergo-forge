@@ -1,0 +1,107 @@
+{
+  "source": "/**\n * A savings box you can only draw from a little at a time: at most a fixed\n * amount per period, the rest staying locked. A guard against spending it\n * all at once. Closing the box entirely needs a second, backup key.\n * @param owner Who may withdraw? \u2014 Your everyday address.\n * @param backup Who may empty the box together with the owner? \u2014 A backup key kept safely.\n * @param cap How much may be taken per period, in nanoERG \u2014 1 ERG = 1,000,000,000 nanoERG.\n * @param periodBlocks How many blocks between withdrawals? \u2014 About 720 per day.\n */\n@contract def savingsCap(owner: SigmaProp, backup: SigmaProp, cap: Long, periodBlocks: Int) = {\n  val lastDraw = SELF.R4[Int].getOrElse(0)\n  val due = HEIGHT >= lastDraw + periodBlocks\n  val rest = OUTPUTS(0)\n  val smallDraw = rest.propositionBytes == SELF.propositionBytes &&\n                  rest.value >= SELF.value - cap &&\n                  rest.R4[Int].get == HEIGHT\n  (owner && sigmaProp(due && smallDraw)) || (owner && backup)\n}\n",
+  "params": {
+    "owner": {
+      "type": "SigmaProp",
+      "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+    },
+    "backup": {
+      "type": "SigmaProp",
+      "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+    },
+    "cap": {
+      "type": "Long",
+      "value": 100
+    },
+    "periodBlocks": {
+      "type": "Int",
+      "value": 720
+    }
+  },
+  "scenarios": [
+    {
+      "name": "a small draw once a period has passed, recording the height",
+      "expect": "needsProof",
+      "height": 800,
+      "selfBox": {
+        "value": 1000
+      },
+      "outputs": [
+        {
+          "value": 900,
+          "ergoTree": "$self",
+          "registers": {
+            "R4": {
+              "type": "Int",
+              "value": 800
+            }
+          }
+        }
+      ],
+      "expectResidual": "OR("
+    },
+    {
+      "name": "drawing more than the cap needs the backup key too",
+      "expect": "needsProof",
+      "height": 800,
+      "selfBox": {
+        "value": 1000
+      },
+      "outputs": [
+        {
+          "value": 700,
+          "ergoTree": "$self",
+          "registers": {
+            "R4": {
+              "type": "Int",
+              "value": 800
+            }
+          }
+        }
+      ],
+      "expectResidualExcludes": "OR("
+    },
+    {
+      "name": "drawing again too soon needs the backup key too",
+      "expect": "needsProof",
+      "height": 900,
+      "selfBox": {
+        "value": 1000,
+        "registers": {
+          "R4": {
+            "type": "Int",
+            "value": 800
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 900,
+          "ergoTree": "$self",
+          "registers": {
+            "R4": {
+              "type": "Int",
+              "value": 900
+            }
+          }
+        }
+      ],
+      "expectResidualExcludes": "OR("
+    },
+    {
+      "name": "owner and backup together may empty the box",
+      "expect": "needsProof",
+      "expectResidual": "AND(",
+      "height": 10,
+      "selfBox": {
+        "value": 1000
+      },
+      "outputs": [
+        {
+          "value": 1000,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        }
+      ]
+    }
+  ]
+}
