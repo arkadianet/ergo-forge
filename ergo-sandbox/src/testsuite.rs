@@ -120,6 +120,8 @@ pub enum SuiteError {
         "scenario `{name}` names its own source/tree; the suite's contract is what is under test"
     )]
     ScenarioHasContract { name: String },
+    #[error("unknown network {0:?}; expected \"mainnet\" or \"testnet\"")]
+    Network(String),
     #[error("contract: {0}")]
     Compile(#[from] ParamError),
     #[error("{0}")]
@@ -129,8 +131,9 @@ pub enum SuiteError {
 /// Compile the contract once, then run every case against it.
 pub fn run(suite: &Suite) -> Result<SuiteResult, SuiteError> {
     let network = match suite.network.as_deref() {
+        None | Some("mainnet") => NetworkPrefix::Mainnet,
         Some("testnet") => NetworkPrefix::Testnet,
-        _ => NetworkPrefix::Mainnet,
+        Some(other) => return Err(SuiteError::Network(other.to_string())),
     };
     let tree_hex = match (&suite.source, &suite.tree) {
         (Some(_), Some(_)) => return Err(SuiteError::BothContracts),

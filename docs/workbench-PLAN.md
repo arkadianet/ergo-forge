@@ -273,8 +273,8 @@ Still missing (the actual build list):
   originally planned is **deferred, not cancelled**: it buys nothing until a
   browser build wants decompile without `eval`/`scenario` (P4), and the P2.5
   module split makes extracting it mechanical when that day comes.
-- CLI shell: `ergo-sandbox/src/bin/ergo-es.rs` (`compile` / `eval` /
-  `decompile` / `roundtrip`).
+- CLI shell: `ergo-sandbox/src/bin/ergo-es.rs` (`compile` / `params` /
+  `eval` / `decompile` / `roundtrip` / `audit` / `hunt` / `test`).
 - Web: `ergo-web` (workspace member, P4a) — axum service over `ergo-sandbox`
   plus the no-bundler UI in `ui/`. The WASM build originally planned here is
   blocked (see P4); the HTTP API is the stable boundary in the meantime.

@@ -149,7 +149,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
        <code>contract.test.json</code> and run <code>ergo-es test</code> in CI.</p>
     <label for="tests">Scenarios JSON — an array of <code>{ name, expect, ...scenario }</code></label>
     <textarea id="tests" rows="7" spellcheck="false">[
-  { "name": "locked one block before", "expect": "fail", "height": 1000 },
+  { "name": "still locked at the unlock height", "expect": "fail", "height": 1000 },
   { "name": "unlocked one block after", "expect": "pass", "height": 1001 }
 ]</textarea>
     <div class="write-row">

@@ -97,3 +97,16 @@ fn an_unknown_expectation_is_rejected_at_parse_time() {
     )
     .is_err());
 }
+
+#[test]
+fn an_unknown_network_name_is_rejected() {
+    let err = run(&suite(
+        r#"{ "source": "sigmaProp(true)", "network": "testnet ", "scenarios": [] }"#,
+    ))
+    .unwrap_err();
+    assert!(err.to_string().contains("network"), "{err}");
+    assert!(run(&suite(
+        r#"{ "source": "sigmaProp(true)", "network": "testnet", "scenarios": [] }"#
+    ))
+    .is_ok());
+}
