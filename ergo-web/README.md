@@ -219,15 +219,47 @@ ergIn, ergOut, height}`.
 
 `{spec, params?, run?}` → `{source, params, suite?, results?}`. A `spec` is a
 list of spending paths, each `who` (`{anyOne: true}`, `{anyOf: [names]}`,
-`{allOf: [names]}`, `{kOf: k, keys: [names]}`) plus `conditions`
-(`{after: name}`, `{before: name}`, `{payTo: {key, amount}}`,
-`{keepHere: {atLeast: name}}`, `{oracleAbove: {nft, floor}}`); names are
-parameter names. Paths are OR-ed, a path's conditions AND-ed. The source is
-readable ErgoScript with `$name` params. With `params` values, a test suite
-is generated whose expected verdicts come from the composer's own model of
-the rules — running it (`run: true`, or `ergo-es test`) checks that the
-assembled ErgoScript means what the spec says. A path that anyone may take
-with no conditions is refused.
+`{allOf: [names]}`, `{kOf: k, keys: [names]}`) plus `conditions`; names are
+parameter names. Paths are OR-ed, a path's conditions AND-ed. The
+conditions cover what a script can see of the spending transaction:
+
+| Condition | Meaning |
+|---|---|
+| `{after: h}` / `{before: h}` | `HEIGHT >= $h` / `HEIGHT < $h` |
+| `{afterTime: t}` / `{beforeTime: t}` | the block's timestamp (Unix ms) at or after / before `$t` |
+| `{boxAge: n}` | the box has sat here at least `$n` blocks (`HEIGHT - SELF.creationInfo._1`) |
+| `{inputCount: n}` / `{outputCount: n}` | `INPUTS.size == $n` / `OUTPUTS.size == $n` |
+| `{payTo: {key, amount}}` | the next output slot pays `$key` at least `$amount` |
+| `{keepHere: {atLeast}}` | the next output slot stays under this contract with at least `$atLeast` |
+| `{sumPaidTo: {key, atLeast}}` | outputs to `$key` add up to at least `$atLeast` (a fold) |
+| `{oracleAbove: {nft, floor}}` | data input 0 carries `$nft` and its `R4[Long] >= $floor` |
+| `{tokenGated: {tokenId}}` | some input carries `$tokenId` (a membership token) |
+| `{varEquals: {index, type, value}}` | the spender attaches context variable `index` equal to `$value` |
+| `{hashPreimage: {var, hash, algo?}}` | `blake2b256`/`sha256` of context variable `var` equals `$hash` |
+| `{minerIs: m}` | `CONTEXT.minerPubKey == $m` |
+| `{box: rule}` | a rule on one box, below |
+
+A **box rule** names a box — `which`: `output`, `input`, `dataInput` or
+`self`; `index`: a number, `"any"` (exists) or `"all"` (forall); an output
+with no index takes the next free slot — and requires any of: `script`
+(`"self"` for this same contract, or `{key}`), `valueAtLeast`,
+`valueAtLeastShare: {percent}` (of `SELF.value`), `token: {id, atLeast?}`,
+`noTokens`, `keepsSelfTokens` (`tokens == SELF.tokens`), and `registers`
+(`[{reg: "R4".."R9", type, op, value?}]` with `op` one of `eq`, `ne`,
+`gte`, `lte`, `eqHeight`, `eqSelf`). Registers are read with
+`.isDefined` guards, so a missing register refuses rather than errors.
+
+The source is readable ErgoScript with `$name` params. With `params`
+values, a test suite is generated whose expected verdicts come from the
+composer's own model of the rules — running it (`run: true`, or `ergo-es
+test`) checks that the assembled ErgoScript means what the spec says: one
+case per path with everything met, one per condition violated (the most
+specific requirement of a box rule), and a baseline. `spec.witness`
+(`{"0": {type, value}}`) supplies context variables the checks need but the
+contract must not contain, such as the secret behind a `hashPreimage`. A
+path that anyone may take with no conditions, an empty box rule, and a
+path whose conditions contradict each other (no single transaction can
+meet them) are refused with a message.
 
 ### `POST /api/v1/test`
 

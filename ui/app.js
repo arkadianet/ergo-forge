@@ -928,13 +928,194 @@ const WHO_KINDS = [
   ["kOf", "some of these people (k of n)"],
   ["anyOne", "anyone — no signature needed"],
 ];
-const COND_KINDS = [
-  ["after", "only from a date"],
-  ["before", "only until a date"],
-  ["payTo", "must pay someone"],
-  ["keepHere", "must keep funds in this contract"],
-  ["oracleAbove", "only while an oracle price is at or above a floor"],
+// The condition catalogue: what a script can see about the spending
+// transaction, in plain words. Each kind renders its own small form and
+// reads back one composer condition (plus the typed values it needs).
+const COND_GROUPS = [
+  ["When", [
+    ["after", "only from a date"],
+    ["before", "only until a date"],
+    ["boxAge", "only after the funds have sat here for a while"],
+    ["afterTime", "only from a clock time (block timestamp)"],
+    ["beforeTime", "only until a clock time (block timestamp)"],
+  ]],
+  ["Payments", [
+    ["payTo", "must pay someone"],
+    ["sumPaidTo", "must pay someone in total, across all outputs"],
+    ["keepHere", "must keep funds in this contract"],
+    ["keepShare", "must keep a percentage of the funds in this contract"],
+  ]],
+  ["Tokens", [
+    ["tokenGated", "spender must hold a token (membership)"],
+    ["sendToken", "must send a token to someone"],
+    ["keepTokens", "this box's tokens must stay with the funds kept here"],
+    ["noTokensOut", "no output may carry tokens"],
+  ]],
+  ["Outside information (data inputs)", [
+    ["oracleAbove", "only while an oracle price is at or above a floor"],
+    ["oracleBelow", "only while an oracle price is at or below a ceiling"],
+    ["dataToken", "a data input must carry a token"],
+  ]],
+  ["Records (registers)", [
+    ["selfReg", "this box's register must hold a value"],
+    ["stampHeight", "the funds kept here must record the current block height"],
+    ["carryReg", "the funds kept here must carry over a register unchanged"],
+  ]],
+  ["Secrets, attached values, miner", [
+    ["hashPreimage", "spender must reveal a secret phrase"],
+    ["varEquals", "spender must attach a specific number"],
+    ["minerIs", "only a specific miner may include the transaction"],
+  ]],
+  ["Shape of the transaction", [
+    ["inputCount", "exactly this many inputs"],
+    ["outputCount", "exactly this many outputs"],
+    ["boxRule", "a rule on any box (advanced)"],
+  ]],
 ];
+const COND_LABELS = Object.fromEntries(COND_GROUPS.flatMap(([, ks]) => ks));
+const REG_TYPES = ["Int", "Long", "Boolean", "Coll[Byte]"];
+const REG_OPS = [["eq", "equals"], ["gte", "is at least"], ["lte", "is at most"], ["ne", "is not"]];
+
+/// Field builders per kind. `mk(cls, label, attrs)` adds a labelled input;
+/// `sel(cls, label, options)` a labelled select; `dates` says whether the
+/// chain height is known (dates instead of heights).
+const COND_FIELDS = {
+  after: (mk, sel, dates) => mk("c-height", dates ? "From when?" : "From which block height?", dates ? { type: "datetime-local" } : { type: "number", min: "1" }),
+  before: (mk, sel, dates) => mk("c-height", dates ? "Until when?" : "Until which block height?", dates ? { type: "datetime-local" } : { type: "number", min: "1" }),
+  boxAge: (mk) => mk("c-days", "For how many days? (about 720 blocks a day)", { type: "number", min: "0", step: "0.1" }),
+  afterTime: (mk) => mk("c-time", "From when? (the block's own clock, which miners set)", { type: "datetime-local" }),
+  beforeTime: (mk) => mk("c-time", "Until when? (the block's own clock, which miners set)", { type: "datetime-local" }),
+  payTo: (mk) => { mk("c-key", "Who must be paid? (address)", { spellcheck: false }); mk("c-erg", "At least how much, in ERG?", { type: "number", step: "0.000000001" }); },
+  sumPaidTo: (mk) => { mk("c-key", "Who must be paid? (address)", { spellcheck: false }); mk("c-erg", "At least how much in total, in ERG?", { type: "number", step: "0.000000001" }); },
+  keepHere: (mk) => mk("c-erg", "At least how much must stay, in ERG?", { type: "number", step: "0.000000001" }),
+  keepShare: (mk) => mk("c-pct", "At least what percentage must stay?", { type: "number", min: "0", max: "100" }),
+  tokenGated: (mk) => mk("c-token", "Token id the spender must hold (64 hex characters)", { spellcheck: false }),
+  sendToken: (mk) => { mk("c-key", "Who receives the token? (address)", { spellcheck: false }); mk("c-token", "Token id (64 hex characters)", { spellcheck: false }); mk("c-num", "At least how many? (smallest units)", { type: "number", min: "1", value: "1" }); },
+  keepTokens: () => {},
+  noTokensOut: () => {},
+  oracleAbove: (mk) => { mk("c-token", "Oracle token id (64 hex characters)", { spellcheck: false }); mk("c-num", "Minimum price, in the oracle's units", { type: "number" }); },
+  oracleBelow: (mk) => { mk("c-token", "Oracle token id (64 hex characters)", { spellcheck: false }); mk("c-num", "Maximum price, in the oracle's units", { type: "number" }); },
+  dataToken: (mk) => mk("c-token", "Token id the data input must carry (64 hex characters)", { spellcheck: false }),
+  selfReg: (mk, sel) => regFields(mk, sel, true),
+  stampHeight: (mk, sel) => sel("c-reg", "Which register?", ["R4", "R5", "R6", "R7", "R8", "R9"]),
+  carryReg: (mk, sel) => { sel("c-reg", "Which register?", ["R4", "R5", "R6", "R7", "R8", "R9"]); sel("c-type", "What kind of value is in it?", REG_TYPES); },
+  hashPreimage: (mk) => mk("c-secret", "The secret phrase (hashed here in your browser; only the hash goes on chain)", { autocomplete: "off" }),
+  varEquals: (mk) => { mk("c-var", "Variable number (0–9)", { type: "number", min: "0", max: "9", value: "1" }); mk("c-num", "The number the spender must attach", { type: "number" }); },
+  minerIs: (mk) => mk("c-hex", "Miner public key (66 hex characters)", { spellcheck: false }),
+  inputCount: (mk) => mk("c-num", "How many inputs, counting this box?", { type: "number", min: "1", value: "1" }),
+  outputCount: (mk) => mk("c-num", "How many outputs?", { type: "number", min: "1", value: "2" }),
+  boxRule: (mk, sel) => {
+    sel("c-which", "Which box?", [["output", "an output"], ["input", "an input"], ["dataInput", "a data input"], ["self", "this box"]]);
+    mk("c-index", "Which one? (a number from 0, \"any\", or \"all\")", { value: "any", spellcheck: false });
+    sel("c-script", "Its script must be", [["", "anything"], ["self", "this same contract"], ["key", "an address:"]]);
+    mk("c-key", "Address", { spellcheck: false });
+    mk("c-erg", "Value at least, in ERG (optional)", { type: "number", step: "0.000000001" });
+    mk("c-pct", "Value at least this percentage of this box's value (optional)", { type: "number", min: "0", max: "100" });
+    mk("c-token", "Must carry token id (optional, 64 hex characters)", { spellcheck: false });
+    mk("c-num", "…at least this many (optional)", { type: "number", min: "1" });
+    sel("c-tokens", "Tokens", [["", "no rule"], ["none", "must carry no tokens"], ["self", "must carry exactly this box's tokens"]]);
+    sel("c-reg", "Register rule (optional)", [["", "none"], "R4", "R5", "R6", "R7", "R8", "R9"]);
+    sel("c-type", "Register type", REG_TYPES);
+    sel("c-op", "Register comparison", [...REG_OPS, ["eqHeight", "equals the current height (Int)"], ["eqSelf", "equals this box's same register"]]);
+    mk("c-val", "Register value", { spellcheck: false });
+  },
+};
+function regFields(mk, sel, withOp) {
+  sel("c-reg", "Which register?", ["R4", "R5", "R6", "R7", "R8", "R9"]);
+  sel("c-type", "What kind of value?", REG_TYPES);
+  if (withOp) sel("c-op", "How must it compare?", REG_OPS);
+  mk("c-val", "Value (a number, true/false, or hex bytes)", { spellcheck: false });
+}
+
+function hexOf(bytes) { return [...bytes].map((b) => b.toString(16).padStart(2, "0")).join(""); }
+
+/// Readers per kind: `q(cls)` is the row's input; `c` the read context.
+const COND_READ = {
+  after: (q, c) => ({ after: c.set("after", "Int", c.heightOf(q("c-height"))) }),
+  before: (q, c) => ({ before: c.set("before", "Int", c.heightOf(q("c-height"))) }),
+  boxAge: (q, c) => { const d = Number(q("c-days").value); if (!(q("c-days").value.trim() && d >= 0)) throw new Error("How many days the funds must sit is missing."); return { boxAge: c.set("age", "Int", Math.ceil(d * 720)) }; },
+  afterTime: (q, c) => ({ afterTime: c.set("fromTime", "Long", String(c.timeOf(q("c-time")))) }),
+  beforeTime: (q, c) => ({ beforeTime: c.set("untilTime", "Long", String(c.timeOf(q("c-time")))) }),
+  payTo: (q, c) => ({ payTo: { key: c.addKey(q("c-key").value), amount: c.set("amount", "Long", c.erg(q("c-erg"), "A payment amount in ERG is missing.")) } }),
+  sumPaidTo: (q, c) => ({ sumPaidTo: { key: c.addKey(q("c-key").value), atLeast: c.set("total", "Long", c.erg(q("c-erg"), "A total amount in ERG is missing.")) } }),
+  keepHere: (q, c) => ({ box: { which: "output", index: 0, script: "self", valueAtLeast: c.set("keep", "Long", c.erg(q("c-erg"), "A keep amount in ERG is missing.", true)) } }),
+  keepShare: (q, c) => ({ box: { which: "output", index: 0, script: "self", valueAtLeastShare: { percent: c.set("keepPct", "Long", c.pct(q("c-pct"))) } } }),
+  tokenGated: (q, c) => ({ tokenGated: { tokenId: c.set("memberToken", "Coll[Byte]", c.tokenId(q("c-token"))) } }),
+  sendToken: (q, c) => ({ box: { which: "output", index: "any", script: { key: c.addKey(q("c-key").value) }, token: { id: c.set("token", "Coll[Byte]", c.tokenId(q("c-token"))), atLeast: c.set("tokenAmount", "Long", c.whole(q("c-num"), 1)) } } }),
+  keepTokens: () => ({ box: { which: "output", index: 0, script: "self", keepsSelfTokens: true } }),
+  noTokensOut: () => ({ box: { which: "output", index: "all", noTokens: true } }),
+  oracleAbove: (q, c) => ({ oracleAbove: { nft: c.set("oracle", "Coll[Byte]", c.tokenId(q("c-token"))), floor: c.set("floor", "Long", c.whole(q("c-num"))) } }),
+  oracleBelow: (q, c) => ({ box: { which: "dataInput", index: 0, token: { id: c.set("oracle", "Coll[Byte]", c.tokenId(q("c-token"))) }, registers: [{ reg: "R4", type: "Long", op: "lte", value: c.set("ceiling", "Long", c.whole(q("c-num"))) }] } }),
+  dataToken: (q, c) => ({ box: { which: "dataInput", index: "any", token: { id: c.set("dataToken", "Coll[Byte]", c.tokenId(q("c-token"))) } } }),
+  selfReg: (q, c) => ({ box: { which: "self", registers: [c.regRule(q, q("c-op").value)] } }),
+  stampHeight: (q) => ({ box: { which: "output", index: 0, script: "self", registers: [{ reg: q("c-reg").value, type: "Int", op: "eqHeight" }] } }),
+  carryReg: (q) => ({ box: { which: "output", index: 0, script: "self", registers: [{ reg: q("c-reg").value, type: q("c-type").value, op: "eqSelf" }] } }),
+  hashPreimage: (q, c) => {
+    const s = q("c-secret").value; if (!s) throw new Error("The secret phrase is missing.");
+    const bytes = new TextEncoder().encode(s); const idx = c.nextVar();
+    c.witness[String(idx)] = { type: "Coll[Byte]", value: hexOf(bytes) };
+    return { hashPreimage: { var: idx, hash: c.set("secretHash", "Coll[Byte]", window.blake2b.blake2bHex(bytes, null, 32)), algo: "blake2b256" } };
+  },
+  varEquals: (q, c) => ({ varEquals: { index: c.whole(q("c-var"), 0), type: "Int", value: c.set("attached", "Int", c.whole(q("c-num"))) } }),
+  minerIs: (q, c) => { const h = q("c-hex").value.trim().toLowerCase(); if (!/^[0-9a-f]{66}$/.test(h)) throw new Error("A miner public key is 66 hex characters."); return { minerIs: c.set("miner", "Coll[Byte]", h) }; },
+  inputCount: (q, c) => ({ inputCount: c.set("inputs", "Int", c.whole(q("c-num"), 1)) }),
+  outputCount: (q, c) => ({ outputCount: c.set("outputs", "Int", c.whole(q("c-num"), 1)) }),
+  boxRule: (q, c) => {
+    const r = { which: q("c-which").value };
+    const idx = q("c-index").value.trim().toLowerCase();
+    if (r.which !== "self") { if (idx === "any" || idx === "all") r.index = idx; else if (/^\d+$/.test(idx)) r.index = Number(idx); else throw new Error("\"Which one?\" is a number, \"any\", or \"all\"."); }
+    const sc = q("c-script").value;
+    if (sc === "self") r.script = "self"; else if (sc === "key") r.script = { key: c.addKey(q("c-key").value) };
+    if (q("c-erg").value.trim()) r.valueAtLeast = c.set("value", "Long", c.erg(q("c-erg"), "A value in ERG does not parse.", true));
+    if (q("c-pct").value.trim()) r.valueAtLeastShare = { percent: c.set("share", "Long", c.pct(q("c-pct"))) };
+    if (q("c-token").value.trim()) { r.token = { id: c.set("token", "Coll[Byte]", c.tokenId(q("c-token"))) }; if (q("c-num").value.trim()) r.token.atLeast = c.set("tokenAmount", "Long", c.whole(q("c-num"), 1)); }
+    if (q("c-tokens").value === "none") r.noTokens = true;
+    if (q("c-tokens").value === "self") r.keepsSelfTokens = true;
+    if (q("c-reg").value) { const op = q("c-op").value; r.registers = [/^(eq|gte|lte|ne)$/.test(op) ? c.regRule(q, op) : { reg: q("c-reg").value, type: q("c-type").value, op }]; }
+    return { box: r };
+  },
+};
+
+/// Words for a composed condition (the engine's shape), for the summary.
+function describeCond(c, values) {
+  const v = (n) => values[n] ? values[n].value : n;
+  const erg = (n) => `${Number(v(n)) / 1e9} ERG`;
+  const tok = (n) => `token ${String(v(n)).slice(0, 8)}…`;
+  if (c.after) return `from block ${v(c.after)}`;
+  if (c.before) return `until block ${v(c.before)}`;
+  if (c.afterTime) return `from ${new Date(Number(v(c.afterTime))).toLocaleString()} (block clock)`;
+  if (c.beforeTime) return `until ${new Date(Number(v(c.beforeTime))).toLocaleString()} (block clock)`;
+  if (c.boxAge) return `after the funds have sat here ${v(c.boxAge)} blocks`;
+  if (c.inputCount) return `exactly ${v(c.inputCount)} input(s)`;
+  if (c.outputCount) return `exactly ${v(c.outputCount)} output(s)`;
+  if (c.payTo) return `paying ${shortAddr(v(c.payTo.key))} at least ${erg(c.payTo.amount)}`;
+  if (c.sumPaidTo) return `paying ${shortAddr(v(c.sumPaidTo.key))} at least ${erg(c.sumPaidTo.atLeast)} in total`;
+  if (c.keepHere) return `keeping at least ${erg(c.keepHere.atLeast)} here`;
+  if (c.oracleAbove) return `oracle price ≥ ${v(c.oracleAbove.floor)}`;
+  if (c.tokenGated) return `the spender holds ${tok(c.tokenGated.tokenId)}`;
+  if (c.hashPreimage) return "the spender reveals the secret phrase";
+  if (c.varEquals) return `the spender attaches ${v(c.varEquals.value)} as variable ${c.varEquals.index}`;
+  if (c.minerIs) return `mined by ${String(v(c.minerIs)).slice(0, 10)}…`;
+  if (c.box) {
+    const r = c.box;
+    const kept = r.which === "output" && r.index === 0 && r.script === "self";
+    const which = kept ? "the funds kept here" : r.which === "self" ? "this box" : r.index === "any" ? `some ${r.which === "dataInput" ? "data input" : r.which}` : r.index === "all" ? `every ${r.which === "dataInput" ? "data input" : r.which}` : `${r.which === "dataInput" ? "data input" : r.which} ${r.index}`;
+    const parts = [];
+    if (r.script === "self" && !kept) parts.push("stays under this contract"); else if (r.script && r.script.key) parts.push(`goes to ${shortAddr(v(r.script.key))}`);
+    if (r.valueAtLeast) parts.push(`holds at least ${erg(r.valueAtLeast)}`);
+    if (r.valueAtLeastShare) parts.push(`holds at least ${v(r.valueAtLeastShare.percent)}% of this box's value`);
+    if (r.token) parts.push(`carries ${tok(r.token.id)}${r.token.atLeast ? ` ×${v(r.token.atLeast)}+` : ""}`);
+    if (r.noTokens) parts.push("carries no tokens");
+    if (r.keepsSelfTokens) parts.push("carries exactly this box's tokens");
+    for (const rr of r.registers || []) {
+      const op = { eq: "=", ne: "≠", gte: "≥", lte: "≤" }[rr.op];
+      parts.push(rr.op === "eqHeight" ? `${rr.reg} records the current height` : rr.op === "eqSelf" ? `${rr.reg} carries over this box's ${rr.reg}` : `${rr.reg} ${op} ${v(rr.value)}`);
+    }
+    return parts.length ? `${which} ${parts.join(" and ")}` : which;
+  }
+  return "";
+}
+
 let composedContract = null; // the spec-derived source + answers, for step 3
 
 function startComposer() {
@@ -996,7 +1177,11 @@ function addCond(container) {
   const row = document.createElement("div");
   row.className = "cond";
   const sel = document.createElement("select"); sel.className = "cond-kind";
-  for (const [v, l] of COND_KINDS) { const o = document.createElement("option"); o.value = v; o.textContent = l; sel.appendChild(o); }
+  for (const [g, kinds] of COND_GROUPS) {
+    const og = document.createElement("optgroup"); og.label = g;
+    for (const [v, l] of kinds) { const o = document.createElement("option"); o.value = v; o.textContent = l; og.appendChild(o); }
+    sel.appendChild(og);
+  }
   const inputs = document.createElement("div"); inputs.className = "cond-inputs";
   const rm = document.createElement("button"); rm.type = "button"; rm.className = "secondary tiny"; rm.textContent = "remove";
   rm.addEventListener("click", () => row.remove());
@@ -1008,14 +1193,14 @@ function addCond(container) {
       const i = document.createElement("input"); i.className = cls; Object.assign(i, attrs || {});
       f.append(l, i); inputs.appendChild(f); return i;
     };
-    const dates = datesAvailableFor($("compose-network").value);
-    switch (sel.value) {
-      case "after": mk("c-height", dates ? "From when?" : "From which block height?", dates ? { type: "datetime-local" } : { type: "number", min: "1" }); break;
-      case "before": mk("c-height", dates ? "Until when?" : "Until which block height?", dates ? { type: "datetime-local" } : { type: "number", min: "1" }); break;
-      case "payTo": mk("c-key", "Who must be paid? (address)", { spellcheck: false }); mk("c-erg", "At least how much, in ERG?", { type: "number", step: "0.000000001" }); break;
-      case "keepHere": mk("c-erg", "At least how much must stay, in ERG?", { type: "number", step: "0.000000001" }); break;
-      case "oracleAbove": mk("c-token", "Oracle token id (64 hex characters)", { spellcheck: false }); mk("c-num", "Minimum price, in the oracle's units", { type: "number" }); break;
-    }
+    const sel2 = (cls, label, options) => {
+      const f = document.createElement("div"); f.className = "field";
+      const l = document.createElement("label"); l.textContent = label;
+      const el = document.createElement("select"); el.className = cls;
+      for (const opt of options) { const [v, t] = Array.isArray(opt) ? opt : [opt, opt]; const o = document.createElement("option"); o.value = v; o.textContent = t; el.appendChild(o); }
+      f.append(l, el); inputs.appendChild(f); return el;
+    };
+    COND_FIELDS[sel.value](mk, sel2, datesAvailableFor($("compose-network").value));
   };
   sel.addEventListener("change", render);
   render();
@@ -1029,14 +1214,32 @@ function datesAvailableFor(network) { return chainHeight != null && chainNetwork
 /// generated (`key1`, `after1`, …) so the source stays readable.
 function readComposer() {
   const network = $("compose-network").value;
-  const spec = { paths: [] };
+  const spec = { paths: [], witness: {} };
   const values = {};
-  let keyN = 0, condN = 0;
+  let keyN = 0, condN = 0, varN = 0;
   const addKey = (addr) => { const p = fieldProblem("address", addr, network); if (!addr.trim()) throw new Error("An address is missing."); if (p) throw new Error(p); keyN++; const name = `key${keyN}`; values[name] = { type: "SigmaProp", value: addr.trim() }; return name; };
   const heightOf = (inp) => {
     const raw = inp.value.trim(); if (!raw) throw new Error("A date or height is missing.");
     if (inp.type === "datetime-local") { const t = new Date(raw).getTime(); if (Number.isNaN(t)) throw new Error("That date does not parse."); const now = heightNow(); const h = now + Math.ceil((t - Date.now()) / 1000 / BLOCK_SECONDS); if (h <= now) throw new Error("Dates must be in the future."); return h; }
     const h = Number(raw); if (!Number.isInteger(h) || h < 1) throw new Error("A block height is a whole number."); return h;
+  };
+  const ctx = {
+    addKey, heightOf, witness: spec.witness,
+    set: (prefix, type, value) => { const name = `${prefix}${condN}`; values[name] = { type, value }; return name; },
+    timeOf: (inp) => { const t = new Date(inp.value).getTime(); if (!inp.value || Number.isNaN(t)) throw new Error("A time is missing or does not parse."); return t; },
+    erg: (inp, msg, zeroOk) => { const raw = inp.value.trim(); const e = Number(raw); if (!raw || Number.isNaN(e) || (zeroOk ? e < 0 : e <= 0)) throw new Error(msg); return Math.round(e * 1e9); },
+    pct: (inp) => { const n = Number(inp.value); if (!(inp.value.trim() && n >= 0 && n <= 100)) throw new Error("A percentage is between 0 and 100."); return Math.round(n); },
+    tokenId: (inp) => { const t = inp.value.trim().toLowerCase(); if (!/^[0-9a-f]{64}$/.test(t)) throw new Error("A token id is 64 hex characters."); return t; },
+    whole: (inp, min) => { const raw = inp.value.trim(); const n = Number(raw); if (!raw || !Number.isInteger(n) || (min != null && n < min)) throw new Error(`"${inp.previousElementSibling ? inp.previousElementSibling.textContent : "A number"}" needs a whole number${min != null ? ` of at least ${min}` : ""}.`); return n; },
+    nextVar: () => varN++,
+    regRule: (q, op) => {
+      const type = q("c-type").value; const raw = q("c-val").value.trim();
+      let value;
+      if (type === "Boolean") { if (!/^(true|false)$/i.test(raw)) throw new Error("A Boolean register value is true or false."); value = raw.toLowerCase() === "true"; }
+      else if (type === "Coll[Byte]") { if (!/^([0-9a-fA-F]{2})+$/.test(raw)) throw new Error("A Coll[Byte] register value is hex bytes."); value = raw.toLowerCase(); }
+      else { if (!/^-?\d+$/.test(raw)) throw new Error(`An ${type} register value is a whole number.`); value = raw; }
+      return { reg: q("c-reg").value, type, op, value: ctx.set("regValue", type, value) };
+    },
   };
   for (const box of $("paths").children) {
     const kind = box.querySelector(".who-kind").value;
@@ -1047,16 +1250,22 @@ function readComposer() {
     else if (kind === "allOf") who = { allOf: keys };
     else { const k = Number(box.querySelector(".kof").value); if (!(k >= 1 && k <= keys.length)) throw new Error(`"How many must agree" must be between 1 and ${keys.length}.`); who = { kOf: k, keys }; }
     const conditions = [];
-    for (const row of box.querySelectorAll(".cond")) {
+    const rows = [...box.querySelectorAll(".cond")];
+    // "The funds kept here" is always output 0; payments take the slots after it.
+    const keepsFirst = rows.some((r) => /^(keepHere|keepShare|keepTokens|stampHeight|carryReg)$/.test(r.querySelector(".cond-kind").value));
+    let paySlot = keepsFirst ? 1 : 0;
+    for (const row of rows) {
       condN++;
       const ck = row.querySelector(".cond-kind").value;
-      if (ck === "after" || ck === "before") { const name = `${ck}${condN}`; values[name] = { type: "Int", value: heightOf(row.querySelector(".c-height")) }; conditions.push({ [ck]: name }); }
-      else if (ck === "payTo") { const key = addKey(row.querySelector(".c-key").value); const erg = Number(row.querySelector(".c-erg").value); if (!(erg > 0)) throw new Error("A payment amount in ERG is missing."); const amt = `amount${condN}`; values[amt] = { type: "Long", value: Math.round(erg * 1e9) }; conditions.push({ payTo: { key, amount: amt } }); }
-      else if (ck === "keepHere") { const erg = Number(row.querySelector(".c-erg").value); if (!(erg >= 0)) throw new Error("A keep amount in ERG is missing."); const n = `keep${condN}`; values[n] = { type: "Long", value: Math.round(erg * 1e9) }; conditions.push({ keepHere: { atLeast: n } }); }
-      else if (ck === "oracleAbove") { const tok = row.querySelector(".c-token").value.trim(); if (!/^[0-9a-fA-F]{64}$/.test(tok)) throw new Error("A token id is 64 hex characters."); const n1 = `oracle${condN}`, n2 = `floor${condN}`; values[n1] = { type: "Coll[Byte]", value: tok.toLowerCase() }; values[n2] = { type: "Long", value: Number(row.querySelector(".c-num").value || 0) }; conditions.push({ oracleAbove: { nft: n1, floor: n2 } }); }
+      const q = (cls) => row.querySelector(`.${cls}`);
+      let cond;
+      try { cond = COND_READ[ck](q, ctx); } catch (e) { throw new Error(`Way ${spec.paths.length + 1}, "${COND_LABELS[ck]}": ${e.message}`); }
+      if (cond.payTo) { cond = { box: { which: "output", index: paySlot++, script: { key: cond.payTo.key }, valueAtLeast: cond.payTo.amount } }; }
+      conditions.push(cond);
     }
     spec.paths.push({ name: `way ${spec.paths.length + 1}`, who, conditions });
   }
+  if (!Object.keys(spec.witness).length) delete spec.witness;
   return { spec, values, network };
 }
 
@@ -1102,16 +1311,6 @@ function describeWho(who, values) {
   if (who.allOf) return `all of ${who.allOf.map(a).join(", ")}`;
   return `${who.kOf} of ${who.keys.map(a).join(", ")}`;
 }
-function describeCond(c, values) {
-  const v = (n) => values[n] ? values[n].value : n;
-  if (c.after) return `from block ${v(c.after)}`;
-  if (c.before) return `until block ${v(c.before)}`;
-  if (c.payTo) return `paying ${shortAddr(v(c.payTo.key))} at least ${v(c.payTo.amount) / 1e9} ERG`;
-  if (c.keepHere) return `keeping at least ${v(c.keepHere.atLeast) / 1e9} ERG here`;
-  if (c.oracleAbove) return `oracle price ≥ ${v(c.oracleAbove.floor)}`;
-  return "";
-}
-
 function renderChecks(results) {
   const box = $("build-checks");
   if (!results) { box.hidden = true; return; }

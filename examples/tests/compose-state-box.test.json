@@ -1,0 +1,726 @@
+{
+  "source": "// Composed with ergo-forge: 2 spending paths. Paths are OR-ed; a path's\n// conditions are AND-ed.\n// $owner: SigmaProp\n// $keepPct: Long\n// $feeTo: SigmaProp\n// $fee: Long\n// $cooldown: Int\n// $oracleNFT: Coll[Byte]\n// $ceiling: Long\n// $secretHash: Coll[Byte]\n// $refund: Long\n{\n  // path1: owner ticks the box\n  val path1 = $owner &&\n    sigmaProp((OUTPUTS.size > 0 && OUTPUTS(0).propositionBytes == SELF.propositionBytes && OUTPUTS(0).value >= SELF.value * $keepPct / 100L && OUTPUTS(0).tokens == SELF.tokens && OUTPUTS(0).R4[Int].isDefined && OUTPUTS(0).R4[Int].get == HEIGHT && SELF.R5[Coll[Byte]].isDefined && OUTPUTS(0).R5[Coll[Byte]].isDefined && OUTPUTS(0).R5[Coll[Byte]].get == SELF.R5[Coll[Byte]].get) &&\n              (OUTPUTS.size > 1 && OUTPUTS(1).propositionBytes == $feeTo.propBytes && OUTPUTS(1).value >= $fee) &&\n              HEIGHT - SELF.creationInfo._1 >= $cooldown)\n  // path2: anyone closes it on a low price with the secret\n  val path2 = sigmaProp((CONTEXT.dataInputs.size > 0 && CONTEXT.dataInputs(0).tokens.exists { (t: (Coll[Byte], Long)) => t._1 == $oracleNFT } && CONTEXT.dataInputs(0).R4[Long].isDefined && CONTEXT.dataInputs(0).R4[Long].get <= $ceiling) &&\n              (getVar[Coll[Byte]](0).isDefined && blake2b256(getVar[Coll[Byte]](0).get) == $secretHash) &&\n              OUTPUTS.fold(0L, { (acc: Long, bx: Box) => if (bx.propositionBytes == $owner.propBytes) acc + bx.value else acc }) >= $refund &&\n              OUTPUTS.forall { (bx: Box) => bx.tokens.size == 0 })\n  path1 || path2\n}\n",
+  "params": {
+    "ceiling": {
+      "type": "Long",
+      "value": 500
+    },
+    "cooldown": {
+      "type": "Int",
+      "value": 720
+    },
+    "fee": {
+      "type": "Long",
+      "value": 10000000
+    },
+    "feeTo": {
+      "type": "SigmaProp",
+      "value": "9fMPy1XY3GW4T6t3LjYofqmzER6x9cV21n5UVJTWmma4Y9mAW6c"
+    },
+    "keepPct": {
+      "type": "Long",
+      "value": 95
+    },
+    "oracleNFT": {
+      "type": "Coll[Byte]",
+      "value": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+    },
+    "owner": {
+      "type": "SigmaProp",
+      "value": "9fMPy1XY3GW4T6t3LjYofqmzER6x9cV21n5UVJTWmma4Y9mAW6c"
+    },
+    "refund": {
+      "type": "Long",
+      "value": 500000000
+    },
+    "secretHash": {
+      "type": "Coll[Byte]",
+      "value": "928db2d7bd4e793d9cc22938b5a960aaf601d4409c2bafb096d95046f61f65ad"
+    }
+  },
+  "tree": null,
+  "network": null,
+  "treeVersion": null,
+  "scenarios": [
+    {
+      "name": "owner ticks the box: every condition met",
+      "expect": "needsProof",
+      "expectResidual": "026dc059",
+      "expectResidualExcludes": null,
+      "tree": null,
+      "source": null,
+      "treeVersion": 0,
+      "network": null,
+      "height": 720,
+      "selfBox": {
+        "value": 1000000000,
+        "ergoTree": "$self",
+        "tokens": [
+          {
+            "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "amount": 7
+          }
+        ],
+        "creationHeight": 0,
+        "registers": {
+          "R4": {
+            "type": "Int",
+            "value": 0
+          },
+          "R5": {
+            "type": "Coll[Byte]",
+            "value": "0102030405"
+          }
+        },
+        "boxId": null
+      },
+      "selfIndex": null,
+      "inputs": [],
+      "outputs": [
+        {
+          "value": 950000000,
+          "ergoTree": "$self",
+          "tokens": [
+            {
+              "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "amount": 7
+            }
+          ],
+          "creationHeight": 0,
+          "registers": {
+            "R4": {
+              "type": "Int",
+              "value": 720
+            },
+            "R5": {
+              "type": "Coll[Byte]",
+              "value": "0102030405"
+            }
+          },
+          "boxId": null
+        },
+        {
+          "value": 10000000,
+          "ergoTree": "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7",
+          "tokens": [],
+          "creationHeight": 0,
+          "registers": {},
+          "boxId": null
+        }
+      ],
+      "dataInputs": [],
+      "contextVars": {},
+      "minerPubkey": null,
+      "preHeader": null,
+      "costLimit": null,
+      "activatedScriptVersion": null,
+      "proof": null,
+      "message": null
+    },
+    {
+      "name": "owner ticks the box: output 0 not recording the current height",
+      "expect": "fail",
+      "expectResidual": null,
+      "expectResidualExcludes": null,
+      "tree": null,
+      "source": null,
+      "treeVersion": 0,
+      "network": null,
+      "height": 720,
+      "selfBox": {
+        "value": 1000000000,
+        "ergoTree": "$self",
+        "tokens": [
+          {
+            "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "amount": 7
+          }
+        ],
+        "creationHeight": 0,
+        "registers": {
+          "R4": {
+            "type": "Int",
+            "value": 0
+          },
+          "R5": {
+            "type": "Coll[Byte]",
+            "value": "0102030405"
+          }
+        },
+        "boxId": null
+      },
+      "selfIndex": null,
+      "inputs": [],
+      "outputs": [
+        {
+          "value": 950000000,
+          "ergoTree": "$self",
+          "tokens": [
+            {
+              "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "amount": 7
+            }
+          ],
+          "creationHeight": 0,
+          "registers": {
+            "R4": {
+              "type": "Int",
+              "value": 0
+            },
+            "R5": {
+              "type": "Coll[Byte]",
+              "value": "0102030405"
+            }
+          },
+          "boxId": null
+        },
+        {
+          "value": 10000000,
+          "ergoTree": "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7",
+          "tokens": [],
+          "creationHeight": 0,
+          "registers": {},
+          "boxId": null
+        }
+      ],
+      "dataInputs": [],
+      "contextVars": {},
+      "minerPubkey": null,
+      "preHeader": null,
+      "costLimit": null,
+      "activatedScriptVersion": null,
+      "proof": null,
+      "message": null
+    },
+    {
+      "name": "owner ticks the box: paying one nanoERG too little",
+      "expect": "fail",
+      "expectResidual": null,
+      "expectResidualExcludes": null,
+      "tree": null,
+      "source": null,
+      "treeVersion": 0,
+      "network": null,
+      "height": 720,
+      "selfBox": {
+        "value": 1000000000,
+        "ergoTree": "$self",
+        "tokens": [
+          {
+            "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "amount": 7
+          }
+        ],
+        "creationHeight": 0,
+        "registers": {
+          "R4": {
+            "type": "Int",
+            "value": 0
+          },
+          "R5": {
+            "type": "Coll[Byte]",
+            "value": "0102030405"
+          }
+        },
+        "boxId": null
+      },
+      "selfIndex": null,
+      "inputs": [],
+      "outputs": [
+        {
+          "value": 950000000,
+          "ergoTree": "$self",
+          "tokens": [
+            {
+              "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "amount": 7
+            }
+          ],
+          "creationHeight": 0,
+          "registers": {
+            "R4": {
+              "type": "Int",
+              "value": 720
+            },
+            "R5": {
+              "type": "Coll[Byte]",
+              "value": "0102030405"
+            }
+          },
+          "boxId": null
+        },
+        {
+          "value": 9999999,
+          "ergoTree": "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7",
+          "tokens": [],
+          "creationHeight": 0,
+          "registers": {},
+          "boxId": null
+        }
+      ],
+      "dataInputs": [],
+      "contextVars": {},
+      "minerPubkey": null,
+      "preHeader": null,
+      "costLimit": null,
+      "activatedScriptVersion": null,
+      "proof": null,
+      "message": null
+    },
+    {
+      "name": "owner ticks the box: one block too young",
+      "expect": "fail",
+      "expectResidual": null,
+      "expectResidualExcludes": null,
+      "tree": null,
+      "source": null,
+      "treeVersion": 0,
+      "network": null,
+      "height": 720,
+      "selfBox": {
+        "value": 1000000000,
+        "ergoTree": "$self",
+        "tokens": [
+          {
+            "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "amount": 7
+          }
+        ],
+        "creationHeight": 1,
+        "registers": {
+          "R4": {
+            "type": "Int",
+            "value": 0
+          },
+          "R5": {
+            "type": "Coll[Byte]",
+            "value": "0102030405"
+          }
+        },
+        "boxId": null
+      },
+      "selfIndex": null,
+      "inputs": [],
+      "outputs": [
+        {
+          "value": 950000000,
+          "ergoTree": "$self",
+          "tokens": [
+            {
+              "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "amount": 7
+            }
+          ],
+          "creationHeight": 0,
+          "registers": {
+            "R4": {
+              "type": "Int",
+              "value": 720
+            },
+            "R5": {
+              "type": "Coll[Byte]",
+              "value": "0102030405"
+            }
+          },
+          "boxId": null
+        },
+        {
+          "value": 10000000,
+          "ergoTree": "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7",
+          "tokens": [],
+          "creationHeight": 0,
+          "registers": {},
+          "boxId": null
+        }
+      ],
+      "dataInputs": [],
+      "contextVars": {},
+      "minerPubkey": null,
+      "preHeader": null,
+      "costLimit": null,
+      "activatedScriptVersion": null,
+      "proof": null,
+      "message": null
+    },
+    {
+      "name": "anyone closes it on a low price with the secret: every condition met",
+      "expect": "pass",
+      "expectResidual": null,
+      "expectResidualExcludes": null,
+      "tree": null,
+      "source": null,
+      "treeVersion": 0,
+      "network": null,
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "ergoTree": "$self",
+        "tokens": [
+          {
+            "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "amount": 7
+          }
+        ],
+        "creationHeight": 0,
+        "registers": {},
+        "boxId": null
+      },
+      "selfIndex": null,
+      "inputs": [],
+      "outputs": [
+        {
+          "value": 500000000,
+          "ergoTree": "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7",
+          "tokens": [],
+          "creationHeight": 0,
+          "registers": {},
+          "boxId": null
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+              "amount": 1
+            }
+          ],
+          "creationHeight": 0,
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 500
+            }
+          },
+          "boxId": null
+        }
+      ],
+      "contextVars": {
+        "0": {
+          "type": "Coll[Byte]",
+          "value": "6f70656e20736573616d65"
+        }
+      },
+      "minerPubkey": null,
+      "preHeader": null,
+      "costLimit": null,
+      "activatedScriptVersion": null,
+      "proof": null,
+      "message": null
+    },
+    {
+      "name": "anyone closes it on a low price with the secret: data input 0 with the wrong register value",
+      "expect": "fail",
+      "expectResidual": null,
+      "expectResidualExcludes": null,
+      "tree": null,
+      "source": null,
+      "treeVersion": 0,
+      "network": null,
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "ergoTree": "$self",
+        "tokens": [
+          {
+            "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "amount": 7
+          }
+        ],
+        "creationHeight": 0,
+        "registers": {},
+        "boxId": null
+      },
+      "selfIndex": null,
+      "inputs": [],
+      "outputs": [
+        {
+          "value": 500000000,
+          "ergoTree": "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7",
+          "tokens": [],
+          "creationHeight": 0,
+          "registers": {},
+          "boxId": null
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+              "amount": 1
+            }
+          ],
+          "creationHeight": 0,
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": "501"
+            }
+          },
+          "boxId": null
+        }
+      ],
+      "contextVars": {
+        "0": {
+          "type": "Coll[Byte]",
+          "value": "6f70656e20736573616d65"
+        }
+      },
+      "minerPubkey": null,
+      "preHeader": null,
+      "costLimit": null,
+      "activatedScriptVersion": null,
+      "proof": null,
+      "message": null
+    },
+    {
+      "name": "anyone closes it on a low price with the secret: with the wrong secret in variable 0",
+      "expect": "fail",
+      "expectResidual": null,
+      "expectResidualExcludes": null,
+      "tree": null,
+      "source": null,
+      "treeVersion": 0,
+      "network": null,
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "ergoTree": "$self",
+        "tokens": [
+          {
+            "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "amount": 7
+          }
+        ],
+        "creationHeight": 0,
+        "registers": {},
+        "boxId": null
+      },
+      "selfIndex": null,
+      "inputs": [],
+      "outputs": [
+        {
+          "value": 500000000,
+          "ergoTree": "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7",
+          "tokens": [],
+          "creationHeight": 0,
+          "registers": {},
+          "boxId": null
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+              "amount": 1
+            }
+          ],
+          "creationHeight": 0,
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 500
+            }
+          },
+          "boxId": null
+        }
+      ],
+      "contextVars": {
+        "0": {
+          "type": "Coll[Byte]",
+          "value": "00"
+        }
+      },
+      "minerPubkey": null,
+      "preHeader": null,
+      "costLimit": null,
+      "activatedScriptVersion": null,
+      "proof": null,
+      "message": null
+    },
+    {
+      "name": "anyone closes it on a low price with the secret: paying one nanoERG too little in total",
+      "expect": "fail",
+      "expectResidual": null,
+      "expectResidualExcludes": null,
+      "tree": null,
+      "source": null,
+      "treeVersion": 0,
+      "network": null,
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "ergoTree": "$self",
+        "tokens": [
+          {
+            "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "amount": 7
+          }
+        ],
+        "creationHeight": 0,
+        "registers": {},
+        "boxId": null
+      },
+      "selfIndex": null,
+      "inputs": [],
+      "outputs": [
+        {
+          "value": 499999999,
+          "ergoTree": "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7",
+          "tokens": [],
+          "creationHeight": 0,
+          "registers": {},
+          "boxId": null
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+              "amount": 1
+            }
+          ],
+          "creationHeight": 0,
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 500
+            }
+          },
+          "boxId": null
+        }
+      ],
+      "contextVars": {
+        "0": {
+          "type": "Coll[Byte]",
+          "value": "6f70656e20736573616d65"
+        }
+      },
+      "minerPubkey": null,
+      "preHeader": null,
+      "costLimit": null,
+      "activatedScriptVersion": null,
+      "proof": null,
+      "message": null
+    },
+    {
+      "name": "anyone closes it on a low price with the secret: one output carrying a token",
+      "expect": "fail",
+      "expectResidual": null,
+      "expectResidualExcludes": null,
+      "tree": null,
+      "source": null,
+      "treeVersion": 0,
+      "network": null,
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "ergoTree": "$self",
+        "tokens": [
+          {
+            "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "amount": 7
+          }
+        ],
+        "creationHeight": 0,
+        "registers": {},
+        "boxId": null
+      },
+      "selfIndex": null,
+      "inputs": [],
+      "outputs": [
+        {
+          "value": 500000000,
+          "ergoTree": "0008cd026dc059d64a50d0dbf07755c2c4a4e557e3df8afa7141868b3ab200643d437ee7",
+          "tokens": [
+            {
+              "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "amount": 1
+            }
+          ],
+          "creationHeight": 0,
+          "registers": {},
+          "boxId": null
+        }
+      ],
+      "dataInputs": [
+        {
+          "value": 1,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+              "amount": 1
+            }
+          ],
+          "creationHeight": 0,
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 500
+            }
+          },
+          "boxId": null
+        }
+      ],
+      "contextVars": {
+        "0": {
+          "type": "Coll[Byte]",
+          "value": "6f70656e20736573616d65"
+        }
+      },
+      "minerPubkey": null,
+      "preHeader": null,
+      "costLimit": null,
+      "activatedScriptVersion": null,
+      "proof": null,
+      "message": null
+    },
+    {
+      "name": "baseline: no conditions met, no outputs",
+      "expect": "fail",
+      "expectResidual": null,
+      "expectResidualExcludes": null,
+      "tree": null,
+      "source": null,
+      "treeVersion": 0,
+      "network": null,
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "ergoTree": "$self",
+        "tokens": [
+          {
+            "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "amount": 7
+          }
+        ],
+        "creationHeight": 0,
+        "registers": {},
+        "boxId": null
+      },
+      "selfIndex": null,
+      "inputs": [],
+      "outputs": [],
+      "dataInputs": [],
+      "contextVars": {},
+      "minerPubkey": null,
+      "preHeader": null,
+      "costLimit": null,
+      "activatedScriptVersion": null,
+      "proof": null,
+      "message": null
+    }
+  ]
+}
