@@ -126,6 +126,9 @@ pub enum Condition {
         #[serde(rename = "atLeast")]
         at_least: String,
     },
+    /// Every unit of token `$id` this box holds is in the outputs: none
+    /// burned, none conjured.
+    TokenConserved { id: String },
 }
 
 fn default_algo() -> String {
@@ -233,6 +236,40 @@ pub struct BoxRule {
     pub keeps_self_tokens: bool,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub registers: Vec<RegRule>,
+    /// `value >= SELF.value - $name`: the box may hold at most this much
+    /// less than this one.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub value_at_least_self_minus: Option<String>,
+    /// The box mints a token: its first token's id is the first input's
+    /// box id (EIP-4), optionally with at least `$at_least` units.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mints: Option<Mint>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Mint {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub at_least: Option<String>,
+}
+
+impl BoxRule {
+    /// A rule about `which` with nothing required yet.
+    pub fn new(which: Which) -> Self {
+        BoxRule {
+            which,
+            index: None,
+            script: None,
+            value_at_least: None,
+            value_at_least_share: None,
+            token: None,
+            no_tokens: false,
+            keeps_self_tokens: false,
+            registers: vec![],
+            value_at_least_self_minus: None,
+            mints: None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -302,10 +339,7 @@ fn lower(c: &Condition) -> Condition {
             script: Some(ScriptRef::Key { key: key.clone() }),
             value_at_least: Some(amount.clone()),
             value_at_least_share: None,
-            token: None,
-            no_tokens: false,
-            keeps_self_tokens: false,
-            registers: vec![],
+            ..BoxRule::new(Which::Output)
         }),
         Condition::KeepHere { at_least } => Condition::Box(BoxRule {
             which: Which::Output,
@@ -313,10 +347,7 @@ fn lower(c: &Condition) -> Condition {
             script: Some(ScriptRef::SelfScript(SelfWord::SelfScript)),
             value_at_least: Some(at_least.clone()),
             value_at_least_share: None,
-            token: None,
-            no_tokens: false,
-            keeps_self_tokens: false,
-            registers: vec![],
+            ..BoxRule::new(Which::Output)
         }),
         Condition::OracleAbove { nft, floor } => Condition::Box(BoxRule {
             which: Which::DataInput,
@@ -328,14 +359,13 @@ fn lower(c: &Condition) -> Condition {
                 id: nft.clone(),
                 at_least: None,
             }),
-            no_tokens: false,
-            keeps_self_tokens: false,
             registers: vec![RegRule {
                 reg: "R4".into(),
                 r#type: "Long".into(),
                 op: RegOp::Gte,
                 value: Some(floor.clone()),
             }],
+            ..BoxRule::new(Which::DataInput)
         }),
         other => other.clone(),
     }
@@ -413,6 +443,17 @@ fn box_predicate(r: &BoxRule, b: &str) -> Vec<String> {
     if r.keeps_self_tokens {
         parts.push(format!("{b}.tokens == SELF.tokens"));
     }
+    if let Some(x) = &r.value_at_least_self_minus {
+        parts.push(format!("{b}.value >= SELF.value - ${x}"));
+    }
+    if let Some(m) = &r.mints {
+        parts.push(format!(
+            "{b}.tokens.size > 0 && {b}.tokens(0)._1 == INPUTS(0).id"
+        ));
+        if let Some(n) = &m.at_least {
+            parts.push(format!("{b}.tokens(0)._2 >= ${n}"));
+        }
+    }
     for rr in &r.registers {
         let reg = format!("{b}.{}[{}]", rr.reg, rr.r#type);
         let rhs = match rr.op {
@@ -487,6 +528,9 @@ fn conditions_source(conds: &[Condition]) -> Option<String> {
             Condition::MinerIs(m) => format!("CONTEXT.minerPubKey == ${m}"),
             Condition::SumPaidTo { key, at_least } => format!(
                 "OUTPUTS.fold(0L, {{ (acc: Long, bx: Box) => if (bx.propositionBytes == ${key}.propBytes) acc + bx.value else acc }}) >= ${at_least}"
+            ),
+            Condition::TokenConserved { id } => format!(
+                "OUTPUTS.flatMap({{ (bx: Box) => bx.tokens }}).fold(0L, {{ (a: Long, t: (Coll[Byte], Long)) => if (t._1 == ${id}) a + t._2 else a }}) == SELF.tokens.fold(0L, {{ (a: Long, t: (Coll[Byte], Long)) => if (t._1 == ${id}) a + t._2 else a }})"
             ),
             Condition::PayTo { .. } | Condition::KeepHere { .. } | Condition::OracleAbove { .. } => {
                 unreachable!("lowered")
@@ -569,6 +613,12 @@ fn params_of(spec: &Spec) -> Vec<ParamNeed> {
                             push(v, &rr.r#type, format!("Register {} value (\"{v}\") — A {}.", rr.reg, rr.r#type));
                         }
                     }
+                    if let Some(x) = &r.value_at_least_self_minus {
+                        push(x, "Long", format!("At most how much may leave (\"{x}\"), {NANO}"));
+                    }
+                    if let Some(Mint { at_least: Some(n) }) = &r.mints {
+                        push(n, "Long", format!("How many units to mint (\"{n}\")? — In the token's smallest unit."));
+                    }
                 }
                 Condition::VarEquals { r#type, value, index } => push(value, r#type, format!("Value the spender must attach as variable {index} (\"{value}\") — A {type}.", type = r#type)),
                 Condition::HashPreimage { hash, algo, .. } => push(hash, "Coll[Byte]", format!("The {algo} hash of the secret (\"{hash}\") — 32 bytes, hex; the secret itself never goes on chain until it is spent.")),
@@ -578,6 +628,7 @@ fn params_of(spec: &Spec) -> Vec<ParamNeed> {
                     push(key, "SigmaProp", format!("Who is paid (\"{key}\")? — Their Ergo address."));
                     push(at_least, "Long", format!("How much in total across outputs (\"{at_least}\"), {NANO}"));
                 }
+                Condition::TokenConserved { id } => push(id, "Coll[Byte]", format!("Which token must be passed on in full (\"{id}\")? — Its token id.")),
             }
         }
     }
@@ -620,6 +671,8 @@ fn validate(spec: &Spec) -> Result<(), ComposeError> {
                         && !r.no_tokens
                         && !r.keeps_self_tokens
                         && r.registers.is_empty()
+                        && r.value_at_least_self_minus.is_none()
+                        && r.mints.is_none()
                     {
                         return Err(ComposeError::EmptyBoxRule(p.name.clone()));
                     }
@@ -631,7 +684,15 @@ fn validate(spec: &Spec) -> Result<(), ComposeError> {
                             "`keepsSelfTokens` on this box itself is always true".into()
                         ));
                     }
-                    if r.no_tokens && (r.token.is_some() || r.keeps_self_tokens) {
+                    if r.which == Which::SelfBox && r.mints.is_some() {
+                        return Err(bad(
+                            "this box cannot mint into itself; a mint rule is about an output"
+                                .into(),
+                        ));
+                    }
+                    if r.no_tokens
+                        && (r.token.is_some() || r.keeps_self_tokens || r.mints.is_some())
+                    {
                         return Err(bad(
                             "`noTokens` contradicts a token requirement on the same box".into(),
                         ));
@@ -781,6 +842,10 @@ impl Default for MBox {
 const ANY_TREE: &str = "10010101d17300";
 /// The token this box carries in the model when a rule refers to its tokens.
 const SELF_TOKEN: &str = "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+/// This box's id in the model (it is INPUTS(0), so also any minted token's id).
+const SELF_ID: &str = "1111111111111111111111111111111111111111111111111111111111111111";
+/// How many units of a conserved token this box holds in the model.
+const CONSERVED_UNITS: u64 = 7;
 
 /// A concrete scenario the model reasons about.
 #[derive(Clone, Debug)]
@@ -797,23 +862,30 @@ struct World {
 }
 
 impl World {
-    fn baseline(spec: &Spec) -> World {
-        let uses_self_tokens = spec
-            .paths
-            .iter()
-            .flat_map(|p| &p.conditions)
-            .any(|c| matches!(c, Condition::Box(r) if r.keeps_self_tokens));
+    fn baseline(spec: &Spec, values: &BTreeMap<String, TypedValue>) -> World {
+        let conds = || spec.paths.iter().flat_map(|p| &p.conditions);
+        let uses_self_tokens =
+            conds().any(|c| matches!(c, Condition::Box(r) if r.keeps_self_tokens));
+        let mut tokens = Vec::new();
+        if uses_self_tokens {
+            tokens.push((SELF_TOKEN.to_string(), 7));
+        }
+        for c in conds() {
+            if let Condition::TokenConserved { id } = c {
+                if let Ok(id) = str_of(values, id) {
+                    if !tokens.iter().any(|(i, _)| *i == id) {
+                        tokens.push((id, CONSERVED_UNITS));
+                    }
+                }
+            }
+        }
         World {
             height: 1,
             timestamp: None,
             self_box: MBox {
                 tree: "$self".into(),
                 value: 1_000_000_000,
-                tokens: if uses_self_tokens {
-                    vec![(SELF_TOKEN.into(), 7)]
-                } else {
-                    vec![]
-                },
+                tokens,
                 registers: BTreeMap::new(),
                 creation_height: 0,
             },
@@ -975,6 +1047,21 @@ fn box_ok(
     if r.keeps_self_tokens && b.tokens != w.self_box.tokens {
         return Ok(false);
     }
+    if let Some(x) = &r.value_at_least_self_minus {
+        if b.value < w.self_box.value - int_of(values, x)? {
+            return Ok(false);
+        }
+    }
+    if let Some(m) = &r.mints {
+        let min = match &m.at_least {
+            Some(n) => int_of(values, n)?,
+            None => i64::MIN,
+        };
+        match b.tokens.first() {
+            Some((id, n)) if id == SELF_ID && i64::try_from(*n).unwrap_or(i64::MAX) >= min => {}
+            _ => return Ok(false),
+        }
+    }
     for rr in &r.registers {
         let Some((t, rv)) = b.registers.get(&rr.reg) else {
             return Ok(false);
@@ -1107,6 +1194,10 @@ fn satisfied(
                     .sum();
                 sum >= i128::from(int_of(values, at_least)?)
             }
+            Condition::TokenConserved { id } => {
+                let id = str_of(values, id)?;
+                token_sum(&w.outputs, &id) == token_sum(std::slice::from_ref(&w.self_box), &id)
+            }
             Condition::PayTo { .. }
             | Condition::KeepHere { .. }
             | Condition::OracleAbove { .. } => unreachable!("lowered"),
@@ -1116,6 +1207,15 @@ fn satisfied(
         }
     }
     Ok(true)
+}
+
+fn token_sum(boxes: &[MBox], id: &str) -> u128 {
+    boxes
+        .iter()
+        .flat_map(|b| b.tokens.iter())
+        .filter(|(i, _)| i == id)
+        .map(|(_, n)| u128::from(*n))
+        .sum()
 }
 
 /// Make box `b` satisfy rule `r` (requirements accumulate; later rules win
@@ -1155,6 +1255,17 @@ fn apply_rule(
     }
     if r.keeps_self_tokens {
         b.tokens = self_tokens.to_vec();
+    }
+    if let Some(x) = &r.value_at_least_self_minus {
+        b.value = b.value.max(self_value - int_of(values, x)?);
+    }
+    if let Some(m) = &r.mints {
+        let n = match &m.at_least {
+            Some(n) => u64::try_from(int_of(values, n)?).unwrap_or(1).max(1),
+            None => 1,
+        };
+        b.tokens.retain(|(i, _)| i != SELF_ID);
+        b.tokens.insert(0, (SELF_ID.into(), n));
     }
     for rr in &r.registers {
         let rv = match rr.op {
@@ -1202,7 +1313,7 @@ fn satisfying_world(
     p: &Path,
     values: &BTreeMap<String, TypedValue>,
 ) -> Result<World, ComposeError> {
-    let with = World::baseline(spec);
+    let with = World::baseline(spec, values);
     if with.self_box.tokens.is_empty() {
         return satisfying_world_from(spec, p, values, with);
     }
@@ -1306,6 +1417,7 @@ fn satisfying_world_from(
                     ..MBox::default()
                 });
             }
+            Condition::TokenConserved { .. } => {} // balanced after the box rules
             Condition::PayTo { .. }
             | Condition::KeepHere { .. }
             | Condition::OracleAbove { .. } => unreachable!("lowered"),
@@ -1356,6 +1468,27 @@ fn satisfying_world_from(
                         .registers
                         .insert(rr.reg.clone(), sv.clone());
                 }
+            }
+        }
+    }
+    // Conserved tokens: whatever the outputs do not already carry goes in
+    // one more output.
+    for c in &conds {
+        if let Condition::TokenConserved { id } = c {
+            let id = str_of(values, id)?;
+            let have = token_sum(&w.outputs, &id);
+            let need = token_sum(std::slice::from_ref(&w.self_box), &id);
+            if have > need {
+                return Err(ComposeError::Unsatisfiable(
+                    p.name.clone(),
+                    format!("the outputs must carry more of token {id} than this box holds"),
+                ));
+            }
+            if have < need {
+                w.outputs.push(MBox {
+                    tokens: vec![(id, (need - have) as u64)],
+                    ..MBox::default()
+                });
             }
         }
     }
@@ -1418,13 +1551,18 @@ fn violation_name(c: &Condition) -> String {
                     RegOp::EqSelf => "not carrying the register over",
                     _ => "with the wrong register value",
                 }
+            } else if r.mints.is_some() {
+                "minting under the wrong token id"
             } else if r.token.is_some() {
                 "without the token"
             } else if r.no_tokens {
                 "carrying a token"
             } else if r.keeps_self_tokens {
                 "dropping this box's tokens"
-            } else if r.value_at_least.is_some() || r.value_at_least_share.is_some() {
+            } else if r.value_at_least.is_some()
+                || r.value_at_least_share.is_some()
+                || r.value_at_least_self_minus.is_some()
+            {
                 "one nanoERG short"
             } else {
                 "to the wrong script"
@@ -1445,6 +1583,7 @@ fn violation_name(c: &Condition) -> String {
         Condition::TokenGated { .. } => "without the membership token".into(),
         Condition::MinerIs(_) => "mined by someone else".into(),
         Condition::SumPaidTo { .. } => "paying one nanoERG too little in total".into(),
+        Condition::TokenConserved { .. } => "burning one unit of the token".into(),
     }
 }
 
@@ -1496,6 +1635,10 @@ fn break_box(
                 );
             }
         }
+    } else if r.mints.is_some() {
+        if let Some(t) = b.tokens.first_mut() {
+            t.0 = SELF_TOKEN.into();
+        }
     } else if let Some(t) = &r.token {
         let id = str_of(values, &t.id)?;
         b.tokens.retain(|(i, _)| *i != id);
@@ -1507,7 +1650,10 @@ fn break_box(
         } else {
             b.tokens.clear();
         }
-    } else if r.value_at_least.is_some() || r.value_at_least_share.is_some() {
+    } else if r.value_at_least.is_some()
+        || r.value_at_least_share.is_some()
+        || r.value_at_least_self_minus.is_some()
+    {
         b.value -= 1;
     } else if r.script.is_some() {
         b.tree = ANY_TREE.into();
@@ -1612,6 +1758,16 @@ fn violating_world(
             let (_, at) = any_slots.get(&k).copied().unwrap_or((Which::Output, 0));
             w.slot(Which::Output, at).value -= 1;
         }
+        Condition::TokenConserved { id } => {
+            let id = str_of(values, id)?;
+            for b in w.outputs.iter_mut() {
+                if let Some(t) = b.tokens.iter_mut().find(|(i, _)| *i == id) {
+                    t.1 -= 1;
+                    b.tokens.retain(|(_, n)| *n > 0);
+                    break;
+                }
+            }
+        }
         Condition::PayTo { .. } | Condition::KeepHere { .. } | Condition::OracleAbove { .. } => {
             unreachable!("lowered")
         }
@@ -1703,7 +1859,7 @@ fn scenario_json(w: &World) -> serde_json::Value {
     let mut sc = serde_json::json!({ "height": w.height, "selfBox": box_json(&w.self_box, w), "outputs": list(&w.outputs) });
     // Synthetic boxes share an all-zero id unless told otherwise; a token
     // gate compares ids, so every input gets its own.
-    sc["selfBox"]["boxId"] = serde_json::json!("11".repeat(32));
+    sc["selfBox"]["boxId"] = serde_json::json!(SELF_ID);
     if !w.extra_inputs.is_empty() {
         let mut inputs = list(&w.extra_inputs);
         for (i, b) in inputs.as_array_mut().unwrap().iter_mut().enumerate() {
@@ -1768,7 +1924,7 @@ fn generate_suite(
     if spec.paths.iter().any(|p| !p.conditions.is_empty()) {
         add(
             "baseline: no conditions met, no outputs".into(),
-            &World::baseline(spec),
+            &World::baseline(spec, values),
         )?;
     }
     let doc = serde_json::json!({ "source": source, "params": values, "scenarios": scenarios });

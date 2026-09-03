@@ -418,3 +418,62 @@ fn the_contracts_own_token_does_not_open_a_token_gate() {
         r.cases.iter().filter(|c| !c.passed).collect::<Vec<_>>()
     );
 }
+
+// ── arithmetic and conservation ───────────────────────────────────────────
+
+#[test]
+fn kept_funds_may_drop_by_at_most_an_amount() {
+    let out = compose_ok(
+        r#"{ "paths": [ { "name": "withdraw a little", "who": { "anyOf": ["k"] },
+        "conditions": [ { "box": { "which": "output", "index": 0, "script": "self", "valueAtLeastSelfMinus": "cap" } } ] } ] }"#,
+        v(&[
+            ("k", "SigmaProp", serde_json::json!(A)),
+            ("cap", "Long", serde_json::json!(100_000_000)),
+        ]),
+    );
+    assert!(
+        out.source.contains("OUTPUTS(0).value >= SELF.value - $cap"),
+        "{}",
+        out.source
+    );
+    green(&out);
+}
+
+#[test]
+fn a_token_is_conserved_across_outputs() {
+    let out = compose_ok(
+        r#"{ "paths": [ { "name": "pass the token on", "who": { "anyOf": ["k"] },
+        "conditions": [ { "tokenConserved": { "id": "t" } } ] } ] }"#,
+        v(&[
+            ("k", "SigmaProp", serde_json::json!(A)),
+            ("t", "Coll[Byte]", serde_json::json!("ab".repeat(32))),
+        ]),
+    );
+    assert!(out.source.contains("SELF.tokens.fold"), "{}", out.source);
+    let suite = out.suite.clone().unwrap();
+    assert!(
+        suite.scenarios.iter().any(|c| c.name.contains("burning")),
+        "{:?}",
+        suite.scenarios.iter().map(|c| &c.name).collect::<Vec<_>>()
+    );
+    green(&out);
+}
+
+#[test]
+fn an_output_mints_a_token_named_after_the_first_input() {
+    let out = compose_ok(
+        r#"{ "paths": [ { "name": "issue", "who": { "anyOf": ["k"] },
+        "conditions": [ { "box": { "which": "output", "index": 0, "script": { "key": "k" }, "mints": { "atLeast": "supply" } } } ] } ] }"#,
+        v(&[
+            ("k", "SigmaProp", serde_json::json!(A)),
+            ("supply", "Long", serde_json::json!(1000)),
+        ]),
+    );
+    assert!(
+        out.source
+            .contains("OUTPUTS(0).tokens(0)._1 == INPUTS(0).id"),
+        "{}",
+        out.source
+    );
+    green(&out);
+}
