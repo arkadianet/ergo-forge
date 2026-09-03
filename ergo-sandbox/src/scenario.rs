@@ -84,6 +84,11 @@ pub struct Scenario {
     /// reports proof verification against `message`.
     #[serde(default)]
     pub proof: Option<String>,
+    /// The last block headers, newest first (`CONTEXT.headers`, at most
+    /// 10). `CONTEXT.LastBlockUtxoRootHash` is the newest one's
+    /// `stateRoot`. Every field is optional and defaults to zero.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub headers: Vec<HeaderSpec>,
     /// Secrets the spender holds. When the script reduces to a sigma
     /// proposition and no `proof` is given, the sandbox PRODUCES a proof
     /// with the node's wallet prover and verifies it like a supplied one.
@@ -115,6 +120,45 @@ where
                 .map_err(|_| D::Error::custom(format!("context var id `{k}` is not 0..=255")))
         })
         .collect()
+}
+
+/// One entry of `headers`. Hex fields: `id`, `parentId`, `adProofsRoot`,
+/// `transactionsRoot`, `extensionRoot` (32 bytes), `stateRoot` (33 bytes:
+/// digest + tree height), `minerPk`, `powOnetimePk` (33 bytes),
+/// `powNonce` (8 bytes); `powDistance` is a decimal string.
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct HeaderSpec {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub version: Option<u8>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parent_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ad_proofs_root: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub state_root: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub transactions_root: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub timestamp: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub n_bits: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub height: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub extension_root: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub miner_pk: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pow_onetime_pk: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pow_nonce: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pow_distance: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub votes: Option<[u8; 3]>,
 }
 
 /// Pre-header fields (SPreHeader). All optional; defaults are zero.

@@ -226,6 +226,30 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
         None => [0u8; 32],
     };
 
+    // 4b. Headers, newest first; the pre-block UTXO root is the newest
+    // header's state root with all operations allowed (Scala
+    // `ErgoInterpreter.avlTreeFromDigest`).
+    if sc.headers.len() > 10 {
+        return Err(SandboxError::Scenario(format!(
+            "at most 10 headers, got {}",
+            sc.headers.len()
+        )));
+    }
+    let headers: Vec<ergo_sigma::evaluator::EvalHeader> = sc
+        .headers
+        .iter()
+        .enumerate()
+        .map(|(i, h)| eval_header(i, h))
+        .collect::<Result<_, _>>()?;
+    let last_block_utxo_root = headers.first().map(|h| ergo_ser::sigma_value::AvlTreeData {
+        digest: h.state_root.to_vec(),
+        insert_allowed: true,
+        update_allowed: true,
+        remove_allowed: true,
+        key_length: 32,
+        value_length_opt: None,
+    });
+
     // 5. The reduction context — same shape validate_scripts assembles.
     let ctx = ReductionContext {
         height: sc.height,
@@ -242,8 +266,8 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
         pre_header_votes: ph.votes.unwrap_or([0u8; 3]),
         extension,
         input_extensions: &input_extensions,
-        last_headers: &[],
-        last_block_utxo_root: None,
+        last_headers: &headers,
+        last_block_utxo_root,
         activated_script_version: sc.activated_script_version.unwrap_or(3),
         ergo_tree_version: tree.version,
     };
@@ -392,4 +416,58 @@ fn parse_network(name: Option<&str>) -> Result<Option<NetworkPrefix>, SandboxErr
             "unknown network `{other}` (expected `mainnet` or `testnet`)"
         ))),
     }
+}
+
+fn fixed<const N: usize>(
+    what: &str,
+    i: usize,
+    v: &Option<String>,
+) -> Result<[u8; N], SandboxError> {
+    let Some(s) = v else { return Ok([0u8; N]) };
+    let bytes = hex::decode(s.trim())
+        .map_err(|e| SandboxError::Scenario(format!("headers[{i}].{what} hex: {e}")))?;
+    bytes
+        .try_into()
+        .map_err(|_| SandboxError::Scenario(format!("headers[{i}].{what}: {N} bytes expected")))
+}
+
+/// A scenario header as the evaluator sees it; absent fields are zero
+/// (points: the encoding of a zero point, `02 00…`).
+fn eval_header(
+    i: usize,
+    h: &crate::scenario::HeaderSpec,
+) -> Result<ergo_sigma::evaluator::EvalHeader, SandboxError> {
+    let pow_distance = match &h.pow_distance {
+        Some(d) => d
+            .trim()
+            .parse::<num_bigint::BigInt>()
+            .map_err(|e| SandboxError::Scenario(format!("headers[{i}].powDistance: {e}")))?,
+        None => num_bigint::BigInt::from(0),
+    };
+    let pk = |what: &str, v: &Option<String>| -> Result<[u8; 33], SandboxError> {
+        if v.is_none() {
+            let mut z = [0u8; 33];
+            z[0] = 0x02;
+            return Ok(z);
+        }
+        fixed::<33>(what, i, v)
+    };
+    Ok(ergo_sigma::evaluator::EvalHeader {
+        id: fixed::<32>("id", i, &h.id)?,
+        version: h.version.unwrap_or(0),
+        parent_id: fixed::<32>("parentId", i, &h.parent_id)?,
+        ad_proofs_root: fixed::<32>("adProofsRoot", i, &h.ad_proofs_root)?,
+        state_root: fixed::<33>("stateRoot", i, &h.state_root)?,
+        transactions_root: fixed::<32>("transactionsRoot", i, &h.transactions_root)?,
+        timestamp: h.timestamp.unwrap_or(0),
+        n_bits: h.n_bits.unwrap_or(0),
+        height: h.height.unwrap_or(0),
+        extension_root: fixed::<32>("extensionRoot", i, &h.extension_root)?,
+        miner_pk: pk("minerPk", &h.miner_pk)?,
+        pow_onetime_pk: pk("powOnetimePk", &h.pow_onetime_pk)?,
+        pow_nonce: fixed::<8>("powNonce", i, &h.pow_nonce)?,
+        pow_distance,
+        votes: h.votes.unwrap_or([0u8; 3]),
+        unparsed_bytes: Vec::new(),
+    })
 }

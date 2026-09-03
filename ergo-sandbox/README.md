@@ -58,6 +58,17 @@ A register (or context variable) value may be given as the serialized
 constant a node or explorer reports — `{"type": "raw", "value": "040a"}` —
 type descriptor first. This is how a real box reaches a scenario untouched.
 
+### Headers
+
+`"headers": [ {…newest…}, {…} ]` (at most 10) fills `CONTEXT.headers`;
+`CONTEXT.LastBlockUtxoRootHash` is the newest header's `stateRoot` with
+all operations allowed, as on mainnet. Every field is optional and
+defaults to zero: `id`, `parentId`, `adProofsRoot`, `transactionsRoot`,
+`extensionRoot` (32-byte hex), `stateRoot` (33 bytes: digest + tree
+height), `minerPk`, `powOnetimePk` (33 bytes), `powNonce` (8 bytes),
+`version`, `timestamp` (ms), `nBits`, `height`, `powDistance` (decimal
+string), `votes` (`[b, b, b]`).
+
 ### Secrets: proofs the sandbox makes
 
 A scenario may name the spender's secrets; when the script reduces to a

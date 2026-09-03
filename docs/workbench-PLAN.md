@@ -329,8 +329,12 @@ Still missing (the actual build list):
     protocol templates ride on it: a registry (ErgoNames shape, 6 cases,
     every proof from the prover) and a mixer (ZeroJoin shape, half + full
     mix, 12 cases, every proof from secrets). Not built: multi-signature
-    hint exchange (the wallet has hints; the sandbox proves alone) and
-    header-chain proofs.
+    hint exchange (the wallet has hints; the sandbox proves alone).
+    Headers landed the same day: `headers` in a scenario fills
+    `CONTEXT.headers` and `LastBlockUtxoRootHash`. Found while doing it:
+    the pinned node evaluator has no `SizeOf` arm for `Coll[Header]`, so
+    `CONTEXT.headers.size` errors where Scala answers 10 — a consensus
+    divergence for any script that reads it; fixed upstream.
 15. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.

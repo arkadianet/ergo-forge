@@ -289,7 +289,7 @@ Run a scenario — contract plus spending context — on the consensus reducer.
 The body is the scenario JSON itself (the `ergo-es eval` schema in the sandbox
 README): `source` or `tree`, `height`, optional `selfBox` / `inputs` /
 `outputs` / `dataInputs` / `contextVars` / `proof` / `costLimit` / `network`,
-plus `secrets` (the sandbox makes and verifies the spending proof) and
+plus `headers` (`CONTEXT.headers`, newest first), `secrets` (the sandbox makes and verifies the spending proof) and
 `avl` (trees built by a real prover, referenced as `@avl.name…`); see the
 engine README. Both also work per case in `POST /api/v1/test`.
 
