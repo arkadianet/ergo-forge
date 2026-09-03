@@ -364,8 +364,15 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
                 })?,
             )
         }
-        None if !sc.secrets.is_empty() && outcome.verdict == Verdict::NeedsProof => {
-            match crate::prove::prove(&proposition, &sc.secrets, &message) {
+        None if (!sc.secrets.is_empty() || !sc.parties.is_empty())
+            && outcome.verdict == Verdict::NeedsProof =>
+        {
+            let made = if sc.secrets.is_empty() {
+                crate::prove::prove_parties(&proposition, &sc.parties, &message)
+            } else {
+                crate::prove::prove(&proposition, &sc.secrets, &message)
+            };
+            match made {
                 Ok(p) => Some(p),
                 Err(e) => {
                     outcome.error = Some(format!("no proof from these secrets: {e}"));

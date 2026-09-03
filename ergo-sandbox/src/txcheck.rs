@@ -179,6 +179,7 @@ pub fn check(req: &TxRequest) -> Result<TxCheck, SandboxError> {
         let sc = Scenario {
             headers: Vec::new(),
             secrets: Vec::new(),
+            parties: Vec::new(),
             avl: Default::default(),
             tree: Some(tree_hex),
             source: None,

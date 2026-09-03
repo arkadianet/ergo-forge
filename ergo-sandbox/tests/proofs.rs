@@ -187,3 +187,56 @@ fn a_scenario_can_carry_the_last_headers() {
     let r = run(src, serde_json::json!({}), sc);
     assert_eq!(r.0, "pass", "{:?}", r.1);
 }
+
+#[test]
+fn two_parties_sign_a_two_of_three_without_sharing_secrets() {
+    // The standard Ergo multi-party flow: each party generates commitments
+    // for its own key, the first proves with the others' commitments, the
+    // next completes from the extracted hints. No registry ever holds two
+    // parties' secrets.
+    let pk = |x: &str| ergo_sandbox::prove::pubkey_hex(x).unwrap();
+    let (a, b, c) = (pk(X1), pk(X2), pk(X3));
+    let src = "atLeast(2, Coll($a, $b, $c))";
+    let params = serde_json::json!({ "a": {"type":"SigmaProp","value":a}, "b": {"type":"SigmaProp","value":b}, "c": {"type":"SigmaProp","value":c} });
+    let ok = run(
+        src,
+        params.clone(),
+        serde_json::json!({ "height": 1, "parties": [ { "name": "alice", "secrets": [ {"dlog": X1} ] }, { "name": "carol", "secrets": [ {"dlog": X3} ] } ] }),
+    );
+    assert_eq!(ok.0, "proofAccepted", "{:?}", ok.1);
+    let one = run(
+        src,
+        params,
+        serde_json::json!({ "height": 1, "parties": [ { "secrets": [ {"dlog": X1} ] } ] }),
+    );
+    assert_eq!(one.0, "needsProof", "{:?}", one.1);
+    assert!(
+        one.1.as_deref().unwrap_or("").contains("no proof"),
+        "{:?}",
+        one.1
+    );
+}
+
+#[test]
+fn three_parties_sign_an_and_of_three_in_sequence() {
+    let pk = |x: &str| ergo_sandbox::prove::pubkey_hex(x).unwrap();
+    let (a, b, c) = (pk(X1), pk(X2), pk(X3));
+    let src = "$a && $b && $c";
+    let params = serde_json::json!({ "a": {"type":"SigmaProp","value":a}, "b": {"type":"SigmaProp","value":b}, "c": {"type":"SigmaProp","value":c} });
+    let ok = run(
+        src,
+        params,
+        serde_json::json!({ "height": 1, "parties": [ { "secrets": [ {"dlog": X1} ] }, { "secrets": [ {"dlog": X2} ] }, { "secrets": [ {"dlog": X3} ] } ] }),
+    );
+    assert_eq!(ok.0, "proofAccepted", "{:?}", ok.1);
+}
+
+#[test]
+fn headers_size_is_answered_after_the_pin_bump() {
+    let r = run(
+        "sigmaProp(CONTEXT.headers.size == 2)",
+        serde_json::json!({}),
+        serde_json::json!({ "height": 5, "headers": [ {"height": 4}, {"height": 3} ] }),
+    );
+    assert_eq!(r.0, "pass", "{:?}", r.1);
+}
