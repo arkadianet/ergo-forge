@@ -1,6 +1,7 @@
-# Dogfood: run this repo's example suites through the composite action the
-# way another project would — with the prebuilt ergo-es from the latest
-# release, not a local build. Proves the action end to end on every PR.
+# Dogfood: run this repo's example suites through the composite action.
+# Built from source, because a PR may add suites that use runner features
+# newer than the latest release (other projects use `version: latest` or a
+# tag; that path is exercised by the release workflow's assets).
 name: contract-tests
 
 on:
@@ -19,4 +20,4 @@ jobs:
       - uses: ./.github/actions/test
         with:
           suites: "examples/tests/*.test.json"
-          version: latest
+          version: source

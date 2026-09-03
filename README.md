@@ -98,7 +98,7 @@ table to the job summary:
 - uses: arkadianet/ergo-forge/.github/actions/test@main
   with:
     suites: "contracts/**/contract.test.json"   # default: **/contract.test.json
-    version: latest                             # or a tag, e.g. v0.2.0
+    version: latest                             # or a tag, e.g. v0.2.0; 'source' builds from an ergo-forge checkout
 ```
 
 Prebuilt `ergo-es` binaries (Linux x86_64/aarch64, macOS arm64) are attached
