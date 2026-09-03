@@ -477,3 +477,26 @@ fn an_output_mints_a_token_named_after_the_first_input() {
     );
     green(&out);
 }
+
+#[test]
+fn a_conserved_token_fits_in_a_single_required_output() {
+    let out = compose_ok(
+        r#"{ "paths": [ { "name": "one output", "who": { "anyOf": ["k"] },
+        "conditions": [ { "outputCount": "n" }, { "tokenConserved": { "id": "t" } } ] } ] }"#,
+        v(&[
+            ("k", "SigmaProp", serde_json::json!(A)),
+            ("n", "Int", serde_json::json!(1)),
+            ("t", "Coll[Byte]", serde_json::json!("ab".repeat(32))),
+        ]),
+    );
+    green(&out);
+}
+
+#[test]
+fn a_mint_rule_is_only_about_outputs() {
+    for which in ["self", "input", "dataInput"] {
+        let err = compose(&spec(&format!(r#"{{ "paths": [ {{ "name": "x", "who": {{ "anyOf": ["k"] }},
+            "conditions": [ {{ "box": {{ "which": "{which}", "index": 0, "mints": {{}} }} }} ] }} ] }}"#)), &BTreeMap::new()).unwrap_err();
+        assert!(err.to_string().contains("only an output"), "{which}: {err}");
+    }
+}

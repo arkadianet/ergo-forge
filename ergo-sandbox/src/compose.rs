@@ -684,10 +684,9 @@ fn validate(spec: &Spec) -> Result<(), ComposeError> {
                             "`keepsSelfTokens` on this box itself is always true".into()
                         ));
                     }
-                    if r.which == Which::SelfBox && r.mints.is_some() {
+                    if r.mints.is_some() && r.which != Which::Output {
                         return Err(bad(
-                            "this box cannot mint into itself; a mint rule is about an output"
-                                .into(),
+                            "a mint rule is about an output: only an output can carry a newly minted token".into(),
                         ));
                     }
                     if r.no_tokens
@@ -1423,6 +1422,55 @@ fn satisfying_world_from(
             | Condition::OracleAbove { .. } => unreachable!("lowered"),
         }
     }
+    // Conserved tokens: whatever the outputs do not already carry goes
+    // into an output that may carry tokens, else into one more output.
+    let no_token_slots: Vec<usize> = conds
+        .iter()
+        .filter_map(|c| match c {
+            Condition::Box(r) if r.which == Which::Output && r.no_tokens => match r.index {
+                Some(Index::At(i)) => Some(i),
+                _ => None,
+            },
+            _ => None,
+        })
+        .collect();
+    let all_no_tokens = conds.iter().any(|c| {
+        matches!(c, Condition::Box(r) if r.which == Which::Output && r.no_tokens && r.index == Some(Index::Word(Word::All)))
+    });
+    for c in &conds {
+        if let Condition::TokenConserved { id } = c {
+            let id = str_of(values, id)?;
+            let have = token_sum(&w.outputs, &id);
+            let need = token_sum(std::slice::from_ref(&w.self_box), &id);
+            if have > need {
+                return Err(ComposeError::Unsatisfiable(
+                    p.name.clone(),
+                    format!("the outputs must carry more of token {id} than this box holds"),
+                ));
+            }
+            if have < need {
+                if all_no_tokens {
+                    return Err(ComposeError::Unsatisfiable(
+                        p.name.clone(),
+                        "the token must be passed on, yet no output may carry tokens".into(),
+                    ));
+                }
+                let shortfall = (need - have) as u64;
+                let room = w
+                    .outputs
+                    .iter()
+                    .position(|b| b.tokens.is_empty())
+                    .filter(|i| !no_token_slots.contains(i));
+                match room {
+                    Some(i) => w.outputs[i].tokens.push((id, shortfall)),
+                    None => {
+                        let i = w.outputs.len();
+                        w.slot(Which::Output, i).tokens.push((id, shortfall));
+                    }
+                }
+            }
+        }
+    }
     if let Some(n) = out_count {
         if (w.outputs.len() as i64) > n {
             return Err(ComposeError::Unsatisfiable(
@@ -1468,27 +1516,6 @@ fn satisfying_world_from(
                         .registers
                         .insert(rr.reg.clone(), sv.clone());
                 }
-            }
-        }
-    }
-    // Conserved tokens: whatever the outputs do not already carry goes in
-    // one more output.
-    for c in &conds {
-        if let Condition::TokenConserved { id } = c {
-            let id = str_of(values, id)?;
-            let have = token_sum(&w.outputs, &id);
-            let need = token_sum(std::slice::from_ref(&w.self_box), &id);
-            if have > need {
-                return Err(ComposeError::Unsatisfiable(
-                    p.name.clone(),
-                    format!("the outputs must carry more of token {id} than this box holds"),
-                ));
-            }
-            if have < need {
-                w.outputs.push(MBox {
-                    tokens: vec![(id, (need - have) as u64)],
-                    ..MBox::default()
-                });
             }
         }
     }
