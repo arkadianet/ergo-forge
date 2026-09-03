@@ -313,3 +313,33 @@ button.secondary {
 .summary { white-space: pre-line; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 0.7rem 0.9rem; }
 button.tiny { padding: 0.1rem 0.5rem; margin: 0 0 0 0.4rem; font-size: 0.8rem; }
 #open-file, #save-project { margin-top: 0; }
+
+/* ── build mode, step flow ── */
+.step { margin-top: 0.5rem; }
+.lead { color: var(--text); max-width: 46rem; }
+.recipe strong { font-size: 1rem; }
+.field input.invalid { border-color: var(--high); }
+.field .problem { display: block; margin-top: 0.2rem; color: var(--high); font-size: 0.85rem; }
+.field select { width: 100%; box-sizing: border-box; padding: 0.5rem 0.6rem; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; color: var(--text); }
+.address-card { display: flex; gap: 1.2rem; align-items: flex-start; flex-wrap: wrap; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 1rem; }
+.qr { width: 132px; height: 132px; flex: 0 0 auto; background: #fff; border-radius: 6px; padding: 4px; box-sizing: border-box; }
+.qr svg { width: 100%; height: 100%; display: block; }
+.address-text { flex: 1 1 16rem; min-width: 0; }
+.address-text code { display: block; font-size: 0.95rem; word-break: break-all; line-height: 1.5; margin-bottom: 0.5rem; }
+.steps { padding-left: 1.3rem; line-height: 1.6; }
+.steps li { margin: 0.35rem 0; }
+h3 { font-size: 1rem; margin: 1.4rem 0 0.4rem; color: var(--accent); }
+details.dev summary { color: var(--dim); cursor: pointer; }
+#build-create { padding: 0.6rem 1.4rem; border: 0; border-radius: 6px; background: var(--accent); color: #06222e; font-weight: 600; cursor: pointer; font-size: 1rem; }
+#toast {
+  position: fixed; left: 50%; bottom: 1.5rem; transform: translate(-50%, 1rem); opacity: 0;
+  background: var(--panel); color: var(--text); border: 1px solid var(--accent); border-radius: 8px;
+  padding: 0.6rem 1rem; transition: opacity .2s, transform .2s; pointer-events: none; max-width: 90vw;
+}
+#toast.show { opacity: 1; transform: translate(-50%, 0); }
+.wire dd code { word-break: break-all; }
+@media (max-width: 600px) {
+  .write-row { flex-wrap: wrap; }
+  .modes { overflow-x: auto; }
+  .recipes { grid-template-columns: 1fr; }
+}

@@ -1,11 +1,10 @@
 /**
- * Sell tokens from this box at a fixed price. A buyer may take some or all
- * of the tokens as long as the seller is paid the price for what is taken
- * (first output); any tokens left must stay in a box under this same
- * contract (second output). The seller can always take everything back.
- * @param seller the address that receives the payment and may cancel
- * @param tokenId the id of the token being sold
- * @param pricePerToken the price of one token, in nanoERG
+ * Sell tokens at a fixed price. Buyers may take some or all of the tokens
+ * as long as you are paid for what they take; unsold tokens stay for sale.
+ * You can cancel and take everything back at any time.
+ * @param seller Who receives the payments? — Your Ergo address.
+ * @param tokenId Which token are you selling? — The token id (64 characters), from your wallet or an explorer.
+ * @param pricePerToken Price per token, in nanoERG — 1 ERG = 1,000,000,000 nanoERG.
  */
 @contract def tokenSale(seller: SigmaProp, tokenId: Coll[Byte], pricePerToken: Long) = {
   val forSale = SELF.tokens(0)

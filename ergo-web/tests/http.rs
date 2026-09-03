@@ -823,7 +823,7 @@ async fn examples_serve_raw_es_files_and_recipe_docs() {
         one["doc"]["description"]
             .as_str()
             .unwrap()
-            .contains("Lock funds"),
+            .contains("Savings"),
         "{one}"
     );
     assert_eq!(one["params"][0]["name"], "owner");

@@ -1,10 +1,9 @@
 /**
- * Pay someone, and get it back if they have not claimed it by a height.
- * The receiver can spend at any time; the sender can reclaim after the
- * deadline.
- * @param receiver the address being paid
- * @param sender the address that may reclaim after the deadline
- * @param refundHeight the block height from which the sender may reclaim
+ * Pay someone, and get it back if they have not claimed it by a date. The
+ * receiver can take it at any time until then; after the date you can reclaim.
+ * @param receiver Who are you paying? — Their Ergo address.
+ * @param sender Who gets the refund? — Usually your own address.
+ * @param refundHeight After which date may you reclaim it? — The receiver can claim until then.
  */
 @contract def refundablePayment(receiver: SigmaProp, sender: SigmaProp, refundHeight: Int) =
   receiver || (sender && sigmaProp(HEIGHT >= refundHeight))

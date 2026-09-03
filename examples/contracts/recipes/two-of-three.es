@@ -1,9 +1,9 @@
 /**
- * Any two of three people must sign to spend. A shared account, a small
- * treasury, or a backup key arrangement.
- * @param first the first signer's address
- * @param second the second signer's address
- * @param third the third signer's address
+ * A shared account: any two of three people must agree to spend. Good for a
+ * small treasury, a couple with a backup key, or a company.
+ * @param first First person — An Ergo address.
+ * @param second Second person — An Ergo address.
+ * @param third Third person — An Ergo address.
  */
 @contract def twoOfThree(first: SigmaProp, second: SigmaProp, third: SigmaProp) =
   atLeast(2, Coll(first, second, third))

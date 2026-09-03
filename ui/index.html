@@ -11,9 +11,9 @@
   <header>
     <h1>ErgoScript playground</h1>
     <p><strong>Build</strong> a contract by answering a few questions,
-       <strong>Write</strong> ErgoScript and compile it on the node's own
-       compiler, or <strong>Read</strong> what an on-chain address does.
-       Findings, spendability, and tests run on the consensus reducer.</p>
+       <strong>Write</strong> one in ErgoScript, or <strong>Read</strong> what
+       an address on the Ergo blockchain actually does. Everything is checked
+       with the same code the Ergo network itself uses.</p>
   </header>
 
   <main>
@@ -24,38 +24,66 @@
     </nav>
 
     <section id="build" class="pane" hidden>
-      <p class="hint">Pick what you want the contract to do, answer a few
-         questions, and get an address. The contract is compiled on the node's
-         own compiler; you can open it in Write to see or change the code.</p>
-      <div id="recipes" class="recipes"></div>
-      <form id="wizard" hidden>
-        <h2 id="wizard-title"></h2>
-        <p id="wizard-desc" class="hint"></p>
-        <div id="wizard-fields"></div>
-        <div class="write-row">
-          <select id="build-network" aria-label="network">
-            <option value="mainnet" selected>mainnet</option>
-            <option value="testnet">testnet</option>
-          </select>
-          <button id="build-create" type="submit">Create contract</button>
-          <button id="build-open-write" type="button" class="secondary">Open in Write</button>
+      <div id="build-step-1" class="step">
+        <p class="hint">Step 1 of 3 — What should the contract do?</p>
+        <div id="recipes" class="recipes"></div>
+      </div>
+
+      <div id="build-step-2" class="step" hidden>
+        <p class="hint">Step 2 of 3 — Answer a few questions</p>
+        <form id="wizard">
+          <h2 id="wizard-title"></h2>
+          <p id="wizard-desc" class="lead"></p>
+          <div id="wizard-fields"></div>
+          <div class="field">
+            <label for="build-network">Network</label>
+            <select id="build-network">
+              <option value="mainnet" selected>mainnet — the real Ergo network</option>
+              <option value="testnet">testnet — for trying things out with test coins</option>
+            </select>
+          </div>
+          <div class="write-row">
+            <button id="build-back" type="button" class="secondary">← Back</button>
+            <button id="build-create" type="submit">Create my contract</button>
+          </div>
+          <p id="build-status" class="status" hidden></p>
+        </form>
+      </div>
+
+      <div id="build-step-3" class="step" hidden>
+        <p class="hint">Step 3 of 3 — Done</p>
+        <h2>Here is your contract address</h2>
+        <div class="address-card">
+          <div id="build-qr" class="qr" aria-label="QR code of the address"></div>
+          <div class="address-text">
+            <code id="build-address"></code>
+            <div class="write-row">
+              <button id="build-copy" class="secondary" type="button">Copy address</button>
+              <button id="build-share" class="secondary" type="button">Copy a link to this page</button>
+            </div>
+          </div>
         </div>
-        <p id="build-status" class="status" hidden></p>
-      </form>
-      <div id="build-result" hidden>
-        <h2>Your contract</h2>
+        <h3>What you made</h3>
         <p id="build-summary" class="summary"></p>
-        <dl class="wire">
-          <dt>address</dt><dd><code id="build-address"></code> <button id="build-copy" class="secondary tiny" type="button">Copy</button></dd>
-          <dt>spendability</dt><dd id="build-hunt">—</dd>
-          <dt>tree hex</dt><dd><code id="build-tree"></code></dd>
-        </dl>
-        <p class="hint">Send funds or tokens to the address to lock them under this
-           contract. Keep the parameters: they are what makes this address yours.
-           Anyone can verify the contract by pasting the address into Read.</p>
+        <p id="build-hunt" class="lead"></p>
+        <h3>What to do now</h3>
+        <ol class="steps">
+          <li>Send ERG or tokens from your wallet to the address above. That locks them under this contract.</li>
+          <li>Keep the link to this page (button above): it remembers your answers, and you will want them when you spend.</li>
+          <li>To spend later, use a wallet that can spend from contracts (or the Write mode here) with the same answers.</li>
+        </ol>
+        <details class="dev">
+          <summary>Details for developers</summary>
+          <dl class="wire">
+            <dt>tree hex</dt><dd><code id="build-tree"></code></dd>
+          </dl>
+          <div class="write-row">
+            <button id="build-open-write" type="button" class="secondary">Open in Write</button>
+            <button id="build-project" class="secondary" type="button">Download project (.zip)</button>
+          </div>
+        </details>
         <div class="write-row">
-          <button id="build-share" class="secondary" type="button">Copy share link</button>
-          <button id="build-project" class="secondary" type="button">Download project (.zip)</button>
+          <button id="build-again" type="button" class="secondary">← Build another</button>
         </div>
       </div>
     </section>
@@ -202,6 +230,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
     </section>
   </main>
 
+  <div id="dev-panels">
   <section class="scenario">
     <h2>Validate a transaction</h2>
     <p class="hint">Will this unsigned transaction validate? Paste the node-format
@@ -273,6 +302,8 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
     </div>
   </section>
 
+  </div>
+
   <footer>ergo-web <span id="api-version">v1</span> — <span id="footer-note">source and findings are
     computed from the ErgoTree bytes; no node or explorer is contacted.</span></footer>
 
@@ -281,6 +312,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
   <script src="vendor/codemirror/matchbrackets.min.js"></script>
   <script src="vendor/codemirror/active-line.min.js"></script>
   <script src="vendor/ergoscript-mode.js"></script>
+  <script src="vendor/qrcode.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

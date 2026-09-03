@@ -1,27 +1,169 @@
 {
-  "source": "/**\n * Sell tokens from this box at a fixed price. A buyer may take some or all\n * of the tokens as long as the seller is paid the price for what is taken\n * (first output); any tokens left must stay in a box under this same\n * contract (second output). The seller can always take everything back.\n * @param seller the address that receives the payment and may cancel\n * @param tokenId the id of the token being sold\n * @param pricePerToken the price of one token, in nanoERG\n */\n@contract def tokenSale(seller: SigmaProp, tokenId: Coll[Byte], pricePerToken: Long) = {\n  val forSale = SELF.tokens(0)\n  val stock = if (forSale._1 == tokenId) forSale._2 else 0L\n  val payment = OUTPUTS(0)\n  val restStock =\n    if (OUTPUTS.size > 1 && OUTPUTS(1).tokens.size > 0 && OUTPUTS(1).tokens(0)._1 == tokenId) OUTPUTS(1).tokens(0)._2\n    else 0L\n  val sold = stock - restStock\n  val paid = payment.propositionBytes == seller.propBytes && payment.value >= sold * pricePerToken\n  val restKept = OUTPUTS.size > 1 &&\n                 OUTPUTS(1).propositionBytes == SELF.propositionBytes &&\n                 OUTPUTS(1).value >= SELF.value\n  val partial = sold > 0L && sold < stock && paid && restKept\n  val soldOut = sold == stock && stock > 0L && paid\n  seller || sigmaProp(partial || soldOut)\n}\n",
-  "params": { "seller": { "type": "SigmaProp", "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197" }, "tokenId": { "type": "Coll[Byte]", "value": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" }, "pricePerToken": { "type": "Long", "value": 1000000 } },
+  "source": "/**\n * Sell tokens at a fixed price. Buyers may take some or all of the tokens\n * as long as you are paid for what they take; unsold tokens stay for sale.\n * You can cancel and take everything back at any time.\n * @param seller Who receives the payments? \u2014 Your Ergo address.\n * @param tokenId Which token are you selling? \u2014 The token id (64 characters), from your wallet or an explorer.\n * @param pricePerToken Price per token, in nanoERG \u2014 1 ERG = 1,000,000,000 nanoERG.\n */\n@contract def tokenSale(seller: SigmaProp, tokenId: Coll[Byte], pricePerToken: Long) = {\n  val forSale = SELF.tokens(0)\n  val stock = if (forSale._1 == tokenId) forSale._2 else 0L\n  val payment = OUTPUTS(0)\n  val restStock =\n    if (OUTPUTS.size > 1 && OUTPUTS(1).tokens.size > 0 && OUTPUTS(1).tokens(0)._1 == tokenId) OUTPUTS(1).tokens(0)._2\n    else 0L\n  val sold = stock - restStock\n  val paid = payment.propositionBytes == seller.propBytes && payment.value >= sold * pricePerToken\n  val restKept = OUTPUTS.size > 1 &&\n                 OUTPUTS(1).propositionBytes == SELF.propositionBytes &&\n                 OUTPUTS(1).value >= SELF.value\n  val partial = sold > 0L && sold < stock && paid && restKept\n  val soldOut = sold == stock && stock > 0L && paid\n  seller || sigmaProp(partial || soldOut)\n}\n",
+  "params": {
+    "seller": {
+      "type": "SigmaProp",
+      "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+    },
+    "tokenId": {
+      "type": "Coll[Byte]",
+      "value": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    },
+    "pricePerToken": {
+      "type": "Long",
+      "value": 1000000
+    }
+  },
   "scenarios": [
-    { "name": "buy 4 of 10: seller paid 4 ERG-units, 6 stay under the contract", "expect": "pass", "height": 1,
-      "selfBox": { "value": 1000000, "tokens": [ { "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "amount": 10 } ] },
-      "outputs": [ { "value": 4000000, "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197" },
-                   { "value": 1000000, "ergoTree": "$self", "tokens": [ { "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "amount": 6 } ] } ] },
-    { "name": "underpaying is only allowed for the seller", "expect": "needsProof", "height": 1,
-      "selfBox": { "value": 1000000, "tokens": [ { "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "amount": 10 } ] },
-      "outputs": [ { "value": 3000000, "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197" },
-                   { "value": 1000000, "ergoTree": "$self", "tokens": [ { "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "amount": 6 } ] } ] },
-    { "name": "the rest must stay under this contract", "expect": "needsProof", "height": 1,
-      "selfBox": { "value": 1000000, "tokens": [ { "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "amount": 10 } ] },
-      "outputs": [ { "value": 4000000, "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197" },
-                   { "value": 1000000, "ergoTree": "10010101d17300", "tokens": [ { "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "amount": 6 } ] } ] },
-    { "name": "buy all 10 with a single payment output", "expect": "pass", "height": 1,
-      "selfBox": { "value": 1000000, "tokens": [ { "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "amount": 10 } ] },
-      "outputs": [ { "value": 10000000, "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197" } ] },
-    { "name": "paying someone else is only allowed for the seller", "expect": "needsProof", "height": 1,
-      "selfBox": { "value": 1000000, "tokens": [ { "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "amount": 10 } ] },
-      "outputs": [ { "value": 10000000, "ergoTree": "10010101d17300" } ] },
-    { "name": "an empty box (no stock) cannot be bought", "expect": "needsProof", "height": 1,
-      "selfBox": { "value": 1000000, "tokens": [ { "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "amount": 0 } ] },
-      "outputs": [ { "value": 0, "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197" } ] }
+    {
+      "name": "buy 4 of 10: seller paid 4 ERG-units, 6 stay under the contract",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000,
+        "tokens": [
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 10
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 4000000,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "$self",
+          "tokens": [
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "underpaying is only allowed for the seller",
+      "expect": "needsProof",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000,
+        "tokens": [
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 10
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 3000000,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "$self",
+          "tokens": [
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "the rest must stay under this contract",
+      "expect": "needsProof",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000,
+        "tokens": [
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 10
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 4000000,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "buy all 10 with a single payment output",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000,
+        "tokens": [
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 10
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        }
+      ]
+    },
+    {
+      "name": "paying someone else is only allowed for the seller",
+      "expect": "needsProof",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000,
+        "tokens": [
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 10
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "10010101d17300"
+        }
+      ]
+    },
+    {
+      "name": "an empty box (no stock) cannot be bought",
+      "expect": "needsProof",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000,
+        "tokens": [
+          {
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "amount": 0
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "value": 0,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        }
+      ]
+    }
   ]
 }

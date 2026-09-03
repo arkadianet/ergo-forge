@@ -282,6 +282,7 @@ function setMode(mode) {
     $(`mode-${m}`).classList.toggle("active", on);
     $(`mode-${m}`).setAttribute("aria-selected", String(on));
   }
+  $("dev-panels").hidden = mode === "build";
   if (mode === "write") editor.refresh();
 }
 $("mode-build").addEventListener("click", () => setMode("build"));
@@ -577,10 +578,15 @@ loadExamples();
 let chainHeight = null;   // from /api/v1/config when an explorer is configured
 let chainHeightAt = 0;    // when that height was observed (ms)
 let chainNetwork = null;  // which network the height belongs to
-let recipe = null;      // { id, name, doc, params, source }
-let built = null;       // last compile result for the wizard
+let recipe = null;        // { id, name, doc, params, source }
+let built = null;         // last compile result for the wizard
 
 const BLOCK_SECONDS = 120;
+
+function buildStep(n) {
+  for (const k of [1, 2, 3]) $(`build-step-${k}`).hidden = k !== n;
+  window.scrollTo({ top: $("build").offsetTop - 12, behavior: "smooth" });
+}
 
 async function loadRecipes() {
   try {
@@ -596,15 +602,26 @@ async function loadRecipes() {
       card.type = "button";
       card.className = "recipe";
       const title = document.createElement("strong");
-      title.textContent = (ex.doc && ex.doc.name) ? humanize(ex.doc.name) : it.name;
+      title.textContent = RECIPE_TITLES[it.name] || humanize(ex.doc ? ex.doc.name : it.name);
       const desc = document.createElement("span");
-      desc.textContent = (ex.doc && ex.doc.description.split("\n")[0]) || "";
+      desc.textContent = (ex.doc && ex.doc.description.split(/\.\s/)[0] + ".") || "";
       card.append(title, desc);
       card.addEventListener("click", () => startRecipe(ex));
       box.appendChild(card);
     }
   } catch (e) { /* no gallery, no build mode */ }
 }
+
+const RECIPE_TITLES = {
+  "time-lock": "Lock savings until a date",
+  "inheritance": "Inheritance / backup access",
+  "two-of-three": "Shared account (2 of 3 must agree)",
+  "refundable-payment": "Payment you can take back",
+  "vesting": "Release funds gradually",
+  "token-sale": "Sell tokens at a fixed price",
+  "price-gate": "Spend only above an oracle price",
+  "burn": "Burn address (destroy for good)",
+};
 
 function humanize(name) {
   return name.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, (c) => c.toUpperCase());
@@ -631,53 +648,84 @@ function fieldKind(p) {
   return "text";
 }
 
+/// "Question? — help text" from a recipe's @param line.
+function splitDoc(d) {
+  const [q, ...rest] = (d || "").split(" — ");
+  return { question: q || "", help: rest.join(" — ") };
+}
+
+/// Client-side sanity check per field kind, so a typo is caught while typing.
+function fieldProblem(kind, raw, network) {
+  const v = raw.trim();
+  if (!v) return "";
+  if (kind === "address") {
+    if (!/^[1-9A-HJ-NP-Za-km-z]+$/.test(v)) return "An address only has letters and digits (no 0, O, I or l).";
+    if (network === "mainnet" && !v.startsWith("9")) return "A mainnet wallet address starts with 9.";
+    if (network === "testnet" && !v.startsWith("3")) return "A testnet wallet address starts with 3.";
+    if (v.length < 40 || v.length > 60) return "That doesn't look like a wallet address (about 51 characters).";
+  }
+  if (kind === "tokenId" && !/^[0-9a-fA-F]{64}$/.test(v)) return "A token id is exactly 64 hex characters.";
+  if (kind === "erg" && !(Number(v) >= 0)) return "Enter an amount in ERG, like 1.5.";
+  return "";
+}
+
 function startRecipe(ex) {
   recipe = ex;
   built = null;
-  $("wizard-title").textContent = ex.doc ? humanize(ex.doc.name) : ex.name;
+  $("wizard-title").textContent = RECIPE_TITLES[ex.name] || (ex.doc ? humanize(ex.doc.name) : ex.name);
   $("wizard-desc").textContent = ex.doc ? ex.doc.description : "";
   const fields = $("wizard-fields");
   fields.textContent = "";
+  const network = $("build-network").value;
   for (const p of ex.params) {
     const kind = fieldKind(p);
+    const { question, help } = splitDoc(p.description);
     const row = document.createElement("div");
     row.className = "field";
-    row.dataset.name = p.name;
-    row.dataset.kind = kind;
-    row.dataset.type = p.typeHint || "Long";
+    row.dataset.name = p.name; row.dataset.kind = kind; row.dataset.type = p.typeHint || "Long";
     const label = document.createElement("label");
     label.htmlFor = `f-${p.name}`;
-    label.textContent = p.description || p.name;
+    label.textContent = question || p.name;
     const inp = document.createElement("input");
     inp.id = `f-${p.name}`;
     inp.required = true;
-    if (kind === "address") { inp.placeholder = "an Ergo address (9… on mainnet)"; inp.spellcheck = false; }
+    inp.autocomplete = "off";
+    if (kind === "address") { inp.placeholder = network === "testnet" ? "3…" : "9…"; inp.spellcheck = false; }
     else if (kind === "height") {
       inp.type = datesAvailable() ? "datetime-local" : "number";
-      inp.placeholder = datesAvailable() ? "" : "block height";
+      inp.placeholder = datesAvailable() ? "" : "block height, e.g. 1900000";
       inp.min = "1";
     }
-    else if (kind === "tokenId") { inp.placeholder = "token id (64 hex characters)"; inp.spellcheck = false; }
-    else if (kind === "erg") { inp.type = "number"; inp.step = "0.000000001"; inp.placeholder = "amount in ERG"; }
+    else if (kind === "tokenId") { inp.placeholder = "64 hex characters"; inp.spellcheck = false; }
+    else if (kind === "erg") { inp.type = "number"; inp.step = "0.000000001"; inp.placeholder = "e.g. 1.5"; }
     else if (kind === "bool") { inp.type = "checkbox"; inp.required = false; }
-    else { inp.placeholder = p.typeHint || ""; }
+    else { inp.placeholder = p.typeHint === "Long" || p.typeHint === "Int" ? "a whole number" : (p.typeHint || ""); }
     if (p.default != null && kind !== "height") inp.value = p.default;
-    row.append(label, inp);
+    const helpEl = document.createElement("span");
+    helpEl.className = "hint";
+    let helpText = help;
     if (kind === "height") {
-      const note = document.createElement("span");
-      note.className = "hint";
-      note.textContent = datesAvailable()
-        ? `Converted to a block height from the current ${chainNetwork} height (${heightNow()}) at ~2 minutes per block.`
-        : "Block height (about 2 minutes per block). Dates are offered when an explorer for this network is configured.";
-      row.appendChild(note);
+      helpText = (help ? help + " " : "") + (datesAvailable()
+        ? "Ergo counts time in blocks (about one every 2 minutes); we convert your date to a block."
+        : "Enter a block height; there is about one block every 2 minutes. Dates are offered when this instance has an explorer for the chosen network.");
     }
+    if (kind === "address" && !help) helpText = "Paste an address from your wallet.";
+    helpEl.textContent = helpText;
+    const problem = document.createElement("span");
+    problem.className = "problem";
+    problem.hidden = true;
+    inp.addEventListener("input", () => {
+      const msg = fieldProblem(kind, inp.value, $("build-network").value);
+      problem.textContent = msg; problem.hidden = !msg;
+      inp.classList.toggle("invalid", !!msg);
+    });
+    row.append(label, inp, helpEl, problem);
     fields.appendChild(row);
   }
-  $("wizard").hidden = false;
-  $("build-network").onchange = () => startRecipe(recipe);
-  $("build-result").hidden = true;
   $("build-status").hidden = true;
-  $("wizard").scrollIntoView({ behavior: "smooth", block: "start" });
+  buildStep(2);
+  const first = fields.querySelector("input");
+  if (first) first.focus();
 }
 
 /// The wizard's answers as typed parameters, or an error message.
@@ -687,36 +735,30 @@ function wizardParams() {
     const name = row.dataset.name, kind = row.dataset.kind, type = row.dataset.type;
     const inp = row.querySelector("input");
     const raw = (inp.value || "").trim();
+    const label = row.querySelector("label").textContent;
     if (kind === "bool") { out[name] = { type: "Boolean", value: inp.checked }; continue; }
-    if (!raw) return { error: `Please fill in: ${row.querySelector("label").textContent}` };
+    if (!raw) return { error: `Please answer: ${label}` };
+    const problem = fieldProblem(kind, raw, $("build-network").value);
+    if (problem) return { error: `${label} — ${problem}` };
     if (kind === "address") out[name] = { type: "SigmaProp", value: raw };
     else if (kind === "height") {
       let h;
       if (inp.type === "datetime-local") {
         const t = new Date(raw).getTime();
-        if (Number.isNaN(t)) return { error: "That date does not parse." };
+        if (Number.isNaN(t)) return { error: `${label} — that date does not parse.` };
         const now = heightNow();
         h = now + Math.ceil((t - Date.now()) / 1000 / BLOCK_SECONDS);
-        if (h <= now) return { error: "The date must be in the future." };
+        if (h <= now) return { error: `${label} — the date must be in the future.` };
       } else {
         h = Number(raw);
-        if (!Number.isInteger(h) || h < 1) return { error: "Height must be a whole number." };
+        if (!Number.isInteger(h) || h < 1) return { error: `${label} — a block height is a whole number.` };
       }
       out[name] = { type, value: h };
     }
-    else if (kind === "tokenId") {
-      if (!/^[0-9a-fA-F]{64}$/.test(raw)) return { error: "A token id is 64 hex characters." };
-      out[name] = { type: "Coll[Byte]", value: raw.toLowerCase() };
-    }
-    else if (kind === "erg") {
-      const n = Number(raw);
-      if (!(n >= 0)) return { error: "Amount must be a number of ERG." };
-      out[name] = { type: "Long", value: Math.round(n * 1e9) };
-    }
+    else if (kind === "tokenId") out[name] = { type: "Coll[Byte]", value: raw.toLowerCase() };
+    else if (kind === "erg") out[name] = { type: "Long", value: Math.round(Number(raw) * 1e9) };
     else if (type === "Int" || type === "Long" || type === "Short" || type === "Byte") {
-      if (!/^-?\d+$/.test(raw)) return { error: `${name} must be a whole number.` };
-      // Exact: beyond the safe-integer range a JSON number would round, so
-      // send the decimal string (the API accepts it for integer types).
+      if (!/^-?\d+$/.test(raw)) return { error: `${label} — a whole number, please.` };
       const big = BigInt(raw);
       const safe = big <= BigInt(Number.MAX_SAFE_INTEGER) && big >= -BigInt(Number.MAX_SAFE_INTEGER);
       out[name] = { type, value: safe ? Number(raw) : raw };
@@ -726,22 +768,37 @@ function wizardParams() {
   return { params: out };
 }
 
-/// Plain-language summary: the recipe's description with each answer named.
+function shortAddr(a) { a = String(a); return a.length > 16 ? `${a.slice(0, 8)}…${a.slice(-6)}` : a; }
+function dateOfHeight(h) {
+  const when = new Date(Date.now() + (h - heightNow()) * BLOCK_SECONDS * 1000);
+  return when.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+}
+
+/// Plain-language summary: each answer restated under its question.
 function describeBuild(params) {
   const lines = [];
   for (const row of $("wizard-fields").children) {
     const name = row.dataset.name, kind = row.dataset.kind;
-    const label = row.querySelector("label").textContent;
+    const label = row.querySelector("label").textContent.replace(/\?$/, "");
     const v = params[name] && params[name].value;
     let shown = String(v);
-    if (kind === "height" && datesAvailable()) {
-      const when = new Date(Date.now() + (v - heightNow()) * BLOCK_SECONDS * 1000);
-      shown = `block ${v} (about ${when.toLocaleString()})`;
-    } else if (kind === "erg") shown = `${v / 1e9} ERG`;
-    else if (kind === "address") shown = `${String(v).slice(0, 10)}…${String(v).slice(-6)}`;
+    if (kind === "height") shown = datesAvailable() ? `about ${dateOfHeight(v)} (block ${v})` : `block ${v}`;
+    else if (kind === "erg") shown = `${v / 1e9} ERG`;
+    else if (kind === "address") shown = shortAddr(v);
     lines.push(`${label}: ${shown}`);
   }
-  return `${recipe.doc ? recipe.doc.description.split("\n")[0] : ""}\n${lines.join("\n")}`;
+  return lines.join("\n");
+}
+
+function renderQr(text) {
+  const el = $("build-qr");
+  el.textContent = "";
+  try {
+    const qr = qrcode(0, "M");
+    qr.addData(text);
+    qr.make();
+    el.innerHTML = qr.createSvgTag({ cellSize: 3, margin: 2, scalable: true });
+  } catch (e) { el.textContent = ""; }
 }
 
 $("wizard").addEventListener("submit", async (e) => {
@@ -750,7 +807,7 @@ $("wizard").addEventListener("submit", async (e) => {
   const status = $("build-status");
   const { params, error } = wizardParams();
   if (error) { status.textContent = error; status.hidden = false; return; }
-  status.textContent = "Compiling…"; status.hidden = false;
+  status.textContent = "Creating…"; status.hidden = false;
   $("build-create").disabled = true;
   try {
     const network = $("build-network").value;
@@ -759,30 +816,39 @@ $("wizard").addEventListener("submit", async (e) => {
       body: JSON.stringify({ source: recipe.source, network, params }),
     });
     const body = await res.json();
-    if (!res.ok) { status.textContent = `Could not create the contract: ${(body.error && body.error.message) || res.status}`; return; }
+    if (!res.ok) {
+      const m = (body.error && body.error.message) || String(res.status);
+      status.textContent = /SigmaProp|address/i.test(m) ? "One of the addresses is not valid. Check it against your wallet." : `Something went wrong: ${m}`;
+      return;
+    }
     built = { ...body, params, network };
     $("build-summary").textContent = describeBuild(params);
     $("build-address").textContent = body.p2s;
     $("build-tree").textContent = body.treeHex;
-    $("build-hunt").textContent = "checking…";
-    $("build-result").hidden = false;
+    renderQr(body.p2s);
+    $("build-hunt").textContent = "Checking who can spend it…";
     status.hidden = true;
-    $("build-result").scrollIntoView({ behavior: "smooth", block: "start" });
+    buildStep(3);
     const hunt = await (await fetch("/api/v1/hunt", {
       method: "POST", headers: { "content-type": "application/json" },
       body: JSON.stringify({ input: body.treeHex, network }),
     })).json();
-    const [label] = HUNT_VERDICTS[hunt.verdict] || [hunt.verdict];
-    $("build-hunt").textContent = hunt.verdict === "requiresProof"
-      ? `Requires a signature (${hunt.residuals.length} key path${hunt.residuals.length === 1 ? "" : "s"} found) — nobody can spend it without one.`
-      : label;
+    $("build-hunt").textContent = {
+      requiresProof: "Only the people you named can spend from this address, and only under the rules above. Nobody else can.",
+      spendableByAnyone: "Warning: anyone could spend from this address as it stands. Check your answers before sending anything.",
+      movableByAnyone: "Anyone can move the funds, but only back into this same contract.",
+      notUnderProbes: recipe.name === "burn" ? "Nobody can ever spend from this address. Anything sent here is gone for good." : "Nobody could spend it in our checks.",
+    }[hunt.verdict] || "";
   } catch (err) {
-    status.textContent = `Could not create the contract: ${err}`;
+    status.textContent = `Something went wrong: ${err}`;
   } finally {
     $("build-create").disabled = false;
   }
 });
 
+$("build-back").addEventListener("click", () => buildStep(1));
+$("build-again").addEventListener("click", () => { built = null; buildStep(1); });
+$("build-network").addEventListener("change", () => { if (recipe) startRecipe(recipe); });
 $("build-open-write").addEventListener("click", () => {
   if (!recipe) return;
   setEditorValue(recipe.source);
@@ -799,7 +865,7 @@ $("build-share").addEventListener("click", () => {
   const bytes = new TextEncoder().encode(JSON.stringify(state));
   let bin = ""; for (const b of bytes) bin += String.fromCharCode(b);
   const frag = btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-  copyText(`${location.origin}${location.pathname}#s=${frag}`, "Share link copied.");
+  copyText(`${location.origin}${location.pathname}#s=${frag}`, "Link copied. It carries your answers; nothing is stored on the server.");
 });
 $("build-project").addEventListener("click", () => {
   if (!built) return;
@@ -927,10 +993,17 @@ async function loadShared(frag) {
 }
 
 async function copyText(text, okMessage) {
-  const status = $("export-status");
-  try { await navigator.clipboard.writeText(text); status.textContent = okMessage; }
-  catch (e) { status.textContent = text; }
-  status.hidden = false;
+  const status = $("build").hidden ? $("export-status") : $("build-status");
+  try { await navigator.clipboard.writeText(text); toast(okMessage); }
+  catch (e) { status.textContent = text; status.hidden = false; }
+}
+
+/// A brief confirmation at the bottom of the screen.
+function toast(msg) {
+  let t = document.getElementById("toast");
+  if (!t) { t = document.createElement("div"); t.id = "toast"; t.setAttribute("role", "status"); document.body.appendChild(t); }
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2500);
 }
 
 $("share").addEventListener("click", () => {

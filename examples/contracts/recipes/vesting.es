@@ -1,11 +1,10 @@
 /**
- * Release funds to someone gradually between two heights. Before the start
- * nothing can be taken; between start and end the beneficiary may withdraw
- * up to the vested share, leaving the rest in a box under this same
- * contract; after the end everything is theirs.
- * @param beneficiary the address the funds vest to
- * @param startHeight the block height at which vesting begins
- * @param endHeight the block height at which everything has vested
+ * Release funds to someone gradually between two dates. Before the start
+ * nothing can be taken; in between they may withdraw the vested share, and
+ * the rest stays locked; after the end everything is theirs.
+ * @param beneficiary Who receives the funds? — Their Ergo address.
+ * @param startHeight When does vesting start? — Nothing vests before this.
+ * @param endHeight When has everything vested? — After this they may take it all.
  */
 @contract def vesting(beneficiary: SigmaProp, startHeight: Int, endHeight: Int) = {
   val total = SELF.value
