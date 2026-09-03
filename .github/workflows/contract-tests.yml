@@ -1,0 +1,22 @@
+# Dogfood: run this repo's example suites through the composite action the
+# way another project would — with the prebuilt ergo-es from the latest
+# release, not a local build. Proves the action end to end on every PR.
+name: contract-tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  suites:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/test
+        with:
+          suites: "examples/tests/*.test.json"
+          version: latest
