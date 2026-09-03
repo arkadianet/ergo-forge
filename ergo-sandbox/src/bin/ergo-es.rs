@@ -28,6 +28,7 @@ fn main() -> ExitCode {
         "hunt" => cmd_hunt(rest),
         "test" => cmd_test(rest),
         "validate-tx" => cmd_validate_tx(rest),
+        "compose" => cmd_compose(rest),
         "help" | "--help" | "-h" => {
             usage();
             return ExitCode::SUCCESS;
@@ -63,6 +64,10 @@ USAGE:
       Will this unsigned transaction validate? {{tx, boxes, height?}}: every
       input's script runs in the real context; ERG/token conservation is
       checked. Non-zero exit when the transaction would be rejected.
+  ergo-es compose <spec.json> [--params p.json] [--suite out.test.json]
+      Assemble ErgoScript from spending paths (who + conditions); with
+      --params also generate a test suite whose expectations come from the
+      composer's model (write it with --suite, then `ergo-es test` it).
   ergo-es params <source-file>
       List the $parameters a source needs (with // $name: Type hints).
   ergo-es eval <scenario.json> [--hot-spots]
@@ -919,4 +924,33 @@ fn cmd_validate_tx(args: &[String]) -> Result<(), String> {
         println!("valid: NO");
         Err(format!("{} problem(s)", r.problems.len()))
     }
+}
+
+/// `ergo-es compose <spec.json> [--params p.json] [--suite out.json]`.
+fn cmd_compose(args: &[String]) -> Result<(), String> {
+    let Some(path) = args.iter().find(|a| !a.starts_with("--")) else {
+        return Err("compose needs a spec JSON file".into());
+    };
+    let text = read_input(path)?;
+    let spec: ergo_sandbox::compose::Spec =
+        serde_json::from_str(&text).map_err(|e| format!("spec JSON: {e}"))?;
+    let params: std::collections::BTreeMap<String, ergo_sandbox::TypedValue> =
+        match flag_value(args, "--params")? {
+            Some(p) => {
+                serde_json::from_str(&std::fs::read_to_string(&p).map_err(|e| format!("{p}: {e}"))?)
+                    .map_err(|e| format!("{p}: {e}"))?
+            }
+            None => Default::default(),
+        };
+    let out = ergo_sandbox::compose::compose(&spec, &params).map_err(|e| e.to_string())?;
+    print!("{}", out.source);
+    if let Some(suite_path) = flag_value(args, "--suite")? {
+        let Some(suite) = out.suite else {
+            return Err("--suite needs --params (values make the suite)".into());
+        };
+        let json = serde_json::to_string_pretty(&suite).map_err(|e| e.to_string())?;
+        std::fs::write(&suite_path, json + "\n").map_err(|e| format!("{suite_path}: {e}"))?;
+        eprintln!("wrote {suite_path} ({} cases)", suite.scenarios.len());
+    }
+    Ok(())
 }

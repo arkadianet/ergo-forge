@@ -29,6 +29,30 @@
         <div id="recipes" class="recipes"></div>
       </div>
 
+      <div id="build-compose" class="step" hidden>
+        <p class="hint">Step 2 of 3 — Combine rules</p>
+        <h2>Combine rules yourself</h2>
+        <p class="lead">A contract is a list of <strong>ways to spend</strong>. Each way says
+           <em>who</em> may spend and <em>under what conditions</em>. Any one way is enough.
+           Add as many as you need.</p>
+        <div id="paths"></div>
+        <div class="write-row">
+          <button id="path-add" type="button" class="secondary">+ Add a way to spend</button>
+        </div>
+        <div class="field">
+          <label for="compose-network">Network</label>
+          <select id="compose-network">
+            <option value="mainnet" selected>mainnet — the real Ergo network</option>
+            <option value="testnet">testnet — for trying things out with test coins</option>
+          </select>
+        </div>
+        <div class="write-row">
+          <button id="compose-back" type="button" class="secondary">← Back</button>
+          <button id="compose-create" type="button">Create my contract</button>
+        </div>
+        <p id="compose-status" class="status" hidden></p>
+      </div>
+
       <div id="build-step-2" class="step" hidden>
         <p class="hint">Step 2 of 3 — Answer a few questions</p>
         <form id="wizard">
@@ -66,6 +90,12 @@
         <h3>What you made</h3>
         <p id="build-summary" class="summary"></p>
         <p id="build-hunt" class="lead"></p>
+        <div id="build-checks" hidden>
+          <h3>Checks we ran on your contract</h3>
+          <p class="hint">Each row is a situation we tried on the real Ergo rules. ✓ means the
+             contract behaved as your rules say it should.</p>
+          <table class="probes"><tbody id="build-checks-rows"></tbody></table>
+        </div>
         <h3>Storage rent — read this once</h3>
         <p id="build-rent" class="lead"></p>
         <h3>What to do now</h3>

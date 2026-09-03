@@ -65,6 +65,7 @@ every endpoint and setting.
 | Question | Where |
 |---|---|
 | I want a contract that does X, and I don't write code | **Build** mode: pick a recipe (time lock, inheritance, 2-of-3, escrow, refundable payment, savings with a spending limit, subscription, vesting with or without a cliff, token sale, bounty for a secret, price gate, burn), answer its questions in plain terms (addresses, dates, amounts), get an address |
+| I want to combine rules: who may spend, under what conditions | **Build → Combine rules yourself**: ways to spend (a key, any/all/k-of-n keys, anyone) with conditions (from/until a date, must pay someone, must keep funds here, oracle price); the tool assembles readable ErgoScript and runs generated checks. Also `ergo-es compose spec.json`, `POST /api/v1/compose` |
 | What does this on-chain contract say? | `ergo-es decompile`, `POST /api/v1/inspect`, the reader |
 | Is the code fragile? (unguarded `Option.get`, tiered by who controls the value) | `ergo-es audit`, inspect findings |
 | Can someone with **no key** spend this box? | `ergo-es hunt`, `POST /api/v1/hunt`, the reader's Spendability section |

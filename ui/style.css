@@ -343,3 +343,14 @@ details.dev summary { color: var(--dim); cursor: pointer; }
   .modes { overflow-x: auto; }
   .recipes { grid-template-columns: 1fr; }
 }
+
+/* ── composer ── */
+.recipe.custom { border-style: dashed; }
+.path { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 0.8rem 1rem; margin: 0.6rem 0; }
+.path-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
+.path select, .cond select { width: 100%; box-sizing: border-box; padding: 0.45rem 0.6rem; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; color: var(--text); }
+.path input { width: 100%; box-sizing: border-box; padding: 0.45rem 0.6rem; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; color: var(--text); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.9rem; }
+.cond { border-top: 1px dashed var(--line); padding-top: 0.5rem; margin-top: 0.5rem; }
+.cond .field { margin: 0.4rem 0; }
+#compose-network { width: 100%; box-sizing: border-box; padding: 0.5rem 0.6rem; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; color: var(--text); }
+#compose-create { padding: 0.6rem 1.4rem; border: 0; border-radius: 6px; background: var(--accent); color: #06222e; font-weight: 600; cursor: pointer; font-size: 1rem; }

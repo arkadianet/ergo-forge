@@ -13,7 +13,7 @@ use crate::scenario::{Scenario, TypedValue};
 use crate::SandboxError;
 
 /// The suite file (`contract.test.json`).
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Suite {
     /// ErgoScript source of the contract under test (with `params`).
@@ -36,7 +36,7 @@ pub struct Suite {
 }
 
 /// One case: a scenario plus a name and the verdict it must produce.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Case {
     pub name: String,

@@ -44,6 +44,7 @@
 pub mod audit;
 pub mod box_build;
 pub mod compile;
+pub mod compose;
 pub mod decompile;
 pub mod eval;
 pub mod hot_spots;

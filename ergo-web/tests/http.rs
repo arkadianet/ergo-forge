@@ -934,3 +934,61 @@ async fn hunt_rent_grows_with_a_typed_register_of_real_size() {
             .await;
     assert!(big >= small + 190, "big {big} small {small}");
 }
+
+// ── /api/v1/compose ─────────────────────────────────────────────────────────
+
+#[tokio::test]
+async fn compose_returns_source_params_and_a_run_suite_when_values_are_given() {
+    let base = spawn().await;
+    let res: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/compose"))
+        .json(&serde_json::json!({
+            "spec": { "paths": [
+                { "name": "owner", "who": { "anyOf": ["owner"] }, "conditions": [] },
+                { "name": "heir later", "who": { "anyOf": ["heir"] }, "conditions": [ { "after": "heirHeight" } ] }
+            ] },
+            "params": {
+                "owner": { "type": "SigmaProp", "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197" },
+                "heir": { "type": "SigmaProp", "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798" },
+                "heirHeight": { "type": "Int", "value": 1000 }
+            },
+            "run": true
+        }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert!(
+        res["source"].as_str().unwrap().contains("path1 || path2"),
+        "{res}"
+    );
+    assert_eq!(res["params"].as_array().unwrap().len(), 3);
+    assert!(res["suite"]["scenarios"].as_array().unwrap().len() >= 3);
+    assert_eq!(res["results"]["failed"], 0, "{res}");
+    assert!(res["results"]["passed"].as_u64().unwrap() >= 3);
+}
+
+#[tokio::test]
+async fn compose_without_values_returns_no_suite_and_rejects_a_bad_spec() {
+    let base = spawn().await;
+    let res: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/compose"))
+        .json(&serde_json::json!({ "spec": { "paths": [ { "name": "x", "who": { "anyOf": ["k"] } } ] } }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert!(res["suite"].is_null(), "{res}");
+    assert!(res["results"].is_null());
+    let r = reqwest::Client::new()
+        .post(format!("{base}/api/v1/compose"))
+        .json(&serde_json::json!({ "spec": { "paths": [] } }))
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(r.status(), 400);
+}
