@@ -23,6 +23,8 @@ Configuration is environment-only, no config file:
 | `BIND_ADDR`| `127.0.0.1:8080` | Socket the server binds                             |
 | `UI_DIR`   | `ui`             | Static folder served for non-API paths (repo root's `ui/` when run from the workspace root) |
 | `EXAMPLES_DIR` | `examples/contracts` | Example `.es` files for the gallery |
+| `RATE_LIMIT_PER_MINUTE` | unset | Per-client budget for the engine routes (burst = the same number). Unset = no rate limiting; set it on a public instance. Over budget → `429 rate_limited` with `Retry-After` |
+| `TRUST_PROXY` | unset | `1` to take the client address from the last `X-Forwarded-For` entry (only behind a proxy you control) |
 | `EXPLORER_URL` | unset | Base URL of an Ergo explorer API (e.g. `https://api.ergoplatform.com`). **The one outbound dependency.** Unset = no outbound calls, `/api/v1/lookup` answers 501 |
 | `RUST_LOG` | `info`           | `tracing` filter (method, path, status, duration are logged; never request bodies) |
 

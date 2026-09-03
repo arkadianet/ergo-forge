@@ -20,10 +20,12 @@ pub const MAX_BODY_BYTES: usize = 64 * 1024;
 /// permit.
 pub const MAX_ENGINE_IN_FLIGHT: usize = 64;
 
-/// Shared state: configuration and the engine budget.
+/// Shared state: configuration, the engine budget, and the optional
+/// per-client limiter.
 pub struct AppState {
     pub cfg: AppConfig,
     pub engine: EngineBudget,
+    pub limiter: Option<crate::ratelimit::RateLimiter>,
 }
 
 /// Runtime configuration. `explorer_url` is the ONE outbound dependency the
@@ -35,6 +37,12 @@ pub struct AppConfig {
     pub explorer_url: Option<String>,
     /// Static folder for non-API paths.
     pub ui_dir: Option<String>,
+    /// Per-client engine requests per minute (burst = the same number).
+    /// `None` = no rate limiting (leave it to a reverse proxy).
+    pub rate_limit_per_minute: Option<u32>,
+    /// Trust the last `X-Forwarded-For` entry as the client address (only
+    /// when a reverse proxy you control sits in front).
+    pub trust_proxy: bool,
 }
 
 impl AppConfig {
@@ -46,6 +54,13 @@ impl AppConfig {
                 .map(|u| u.trim_end_matches('/').to_string())
                 .filter(|u| !u.is_empty()),
             ui_dir: std::env::var("UI_DIR").ok(),
+            rate_limit_per_minute: std::env::var("RATE_LIMIT_PER_MINUTE")
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .filter(|n: &u32| *n > 0),
+            trust_proxy: std::env::var("TRUST_PROXY")
+                .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
+                .unwrap_or(false),
         }
     }
 }
@@ -59,10 +74,14 @@ pub fn router() -> Router {
 pub fn router_with(cfg: AppConfig) -> Router {
     let state = Arc::new(AppState {
         engine: EngineBudget::new(MAX_ENGINE_IN_FLIGHT),
+        limiter: cfg
+            .rate_limit_per_minute
+            .map(crate::ratelimit::RateLimiter::new),
         cfg,
     });
-    Router::new()
-        .route("/api/v1/health", get(crate::routes::health::health))
+    // Engine routes: everything that runs the compiler or the reducer, or
+    // calls out. Rate-limited when configured; health and the UI are not.
+    let engine = Router::new()
         .route("/api/v1/inspect", post(crate::routes::inspect::inspect))
         .route("/api/v1/hunt", post(crate::routes::hunt::hunt_route))
         .route("/api/v1/eval", post(crate::routes::eval::eval_route))
@@ -76,8 +95,15 @@ pub fn router_with(cfg: AppConfig) -> Router {
             "/api/v1/examples/{*id}",
             get(crate::routes::examples::fetch),
         )
-        .route("/api/v1/config", get(crate::routes::lookup::config))
         .route("/api/v1/lookup", post(crate::routes::lookup::lookup))
+        .route_layer(axum::middleware::from_fn_with_state(
+            state.clone(),
+            crate::ratelimit::limit,
+        ));
+    Router::new()
+        .merge(engine)
+        .route("/api/v1/health", get(crate::routes::health::health))
+        .route("/api/v1/config", get(crate::routes::lookup::config))
         .fallback_service(ServeDir::new(
             state.cfg.ui_dir.clone().unwrap_or_else(|| "ui".into()),
         ))

@@ -737,3 +737,60 @@ async fn a_fetched_box_feeds_the_hunt_as_self_box() {
     assert_eq!(hunt["verdict"], "spendableByAnyone", "{hunt}");
     assert_eq!(hunt["selfSynthetic"], false);
 }
+
+// ── per-IP rate limiting (for a public instance) ────────────────────────────
+
+async fn spawn_rate_limited(per_minute: u32) -> String {
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let addr: SocketAddr = listener.local_addr().unwrap();
+    let cfg = ergo_web::app::AppConfig {
+        rate_limit_per_minute: Some(per_minute),
+        ..ergo_web::app::AppConfig::default()
+    };
+    tokio::spawn(async move {
+        axum::serve(
+            listener,
+            ergo_web::app::router_with(cfg).into_make_service_with_connect_info::<SocketAddr>(),
+        )
+        .await
+        .unwrap();
+    });
+    format!("http://{addr}")
+}
+
+#[tokio::test]
+async fn rate_limit_is_off_by_default() {
+    let base = spawn().await;
+    for _ in 0..30 {
+        let r = reqwest::get(format!("{base}/api/v1/health")).await.unwrap();
+        assert_eq!(r.status(), 200);
+    }
+}
+
+#[tokio::test]
+async fn engine_requests_over_the_per_ip_budget_get_a_json_429() {
+    let base = spawn_rate_limited(3).await;
+    let client = reqwest::Client::new();
+    let mut statuses = Vec::new();
+    for _ in 0..5 {
+        let r = client
+            .post(format!("{base}/api/v1/inspect"))
+            .json(&serde_json::json!({ "input": "1001040ad191e4c6a704047300" }))
+            .send()
+            .await
+            .unwrap();
+        statuses.push(r.status().as_u16());
+        if r.status() == 429 {
+            assert!(
+                r.headers().get("retry-after").is_some(),
+                "Retry-After header"
+            );
+            let body: serde_json::Value = r.json().await.unwrap();
+            assert_eq!(body["error"]["code"], "rate_limited");
+        }
+    }
+    assert_eq!(statuses, vec![200, 200, 200, 429, 429], "{statuses:?}");
+    // Health and the UI are never rate limited.
+    let h = reqwest::get(format!("{base}/api/v1/health")).await.unwrap();
+    assert_eq!(h.status(), 200);
+}

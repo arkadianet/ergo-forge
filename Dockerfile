@@ -13,8 +13,11 @@ RUN useradd --system --no-create-home ergo
 WORKDIR /app
 COPY --from=build /src/target/release/ergo-web /usr/local/bin/ergo-web
 COPY ui /app/ui
+COPY examples /app/examples
 USER ergo
-ENV BIND_ADDR=0.0.0.0:8080 UI_DIR=/app/ui RUST_LOG=info
+# Public-instance defaults: rate-limit the engine routes; set EXPLORER_URL to
+# enable chain lookups; RATE_LIMIT_PER_MINUTE=0 turns limiting off.
+ENV BIND_ADDR=0.0.0.0:8080 UI_DIR=/app/ui EXAMPLES_DIR=/app/examples/contracts RUST_LOG=info RATE_LIMIT_PER_MINUTE=120
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s CMD ["/bin/sh", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /api/v1/health HTTP/1.0\r\n\r\n' >&3 && grep -q '\"ok\"' <&3"]
 ENTRYPOINT ["/usr/local/bin/ergo-web"]
