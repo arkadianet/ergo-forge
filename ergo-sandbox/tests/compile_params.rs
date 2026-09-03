@@ -271,3 +271,22 @@ fn a_sigma_prop_parameter_accepts_a_p2pk_address() {
         parse_typed_value("SigmaProp", &serde_json::json!("8NJuqcG7SdhX7cFKGBmfAkXn")).is_err()
     );
 }
+
+#[test]
+fn a_pubkey_with_surrounding_whitespace_is_still_a_pubkey() {
+    use ergo_sandbox::parse_typed_value;
+    let pk = " 028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197 ";
+    assert!(parse_typed_value("SigmaProp", &serde_json::json!(pk)).is_ok());
+}
+
+#[test]
+fn integer_types_accept_exact_decimal_strings() {
+    use ergo_sandbox::parse_typed_value;
+    use ergo_ser::sigma_value::SigmaValue;
+    let (_, v) = parse_typed_value("Long", &serde_json::json!("9007199254740993")).unwrap();
+    assert_eq!(v, SigmaValue::Long(9007199254740993));
+    let (_, v) = parse_typed_value("Int", &serde_json::json!("-5")).unwrap();
+    assert_eq!(v, SigmaValue::Int(-5));
+    assert!(parse_typed_value("Int", &serde_json::json!("2147483648")).is_err());
+    assert!(parse_typed_value("Long", &serde_json::json!("1.5")).is_err());
+}

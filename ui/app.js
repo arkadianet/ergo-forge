@@ -574,7 +574,9 @@ loadExamples();
 
 // ── build mode: recipes → questions → address ────────────────────────────
 
-let chainHeight = null; // from /api/v1/config when an explorer is configured
+let chainHeight = null;   // from /api/v1/config when an explorer is configured
+let chainHeightAt = 0;    // when that height was observed (ms)
+let chainNetwork = null;  // which network the height belongs to
 let recipe = null;      // { id, name, doc, params, source }
 let built = null;       // last compile result for the wizard
 
@@ -606,6 +608,15 @@ async function loadRecipes() {
 
 function humanize(name) {
   return name.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, (c) => c.toUpperCase());
+}
+
+/// Date→height conversion is only honest for the explorer's own network.
+function datesAvailable() {
+  return chainHeight != null && chainNetwork === $("build-network").value;
+}
+/// The chain height now, extrapolated from the observation at ~2 min/block.
+function heightNow() {
+  return chainHeight + Math.floor((Date.now() - chainHeightAt) / 1000 / BLOCK_SECONDS);
 }
 
 /// Which input to show for a template parameter, from its type and name.
@@ -642,8 +653,8 @@ function startRecipe(ex) {
     inp.required = true;
     if (kind === "address") { inp.placeholder = "an Ergo address (9… on mainnet)"; inp.spellcheck = false; }
     else if (kind === "height") {
-      inp.type = chainHeight ? "datetime-local" : "number";
-      inp.placeholder = chainHeight ? "" : "block height";
+      inp.type = datesAvailable() ? "datetime-local" : "number";
+      inp.placeholder = datesAvailable() ? "" : "block height";
       inp.min = "1";
     }
     else if (kind === "tokenId") { inp.placeholder = "token id (64 hex characters)"; inp.spellcheck = false; }
@@ -655,14 +666,15 @@ function startRecipe(ex) {
     if (kind === "height") {
       const note = document.createElement("span");
       note.className = "hint";
-      note.textContent = chainHeight
-        ? `Converted to a block height from the current height ${chainHeight} at ~2 minutes per block.`
-        : "Block height (about 2 minutes per block). Configure an explorer to enter a date instead.";
+      note.textContent = datesAvailable()
+        ? `Converted to a block height from the current ${chainNetwork} height (${heightNow()}) at ~2 minutes per block.`
+        : "Block height (about 2 minutes per block). Dates are offered when an explorer for this network is configured.";
       row.appendChild(note);
     }
     fields.appendChild(row);
   }
   $("wizard").hidden = false;
+  $("build-network").onchange = () => startRecipe(recipe);
   $("build-result").hidden = true;
   $("build-status").hidden = true;
   $("wizard").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -683,8 +695,9 @@ function wizardParams() {
       if (inp.type === "datetime-local") {
         const t = new Date(raw).getTime();
         if (Number.isNaN(t)) return { error: "That date does not parse." };
-        h = chainHeight + Math.ceil((t - Date.now()) / 1000 / BLOCK_SECONDS);
-        if (h <= chainHeight) return { error: "The date must be in the future." };
+        const now = heightNow();
+        h = now + Math.ceil((t - Date.now()) / 1000 / BLOCK_SECONDS);
+        if (h <= now) return { error: "The date must be in the future." };
       } else {
         h = Number(raw);
         if (!Number.isInteger(h) || h < 1) return { error: "Height must be a whole number." };
@@ -701,9 +714,12 @@ function wizardParams() {
       out[name] = { type: "Long", value: Math.round(n * 1e9) };
     }
     else if (type === "Int" || type === "Long" || type === "Short" || type === "Byte") {
-      const n = Number(raw);
-      if (!Number.isInteger(n)) return { error: `${name} must be a whole number.` };
-      out[name] = { type, value: n };
+      if (!/^-?\d+$/.test(raw)) return { error: `${name} must be a whole number.` };
+      // Exact: beyond the safe-integer range a JSON number would round, so
+      // send the decimal string (the API accepts it for integer types).
+      const big = BigInt(raw);
+      const safe = big <= BigInt(Number.MAX_SAFE_INTEGER) && big >= -BigInt(Number.MAX_SAFE_INTEGER);
+      out[name] = { type, value: safe ? Number(raw) : raw };
     }
     else out[name] = { type, value: raw };
   }
@@ -718,8 +734,8 @@ function describeBuild(params) {
     const label = row.querySelector("label").textContent;
     const v = params[name] && params[name].value;
     let shown = String(v);
-    if (kind === "height" && chainHeight) {
-      const when = new Date(Date.now() + (v - chainHeight) * BLOCK_SECONDS * 1000);
+    if (kind === "height" && datesAvailable()) {
+      const when = new Date(Date.now() + (v - heightNow()) * BLOCK_SECONDS * 1000);
       shown = `block ${v} (about ${when.toLocaleString()})`;
     } else if (kind === "erg") shown = `${v / 1e9} ERG`;
     else if (kind === "address") shown = `${String(v).slice(0, 10)}…${String(v).slice(-6)}`;
@@ -967,9 +983,10 @@ val contract: ErgoContract = ErgoTreeContract.fromErgoTree(
   copyText(code, "appkit snippet copied.");
 });
 
+let firstVisit = true;
+try { firstVisit = !localStorage.getItem("ergo-forge-seen"); localStorage.setItem("ergo-forge-seen", "1"); } catch (e) { /* storage blocked: treat as a first visit */ }
 if (location.hash.startsWith("#s=")) loadShared(location.hash.slice(3));
-else if (location.hash === "#build" || !localStorage.getItem("ergo-forge-seen")) { setMode("build"); }
-try { localStorage.setItem("ergo-forge-seen", "1"); } catch (e) { /* private mode */ }
+else if (location.hash === "#build" || firstVisit) setMode("build");
 
 // ── contract tests ───────────────────────────────────────────────────────
 
@@ -1136,7 +1153,7 @@ let fetchedBoxes = [];
 async function loadConfig() {
   try {
     const cfg = await (await fetch("/api/v1/config")).json();
-    if (cfg.height) chainHeight = cfg.height;
+    if (cfg.height) { chainHeight = cfg.height; chainHeightAt = Date.now(); chainNetwork = cfg.network || "mainnet"; }
     if (cfg.explorer) {
       $("chain-panel").hidden = false;
       $("footer-note").textContent =

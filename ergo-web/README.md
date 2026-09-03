@@ -25,6 +25,7 @@ Configuration is environment-only, no config file:
 | `EXAMPLES_DIR` | `examples/contracts` | Example `.es` files for the gallery |
 | `RATE_LIMIT_PER_MINUTE` | unset | Per-client budget for the engine routes (burst = the same number). Unset = no rate limiting; set it on a public instance. Over budget → `429 rate_limited` with `Retry-After` |
 | `TRUST_PROXY` | unset | `1` to take the client address from the last `X-Forwarded-For` entry (only behind a proxy you control) |
+| `EXPLORER_NETWORK` | `mainnet` | Which network `EXPLORER_URL` serves; the UI converts dates to heights only for that network |
 | `EXPLORER_URL` | unset | Base URL of an Ergo explorer API (e.g. `https://api.ergoplatform.com`). **The one outbound dependency.** Unset = no outbound calls, `/api/v1/lookup` answers 501 |
 | `RUST_LOG` | `info`           | `tracing` filter (method, path, status, duration are logged; never request bodies) |
 
@@ -181,8 +182,9 @@ sources, which cannot be parameterised yet.
 
 ### `GET /api/v1/config`, `POST /api/v1/lookup`
 
-`config` → `{"explorer": true|false, "height"?: n}` (`height` is the chain tip
-when an explorer is configured, so a form can turn a date into a height). When an explorer is configured,
+`config` → `{"explorer": true|false, "height"?: n, "network"?: "mainnet"|"testnet"}`
+(`height` is the chain tip when an explorer is configured, so a form can
+turn a date into a height — for that `network` only). When an explorer is configured,
 `lookup` `{input, limit?}` fetches a box by id (64 hex) or an address's
 unspent boxes, and the current height, in the scenario box shape — registers
 are passed through as `{"type": "raw", "value": "<serialized constant hex>"}`

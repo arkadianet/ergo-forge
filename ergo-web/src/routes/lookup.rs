@@ -23,6 +23,9 @@ pub struct ConfigDto {
     /// what a date-to-height conversion in a form needs.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<u32>,
+    /// The network the explorer (and so `height`) belongs to.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub network: Option<String>,
 }
 
 pub async fn config(State(state): State<Arc<AppState>>) -> Json<ConfigDto> {
@@ -42,6 +45,11 @@ pub async fn config(State(state): State<Arc<AppState>>) -> Json<ConfigDto> {
     Json(ConfigDto {
         explorer: state.cfg.explorer_url.is_some(),
         height,
+        network: state
+            .cfg
+            .explorer_url
+            .as_ref()
+            .map(|_| state.cfg.explorer_network.clone()),
     })
 }
 

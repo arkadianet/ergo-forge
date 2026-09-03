@@ -332,9 +332,8 @@ fn parse_sigma_prop(value: &serde_json::Value) -> Result<(SigmaType, SigmaValue)
     }
     // A 33-byte pubkey hex, or a P2PK address (mainnet or testnet), whose
     // tree is `0008cd` + the key. A script address is not a key: refused.
-    let bytes = match value.as_str() {
-        Some(s) if s.len() != 66 || hex::decode(s.trim()).is_err() => {
-            let s = s.trim();
+    let bytes = match value.as_str().map(str::trim) {
+        Some(s) if s.len() != 66 || hex::decode(s).is_err() => {
             let tree = ergo_ser::address::decode_address_to_tree_bytes(s, NetworkPrefix::Mainnet)
                 .or_else(|_| {
                     ergo_ser::address::decode_address_to_tree_bytes(s, NetworkPrefix::Testnet)
@@ -383,10 +382,16 @@ fn user_hex(tpe: &str, value: &serde_json::Value, want: usize) -> Result<Vec<u8>
     Ok(bytes)
 }
 
+/// A JSON integer, or a decimal string — the exact form for a `Long` beyond
+/// JavaScript's safe-integer range, which a JSON number would round.
 fn value_i64(tpe: &str, value: &serde_json::Value) -> Result<i64, SandboxError> {
+    if let Some(n) = value.as_i64() {
+        return Ok(n);
+    }
     value
-        .as_i64()
-        .ok_or_else(|| bad(tpe, value, "a JSON integer"))
+        .as_str()
+        .and_then(|s| s.trim().parse::<i64>().ok())
+        .ok_or_else(|| bad(tpe, value, "a JSON integer (or a decimal string)"))
 }
 
 fn bad(tpe: &str, value: &serde_json::Value, expected: &str) -> SandboxError {

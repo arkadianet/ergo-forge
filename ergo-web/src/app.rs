@@ -35,6 +35,9 @@ pub struct AppState {
 pub struct AppConfig {
     /// Base URL of an Ergo explorer API (e.g. `https://api.ergoplatform.com`).
     pub explorer_url: Option<String>,
+    /// Which network that explorer serves (`mainnet` default, or `testnet`),
+    /// so a client only converts dates to heights for that network.
+    pub explorer_network: String,
     /// Static folder for non-API paths.
     pub ui_dir: Option<String>,
     /// Per-client engine requests per minute (burst = the same number).
@@ -53,6 +56,10 @@ impl AppConfig {
                 .ok()
                 .map(|u| u.trim_end_matches('/').to_string())
                 .filter(|u| !u.is_empty()),
+            explorer_network: std::env::var("EXPLORER_NETWORK")
+                .ok()
+                .filter(|n| n == "testnet")
+                .unwrap_or_else(|| "mainnet".into()),
             ui_dir: std::env::var("UI_DIR").ok(),
             rate_limit_per_minute: std::env::var("RATE_LIMIT_PER_MINUTE")
                 .ok()
