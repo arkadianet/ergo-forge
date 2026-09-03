@@ -571,6 +571,94 @@ $("example-pick").addEventListener("change", async (e) => {
 $("compile").addEventListener("click", compile);
 loadExamples();
 
+// ── export: share link, SDK snippets ─────────────────────────────────────
+
+/// The editor state as a URL fragment: base64url of {source, params, network}.
+function encodeShare() {
+  const state = { s: editorValue(), p: collectParams(), n: $("write-network").value };
+  const bytes = new TextEncoder().encode(JSON.stringify(state));
+  let bin = ""; for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function decodeShare(frag) {
+  const b64 = frag.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - frag.length % 4) % 4);
+  const bin = atob(b64);
+  const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
+/// Apply a shared state: source, params (form rebuilt from the scan), network.
+async function loadShared(frag) {
+  let st;
+  try { st = decodeShare(frag); } catch (e) { return; }
+  if (typeof st.s !== "string") return;
+  setEditorValue(st.s);
+  if (st.n === "testnet" || st.n === "mainnet") $("write-network").value = st.n;
+  $("params-rows").textContent = "";
+  const needs = Object.entries(st.p || {}).map(([name, tv]) => ({ name, typeHint: tv.type, default: typeof tv.value === "object" ? JSON.stringify(tv.value) : String(tv.value) }));
+  renderParams(needs);
+  setMode("write");
+}
+
+async function copyText(text, okMessage) {
+  const status = $("export-status");
+  try { await navigator.clipboard.writeText(text); status.textContent = okMessage; }
+  catch (e) { status.textContent = text; }
+  status.hidden = false;
+}
+
+$("share").addEventListener("click", () => {
+  const url = `${location.origin}${location.pathname}#s=${encodeShare()}`;
+  history.replaceState(null, "", `#s=${encodeShare()}`);
+  copyText(url, "Share link copied — it carries the source, parameters and network in the URL fragment (nothing is stored server-side).");
+});
+
+/// Fleet SDK: the compiled tree as an ErgoTree with the address, plus the
+/// parameters as named constants for reference.
+$("export-fleet").addEventListener("click", () => {
+  if (!lastCompiled) { copyText("", "Compile first."); return; }
+  const c = lastCompiled;
+  const params = collectParams();
+  const consts = Object.entries(params).map(([k, v]) => `  // ${k}: ${v.type} = ${JSON.stringify(v.value)}`).join("\n");
+  const code = `import { ErgoTree, ErgoAddress, Network } from "@fleet-sdk/core";
+
+// Compiled by ergo-forge on the node's own compiler (byte-exact vs the reference).
+// Source parameters:
+${consts || "  // (none)"}
+const TREE_HEX = "${c.treeHex}";
+
+const tree = new ErgoTree(TREE_HEX);
+const address = ErgoAddress.fromErgoTree(TREE_HEX, Network.${$("write-network").value === "testnet" ? "Testnet" : "Mainnet"});
+// address.encode() === "${c.p2s}"
+
+// Use it as an output's script:
+// new OutputBuilder(value, address)
+`;
+  copyText(code, "Fleet SDK snippet copied.");
+});
+
+/// appkit (Scala/Java): the same tree via the address and the raw bytes.
+$("export-appkit").addEventListener("click", () => {
+  if (!lastCompiled) { copyText("", "Compile first."); return; }
+  const c = lastCompiled;
+  const params = collectParams();
+  const consts = Object.entries(params).map(([k, v]) => `  // ${k}: ${v.type} = ${JSON.stringify(v.value)}`).join("\n");
+  const code = `import org.ergoplatform.appkit._
+
+// Compiled by ergo-forge on the node's own compiler (byte-exact vs the reference).
+// Source parameters:
+${consts || "  // (none)"}
+val treeHex = "${c.treeHex}"
+val contract: ErgoContract = ErgoTreeContract.fromErgoTree(
+  JavaHelpers.decodeStringToBytes(treeHex), NetworkType.${$("write-network").value === "testnet" ? "TESTNET" : "MAINNET"}
+)
+// contract.toAddress.toString == "${c.p2s}"
+`;
+  copyText(code, "appkit snippet copied.");
+});
+
+if (location.hash.startsWith("#s=")) loadShared(location.hash.slice(3));
+
 // ── contract tests ───────────────────────────────────────────────────────
 
 let testsInFlight = false;

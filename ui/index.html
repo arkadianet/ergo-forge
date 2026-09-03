@@ -55,6 +55,12 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
           <dt>P2S</dt><dd><code id="c-p2s"></code></dd>
           <dt>P2SH</dt><dd><code id="c-p2sh"></code></dd>
         </dl>
+        <div class="write-row">
+          <button id="share" class="secondary">Copy share link</button>
+          <button id="export-fleet" class="secondary">Copy Fleet SDK snippet</button>
+          <button id="export-appkit" class="secondary">Copy appkit snippet</button>
+        </div>
+        <p id="export-status" class="status" hidden></p>
         <h2>What consensus will run</h2>
         <p class="hint">The tree decompiled back to source: constants inlined, sugar gone.</p>
         <pre id="c-source"></pre>
