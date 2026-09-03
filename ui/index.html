@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ergo-web — ErgoScript playground</title>
+  <link rel="stylesheet" href="vendor/codemirror/codemirror.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -32,7 +33,7 @@
         </select>
         <button id="compile">Compile</button>
       </div>
-      <label for="editor" class="hint">ErgoScript source. <code>$name</code> constants become a form below.</label>
+      <label for="editor" class="hint">ErgoScript source. <code>$name</code> constants become a form below. Ctrl+Enter compiles.</label>
       <textarea id="editor" rows="14" spellcheck="false">// Funds unlock after a block height.
 // $unlockHeight: Int
 sigmaProp(HEIGHT > $unlockHeight)</textarea>
@@ -206,6 +207,11 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
   <footer>ergo-web <span id="api-version">v1</span> — <span id="footer-note">source and findings are
     computed from the ErgoTree bytes; no node or explorer is contacted.</span></footer>
 
+  <script src="vendor/codemirror/codemirror.min.js"></script>
+  <script src="vendor/codemirror/simple.min.js"></script>
+  <script src="vendor/codemirror/matchbrackets.min.js"></script>
+  <script src="vendor/codemirror/active-line.min.js"></script>
+  <script src="vendor/ergoscript-mode.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
