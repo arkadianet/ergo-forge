@@ -255,6 +255,23 @@ function renderHunt(h) {
 
 // ── write mode: editor, params, compile ─────────────────────────────────
 
+// The editor: CodeMirror over the #editor textarea (vendored, no CDN).
+const editor = CodeMirror.fromTextArea($("editor"), {
+  mode: "ergoscript",
+  lineNumbers: true,
+  matchBrackets: true,
+  styleActiveLine: true,
+  indentUnit: 2,
+  tabSize: 2,
+  lineWrapping: true,
+  viewportMargin: 50,
+  extraKeys: { "Ctrl-Enter": () => compile(), "Cmd-Enter": () => compile() },
+});
+const editorValue = () => editor.getValue();
+const setEditorValue = (v) => { editor.setValue(v); clearMarks(); };
+let marks = [];
+function clearMarks() { for (const m of marks) m.clear(); marks = []; }
+
 let lastCompiled = null; // { treeHex } for the scenario panel
 const paramTypes = ["Int", "Long", "Coll[Byte]", "SigmaProp", "GroupElement", "Boolean", "Byte", "Short", "BigInt", "Coll[Long]", "String"];
 
@@ -333,9 +350,18 @@ function placeholderFor(type) {
            "Coll[Long]": "1, 2, 3" }[type] || "number";
 }
 
-/// Show a caret under the editor at a byte offset.
-function showCaret(offset) {
-  const src = $("editor").value;
+/// Mark a compile error at a byte offset: a squiggle on the token there and
+/// the caret line under the editor (kept for copy/paste of the position).
+function showCaret(byteOffset) {
+  const src = editorValue();
+  const offset = byteOffsetToIndex(src, byteOffset);
+  const tok = (src.slice(offset).match(/^[A-Za-z0-9_$.]+/) || [""])[0];
+  // At end of input (unexpected EOF) mark the last character instead.
+  const start = offset >= src.length ? Math.max(0, src.length - 1) : offset;
+  const from = editor.posFromIndex(start);
+  const to = editor.posFromIndex(Math.min(src.length, start + Math.max(1, tok.length)));
+  marks.push(editor.markText(from, to, { className: "cm-error-mark", title: "compile error here" }));
+  editor.scrollIntoView(from, 60);
   const caret = $("caret");
   if (offset == null || offset > src.length) { caret.hidden = true; return; }
   const before = src.slice(0, offset);
@@ -350,8 +376,9 @@ let compileInFlight = false;
 async function compile() {
   if (compileInFlight) return;
   const status = $("compile-status");
-  const source = $("editor").value;
+  const source = editorValue();
   compileInFlight = true;
+  clearMarks();
   $("compile").disabled = true;
   status.textContent = "Compiling…";
   status.hidden = false;
@@ -407,8 +434,7 @@ function byteOffsetToIndex(src, byteOffset) {
 }
 
 function selectInEditor(byteOffset, snippet) {
-  const ed = $("editor");
-  const src = ed.value;
+  const src = editorValue();
   const offset = byteOffsetToIndex(src, byteOffset);
   const text = snippet.replace(/…$/, "");
   let start = -1, end = -1;
@@ -423,11 +449,25 @@ function selectInEditor(byteOffset, snippet) {
     const m = src.slice(offset).match(/^[A-Za-z0-9_$]+/);
     start = offset; end = offset + (m ? m[0].length : 1);
   }
-  ed.focus();
-  ed.setSelectionRange(start, Math.min(end, src.length));
-  const line = src.slice(0, start).split("\n").length;
-  const lineHeight = parseFloat(getComputedStyle(ed).lineHeight) || 18;
-  ed.scrollTop = Math.max(0, (line - 3) * lineHeight);
+  const from = editor.posFromIndex(start), to = editor.posFromIndex(Math.min(end, src.length));
+  editor.focus();
+  editor.setSelection(from, to);
+  editor.scrollIntoView({ from, to }, 60);
+}
+
+/// Squiggle every positioned finding in the editor (severity-coloured).
+function markFindings(findings) {
+  const src = editorValue();
+  for (const f of findings) {
+    if (f.offset == null) continue;
+    const offset = byteOffsetToIndex(src, f.offset);
+    const text = f.snippet.replace(/…$/, "");
+    let start = offset, end = offset + 1;
+    let i = src.indexOf(text);
+    while (i >= 0) { if (i <= offset && offset < i + text.length) { start = i; end = i + text.length; break; } i = src.indexOf(text, i + 1); }
+    marks.push(editor.markText(editor.posFromIndex(start), editor.posFromIndex(end),
+      { className: `cm-finding-${f.severity}`, title: `${f.lint}: ${f.message}` }));
+  }
 }
 
 function renderCompiled(c) {
@@ -461,6 +501,7 @@ function renderCompiled(c) {
   }
   $("c-no-findings").hidden = c.findings.length > 0;
   $("c-positioned").hidden = c.positioned || c.findings.length === 0;
+  markFindings(c.findings);
   $("c-hunt").textContent = "Hunting…";
   $("c-hunt").className = "hunt-verdict";
   $("compiled").hidden = false;
@@ -509,7 +550,7 @@ $("example-pick").addEventListener("change", async (e) => {
   const res = await fetch(`/api/v1/examples/${id}`);
   if (!res.ok) return;
   const ex = await res.json();
-  $("editor").value = ex.source;
+  setEditorValue(ex.source);
   $("params-rows").textContent = "";
   $("compiled").hidden = true;
   $("caret").hidden = true;
@@ -528,9 +569,6 @@ $("example-pick").addEventListener("change", async (e) => {
 });
 
 $("compile").addEventListener("click", compile);
-$("editor").addEventListener("keydown", (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") compile();
-});
 loadExamples();
 
 // ── contract tests ───────────────────────────────────────────────────────
@@ -548,7 +586,7 @@ function currentSuite() {
   if (!Array.isArray(scenarios)) return { error: "Scenarios must be a JSON array." };
   return {
     suite: {
-      source: $("editor").value,
+      source: editorValue(),
       params: collectParams(),
       network: $("write-network").value,
       scenarios,
