@@ -988,6 +988,41 @@ try { firstVisit = !localStorage.getItem("ergo-forge-seen"); localStorage.setIte
 if (location.hash.startsWith("#s=")) loadShared(location.hash.slice(3));
 else if (location.hash === "#build" || firstVisit) setMode("build");
 
+// ── validate a transaction ───────────────────────────────────────────────
+
+$("validate-tx").addEventListener("click", async () => {
+  const status = $("vtx-status");
+  let req;
+  try { req = JSON.parse($("txjson").value); } catch (e) { status.textContent = `JSON does not parse: ${e.message}`; status.hidden = false; return; }
+  if (req && req.inputs && !req.tx) req = { tx: req };
+  status.textContent = "Validating…"; status.hidden = false;
+  $("vtx-result").hidden = true;
+  try {
+    const res = await fetch("/api/v1/validate-tx", {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(req),
+    });
+    const body = await res.json();
+    if (!res.ok) { status.textContent = `Error: ${(body.error && body.error.message) || res.status}`; return; }
+    const v = $("vtx-verdict");
+    v.textContent = body.valid
+      ? `Would validate — ${body.signaturesNeeded} signature(s) needed. ERG in ${body.ergIn}, out ${body.ergOut}, at height ${body.height}.`
+      : `Would be rejected. ERG in ${body.ergIn}, out ${body.ergOut}, at height ${body.height}.`;
+    v.className = `hunt-verdict ${body.valid ? "ok" : "bad"}`;
+    const probs = $("vtx-problems"); probs.textContent = "";
+    for (const p of body.problems) { const li = document.createElement("li"); li.textContent = p; probs.appendChild(li); }
+    const tb = $("vtx-rows"); tb.textContent = "";
+    for (const i of body.inputs) {
+      const tr = document.createElement("tr");
+      tr.dataset.verdict = i.verdict === "pass" ? "ok" : (i.verdict === "needsProof" ? "needsProof" : "fail");
+      for (const cell of [String(i.index), i.address || i.boxId, i.verdict, i.error || (i.verdict === "needsProof" ? i.reducedTo : "")]) {
+        const td = document.createElement("td"); td.textContent = cell; tr.appendChild(td);
+      }
+      tb.appendChild(tr);
+    }
+    status.hidden = true; $("vtx-result").hidden = false;
+  } catch (e) { status.textContent = `Request failed: ${e}`; }
+});
+
 // ── contract tests ───────────────────────────────────────────────────────
 
 let testsInFlight = false;

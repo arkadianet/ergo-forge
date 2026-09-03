@@ -263,7 +263,16 @@ Still missing (the actual build list):
     zip (`contract.es` + `params.json` + `contract.test.json` + README)
     that `ergo-es test` runs unchanged; open `.es`/project files into Write.
     Raw `.es` at `/api/v1/examples/{id}.es`.
-11. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
+11. **P4f — transaction validation: DONE 2026-09-03.** `txcheck::check`
+    runs every input's script of an unsigned node-format transaction in
+    the real context (new scenario `selfIndex`: SELF at its index, inputs
+    in order; outputs; data inputs; the input's extension as raw context
+    vars) and checks ERG/token conservation (minting with the first
+    input's id allowed). Signatures are not checked — `needsProof` inputs
+    count as signatures needed. `ergo-es validate-tx`, `POST
+    /api/v1/validate-tx` (missing boxes fetched from the explorer when
+    configured), a Validate section in Read.
+12. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.
    - **A — DONE 2026-08-31** (`compiler/source-positions`, `8479a58`): every

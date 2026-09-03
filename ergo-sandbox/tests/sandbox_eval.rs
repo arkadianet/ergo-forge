@@ -300,3 +300,34 @@ fn a_scenario_box_accepts_raw_registers() {
         ergo_sandbox::Verdict::Pass
     );
 }
+
+// ----- selfIndex: SELF is one of the listed inputs, at its real index -----
+
+#[test]
+fn self_index_makes_the_named_input_self_and_keeps_input_order() {
+    // Input 1 is SELF; the script checks it really is INPUTS(1) and that
+    // INPUTS(0) is the other box (value 7).
+    let sc: ergo_sandbox::Scenario = serde_json::from_str(
+        r#"{"source":"sigmaProp(INPUTS(1).id == SELF.id && INPUTS(0).value == 7L && INPUTS.size == 2)",
+            "height":1,"selfIndex":1,
+            "inputs":[{"value":7,"ergoTree":"10010101","boxId":"1111111111111111111111111111111111111111111111111111111111111111"},
+                      {"value":9,"boxId":"2222222222222222222222222222222222222222222222222222222222222222"}]}"#,
+    )
+    .unwrap();
+    let out = ergo_sandbox::eval_scenario(&sc).unwrap();
+    assert_eq!(out.verdict, ergo_sandbox::Verdict::Pass, "{out:?}");
+}
+
+#[test]
+fn self_index_out_of_range_or_with_self_box_is_an_error() {
+    let sc: ergo_sandbox::Scenario = serde_json::from_str(
+        r#"{"source":"sigmaProp(true)","height":1,"selfIndex":3,"inputs":[{"value":1}]}"#,
+    )
+    .unwrap();
+    assert!(ergo_sandbox::eval_scenario(&sc).is_err());
+    let sc: ergo_sandbox::Scenario = serde_json::from_str(
+        r#"{"source":"sigmaProp(true)","height":1,"selfIndex":0,"inputs":[{"value":1}],"selfBox":{"value":2}}"#,
+    )
+    .unwrap();
+    assert!(ergo_sandbox::eval_scenario(&sc).is_err());
+}

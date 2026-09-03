@@ -103,6 +103,10 @@ pub fn router_with(cfg: AppConfig) -> Router {
             get(crate::routes::examples::fetch),
         )
         .route("/api/v1/lookup", post(crate::routes::lookup::lookup))
+        .route(
+            "/api/v1/validate-tx",
+            post(crate::routes::validate::validate_tx),
+        )
         .route_layer(axum::middleware::from_fn_with_state(
             state.clone(),
             crate::ratelimit::limit,

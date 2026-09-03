@@ -131,17 +131,45 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
     // defaults to `[self]`; an explicit `inputs` list is a proposal for
     // INPUTS(1..), prepended with the self box. To override the spent box's
     // other fields, use `selfBox`.
-    let default_self = ScenarioBox::default();
-    let self_box = build_eval_box(
-        "selfBox",
-        sc.self_box.as_ref().unwrap_or(&default_self),
-        Some(&tree_bytes),
-    )?;
-    let mut inputs: Vec<EvalBox> = Vec::with_capacity(sc.inputs.len() + 1);
-    inputs.push(self_box.clone());
-    for (i, b) in sc.inputs.iter().enumerate() {
-        inputs.push(build_eval_box("inputs", b, None).map_err(index_err(i))?);
-    }
+    let (self_box, inputs): (EvalBox, Vec<EvalBox>) = match sc.self_index {
+        Some(i) => {
+            if sc.self_box.is_some() {
+                return Err(SandboxError::Scenario(
+                    "supply either `selfIndex` or `selfBox`, not both".into(),
+                ));
+            }
+            if i >= sc.inputs.len() {
+                return Err(SandboxError::Scenario(format!(
+                    "`selfIndex` {i} is out of range for {} inputs",
+                    sc.inputs.len()
+                )));
+            }
+            let mut inputs: Vec<EvalBox> = Vec::with_capacity(sc.inputs.len());
+            for (k, b) in sc.inputs.iter().enumerate() {
+                let default_tree = if k == i {
+                    Some(tree_bytes.as_slice())
+                } else {
+                    None
+                };
+                inputs.push(build_eval_box("inputs", b, default_tree).map_err(index_err(k))?);
+            }
+            (inputs[i].clone(), inputs)
+        }
+        None => {
+            let default_self = ScenarioBox::default();
+            let self_box = build_eval_box(
+                "selfBox",
+                sc.self_box.as_ref().unwrap_or(&default_self),
+                Some(&tree_bytes),
+            )?;
+            let mut inputs: Vec<EvalBox> = Vec::with_capacity(sc.inputs.len() + 1);
+            inputs.push(self_box.clone());
+            for (k, b) in sc.inputs.iter().enumerate() {
+                inputs.push(build_eval_box("inputs", b, None).map_err(index_err(k))?);
+            }
+            (self_box, inputs)
+        }
+    };
     let outputs: Vec<EvalBox> = sc
         .outputs
         .iter()

@@ -46,6 +46,12 @@ pub struct Scenario {
     /// evaluated tree and whose value is 0.
     #[serde(default)]
     pub self_box: Option<ScenarioBox>,
+    /// Alternative to `selfBox`: SELF is `inputs[selfIndex]`, and `inputs`
+    /// is the whole input list in transaction order — how a real
+    /// transaction is validated (`CONTEXT.INPUTS(selfIndex) == SELF`). That
+    /// input may omit `ergoTree` (it is the tree under evaluation).
+    #[serde(default)]
+    pub self_index: Option<usize>,
     /// Transaction inputs (CONTEXT.INPUTS). Index 0 is conventionally SELF;
     /// the evaluator sees whatever is provided.
     #[serde(default)]

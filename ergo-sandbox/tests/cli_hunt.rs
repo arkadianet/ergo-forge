@@ -107,3 +107,24 @@ fn test_command_prints_a_table_and_exits_nonzero_on_a_failing_case() {
     assert!(ok, "{out}");
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+// ----- ergo-es validate-tx -----
+
+#[test]
+fn validate_tx_command_reports_each_input_and_exits_nonzero_when_invalid() {
+    let dir = std::env::temp_dir().join(format!("ergo-es-vtx-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let path = dir.join("tx.json");
+    let a = "aa".repeat(32);
+    std::fs::write(&path, format!(r#"{{ "height": 1000,
+        "tx": {{ "inputs": [ {{ "boxId": "{a}" }} ], "dataInputs": [],
+                 "outputs": [ {{ "value": 999, "ergoTree": "10010101d17300", "assets": [], "additionalRegisters": {{}}, "creationHeight": 1000 }} ] }},
+        "boxes": [ {{ "boxId": "{a}", "value": 100, "ergoTree": "10010101d17300", "assets": [], "additionalRegisters": {{}}, "creationHeight": 1 }} ] }}"#)).unwrap();
+    let (ok, out, _) = ergo_es(&["validate-tx", path.to_str().unwrap()]);
+    assert!(!ok, "ERG is not conserved: must exit non-zero\n{out}");
+    assert!(
+        out.contains("input 0") && out.contains("pass") && out.contains("ERG not conserved"),
+        "{out}"
+    );
+    let _ = std::fs::remove_dir_all(&dir);
+}

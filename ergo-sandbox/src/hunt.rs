@@ -180,6 +180,7 @@ pub fn hunt(tree_bytes: &[u8], opts: &HuntOptions) -> Result<Hunt, SandboxError>
                 network: network.clone(),
                 height,
                 self_box: Some(self_box.clone()),
+                self_index: None,
                 inputs: Vec::new(),
                 outputs: vec![out.clone()],
                 data_inputs: opts.data_inputs.clone(),

@@ -199,6 +199,21 @@ curl -s -X POST http://127.0.0.1:8080/api/v1/lookup -H 'content-type: applicatio
 
 Explorer failures are `502 upstream`; an unknown box or address is `404`.
 
+### `POST /api/v1/validate-tx`
+
+Will this unsigned transaction validate? `{tx, boxes?, height?, network?}`
+where `tx` is the node-format transaction (`inputs` with optional
+`extension`, `dataInputs`, `outputs`) and `boxes` the input and data-input
+boxes in node/explorer shape. Boxes not supplied are fetched from the
+explorer when one is configured (and `height` defaults to the chain tip);
+otherwise they are reported `missing`. Every input's script runs with SELF
+at its real index, all inputs in order, all outputs, the data inputs and
+that input's extension; ERG and token conservation are checked (one new
+token may be minted with the first input's id). Signatures are not checked:
+an input reducing to a sigma proposition counts as `needsProof` and does not
+invalidate. Response: `{valid, signaturesNeeded, inputs[], problems[],
+ergIn, ergOut, height}`.
+
 ### `POST /api/v1/test`
 
 Run a contract test suite: the contract (`source` + `params`, or `tree`) and

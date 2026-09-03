@@ -116,6 +116,24 @@ pub async fn lookup(
     Ok(Json(LookupResponse { height, boxes }))
 }
 
+/// One box by id, raw explorer JSON.
+pub(crate) async fn fetch_box(
+    client: &reqwest::Client,
+    base: &str,
+    id: &str,
+) -> Result<serde_json::Value, ApiError> {
+    fetch(client, &format!("{base}/api/v1/boxes/{id}")).await
+}
+
+/// The chain tip, when the explorer answers.
+pub(crate) async fn fetch_height(client: &reqwest::Client, base: &str) -> Option<u32> {
+    fetch(client, &format!("{base}/api/v1/networkState"))
+        .await
+        .ok()
+        .and_then(|v| v.get("height").and_then(|h| h.as_u64()))
+        .map(|h| h as u32)
+}
+
 async fn fetch(client: &reqwest::Client, url: &str) -> Result<serde_json::Value, ApiError> {
     let r = client
         .get(url)
