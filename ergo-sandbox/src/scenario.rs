@@ -84,6 +84,16 @@ pub struct Scenario {
     /// reports proof verification against `message`.
     #[serde(default)]
     pub proof: Option<String>,
+    /// Secrets the spender holds. When the script reduces to a sigma
+    /// proposition and no `proof` is given, the sandbox PRODUCES a proof
+    /// with the node's wallet prover and verifies it like a supplied one.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub secrets: Vec<crate::prove::SecretSpec>,
+    /// AVL+ trees built by a real prover; see [`crate::avl`]. Typed values
+    /// refer to them as `"@avl.name"`, `"@avl.name.after"`,
+    /// `"@avl.name.proof"`.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub avl: BTreeMap<String, crate::avl::AvlSpec>,
     /// Message the proof commits to (bytes-to-sign), hex. Default empty —
     /// real spends sign the transaction bytes.
     #[serde(default)]
@@ -294,11 +304,45 @@ pub fn parse_typed_value(
             ))
         }
         "SigmaProp" => parse_sigma_prop(value),
+        "AvlTree" => parse_avl_tree(value),
         _ => Err(SandboxError::Scenario(format!(
             "unsupported type name `{tpe}` (supported: Boolean, Byte, Short, Int, Long, BigInt, \
-             GroupElement, SigmaProp, Coll[T])"
+             GroupElement, SigmaProp, AvlTree, Coll[T])"
         ))),
     }
+}
+
+/// `{"digest": hex (33 bytes), "keyLength": n, "valueLength": n?,
+/// "insertAllowed": bool, "updateAllowed": bool, "removeAllowed": bool}`;
+/// the flags default to true. `"@avl.name"` strings are resolved before
+/// this runs (see [`crate::avl`]).
+fn parse_avl_tree(value: &serde_json::Value) -> Result<(SigmaType, SigmaValue), SandboxError> {
+    let obj = value.as_object().ok_or_else(|| {
+        bad("AvlTree", value, "an object {digest, keyLength, valueLength?, insertAllowed?, updateAllowed?, removeAllowed?} or \"@avl.name\"")
+    })?;
+    let digest_hex = obj
+        .get("digest")
+        .and_then(|d| d.as_str())
+        .ok_or_else(|| bad("AvlTree.digest", value, "hex"))?;
+    let digest = hex::decode(digest_hex.trim())
+        .map_err(|e| SandboxError::Scenario(format!("AvlTree digest hex: {e}")))?;
+    let key_length = obj.get("keyLength").and_then(|k| k.as_i64()).unwrap_or(32);
+    let value_length_opt = obj
+        .get("valueLength")
+        .and_then(|k| k.as_i64())
+        .map(|n| n as i32);
+    let flag = |k: &str| obj.get(k).and_then(|b| b.as_bool()).unwrap_or(true);
+    Ok((
+        SigmaType::SAvlTree,
+        SigmaValue::AvlTree(ergo_ser::sigma_value::AvlTreeData {
+            digest,
+            insert_allowed: flag("insertAllowed"),
+            update_allowed: flag("updateAllowed"),
+            remove_allowed: flag("removeAllowed"),
+            key_length: key_length as i32,
+            value_length_opt,
+        }),
+    ))
 }
 
 fn parse_coll(

@@ -94,6 +94,9 @@ pub struct EvalOutcome {
 /// malformed scenario) — a script that *ran and failed* is a normal
 /// [`EvalOutcome`] with [`Verdict::Error`] or [`Verdict::Fail`].
 pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
+    // AVL+ references become prover-made digests and proofs first.
+    let resolved = crate::avl::resolved(sc)?;
+    let sc = &resolved;
     // 1. Resolve the tree under evaluation + the address network.
     let network = parse_network(sc.network.as_deref())?;
     let tree_bytes: Vec<u8> = match (&sc.tree, &sc.source) {
@@ -319,18 +322,36 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
     // (pre-reduction checks + deserialize-substitution cost + trivial fast
     // path + evaluator + crypto verify) with a FRESH accumulator — this is
     // the authoritative spend cost; the diagnostic pass above is a preview.
-    if let Some(proof_hex) = &sc.proof {
-        let proof_bytes = hex::decode(proof_hex.trim()).map_err(|source| SandboxError::Hex {
-            field: "proof",
+    let message: Vec<u8> = match &sc.message {
+        Some(m) => hex::decode(m.trim()).map_err(|source| SandboxError::Hex {
+            field: "message",
             source,
-        })?;
-        let message: Vec<u8> = match &sc.message {
-            Some(m) => hex::decode(m.trim()).map_err(|source| SandboxError::Hex {
-                field: "message",
-                source,
-            })?,
-            None => Vec::new(),
-        };
+        })?,
+        None => Vec::new(),
+    };
+    // A supplied proof, or one PRODUCED from the scenario's secrets by the
+    // node's wallet prover for the proposition the script reduced to.
+    let proof_bytes: Option<Vec<u8>> = match &sc.proof {
+        Some(proof_hex) => {
+            Some(
+                hex::decode(proof_hex.trim()).map_err(|source| SandboxError::Hex {
+                    field: "proof",
+                    source,
+                })?,
+            )
+        }
+        None if !sc.secrets.is_empty() && outcome.verdict == Verdict::NeedsProof => {
+            match crate::prove::prove(&proposition, &sc.secrets, &message) {
+                Ok(p) => Some(p),
+                Err(e) => {
+                    outcome.error = Some(format!("no proof from these secrets: {e}"));
+                    None
+                }
+            }
+        }
+        None => None,
+    };
+    if let Some(proof_bytes) = proof_bytes {
         let mut verify_cost = new_accumulator()?;
         match verify_spending_proof_with_context_and_cost(
             &tree,

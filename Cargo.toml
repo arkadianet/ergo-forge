@@ -15,6 +15,14 @@ ergo-primitives = { git = "https://github.com/arkadianet/ergo", rev = "36c88bb79
 ergo-ser        = { git = "https://github.com/arkadianet/ergo", rev = "36c88bb794af4be35d584ed77d8c35358ffd1e8b" }
 ergo-sigma      = { git = "https://github.com/arkadianet/ergo", rev = "36c88bb794af4be35d584ed77d8c35358ffd1e8b" }
 ergo-compiler   = { git = "https://github.com/arkadianet/ergo", rev = "36c88bb794af4be35d584ed77d8c35358ffd1e8b" }
+# The node's wallet prover (Schnorr / DH-tuple / AND / OR / threshold) and
+# the AVL+ crate whose verifier the node's evaluator uses — so the sandbox
+# can PRODUCE the proofs a spender attaches, not only check them.
+ergo-wallet     = { git = "https://github.com/arkadianet/ergo", rev = "36c88bb794af4be35d584ed77d8c35358ffd1e8b" }
+ergo_avltree_rust = "0.1.1"
+k256       = { version = "0.13", features = ["arithmetic"] }
+zeroize    = "1"
+bytes      = "1"
 
 thiserror  = "2"
 serde      = { version = "1", features = ["derive"] }

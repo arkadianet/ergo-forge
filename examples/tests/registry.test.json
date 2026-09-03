@@ -1,0 +1,445 @@
+{
+  "source": "// A name registry kept in an AVL+ tree (the shape of ErgoNames). The\n// registry box holds the tree's digest in R4; the names themselves live\n// off chain with whoever needs them, and every change comes with a proof\n// the tree verifies. To register a name the spender supplies, as context\n// variables, the proof (0), the name key (1, 32 bytes \u2014 hash the name) and\n// the record (2, any bytes), rebuilds the box with the new digest, and\n// pays the registrar. A name that already exists cannot be inserted: the\n// tree refuses the proof. The registrar may spend freely (upgrades).\n//\n// $registrar: SigmaProp\n// $fee: Long\n{\n  val tree = SELF.R4[AvlTree].get\n  val proof = getVar[Coll[Byte]](0)\n  val name = getVar[Coll[Byte]](1)\n  val record = getVar[Coll[Byte]](2)\n  val registered = OUTPUTS.size > 1 && proof.isDefined && name.isDefined && record.isDefined && {\n    val successor = OUTPUTS(0)\n    val next = tree.insert(Coll((name.get, record.get)), proof.get)\n    successor.propositionBytes == SELF.propositionBytes &&\n    successor.tokens == SELF.tokens &&\n    successor.value >= SELF.value &&\n    next.isDefined &&\n    successor.R4[AvlTree].isDefined &&\n    successor.R4[AvlTree].get.digest == next.get.digest &&\n    OUTPUTS(1).propositionBytes == $registrar.propBytes &&\n    OUTPUTS(1).value >= $fee\n  }\n  $registrar || sigmaProp(registered)\n}\n",
+  "params": {
+    "registrar": {
+      "type": "SigmaProp",
+      "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+    },
+    "fee": {
+      "type": "Long",
+      "value": 100000000
+    }
+  },
+  "scenarios": [
+    {
+      "name": "register a new name with the prover's proof and the new digest, paying the fee: no key needed",
+      "expect": "pass",
+      "height": 1,
+      "avl": {
+        "names": {
+          "keyLength": 32,
+          "entries": [
+            [
+              "e11d814979372c883b50bdb0ffadb1eaf0898bf54fd4fbf298af126fbabbda4c",
+              "01"
+            ],
+            [
+              "87683da837137691170e1aaa3902a07fe1639cc709f4602b0e1b72f19773f4cd",
+              "02"
+            ]
+          ],
+          "operations": [
+            {
+              "insert": {
+                "key": "0ffac5d09d8da217bd00de0e9a591da7a7141459dc983d1279ad41877123df9e",
+                "value": "03"
+              }
+            }
+          ]
+        }
+      },
+      "selfBox": {
+        "value": 1000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "AvlTree",
+            "value": "@avl.names"
+          }
+        }
+      },
+      "contextVars": {
+        "0": {
+          "type": "Coll[Byte]",
+          "value": "@avl.names.proof"
+        },
+        "1": {
+          "type": "Coll[Byte]",
+          "value": "0ffac5d09d8da217bd00de0e9a591da7a7141459dc983d1279ad41877123df9e"
+        },
+        "2": {
+          "type": "Coll[Byte]",
+          "value": "03"
+        }
+      },
+      "outputs": [
+        {
+          "value": 1000000000,
+          "ergoTree": "$self",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "AvlTree",
+              "value": "@avl.names.after"
+            }
+          }
+        },
+        {
+          "value": 100000000,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        }
+      ]
+    },
+    {
+      "name": "the fee one nanoERG short: only the registrar could sign that",
+      "expect": "needsProof",
+      "height": 1,
+      "avl": {
+        "names": {
+          "keyLength": 32,
+          "entries": [
+            [
+              "e11d814979372c883b50bdb0ffadb1eaf0898bf54fd4fbf298af126fbabbda4c",
+              "01"
+            ],
+            [
+              "87683da837137691170e1aaa3902a07fe1639cc709f4602b0e1b72f19773f4cd",
+              "02"
+            ]
+          ],
+          "operations": [
+            {
+              "insert": {
+                "key": "0ffac5d09d8da217bd00de0e9a591da7a7141459dc983d1279ad41877123df9e",
+                "value": "03"
+              }
+            }
+          ]
+        }
+      },
+      "selfBox": {
+        "value": 1000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "AvlTree",
+            "value": "@avl.names"
+          }
+        }
+      },
+      "contextVars": {
+        "0": {
+          "type": "Coll[Byte]",
+          "value": "@avl.names.proof"
+        },
+        "1": {
+          "type": "Coll[Byte]",
+          "value": "0ffac5d09d8da217bd00de0e9a591da7a7141459dc983d1279ad41877123df9e"
+        },
+        "2": {
+          "type": "Coll[Byte]",
+          "value": "03"
+        }
+      },
+      "outputs": [
+        {
+          "value": 1000000000,
+          "ergoTree": "$self",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "AvlTree",
+              "value": "@avl.names.after"
+            }
+          }
+        },
+        {
+          "value": 99999999,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        }
+      ],
+      "expectResidual": "028333f9"
+    },
+    {
+      "name": "successor keeps the OLD digest: refused",
+      "expect": "needsProof",
+      "height": 1,
+      "avl": {
+        "names": {
+          "keyLength": 32,
+          "entries": [
+            [
+              "e11d814979372c883b50bdb0ffadb1eaf0898bf54fd4fbf298af126fbabbda4c",
+              "01"
+            ],
+            [
+              "87683da837137691170e1aaa3902a07fe1639cc709f4602b0e1b72f19773f4cd",
+              "02"
+            ]
+          ],
+          "operations": [
+            {
+              "insert": {
+                "key": "0ffac5d09d8da217bd00de0e9a591da7a7141459dc983d1279ad41877123df9e",
+                "value": "03"
+              }
+            }
+          ]
+        }
+      },
+      "selfBox": {
+        "value": 1000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "AvlTree",
+            "value": "@avl.names"
+          }
+        }
+      },
+      "contextVars": {
+        "0": {
+          "type": "Coll[Byte]",
+          "value": "@avl.names.proof"
+        },
+        "1": {
+          "type": "Coll[Byte]",
+          "value": "0ffac5d09d8da217bd00de0e9a591da7a7141459dc983d1279ad41877123df9e"
+        },
+        "2": {
+          "type": "Coll[Byte]",
+          "value": "03"
+        }
+      },
+      "outputs": [
+        {
+          "value": 1000000000,
+          "ergoTree": "$self",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "AvlTree",
+              "value": "@avl.names"
+            }
+          }
+        },
+        {
+          "value": 100000000,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        }
+      ],
+      "expectResidual": "028333f9"
+    },
+    {
+      "name": "a proof for a lookup does not authenticate an insert",
+      "expect": "needsProof",
+      "height": 1,
+      "avl": {
+        "names": {
+          "keyLength": 32,
+          "entries": [
+            [
+              "e11d814979372c883b50bdb0ffadb1eaf0898bf54fd4fbf298af126fbabbda4c",
+              "01"
+            ],
+            [
+              "87683da837137691170e1aaa3902a07fe1639cc709f4602b0e1b72f19773f4cd",
+              "02"
+            ]
+          ],
+          "operations": [
+            {
+              "lookup": {
+                "key": "e11d814979372c883b50bdb0ffadb1eaf0898bf54fd4fbf298af126fbabbda4c"
+              }
+            }
+          ]
+        }
+      },
+      "selfBox": {
+        "value": 1000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "AvlTree",
+            "value": "@avl.names"
+          }
+        }
+      },
+      "contextVars": {
+        "0": {
+          "type": "Coll[Byte]",
+          "value": "@avl.names.proof"
+        },
+        "1": {
+          "type": "Coll[Byte]",
+          "value": "0ffac5d09d8da217bd00de0e9a591da7a7141459dc983d1279ad41877123df9e"
+        },
+        "2": {
+          "type": "Coll[Byte]",
+          "value": "03"
+        }
+      },
+      "outputs": [
+        {
+          "value": 1000000000,
+          "ergoTree": "$self",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "AvlTree",
+              "value": "@avl.names.after"
+            }
+          }
+        },
+        {
+          "value": 100000000,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        }
+      ],
+      "expectResidual": "028333f9"
+    },
+    {
+      "name": "registering a name that already exists: the tree refuses the proof",
+      "expect": "needsProof",
+      "height": 1,
+      "avl": {
+        "names": {
+          "keyLength": 32,
+          "entries": [
+            [
+              "e11d814979372c883b50bdb0ffadb1eaf0898bf54fd4fbf298af126fbabbda4c",
+              "01"
+            ],
+            [
+              "87683da837137691170e1aaa3902a07fe1639cc709f4602b0e1b72f19773f4cd",
+              "02"
+            ]
+          ],
+          "operations": [
+            {
+              "lookup": {
+                "key": "e11d814979372c883b50bdb0ffadb1eaf0898bf54fd4fbf298af126fbabbda4c"
+              }
+            }
+          ]
+        }
+      },
+      "selfBox": {
+        "value": 1000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "AvlTree",
+            "value": "@avl.names"
+          }
+        }
+      },
+      "contextVars": {
+        "0": {
+          "type": "Coll[Byte]",
+          "value": "@avl.names.proof"
+        },
+        "1": {
+          "type": "Coll[Byte]",
+          "value": "e11d814979372c883b50bdb0ffadb1eaf0898bf54fd4fbf298af126fbabbda4c"
+        },
+        "2": {
+          "type": "Coll[Byte]",
+          "value": "03"
+        }
+      },
+      "outputs": [
+        {
+          "value": 1000000000,
+          "ergoTree": "$self",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "AvlTree",
+              "value": "@avl.names"
+            }
+          }
+        },
+        {
+          "value": 100000000,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        }
+      ],
+      "expectResidual": "028333f9"
+    },
+    {
+      "name": "the registrar may spend freely (an upgrade), proving with the registrar's key",
+      "expect": "needsProof",
+      "expectResidual": "028333f9",
+      "height": 1,
+      "avl": {
+        "names": {
+          "keyLength": 32,
+          "entries": [
+            [
+              "e11d814979372c883b50bdb0ffadb1eaf0898bf54fd4fbf298af126fbabbda4c",
+              "01"
+            ]
+          ],
+          "operations": []
+        }
+      },
+      "selfBox": {
+        "value": 1000000000,
+        "tokens": [
+          {
+            "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount": 1
+          }
+        ],
+        "registers": {
+          "R4": {
+            "type": "AvlTree",
+            "value": "@avl.names"
+          }
+        }
+      }
+    }
+  ]
+}
