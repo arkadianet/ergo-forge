@@ -1,0 +1,101 @@
+{
+  "source": "/**\n * Release funds to someone gradually, but nothing at all before a cliff.\n * Before the cliff nothing can be taken; from the cliff the share vested\n * since the start becomes available; after the end everything is theirs.\n * @param beneficiary Who receives the funds? \u2014 Their Ergo address.\n * @param startHeight When does vesting start counting? \u2014 Usually the day the funds are locked.\n * @param cliffHeight When can the first withdrawal happen? \u2014 Nothing at all before this date.\n * @param endHeight When has everything vested? \u2014 After this they may take it all.\n */\n@contract def cliffVesting(beneficiary: SigmaProp, startHeight: Int, cliffHeight: Int, endHeight: Int) = {\n  val total = SELF.value\n  val span = (endHeight - startHeight).toLong\n  val elapsed = (HEIGHT - startHeight).toLong\n  val fullyVested = HEIGHT >= endHeight\n  val vested = if (fullyVested) total else if (HEIGHT < cliffHeight) 0L else total * elapsed / span\n  val remainder = OUTPUTS(0)\n  val keepsRest = remainder.propositionBytes == SELF.propositionBytes &&\n                  remainder.value >= total - vested &&\n                  remainder.tokens.size == 0\n  beneficiary && sigmaProp(fullyVested || keepsRest)\n}\n",
+  "params": {
+    "beneficiary": {
+      "type": "SigmaProp",
+      "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+    },
+    "startHeight": {
+      "type": "Int",
+      "value": 1000
+    },
+    "cliffHeight": {
+      "type": "Int",
+      "value": 1500
+    },
+    "endHeight": {
+      "type": "Int",
+      "value": 2000
+    }
+  },
+  "scenarios": [
+    {
+      "name": "before the cliff nothing can be taken even though time has passed",
+      "expect": "fail",
+      "height": 1400,
+      "selfBox": {
+        "value": 1000
+      },
+      "outputs": [
+        {
+          "value": 900,
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "before the cliff the box may be re-locked untouched",
+      "expect": "needsProof",
+      "height": 1400,
+      "selfBox": {
+        "value": 1000
+      },
+      "outputs": [
+        {
+          "value": 1000,
+          "ergoTree": "$self"
+        }
+      ]
+    },
+    {
+      "name": "at 1600, 60% has vested since the start: 600 may be taken",
+      "expect": "needsProof",
+      "height": 1600,
+      "selfBox": {
+        "value": 1000
+      },
+      "outputs": [
+        {
+          "value": 400,
+          "ergoTree": "$self"
+        },
+        {
+          "value": 600,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        }
+      ]
+    },
+    {
+      "name": "at 1600, taking 700 is refused",
+      "expect": "fail",
+      "height": 1600,
+      "selfBox": {
+        "value": 1000
+      },
+      "outputs": [
+        {
+          "value": 300,
+          "ergoTree": "$self"
+        },
+        {
+          "value": 700,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        }
+      ]
+    },
+    {
+      "name": "after the end everything may go",
+      "expect": "needsProof",
+      "height": 2500,
+      "selfBox": {
+        "value": 1000
+      },
+      "outputs": [
+        {
+          "value": 1000,
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        }
+      ]
+    }
+  ]
+}

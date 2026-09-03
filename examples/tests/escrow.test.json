@@ -1,0 +1,25 @@
+{
+  "source": "/**\n * A payment held until two of three agree: the buyer and seller, or either\n * of them together with an arbiter who settles a dispute. Nobody can take\n * the money alone.\n * @param buyer Who is paying? \u2014 The buyer's Ergo address.\n * @param seller Who is being paid? \u2014 The seller's Ergo address.\n * @param arbiter Who settles disputes? \u2014 A third party both sides trust.\n */\n@contract def escrow(buyer: SigmaProp, seller: SigmaProp, arbiter: SigmaProp) =\n  atLeast(2, Coll(buyer, seller, arbiter))\n",
+  "params": {
+    "buyer": {
+      "type": "SigmaProp",
+      "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+    },
+    "seller": {
+      "type": "SigmaProp",
+      "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+    },
+    "arbiter": {
+      "type": "SigmaProp",
+      "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+    }
+  },
+  "scenarios": [
+    {
+      "name": "nobody can take it alone: two of three keys are required",
+      "expect": "needsProof",
+      "expectResidual": "Cthreshold",
+      "height": 1
+    }
+  ]
+}

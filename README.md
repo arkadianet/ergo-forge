@@ -27,7 +27,7 @@ Layout:
 - [`ergo-web/`](ergo-web/) — the HTTP service and the playground UI
   (`ui/`, vanilla JS, nothing loaded from a CDN). Optional explorer lookups
   and per-client rate limiting for a public instance; a container image.
-- [`examples/`](examples/) — 87 contracts (8 recipes and 7 basics written
+- [`examples/`](examples/) — 92 contracts (13 recipes and 7 basics written
   here, 79 real deployed contracts vendored from the node's corpus) and test
   suites.
 - [`docs/workbench-PLAN.md`](docs/workbench-PLAN.md) — the plan and the
@@ -64,7 +64,7 @@ every endpoint and setting.
 
 | Question | Where |
 |---|---|
-| I want a contract that does X, and I don't write code | **Build** mode: pick a recipe (time lock, inheritance, 2-of-3, refundable payment, vesting, token sale, price gate, burn), answer its questions in plain terms (addresses, dates, amounts), get an address |
+| I want a contract that does X, and I don't write code | **Build** mode: pick a recipe (time lock, inheritance, 2-of-3, escrow, refundable payment, savings with a spending limit, subscription, vesting with or without a cliff, token sale, bounty for a secret, price gate, burn), answer its questions in plain terms (addresses, dates, amounts), get an address |
 | What does this on-chain contract say? | `ergo-es decompile`, `POST /api/v1/inspect`, the reader |
 | Is the code fragile? (unguarded `Option.get`, tiered by who controls the value) | `ergo-es audit`, inspect findings |
 | Can someone with **no key** spend this box? | `ergo-es hunt`, `POST /api/v1/hunt`, the reader's Spendability section |

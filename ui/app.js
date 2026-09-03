@@ -595,7 +595,7 @@ async function loadRecipes() {
     const items = await (await fetch("/api/v1/examples")).json();
     const box = $("recipes");
     // Simplest first; anything not listed goes after, alphabetically.
-    const order = ["time-lock", "inheritance", "two-of-three", "refundable-payment", "vesting", "token-sale", "price-gate", "burn"];
+    const order = ["time-lock", "inheritance", "two-of-three", "escrow", "refundable-payment", "savings-cap", "subscription", "vesting", "cliff-vesting", "token-sale", "bounty", "price-gate", "burn"];
     const rank = (id) => { const i = order.indexOf(id.split("/").pop()); return i < 0 ? order.length : i; };
     const recipes = items.filter((i) => i.group === "recipes").sort((a, b) => rank(a.id) - rank(b.id) || a.id.localeCompare(b.id));
     for (const it of recipes) {
@@ -618,11 +618,16 @@ const RECIPE_TITLES = {
   "time-lock": "Lock savings until a date",
   "inheritance": "Inheritance / backup access",
   "two-of-three": "Shared account (2 of 3 must agree)",
+  "escrow": "Escrow with an arbiter",
   "refundable-payment": "Payment you can take back",
+  "savings-cap": "Savings with a spending limit",
+  "subscription": "Pay someone regularly from a pot",
   "vesting": "Release funds gradually",
+  "cliff-vesting": "Release funds gradually, after a cliff",
   "token-sale": "Sell tokens at a fixed price",
+  "bounty": "Bounty for a secret",
   "price-gate": "Spend only above an oracle price",
-  "burn": "Burn address (destroy for good)",
+  "burn": "Burn address",
 };
 
 function humanize(name) {
@@ -643,6 +648,7 @@ function fieldKind(p) {
   const t = p.typeHint || "";
   const n = p.name.toLowerCase();
   if (t === "SigmaProp") return "address";
+  if (t === "Coll[Byte]" && /hash/.test(n)) return "secret";
   if ((t === "Int" || t === "Long") && /height|deadline|expiry|unlock|until|after/.test(n)) return "height";
   if (t === "Coll[Byte]" && /nft|token|id/.test(n)) return "tokenId";
   if (t === "Long" && /erg|value|amount|fee/.test(n)) return "erg";
@@ -699,6 +705,7 @@ function startRecipe(ex) {
       inp.min = "1";
     }
     else if (kind === "tokenId") { inp.placeholder = "64 hex characters"; inp.spellcheck = false; }
+    else if (kind === "secret") { inp.placeholder = "the secret phrase"; inp.autocomplete = "off"; }
     else if (kind === "erg") { inp.type = "number"; inp.step = "0.000000001"; inp.placeholder = "e.g. 1.5"; }
     else if (kind === "bool") { inp.type = "checkbox"; inp.required = false; }
     else { inp.placeholder = p.typeHint === "Long" || p.typeHint === "Int" ? "a whole number" : (p.typeHint || ""); }
@@ -712,6 +719,7 @@ function startRecipe(ex) {
         : "Enter a block height; there is about one block every 2 minutes. Dates are offered when this instance has an explorer for the chosen network.");
     }
     if (kind === "address" && !help) helpText = "Paste an address from your wallet.";
+    if (kind === "secret") helpText = "Type the secret phrase itself. It is hashed here in your browser; only the hash goes into the contract, and the phrase never leaves this page. Whoever knows the phrase can claim — keep it safe.";
     helpEl.textContent = helpText;
     const problem = document.createElement("span");
     problem.className = "problem";
@@ -758,6 +766,7 @@ function wizardParams() {
       out[name] = { type, value: h };
     }
     else if (kind === "tokenId") out[name] = { type: "Coll[Byte]", value: raw.toLowerCase() };
+    else if (kind === "secret") out[name] = { type: "Coll[Byte]", value: window.blake2b.blake2bHex(new TextEncoder().encode(raw), null, 32) };
     else if (kind === "erg") out[name] = { type: "Long", value: Math.round(Number(raw) * 1e9) };
     else if (type === "Int" || type === "Long" || type === "Short" || type === "Byte") {
       if (!/^-?\d+$/.test(raw)) return { error: `${label} — a whole number, please.` };
@@ -787,6 +796,7 @@ function describeBuild(params) {
     if (kind === "height") shown = datesAvailable() ? `about ${dateOfHeight(v)} (block ${v})` : `block ${v}`;
     else if (kind === "erg") shown = `${v / 1e9} ERG`;
     else if (kind === "address") shown = shortAddr(v);
+    else if (kind === "secret") shown = `(hash ${String(v).slice(0, 12)}… of the phrase you typed — keep the phrase)`;
     lines.push(`${label}: ${shown}`);
   }
   return lines.join("\n");
@@ -850,7 +860,13 @@ $("wizard").addEventListener("submit", async (e) => {
       method: "POST", headers: { "content-type": "application/json" },
       body: JSON.stringify({ input: body.treeHex, network }),
     })).json();
-    $("build-hunt").textContent = {
+    // Recipes whose spending story the six probes cannot see (they carry no
+    // secret and no oracle box) get their own sentence.
+    const special = {
+      "bounty": "Anyone who knows the secret phrase can claim this before the deadline — no key needed. After the deadline, only the funder can take it back.",
+      "price-gate": "Only the owner can spend, and only in a transaction that includes the oracle's box showing a price at or above the floor.",
+    }[recipe.name];
+    $("build-hunt").textContent = special || {
       requiresProof: "Only the people you named can spend from this address, and only under the rules above. Nobody else can.",
       spendableByAnyone: "Warning: anyone could spend from this address as it stands. Check your answers before sending anything.",
       movableByAnyone: "Anyone can move the funds, but only back into this same contract.",
