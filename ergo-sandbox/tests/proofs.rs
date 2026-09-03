@@ -240,3 +240,22 @@ fn headers_size_is_answered_after_the_pin_bump() {
     );
     assert_eq!(r.0, "pass", "{:?}", r.1);
 }
+
+#[test]
+fn a_ceremony_has_a_bounded_number_of_parties() {
+    let parties: Vec<serde_json::Value> = (0..ergo_sandbox::prove::MAX_PARTIES + 1)
+        .map(|i| serde_json::json!({ "secrets": [ {"dlog": format!("{:064x}", i + 1)} ] }))
+        .collect();
+    let pk = ergo_sandbox::prove::pubkey_hex(X1).unwrap();
+    let r = run(
+        "$a",
+        serde_json::json!({ "a": {"type":"SigmaProp","value":pk} }),
+        serde_json::json!({ "height": 1, "parties": parties }),
+    );
+    assert_eq!(r.0, "needsProof");
+    assert!(
+        r.1.as_deref().unwrap_or("").contains("at most"),
+        "{:?}",
+        r.1
+    );
+}

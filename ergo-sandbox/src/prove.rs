@@ -134,6 +134,11 @@ fn leaves(prop: &SigmaBoolean, out: &mut Vec<SigmaBoolean>) {
     }
 }
 
+/// Most signers a ceremony may have. Setup and hint merging grow with the
+/// square of the count and are not charged to the scenario's cost limit;
+/// real multi-signature contracts have a handful of signers.
+pub const MAX_PARTIES: usize = 16;
+
 /// A proof made the way separate wallets make one: each party commits to
 /// its own leaves; the first signs against everyone's commitments (a
 /// partial proof); each next party extracts what came before and adds
@@ -146,6 +151,12 @@ pub fn prove_parties(
 ) -> Result<Vec<u8>, SandboxError> {
     if parties.is_empty() {
         return Err(err("no parties"));
+    }
+    if parties.len() > MAX_PARTIES {
+        return Err(err(format!(
+            "at most {MAX_PARTIES} parties, got {}",
+            parties.len()
+        )));
     }
     let mut rng = OsRngBackend;
     let regs: Vec<SecretRegistry> = parties
