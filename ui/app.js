@@ -587,7 +587,7 @@ async function loadRecipes() {
     const items = await (await fetch("/api/v1/examples")).json();
     const box = $("recipes");
     // Simplest first; anything not listed goes after, alphabetically.
-    const order = ["time-lock", "inheritance", "two-of-three", "refundable-payment", "price-gate", "burn"];
+    const order = ["time-lock", "inheritance", "two-of-three", "refundable-payment", "vesting", "token-sale", "price-gate", "burn"];
     const rank = (id) => { const i = order.indexOf(id.split("/").pop()); return i < 0 ? order.length : i; };
     const recipes = items.filter((i) => i.group === "recipes").sort((a, b) => rank(a.id) - rank(b.id) || a.id.localeCompare(b.id));
     for (const it of recipes) {

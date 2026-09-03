@@ -204,7 +204,10 @@ Explorer failures are `502 upstream`; an unknown box or address is `404`.
 Run a contract test suite: the contract (`source` + `params`, or `tree`) and
 named `scenarios`, each a scenario with a `name` and the verdict it must
 produce (`expect`: `pass` / `fail` / `error` / `needsProof` / `proofAccepted`
-/ `proofRejected`). The contract compiles once; every case runs against it.
+/ `proofRejected`). The contract compiles once; every case runs against it. In any scenario
+box, `"ergoTree": "$self"` stands for the contract under test (its tree is
+not known when the suite is written) — the way to assert "the rest stays
+under this contract".
 The response lists each case with expected and actual verdicts, `passed`,
 the error text when the script threw, the residual proposition, and cost,
 plus `passed`/`failed` totals. Same file shape as `ergo-es test` — see

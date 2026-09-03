@@ -1,0 +1,20 @@
+{
+  "source": "/**\n * Release funds to someone gradually between two heights. Before the start\n * nothing can be taken; between start and end the beneficiary may withdraw\n * up to the vested share, leaving the rest in a box under this same\n * contract; after the end everything is theirs.\n * @param beneficiary the address the funds vest to\n * @param startHeight the block height at which vesting begins\n * @param endHeight the block height at which everything has vested\n */\n@contract def vesting(beneficiary: SigmaProp, startHeight: Int, endHeight: Int) = {\n  val total = SELF.value\n  val span = (endHeight - startHeight).toLong\n  val elapsed = (HEIGHT - startHeight).toLong\n  val fullyVested = HEIGHT >= endHeight\n  // Vested share so far, in nanoERG (linear between start and end).\n  val vested = if (fullyVested) total else if (HEIGHT < startHeight) 0L else total * elapsed / span\n  val remainder = OUTPUTS(0)\n  val keepsRest = remainder.propositionBytes == SELF.propositionBytes &&\n                  remainder.value >= total - vested &&\n                  remainder.tokens.size == 0 && remainder.R4[Int].isDefined == false\n  beneficiary && sigmaProp(fullyVested || keepsRest)\n}\n",
+  "params": { "beneficiary": { "type": "SigmaProp", "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197" }, "startHeight": { "type": "Int", "value": 1000 }, "endHeight": { "type": "Int", "value": 2000 } },
+  "scenarios": [
+    { "name": "before the start, keeping everything under the contract is allowed (with the beneficiary's signature)", "expect": "needsProof", "height": 500,
+      "selfBox": { "value": 1000 }, "outputs": [ { "value": 1000, "ergoTree": "$self" } ] },
+    { "name": "before the start, taking anything is refused", "expect": "fail", "height": 500,
+      "selfBox": { "value": 1000 }, "outputs": [ { "value": 900, "ergoTree": "$self" } ] },
+    { "name": "halfway, half may be withdrawn", "expect": "needsProof", "height": 1500,
+      "selfBox": { "value": 1000 }, "outputs": [ { "value": 500, "ergoTree": "$self" }, { "value": 500, "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197" } ] },
+    { "name": "halfway, more than half is refused", "expect": "fail", "height": 1500,
+      "selfBox": { "value": 1000 }, "outputs": [ { "value": 400, "ergoTree": "$self" }, { "value": 600, "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197" } ] },
+    { "name": "halfway, the rest must stay under this contract", "expect": "fail", "height": 1500,
+      "selfBox": { "value": 1000 }, "outputs": [ { "value": 500, "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197" }, { "value": 500, "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197" } ] },
+    { "name": "after the end, everything may be taken", "expect": "needsProof", "height": 2500,
+      "selfBox": { "value": 1000 }, "outputs": [ { "value": 1000, "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197" } ] },
+    { "name": "nobody but the beneficiary: the boolean part alone never passes", "expect": "needsProof", "height": 2500,
+      "selfBox": { "value": 1000 }, "outputs": [ { "value": 1000, "ergoTree": "10010101d17300" } ] }
+  ]
+}

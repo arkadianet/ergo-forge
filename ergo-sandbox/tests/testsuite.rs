@@ -110,3 +110,20 @@ fn an_unknown_network_name_is_rejected() {
     ))
     .is_ok());
 }
+
+/// `"$self"` as an `ergoTree` in any scenario box stands for the contract
+/// under test — its compiled tree is not known when the suite is written.
+#[test]
+fn self_placeholder_in_a_box_tree_means_the_contract_under_test() {
+    let r = run(&suite(
+        r#"{ "source": "sigmaProp(OUTPUTS(0).propositionBytes == SELF.propositionBytes)",
+             "scenarios": [
+               { "name": "same script", "expect": "pass", "height": 1,
+                 "outputs": [ { "value": 1, "ergoTree": "$self" } ] },
+               { "name": "other script", "expect": "fail", "height": 1,
+                 "outputs": [ { "value": 1, "ergoTree": "10010101d17300" } ] }
+             ] }"#,
+    ))
+    .unwrap();
+    assert_eq!(r.failed, 0, "{:?}", r.cases);
+}
