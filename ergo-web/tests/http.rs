@@ -580,3 +580,160 @@ async fn test_endpoint_reports_a_non_compiling_contract_as_400() {
         .unwrap();
     assert_eq!(r.status(), 400);
 }
+
+// ── /api/v1/lookup (chain data via a configured explorer) ───────────────────
+
+/// A fake explorer serving one box for one address, so the lookup route can
+/// be tested without the network.
+async fn spawn_fake_explorer() -> String {
+    use axum::{routing::get, Json, Router};
+    let box_json = serde_json::json!({
+        "boxId": "605c7844b5ce4eab8eee077c5c15bad9e67535597a75715929502eab8118e9a3",
+        "value": 180000000,
+        "ergoTree": "1001040ad191e4c6a704047300",
+        "creationHeight": 1864000,
+        "assets": [{ "tokenId": "e5abaf1f0a9442123104cdf4d2d56ddd8065803e842bc6d433e712601133a9bc", "amount": 1 }],
+        "additionalRegisters": {
+            "R4": { "serializedValue": "0412", "sigmaType": "SInt", "renderedValue": "9" }
+        }
+    });
+    let by_addr = box_json.clone();
+    let by_id = box_json.clone();
+    let app = Router::new()
+        .route(
+            "/api/v1/boxes/unspent/byAddress/{addr}",
+            get(move || {
+                let b = by_addr.clone();
+                async move { Json(serde_json::json!({ "items": [b], "total": 1 })) }
+            }),
+        )
+        .route(
+            "/api/v1/boxes/{id}",
+            get(move || {
+                let b = by_id.clone();
+                async move { Json(b) }
+            }),
+        )
+        .route(
+            "/api/v1/networkState",
+            get(|| async { Json(serde_json::json!({ "height": 1864624 })) }),
+        );
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let addr = listener.local_addr().unwrap();
+    tokio::spawn(async move { axum::serve(listener, app).await.unwrap() });
+    format!("http://{addr}")
+}
+
+async fn spawn_with_explorer(explorer: Option<String>) -> String {
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let addr: SocketAddr = listener.local_addr().unwrap();
+    let cfg = ergo_web::app::AppConfig {
+        explorer_url: explorer,
+        ..ergo_web::app::AppConfig::default()
+    };
+    tokio::spawn(async move {
+        axum::serve(listener, ergo_web::app::router_with(cfg))
+            .await
+            .unwrap();
+    });
+    format!("http://{addr}")
+}
+
+#[tokio::test]
+async fn lookup_is_not_configured_by_default() {
+    let base = spawn().await;
+    let r = reqwest::Client::new()
+        .post(format!("{base}/api/v1/lookup"))
+        .json(&serde_json::json!({ "input": "8NJuqcG7SdhX7cFKGBmfAkXn" }))
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(r.status(), 501);
+    let body: serde_json::Value = r.json().await.unwrap();
+    assert_eq!(body["error"]["code"], "not_configured");
+    let cfg: serde_json::Value = reqwest::get(format!("{base}/api/v1/config"))
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(cfg["explorer"], false);
+}
+
+#[tokio::test]
+async fn lookup_by_address_returns_boxes_in_scenario_shape_with_raw_registers() {
+    let explorer = spawn_fake_explorer().await;
+    let base = spawn_with_explorer(Some(explorer)).await;
+    let cfg: serde_json::Value = reqwest::get(format!("{base}/api/v1/config"))
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(cfg["explorer"], true);
+    let res: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/lookup"))
+        .json(&serde_json::json!({ "input": "8NJuqcG7SdhX7cFKGBmfAkXn" }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(res["height"], 1864624, "{res}");
+    let b = &res["boxes"][0];
+    assert_eq!(b["value"], 180000000);
+    assert_eq!(b["ergoTree"], "1001040ad191e4c6a704047300");
+    assert_eq!(b["creationHeight"], 1864000);
+    assert_eq!(b["tokens"][0]["amount"], 1);
+    assert_eq!(b["registers"]["R4"]["type"], "raw");
+    assert_eq!(b["registers"]["R4"]["value"], "0412");
+    assert_eq!(
+        b["boxId"],
+        "605c7844b5ce4eab8eee077c5c15bad9e67535597a75715929502eab8118e9a3"
+    );
+}
+
+#[tokio::test]
+async fn lookup_by_box_id_returns_that_box() {
+    let explorer = spawn_fake_explorer().await;
+    let base = spawn_with_explorer(Some(explorer)).await;
+    let res: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/lookup"))
+        .json(&serde_json::json!({ "input": "605c7844b5ce4eab8eee077c5c15bad9e67535597a75715929502eab8118e9a3" }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(res["boxes"].as_array().unwrap().len(), 1);
+    assert_eq!(res["boxes"][0]["registers"]["R4"]["value"], "0412");
+}
+
+#[tokio::test]
+async fn a_fetched_box_feeds_the_hunt_as_self_box() {
+    // End to end: lookup → hunt with the real box → the register read passes.
+    let explorer = spawn_fake_explorer().await;
+    let base = spawn_with_explorer(Some(explorer)).await;
+    let res: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/lookup"))
+        .json(&serde_json::json!({ "input": "8NJuqcG7SdhX7cFKGBmfAkXn" }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    let hunt: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/hunt"))
+        .json(&serde_json::json!({ "input": "1001040ad191e4c6a704047300", "selfBox": res["boxes"][0], "height": res["height"] }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(hunt["verdict"], "spendableByAnyone", "{hunt}");
+    assert_eq!(hunt["selfSynthetic"], false);
+}

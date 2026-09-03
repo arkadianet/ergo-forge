@@ -245,7 +245,14 @@ Still missing (the actual build list):
    runs through `testsuite::run`; `ergo-es test` is the CI entry point
    (non-zero exit on any failing case), `POST /api/v1/test` and a Tests
    panel in the playground (export the suite from the editor's contract).
-9. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
+9. **P4d — chain data in: DONE 2026-09-03.** `EXPLORER_URL` is the one
+   outbound dependency, off by default (the self-hosted promise holds;
+   `/api/v1/config` says which mode). `POST /api/v1/lookup` fetches a box by
+   id or an address's unspent boxes plus the chain height in the scenario
+   box shape, registers as `{"type":"raw"}` serialized constants the engine
+   re-parses. The reader's "Fetch from chain" fills SELF and the height and
+   re-hunts — the spendability answer for the real box.
+10. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.
    - **A — DONE 2026-08-31** (`compiler/source-positions`, `8479a58`): every

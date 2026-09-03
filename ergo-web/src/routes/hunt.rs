@@ -1,12 +1,14 @@
 //! `POST /api/v1/hunt` — the spend hunt: can anyone spend this box with no key?
 
-use axum::Json;
+use axum::{extract::State, Json};
 use ergo_sandbox::hunt::{hunt, HuntOptions};
 
+use crate::app::AppState;
 use crate::routes::inspect::parse_network;
 use crate::{dto, error::ApiError, extract::ApiJson, input};
 
 pub async fn hunt_route(
+    State(state): State<std::sync::Arc<AppState>>,
     ApiJson(req): ApiJson<dto::HuntRequest>,
 ) -> Result<Json<dto::HuntResponse>, ApiError> {
     let network = parse_network(req.network.as_deref())?;
@@ -23,11 +25,11 @@ pub async fn hunt_route(
 
     // The reducer recurses like the lift does; same large-stack blocking task.
     let bytes_for_task = bytes.clone();
-    let result = tokio::task::spawn_blocking(move || {
-        ergo_sandbox::decompile::with_large_stack(move || hunt(&bytes_for_task, &opts))
-    })
-    .await
-    .map_err(|_| ApiError::Internal)?;
+    let result = state
+        .engine
+        .run(move || hunt(&bytes_for_task, &opts))
+        .await
+        .ok_or(ApiError::Internal)?;
 
     // Marshalling errors (bad tree, bad selfBox value) describe the caller's
     // input; script outcomes are inside the Hunt, never errors.

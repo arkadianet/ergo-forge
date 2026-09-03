@@ -5,8 +5,9 @@ ErgoTree hex, get the contract back as readable ErgoScript, plus static audit
 findings** about the code that will actually execute.
 
 Built on `ergo-sandbox` (decompiler + audit lints). Stateless — no database,
-nothing shared between requests, **no outbound network calls** (addresses decode
-locally; no node or explorer is contacted).
+nothing shared between requests, and **no outbound network calls unless you
+set `EXPLORER_URL`** (addresses decode locally; only chain lookups you ask for
+contact the explorer).
 
 ## Running
 
@@ -22,6 +23,7 @@ Configuration is environment-only, no config file:
 | `BIND_ADDR`| `127.0.0.1:8080` | Socket the server binds                             |
 | `UI_DIR`   | `ui`             | Static folder served for non-API paths (repo root's `ui/` when run from the workspace root) |
 | `EXAMPLES_DIR` | `examples/contracts` | Example `.es` files for the gallery |
+| `EXPLORER_URL` | unset | Base URL of an Ergo explorer API (e.g. `https://api.ergoplatform.com`). **The one outbound dependency.** Unset = no outbound calls, `/api/v1/lookup` answers 501 |
 | `RUST_LOG` | `info`           | `tracing` filter (method, path, status, duration are logged; never request bodies) |
 
 Shutdown is graceful on SIGTERM/Ctrl-C so deploys do not cut live requests.
@@ -168,6 +170,23 @@ template}` for one. Files under `EXAMPLES_DIR` (default `examples/contracts`;
 86 files — 7 basics plus the node corpus's 79 real deployed contracts, see
 `examples/contracts/ORIGIN.md`). `template` marks EIP-5 `@contract def`
 sources, which cannot be parameterised yet.
+
+### `GET /api/v1/config`, `POST /api/v1/lookup`
+
+`config` → `{"explorer": true|false}`. When an explorer is configured,
+`lookup` `{input, limit?}` fetches a box by id (64 hex) or an address's
+unspent boxes, and the current height, in the scenario box shape — registers
+are passed through as `{"type": "raw", "value": "<serialized constant hex>"}`
+and re-parsed by the engine, so a real box can be the hunt's `selfBox` or a
+`dataInputs` entry without retyping anything. Without `EXPLORER_URL` the
+route answers `501 not_configured`; the UI hides the feature.
+
+```bash
+curl -s -X POST http://127.0.0.1:8080/api/v1/lookup -H 'content-type: application/json' \
+  -d '{"input":"<address or box id>"}'
+```
+
+Explorer failures are `502 upstream`; an unknown box or address is `404`.
 
 ### `POST /api/v1/test`
 

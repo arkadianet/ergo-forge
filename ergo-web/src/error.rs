@@ -18,6 +18,10 @@ pub enum ApiError {
         offset: Option<u32>,
     },
     NotFound(String),
+    /// The feature needs an outbound dependency that is not configured.
+    NotConfigured(String),
+    /// The configured upstream (explorer) failed or answered unexpectedly.
+    Upstream(String),
     TooLarge,
     Internal,
 }
@@ -54,6 +58,8 @@ impl IntoResponse for ApiError {
                 (StatusCode::BAD_REQUEST, "compile_error", message)
             }
             ApiError::NotFound(m) => (StatusCode::NOT_FOUND, "not_found", m),
+            ApiError::NotConfigured(m) => (StatusCode::NOT_IMPLEMENTED, "not_configured", m),
+            ApiError::Upstream(m) => (StatusCode::BAD_GATEWAY, "upstream", m),
             ApiError::TooLarge => (
                 StatusCode::PAYLOAD_TOO_LARGE,
                 "too_large",

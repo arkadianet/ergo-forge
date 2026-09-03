@@ -5,10 +5,11 @@
 //! P5-B source map and the lift's shared IR ids, when the map aligns with
 //! the tree (`SourceMap::aligns_with`). Templates have no map yet.
 
-use axum::Json;
+use axum::{extract::State, Json};
 use ergo_sandbox::audit;
 use ergo_sandbox::compile::{compile_with_params_and_map, is_template, scan_params, ParamError};
 
+use crate::app::AppState;
 use crate::routes::inspect::parse_network;
 use crate::{dto, error::ApiError, extract::ApiJson};
 
@@ -22,6 +23,7 @@ type Compiled = (
 );
 
 pub async fn compile_route(
+    State(state): State<std::sync::Arc<AppState>>,
     ApiJson(req): ApiJson<dto::CompileRequest>,
 ) -> Result<Json<dto::CompileResponse>, ApiError> {
     let network = parse_network(req.network.as_deref())?;
@@ -35,8 +37,9 @@ pub async fn compile_route(
     let needs_for_error = scan_params(&source);
     let params = req.params;
     let template = is_template(&source);
-    let result = tokio::task::spawn_blocking(move || {
-        ergo_sandbox::decompile::with_large_stack(move || {
+    let result = state
+        .engine
+        .run(move || {
             let needs = scan_params(&source);
             let (out, map) = compile_with_params_and_map(&source, &params, tree_version, network)?;
             let tree = ergo_sandbox::inspect::parse_tree(&out.tree_bytes).map_err(|e| {
@@ -78,9 +81,8 @@ pub async fn compile_route(
                 .collect();
             Ok::<Compiled, ParamError>((out, roundtrip, report, findings, statuses, positioned))
         })
-    })
-    .await
-    .map_err(|_| ApiError::Internal)?;
+        .await
+        .ok_or(ApiError::Internal)?;
 
     let (out, roundtrip, report, findings, statuses, positioned) = match result {
         Ok(v) => v,

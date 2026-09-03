@@ -45,6 +45,12 @@ detail (`Exists (0xAE) n=8`). Needs the `cost-trace` build; the trace is a
 thread-local recorder in `ergo-sigma`, so it is safe per evaluation but is a
 diagnostic build, never a consensus path.
 
+### Raw register values
+
+A register (or context variable) value may be given as the serialized
+constant a node or explorer reports — `{"type": "raw", "value": "040a"}` —
+type descriptor first. This is how a real box reaches a scenario untouched.
+
 ## Decompile (P2)
 
 `ergo_sandbox::decompile` lifts ErgoTree wire bytes to source-like ErgoScript:
