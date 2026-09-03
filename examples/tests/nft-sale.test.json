@@ -1,0 +1,175 @@
+{
+  "source": "/**\n * Sell a token (an NFT) at a fixed price, with a royalty for its creator.\n * Anyone who pays you the price and the creator the royalty in the same\n * transaction gets the token. You can cancel and take it back at any time.\n * @param seller Who is selling? \u2014 Your Ergo address; it receives the price minus the royalty.\n * @param artist Who created the token? \u2014 Their Ergo address; it receives the royalty on this sale.\n * @param priceAmount Price? \u2014 What the buyer pays in total; the royalty comes out of it.\n * @param royaltyPercent Royalty for the creator, as a percentage \u2014 A whole number from 0 to 100.\n */\n@contract def nftSale(seller: SigmaProp, artist: SigmaProp, priceAmount: Long, royaltyPercent: Int) = {\n  val royalty = priceAmount * royaltyPercent.toLong / 100L\n  val paidSeller = OUTPUTS.size > 0 && OUTPUTS(0).propositionBytes == seller.propBytes && OUTPUTS(0).value >= priceAmount - royalty\n  val paidArtist = OUTPUTS.size > 1 && OUTPUTS(1).propositionBytes == artist.propBytes && OUTPUTS(1).value >= royalty\n  // The buyer chooses where the token goes: the third output must carry it.\n  val delivered = OUTPUTS.size > 2 && OUTPUTS(2).tokens == SELF.tokens\n  seller || sigmaProp(paidSeller && paidArtist && delivered)\n}\n",
+  "params": {
+    "seller": {
+      "type": "SigmaProp",
+      "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+    },
+    "artist": {
+      "type": "SigmaProp",
+      "value": "0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+    },
+    "priceAmount": {
+      "type": "Long",
+      "value": 1000000000
+    },
+    "royaltyPercent": {
+      "type": "Int",
+      "value": 10
+    }
+  },
+  "scenarios": [
+    {
+      "name": "buyer pays the seller 0.9, the creator 0.1, and takes the token: no key needed",
+      "expect": "pass",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000,
+        "tokens": [
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 1
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197",
+          "value": 900000000
+        },
+        {
+          "ergoTree": "0008cd0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 100000000
+        },
+        {
+          "ergoTree": "0008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 1000000,
+          "tokens": [
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "the royalty one nanoERG short: only the seller could sign that",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000,
+        "tokens": [
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 1
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197",
+          "value": 900000000
+        },
+        {
+          "ergoTree": "0008cd0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 99999999
+        },
+        {
+          "ergoTree": "0008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 1000000,
+          "tokens": [
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 1
+            }
+          ]
+        }
+      ],
+      "expect": "needsProof",
+      "expectResidual": "028333f9",
+      "expectResidualExcludes": "0379be66"
+    },
+    {
+      "name": "the price one nanoERG short: only the seller could sign that",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000,
+        "tokens": [
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 1
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197",
+          "value": 899999999
+        },
+        {
+          "ergoTree": "0008cd0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 100000000
+        },
+        {
+          "ergoTree": "0008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 1000000,
+          "tokens": [
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 1
+            }
+          ]
+        }
+      ],
+      "expect": "needsProof",
+      "expectResidual": "028333f9",
+      "expectResidualExcludes": "0379be66"
+    },
+    {
+      "name": "paying without taking the token is not a sale",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000,
+        "tokens": [
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 1
+          }
+        ]
+      },
+      "outputs": [
+        {
+          "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197",
+          "value": 900000000
+        },
+        {
+          "ergoTree": "0008cd0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 100000000
+        },
+        {
+          "ergoTree": "0008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "value": 1000000
+        }
+      ],
+      "expect": "needsProof",
+      "expectResidual": "028333f9",
+      "expectResidualExcludes": "0379be66"
+    },
+    {
+      "name": "the seller can cancel at any time, with no outputs at all",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000,
+        "tokens": [
+          {
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "amount": 1
+          }
+        ]
+      },
+      "expect": "needsProof",
+      "expectResidual": "028333f9",
+      "expectResidualExcludes": "0379be66"
+    }
+  ]
+}
