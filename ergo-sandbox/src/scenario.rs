@@ -94,6 +94,12 @@ pub struct Scenario {
     /// with the node's wallet prover and verifies it like a supplied one.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub secrets: Vec<crate::prove::SecretSpec>,
+    /// Signers who never pool their secrets: the sandbox runs the
+    /// multi-party flow (commitments, a partial proof, extraction, the
+    /// next signature) and verifies the completed proof. Use `secrets`
+    /// instead when one wallet holds everything.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub parties: Vec<crate::prove::PartySpec>,
     /// AVL+ trees built by a real prover; see [`crate::avl`]. Typed values
     /// refer to them as `"@avl.name"`, `"@avl.name.after"`,
     /// `"@avl.name.proof"`.

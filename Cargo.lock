@@ -578,8 +578,8 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
 name = "ergo-chain-spec"
-version = "0.5.3"
-source = "git+https://github.com/arkadianet/ergo?rev=36c88bb794af4be35d584ed77d8c35358ffd1e8b#36c88bb794af4be35d584ed77d8c35358ffd1e8b"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=8e2eb13db7c67f0ab2d640e94b0e52b8c051a938#8e2eb13db7c67f0ab2d640e94b0e52b8c051a938"
 dependencies = [
  "ergo-primitives",
  "ergo-ser",
@@ -588,8 +588,8 @@ dependencies = [
 
 [[package]]
 name = "ergo-compiler"
-version = "0.5.3"
-source = "git+https://github.com/arkadianet/ergo?rev=36c88bb794af4be35d584ed77d8c35358ffd1e8b#36c88bb794af4be35d584ed77d8c35358ffd1e8b"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=8e2eb13db7c67f0ab2d640e94b0e52b8c051a938#8e2eb13db7c67f0ab2d640e94b0e52b8c051a938"
 dependencies = [
  "base64",
  "bs58",
@@ -602,8 +602,8 @@ dependencies = [
 
 [[package]]
 name = "ergo-crypto"
-version = "0.5.3"
-source = "git+https://github.com/arkadianet/ergo?rev=36c88bb794af4be35d584ed77d8c35358ffd1e8b#36c88bb794af4be35d584ed77d8c35358ffd1e8b"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=8e2eb13db7c67f0ab2d640e94b0e52b8c051a938#8e2eb13db7c67f0ab2d640e94b0e52b8c051a938"
 dependencies = [
  "blake2",
  "ergo-chain-spec",
@@ -616,8 +616,8 @@ dependencies = [
 
 [[package]]
 name = "ergo-primitives"
-version = "0.5.3"
-source = "git+https://github.com/arkadianet/ergo?rev=36c88bb794af4be35d584ed77d8c35358ffd1e8b#36c88bb794af4be35d584ed77d8c35358ffd1e8b"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=8e2eb13db7c67f0ab2d640e94b0e52b8c051a938#8e2eb13db7c67f0ab2d640e94b0e52b8c051a938"
 dependencies = [
  "blake2",
  "hex",
@@ -649,8 +649,8 @@ dependencies = [
 
 [[package]]
 name = "ergo-ser"
-version = "0.5.3"
-source = "git+https://github.com/arkadianet/ergo?rev=36c88bb794af4be35d584ed77d8c35358ffd1e8b#36c88bb794af4be35d584ed77d8c35358ffd1e8b"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=8e2eb13db7c67f0ab2d640e94b0e52b8c051a938#8e2eb13db7c67f0ab2d640e94b0e52b8c051a938"
 dependencies = [
  "bs58",
  "ergo-primitives",
@@ -661,8 +661,8 @@ dependencies = [
 
 [[package]]
 name = "ergo-sigma"
-version = "0.5.3"
-source = "git+https://github.com/arkadianet/ergo?rev=36c88bb794af4be35d584ed77d8c35358ffd1e8b#36c88bb794af4be35d584ed77d8c35358ffd1e8b"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=8e2eb13db7c67f0ab2d640e94b0e52b8c051a938#8e2eb13db7c67f0ab2d640e94b0e52b8c051a938"
 dependencies = [
  "bytes",
  "ergo-crypto",
@@ -681,8 +681,8 @@ dependencies = [
 
 [[package]]
 name = "ergo-state"
-version = "0.5.3"
-source = "git+https://github.com/arkadianet/ergo?rev=36c88bb794af4be35d584ed77d8c35358ffd1e8b#36c88bb794af4be35d584ed77d8c35358ffd1e8b"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=8e2eb13db7c67f0ab2d640e94b0e52b8c051a938#8e2eb13db7c67f0ab2d640e94b0e52b8c051a938"
 dependencies = [
  "bincode",
  "blake2",
@@ -707,8 +707,8 @@ dependencies = [
 
 [[package]]
 name = "ergo-validation"
-version = "0.5.3"
-source = "git+https://github.com/arkadianet/ergo?rev=36c88bb794af4be35d584ed77d8c35358ffd1e8b#36c88bb794af4be35d584ed77d8c35358ffd1e8b"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=8e2eb13db7c67f0ab2d640e94b0e52b8c051a938#8e2eb13db7c67f0ab2d640e94b0e52b8c051a938"
 dependencies = [
  "ergo-chain-spec",
  "ergo-crypto",
@@ -726,8 +726,8 @@ dependencies = [
 
 [[package]]
 name = "ergo-wallet"
-version = "0.5.3"
-source = "git+https://github.com/arkadianet/ergo?rev=36c88bb794af4be35d584ed77d8c35358ffd1e8b#36c88bb794af4be35d584ed77d8c35358ffd1e8b"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=8e2eb13db7c67f0ab2d640e94b0e52b8c051a938#8e2eb13db7c67f0ab2d640e94b0e52b8c051a938"
 dependencies = [
  "aes-gcm",
  "bip39",
@@ -795,7 +795,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -1530,7 +1530,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]

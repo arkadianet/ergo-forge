@@ -5,12 +5,15 @@
 //! proposition its script reduced to, and that proof is then checked
 //! through the consensus verification path like any supplied proof.
 
+use ergo_primitives::group_element::GroupElement;
 use ergo_ser::sigma_value::SigmaBoolean;
+use ergo_wallet::proving::commitments::generate_commitments_for;
 use ergo_wallet::proving::external::ProverExternalSecret;
-use ergo_wallet::proving::hints::HintsBag;
+use ergo_wallet::proving::extract::bag_for_multisig;
+use ergo_wallet::proving::hints::{Hint, HintsBag};
 use ergo_wallet::proving::randomness::OsRngBackend;
 use ergo_wallet::proving::secrets::SecretRegistry;
-use ergo_wallet::proving::sigma::prove_sigma;
+use ergo_wallet::proving::sigma::{prove_sigma, prove_sigma_partial};
 use k256::elliptic_curve::sec1::{FromEncodedPoint, ToEncodedPoint};
 use k256::elliptic_curve::PrimeField;
 use k256::{AffinePoint, EncodedPoint, FieldBytes, ProjectivePoint, Scalar};
@@ -27,6 +30,15 @@ pub enum SecretSpec {
     Dlog(String),
     /// `x` for `proveDHTuple(g, h, g^x, h^x)`; `u` and `v` are derived.
     Dht { g: String, h: String, x: String },
+}
+
+/// One signer in a multi-party ceremony: the secrets it alone holds.
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PartySpec {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    pub secrets: Vec<SecretSpec>,
 }
 
 fn err(msg: impl Into<String>) -> SandboxError {
@@ -83,6 +95,128 @@ pub fn dht_hex(g_hex: &str, h_hex: &str, x_hex: &str) -> Result<(String, String)
         hex::encode(compressed(&(g * x))),
         hex::encode(compressed(&(h * x))),
     ))
+}
+
+/// The sigma leaves these secrets can prove.
+fn images(secrets: &[SecretSpec]) -> Result<Vec<SigmaBoolean>, SandboxError> {
+    let mut out = Vec::with_capacity(secrets.len());
+    for s in secrets {
+        out.push(match s {
+            SecretSpec::Dlog(x_hex) => {
+                let x = scalar(x_hex)?;
+                SigmaBoolean::ProveDlog(GroupElement::from_bytes(compressed(
+                    &(ProjectivePoint::GENERATOR * x),
+                )))
+            }
+            SecretSpec::Dht { g, h, x } => {
+                let xs = scalar(x)?;
+                let gp = point(g)?;
+                let hp = point(h)?;
+                SigmaBoolean::ProveDHTuple {
+                    g: GroupElement::from_bytes(compressed(&gp)),
+                    h: GroupElement::from_bytes(compressed(&hp)),
+                    u: GroupElement::from_bytes(compressed(&(gp * xs))),
+                    v: GroupElement::from_bytes(compressed(&(hp * xs))),
+                }
+            }
+        });
+    }
+    Ok(out)
+}
+
+/// Every atomic leaf of a proposition, depth-first.
+fn leaves(prop: &SigmaBoolean, out: &mut Vec<SigmaBoolean>) {
+    match prop {
+        SigmaBoolean::TrivialProp(_) => {}
+        SigmaBoolean::ProveDlog(_) | SigmaBoolean::ProveDHTuple { .. } => out.push(prop.clone()),
+        SigmaBoolean::Cand(cs) | SigmaBoolean::Cor(cs) => cs.iter().for_each(|c| leaves(c, out)),
+        SigmaBoolean::Cthreshold { children, .. } => children.iter().for_each(|c| leaves(c, out)),
+    }
+}
+
+/// Most signers a ceremony may have. Setup and hint merging grow with the
+/// square of the count and are not charged to the scenario's cost limit;
+/// real multi-signature contracts have a handful of signers.
+pub const MAX_PARTIES: usize = 16;
+
+/// A proof made the way separate wallets make one: each party commits to
+/// its own leaves; the first signs against everyone's commitments (a
+/// partial proof); each next party extracts what came before and adds
+/// its own signature; the last one's proof is complete. No registry
+/// ever holds two parties' secrets. Mirrors Scala's `ProverUtils` flow.
+pub fn prove_parties(
+    proposition: &SigmaBoolean,
+    parties: &[PartySpec],
+    message: &[u8],
+) -> Result<Vec<u8>, SandboxError> {
+    if parties.is_empty() {
+        return Err(err("no parties"));
+    }
+    if parties.len() > MAX_PARTIES {
+        return Err(err(format!(
+            "at most {MAX_PARTIES} parties, got {}",
+            parties.len()
+        )));
+    }
+    let mut rng = OsRngBackend;
+    let regs: Vec<SecretRegistry> = parties
+        .iter()
+        .map(|p| registry(&p.secrets))
+        .collect::<Result<_, _>>()?;
+    let imgs: Vec<Vec<SigmaBoolean>> = parties
+        .iter()
+        .map(|p| images(&p.secrets))
+        .collect::<Result<_, _>>()?;
+    let owned: Vec<SigmaBoolean> = imgs.iter().flatten().cloned().collect();
+    let mut all_leaves = Vec::new();
+    leaves(proposition, &mut all_leaves);
+    let nobody: Vec<SigmaBoolean> = all_leaves
+        .into_iter()
+        .filter(|l| !owned.contains(l))
+        .collect();
+    // Round 0: everyone commits to their own leaves.
+    let bags: Vec<HintsBag> = imgs
+        .iter()
+        .map(|im| {
+            generate_commitments_for(proposition, im, &mut rng).map_err(|e| err(e.to_string()))
+        })
+        .collect::<Result<_, _>>()?;
+    let public_of = |i: usize| HintsBag {
+        hints: bags[i]
+            .hints
+            .iter()
+            .filter(|h| matches!(h, Hint::RealCommitment(_)))
+            .cloned()
+            .collect(),
+    };
+    // Rounds 1..n: sign in order, each on top of what came before.
+    let mut proof: Option<Vec<u8>> = None;
+    for (i, name) in parties.iter().enumerate() {
+        let who = name
+            .name
+            .clone()
+            .unwrap_or_else(|| format!("party {}", i + 1));
+        let mut hints = bags[i].clone();
+        for (j, _) in parties.iter().enumerate() {
+            if j != i {
+                hints.extend(public_of(j));
+            }
+        }
+        if let Some(prev) = &proof {
+            let real: Vec<SigmaBoolean> = imgs[..i].iter().flatten().cloned().collect();
+            let extracted = bag_for_multisig(proposition, prev, &real, &nobody)
+                .map_err(|e| err(format!("{who}: extracting earlier signatures: {e}")))?;
+            hints.extend(extracted);
+        }
+        let last = i + 1 == parties.len();
+        let r = if last {
+            prove_sigma(proposition, &regs[i], message, &hints, &mut rng)
+        } else {
+            prove_sigma_partial(proposition, &regs[i], message, &hints, &mut rng)
+        };
+        proof = Some(r.map(|(p, _)| p).map_err(|e| err(format!("{who}: {e}")))?);
+    }
+    Ok(proof.expect("at least one party"))
 }
 
 fn registry(secrets: &[SecretSpec]) -> Result<SecretRegistry, SandboxError> {

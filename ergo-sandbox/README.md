@@ -87,6 +87,22 @@ derived. Secrets that cannot prove the proposition leave `needsProof` with
 `error: "no proof from these secrets: …"`. `ergo-es point <x> [--base h]`
 prints `g^x` (or `h^x`) so a script's constants and the secrets agree.
 
+### Parties: signers who never pool their secrets
+
+```json
+{ "parties": [ { "name": "alice", "secrets": [ { "dlog": "…" } ] },
+               { "name": "bob",   "secrets": [ { "dlog": "…" } ] } ] }
+```
+
+Runs the multi-party flow real wallets use (Scala `ProverUtils`): each
+party commits to its own leaves, the first signs against everyone's
+commitments (a partial proof), each next party extracts the signatures
+so far and adds its own, and the last one's proof is complete and is
+verified on the consensus path. No registry ever holds two parties'
+secrets, so a 2-of-3 signed by two parties here is the same computation
+two wallets would do. Use `secrets` instead when one wallet holds
+everything.
+
 ### AVL+ trees: digests and proofs from a real prover
 
 ```json
