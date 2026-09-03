@@ -114,6 +114,7 @@ curl -s -X POST http://127.0.0.1:8080/api/v1/hunt \
 
 ```json
 {
+  "rent": { "boxBytes": 66, "feeNanoerg": 82500000, "periodBlocks": 1051200, "feeFactor": 1250000 },
   "treeHex": "1001040ad191e4c6a704047300",
   "address": "8NJuqcG7SdhX7cFKGBmfAkXn",
   "verdict": "spendableByAnyone",
@@ -258,6 +259,18 @@ curl -s -X POST http://127.0.0.1:8080/api/v1/eval \
 `needsProof` (`reducedTo` is the residual proposition) / `proofAccepted` /
 `proofRejected`. A script that ran and failed is a 200 with that verdict;
 only marshalling and compile errors are 400s, with the compiler's message.
+
+### Storage rent in every answer
+
+`inspect`, `compile` and `hunt` responses carry `rent`: `{boxBytes,
+feeNanoerg, periodBlocks, feeFactor, nextCollectionHeight?}` — the fee a
+miner may take from a box under this contract once per storage period
+(mainnet: 1,051,200 blocks ≈ 4 years, 1,250,000 nanoERG per byte), computed
+from the box's serialized size (the hunt's `selfBox` when given, else a
+minimal box). A box holding less than the fee is taken entirely, tokens
+included; otherwise it is recreated minus the fee with the same script,
+tokens and registers. This applies regardless of the script, which is why
+the UI says it for every contract.
 
 Errors: `{"error":{"code":"invalid_input","message":"…"}}` — `invalid_input`
 (400, including malformed JSON and unknown `network`), `too_large` (413),

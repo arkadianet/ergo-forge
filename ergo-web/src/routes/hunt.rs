@@ -16,6 +16,7 @@ pub async fn hunt_route(
     let tree_hex = hex::encode(&bytes);
     let address = ergo_ser::address::encode_p2s(network, &bytes);
 
+    let rent = dto::rent_for(&bytes, req.self_box.as_ref());
     let opts = HuntOptions {
         height: req.height,
         self_box: req.self_box,
@@ -34,5 +35,7 @@ pub async fn hunt_route(
     // Marshalling errors (bad tree, bad selfBox value) describe the caller's
     // input; script outcomes are inside the Hunt, never errors.
     let h = result.map_err(|e| ApiError::InvalidInput(e.to_string()))?;
-    Ok(Json(dto::HuntResponse::from_engine(tree_hex, address, &h)))
+    Ok(Json(dto::HuntResponse::from_engine(
+        tree_hex, address, &h, rent,
+    )))
 }

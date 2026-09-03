@@ -53,6 +53,7 @@ pub async fn inspect(
     let (completeness, raw_placeholders, truncated) = dto::completeness_parts(&report);
 
     Ok(Json(dto::InspectResponse {
+        rent: dto::rent_for(&bytes, None),
         address: ergo_ser::address::encode_p2s(network, &bytes),
         tree_hex,
         source,
