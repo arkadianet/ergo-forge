@@ -17,7 +17,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = tokio::net::TcpListener::bind(bind).await?;
     tracing::info!("listening on {bind}");
 
-    axum::serve(listener, ergo_web::app::router())
+    let cfg = ergo_web::app::AppConfig::from_env();
+    match &cfg.explorer_url {
+        Some(u) => tracing::info!("chain lookups enabled via {u}"),
+        None => tracing::info!("chain lookups disabled (no EXPLORER_URL); no outbound calls"),
+    }
+    axum::serve(listener, ergo_web::app::router_with(cfg))
         .with_graceful_shutdown(shutdown_signal())
         .await?;
     Ok(())

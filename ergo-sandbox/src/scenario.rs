@@ -177,10 +177,32 @@ fn parse_base_type(tpe: &str) -> Result<SigmaType, SandboxError> {
         other => {
             return Err(SandboxError::Scenario(format!(
                 "unsupported type name `{other}` (supported: Boolean, Byte, Short, Int, Long, \
-                 BigInt, GroupElement, SigmaProp, Coll[T])"
+                 BigInt, GroupElement, SigmaProp, Coll[T], raw)"
             )))
         }
     })
+}
+
+/// `{"type": "raw", "value": "<hex>"}`: a serialized constant exactly as a
+/// node or explorer reports a register (`serializedValue`), type descriptor
+/// first. This is how a real box's registers reach a scenario untouched.
+fn parse_raw_constant(value: &serde_json::Value) -> Result<(SigmaType, SigmaValue), SandboxError> {
+    let hex_str = value
+        .as_str()
+        .ok_or_else(|| SandboxError::Scenario("raw value must be a hex string".into()))?;
+    let bytes = hex::decode(hex_str.trim()).map_err(|source| SandboxError::Hex {
+        field: "raw",
+        source,
+    })?;
+    let mut r = ergo_primitives::reader::VlqReader::new(&bytes);
+    let pair = ergo_ser::sigma_value::read_constant(&mut r)
+        .map_err(|e| SandboxError::Scenario(format!("raw constant does not parse: {e:?}")))?;
+    if !r.is_empty() {
+        return Err(SandboxError::Scenario(
+            "raw constant has trailing bytes".into(),
+        ));
+    }
+    Ok(pair)
 }
 
 /// Parse a user (type name, JSON value) pair into a typed sigma constant.
@@ -196,6 +218,9 @@ pub fn parse_typed_value(
 ) -> Result<(SigmaType, SigmaValue), SandboxError> {
     if let Some(elem) = tpe.strip_prefix("Coll[").and_then(|s| s.strip_suffix(']')) {
         return parse_coll(elem, value);
+    }
+    if tpe == "raw" {
+        return parse_raw_constant(value);
     }
     match tpe {
         "Boolean" => Ok((

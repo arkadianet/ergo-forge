@@ -132,6 +132,18 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
         <input id="height" type="number" min="1" placeholder="default: 1500000">
         <button id="rehunt">Re-run hunt</button>
       </details>
+      <details id="chain-panel" hidden open>
+        <summary>Fetch from chain</summary>
+        <p class="hint">This instance is configured with an explorer. Fetch the
+           unspent boxes at the address you read (or a box by id) and use one as
+           the real SELF; the spending height follows the chain tip.</p>
+        <div class="write-row">
+          <input id="chain-input" type="text" spellcheck="false" placeholder="address (defaults to the one above) or box id">
+          <button id="chain-fetch">Fetch boxes</button>
+        </div>
+        <select id="chain-boxes" aria-label="fetched boxes" hidden></select>
+        <p id="chain-status" class="status" hidden></p>
+      </details>
 
       <h2>Wire form</h2>
       <dl class="wire">
@@ -191,8 +203,8 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
     </div>
   </section>
 
-  <footer>ergo-web <span id="api-version">v1</span> — source and findings are
-    computed from the ErgoTree bytes; no node or explorer is contacted.</footer>
+  <footer>ergo-web <span id="api-version">v1</span> — <span id="footer-note">source and findings are
+    computed from the ErgoTree bytes; no node or explorer is contacted.</span></footer>
 
   <script src="app.js"></script>
 </body>

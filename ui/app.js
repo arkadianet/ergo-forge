@@ -691,6 +691,66 @@ async function runScenario() {
 
 $("run").addEventListener("click", runScenario);
 
+// ── chain lookups (only when the instance is configured with an explorer) ──
+
+let fetchedBoxes = [];
+
+async function loadConfig() {
+  try {
+    const cfg = await (await fetch("/api/v1/config")).json();
+    if (cfg.explorer) {
+      $("chain-panel").hidden = false;
+      $("footer-note").textContent =
+        "source, findings and verdicts are computed locally; this instance fetches box data from a configured explorer when you ask it to.";
+    }
+  } catch (e) { /* stay in the no-outbound mode */ }
+}
+
+function useFetchedBox(i) {
+  const b = fetchedBoxes[i];
+  if (!b) return;
+  const { boxId, ...scenarioBox } = b;
+  $("self-box").value = JSON.stringify(scenarioBox);
+  $("self-box").closest("details").open = true;
+  const input = $("input").value.trim();
+  if (input) huntFor(input, $("network").value);
+}
+
+$("chain-fetch").addEventListener("click", async () => {
+  const status = $("chain-status");
+  const target = $("chain-input").value.trim() || $("input").value.trim();
+  if (!target) { status.textContent = "Read an address first, or give a box id."; status.hidden = false; return; }
+  status.textContent = "Fetching…"; status.hidden = false;
+  $("chain-boxes").hidden = true;
+  try {
+    const res = await fetch("/api/v1/lookup", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ input: target }),
+    });
+    const body = await res.json();
+    if (!res.ok) { status.textContent = `Lookup failed: ${(body.error && body.error.message) || res.status}`; return; }
+    fetchedBoxes = body.boxes || [];
+    if (body.height) $("height").value = String(body.height);
+    if (!fetchedBoxes.length) { status.textContent = "No unspent boxes at that address."; return; }
+    const sel = $("chain-boxes");
+    sel.textContent = "";
+    fetchedBoxes.forEach((b, i) => {
+      const o = document.createElement("option");
+      o.value = String(i);
+      const regs = Object.keys(b.registers || {}).join(",") || "no registers";
+      o.textContent = `${(b.boxId || "").slice(0, 12)}… · ${b.value} nanoERG · ${(b.tokens || []).length} token(s) · ${regs}`;
+      sel.appendChild(o);
+    });
+    sel.hidden = false;
+    status.textContent = `${fetchedBoxes.length} box(es); using the first as SELF at height ${body.height || "?"}.`;
+    useFetchedBox(0);
+  } catch (e) {
+    status.textContent = `Lookup failed: ${e}`;
+  }
+});
+$("chain-boxes").addEventListener("change", (e) => useFetchedBox(Number(e.target.value)));
+loadConfig();
+
 $("rehunt").addEventListener("click", () => {
   const input = $("input").value.trim();
   if (input) huntFor(input, $("network").value);

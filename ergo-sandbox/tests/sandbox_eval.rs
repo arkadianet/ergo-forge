@@ -262,3 +262,41 @@ fn opcode_name_covers_the_parser_supported_set_exactly() {
         );
     }
 }
+
+// ----- raw (serialized) register values, as an explorer reports them -----
+
+#[test]
+fn a_raw_serialized_constant_parses_to_its_typed_value() {
+    use ergo_sandbox::parse_typed_value;
+    use ergo_ser::sigma_type::SigmaType;
+    use ergo_ser::sigma_value::{CollValue, SigmaValue};
+    // Int 5: type code 0x04, zigzag VLQ 10.
+    let (t, v) = parse_typed_value("raw", &serde_json::json!("040a")).unwrap();
+    assert_eq!(t, SigmaType::SInt);
+    assert_eq!(v, SigmaValue::Int(5));
+    // Coll[Byte] aa bb cc: type 0x0e, length 3.
+    let (t, v) = parse_typed_value("raw", &serde_json::json!("0e03aabbcc")).unwrap();
+    assert_eq!(t, SigmaType::SColl(Box::new(SigmaType::SByte)));
+    assert_eq!(
+        v,
+        SigmaValue::Coll(CollValue::Bytes(vec![0xaa, 0xbb, 0xcc]))
+    );
+    assert!(parse_typed_value("raw", &serde_json::json!("zz")).is_err());
+    assert!(
+        parse_typed_value("raw", &serde_json::json!("040a00")).is_err(),
+        "trailing bytes"
+    );
+}
+
+#[test]
+fn a_scenario_box_accepts_raw_registers() {
+    let sc: ergo_sandbox::Scenario = serde_json::from_str(
+        r#"{"source":"sigmaProp(SELF.R4[Int].get == 5)","height":1,
+            "selfBox":{"registers":{"R4":{"type":"raw","value":"040a"}}}}"#,
+    )
+    .unwrap();
+    assert_eq!(
+        ergo_sandbox::eval_scenario(&sc).unwrap().verdict,
+        ergo_sandbox::Verdict::Pass
+    );
+}

@@ -249,3 +249,15 @@ button.secondary {
 }
 .probes tr[data-verdict="ok"] td:first-child { color: var(--low); }
 .probes tr[data-verdict="fail"] td:first-child { color: var(--high); }
+
+/* ── chain lookups ── */
+#chain-input { flex: 1; }
+#chain-input, #chain-boxes {
+  margin-top: 0.25rem; padding: 0.45rem 0.6rem; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 6px; color: var(--text); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.85rem;
+}
+#chain-boxes { width: 100%; box-sizing: border-box; }
+#chain-fetch {
+  margin-top: 0.25rem; padding: 0.45rem 1rem; border: 1px solid var(--accent); border-radius: 6px;
+  background: transparent; color: var(--accent); font-weight: 600; cursor: pointer;
+}
