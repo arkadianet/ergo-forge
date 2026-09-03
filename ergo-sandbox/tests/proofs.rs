@@ -160,3 +160,30 @@ fn an_avl_operation_the_tree_refuses_is_reported_not_faked() {
     let err = ergo_sandbox::eval_scenario(&sc).unwrap_err().to_string();
     assert!(err.contains("avl operation"), "{err}");
 }
+
+#[test]
+fn a_scenario_can_carry_the_last_headers() {
+    // CONTEXT.headers: the newest first; a script may read heights,
+    // timestamps, miner keys, votes. LastBlockUtxoRootHash comes from
+    // headers(0).stateRoot.
+    let src = r#"{
+      val h = CONTEXT.headers
+      // `h.size` is left out on purpose: the pinned node evaluator has no
+      // SizeOf arm for Coll[Header] (fixed upstream; re-enable on the bump).
+      sigmaProp(h(0).height == HEIGHT - 1 && h(1).height == HEIGHT - 2 &&
+                h(0).timestamp > h(1).timestamp && h(0).votes == Coll(1.toByte, 0.toByte, 0.toByte) &&
+                h(0).minerPk == decodePoint(getVar[Coll[Byte]](0).get) &&
+                CONTEXT.LastBlockUtxoRootHash.digest == h(0).stateRoot.digest)
+    }"#;
+    let g = ergo_sandbox::prove::generator_hex();
+    let sc = serde_json::json!({
+        "height": 1000,
+        "headers": [
+            { "height": 999, "timestamp": 1_700_000_120_000u64, "votes": [1, 0, 0], "minerPk": g, "stateRoot": "aa".repeat(32) + "07" },
+            { "height": 998, "timestamp": 1_700_000_000_000u64 }
+        ],
+        "contextVars": { "0": { "type": "Coll[Byte]", "value": g } }
+    });
+    let r = run(src, serde_json::json!({}), sc);
+    assert_eq!(r.0, "pass", "{:?}", r.1);
+}
