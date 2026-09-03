@@ -347,10 +347,11 @@ fn miner_rule_and_self_register_rule() {
 
 #[test]
 fn contradictory_rules_are_refused_not_silently_green() {
+    // Output 0 must carry a token, yet no output may: no transaction can do both.
     let err = compose(&spec(r#"{ "paths": [ { "name": "x", "who": { "anyOf": ["k"] },
-        "conditions": [ { "box": { "which": "output", "index": 0, "keepsSelfTokens": true } },
+        "conditions": [ { "box": { "which": "output", "index": 0, "token": { "id": "t" } } },
                         { "box": { "which": "output", "index": "all", "noTokens": true } } ] } ] }"#),
-        &v(&[("k","SigmaProp",serde_json::json!(A))])).unwrap_err();
+        &v(&[("k","SigmaProp",serde_json::json!(A)),("t","Coll[Byte]",serde_json::json!("ab".repeat(32)))])).unwrap_err();
     assert!(err.to_string().contains("contradict"), "{err}");
     let err = compose(
         &spec(
@@ -361,4 +362,59 @@ fn contradictory_rules_are_refused_not_silently_green() {
     )
     .unwrap_err();
     assert!(err.to_string().contains("nothing required"), "{err}");
+}
+
+#[test]
+fn a_tokenless_state_box_may_keep_its_tokens_and_let_none_leave() {
+    // keepsSelfTokens is `OUTPUTS(0).tokens == SELF.tokens`; with no tokens
+    // on SELF, "no output carries tokens" agrees with it. Valid, and green.
+    let out = compose_ok(
+        r#"{ "paths": [ { "name": "x", "who": { "anyOf": ["k"] },
+        "conditions": [ { "box": { "which": "output", "index": 0, "script": "self", "keepsSelfTokens": true } },
+                        { "box": { "which": "output", "index": "all", "noTokens": true } } ] } ] }"#,
+        v(&[("k", "SigmaProp", serde_json::json!(A))]),
+    );
+    green(&out);
+}
+
+#[test]
+fn token_gate_and_fixed_input_count_agree_in_either_order() {
+    for conds in [
+        r#"[ { "inputCount": "n" }, { "tokenGated": { "tokenId": "m" } } ]"#,
+        r#"[ { "tokenGated": { "tokenId": "m" } }, { "inputCount": "n" } ]"#,
+    ] {
+        let out = compose_ok(
+            &format!(
+                r#"{{ "paths": [ {{ "name": "x", "who": {{ "anyOne": true }}, "conditions": {conds} }} ] }}"#
+            ),
+            v(&[
+                ("n", "Int", serde_json::json!(2)),
+                ("m", "Coll[Byte]", serde_json::json!("cd".repeat(32))),
+            ]),
+        );
+        green(&out);
+    }
+}
+
+#[test]
+fn the_contracts_own_token_does_not_open_a_token_gate() {
+    let out = compose_ok(
+        r#"{ "paths": [ { "name": "member", "who": { "anyOne": true },
+        "conditions": [ { "tokenGated": { "tokenId": "m" } } ] } ] }"#,
+        v(&[("m", "Coll[Byte]", serde_json::json!("cd".repeat(32)))]),
+    );
+    assert!(out.source.contains("bx.id != SELF.id"), "{}", out.source);
+    // Only SELF holds the token: the gate must stay shut.
+    let mut doc = serde_json::to_value(out.suite.clone().unwrap()).unwrap();
+    doc["scenarios"].as_array_mut().unwrap().push(serde_json::json!({
+        "name": "only this box holds the token", "expect": "fail", "height": 1,
+        "selfBox": { "value": 1000000000, "tokens": [ { "id": "cd".repeat(32), "amount": 1 } ] } }));
+    let suite: testsuite::Suite = serde_json::from_value(doc).unwrap();
+    let r = testsuite::run(&suite).unwrap();
+    assert_eq!(
+        r.failed,
+        0,
+        "{:#?}",
+        r.cases.iter().filter(|c| !c.passed).collect::<Vec<_>>()
+    );
 }

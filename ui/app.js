@@ -1223,6 +1223,7 @@ function readComposer() {
     if (inp.type === "datetime-local") { const t = new Date(raw).getTime(); if (Number.isNaN(t)) throw new Error("That date does not parse."); const now = heightNow(); const h = now + Math.ceil((t - Date.now()) / 1000 / BLOCK_SECONDS); if (h <= now) throw new Error("Dates must be in the future."); return h; }
     const h = Number(raw); if (!Number.isInteger(h) || h < 1) throw new Error("A block height is a whole number."); return h;
   };
+  const usedVars = new Set([...$("paths").querySelectorAll(".cond")].filter((r) => r.querySelector(".cond-kind").value === "varEquals").map((r) => Number(r.querySelector(".c-var").value)));
   const ctx = {
     addKey, heightOf, witness: spec.witness,
     set: (prefix, type, value) => { const name = `${prefix}${condN}`; values[name] = { type, value }; return name; },
@@ -1231,7 +1232,9 @@ function readComposer() {
     pct: (inp) => { const n = Number(inp.value); if (!(inp.value.trim() && n >= 0 && n <= 100)) throw new Error("A percentage is between 0 and 100."); return Math.round(n); },
     tokenId: (inp) => { const t = inp.value.trim().toLowerCase(); if (!/^[0-9a-f]{64}$/.test(t)) throw new Error("A token id is 64 hex characters."); return t; },
     whole: (inp, min) => { const raw = inp.value.trim(); const n = Number(raw); if (!raw || !Number.isInteger(n) || (min != null && n < min)) throw new Error(`"${inp.previousElementSibling ? inp.previousElementSibling.textContent : "A number"}" needs a whole number${min != null ? ` of at least ${min}` : ""}.`); return n; },
-    nextVar: () => varN++,
+    // Secrets take the variable numbers the user has not already given to
+    // "attach a specific number" conditions.
+    nextVar: () => { while (usedVars.has(varN)) varN++; return varN++; },
     regRule: (q, op) => {
       const type = q("c-type").value; const raw = q("c-val").value.trim();
       let value;

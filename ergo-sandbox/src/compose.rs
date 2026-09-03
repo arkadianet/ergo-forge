@@ -112,7 +112,8 @@ pub enum Condition {
         #[serde(default = "default_algo")]
         algo: String,
     },
-    /// Some input carries the token `$token_id` — a membership token.
+    /// Some input other than this box carries the token `$token_id` — a
+    /// membership token the spender must bring.
     TokenGated {
         #[serde(rename = "tokenId")]
         token_id: String,
@@ -481,7 +482,7 @@ fn conditions_source(conds: &[Condition]) -> Option<String> {
                 "(getVar[Coll[Byte]]({var}).isDefined && {algo}(getVar[Coll[Byte]]({var}).get) == ${hash})"
             ),
             Condition::TokenGated { token_id } => format!(
-                "INPUTS.exists {{ (bx: Box) => bx.tokens.exists {{ (t: (Coll[Byte], Long)) => t._1 == ${token_id} }} }}"
+                "INPUTS.exists {{ (bx: Box) => bx.id != SELF.id && bx.tokens.exists {{ (t: (Coll[Byte], Long)) => t._1 == ${token_id} }} }}"
             ),
             Condition::MinerIs(m) => format!("CONTEXT.minerPubKey == ${m}"),
             Condition::SumPaidTo { key, at_least } => format!(
@@ -1091,7 +1092,7 @@ fn satisfied(
             },
             Condition::TokenGated { token_id } => {
                 let id = str_of(values, token_id)?;
-                w.list(Which::Input)
+                w.extra_inputs
                     .iter()
                     .any(|b| b.tokens.iter().any(|(i, _)| *i == id))
             }
@@ -1193,13 +1194,32 @@ fn bump(tpe: &str, v: &serde_json::Value) -> serde_json::Value {
     v.clone()
 }
 
-/// A world that satisfies every condition of `p`.
+/// A world that satisfies every condition of `p`: with this box carrying
+/// a token when a rule refers to its tokens, else (a tokenless box is a
+/// valid state too) without.
 fn satisfying_world(
     spec: &Spec,
     p: &Path,
     values: &BTreeMap<String, TypedValue>,
 ) -> Result<World, ComposeError> {
-    let mut w = World::baseline(spec);
+    let with = World::baseline(spec);
+    if with.self_box.tokens.is_empty() {
+        return satisfying_world_from(spec, p, values, with);
+    }
+    let mut without = with.clone();
+    without.self_box.tokens.clear();
+    match satisfying_world_from(spec, p, values, with) {
+        Err(ComposeError::Unsatisfiable(..)) => satisfying_world_from(spec, p, values, without),
+        r => r,
+    }
+}
+
+fn satisfying_world_from(
+    spec: &Spec,
+    p: &Path,
+    values: &BTreeMap<String, TypedValue>,
+    mut w: World,
+) -> Result<World, ComposeError> {
     let mut lo: Option<i64> = None;
     let mut hi: Option<i64> = None;
     let mut tlo: Option<i64> = None;
@@ -1267,10 +1287,16 @@ fn satisfying_world(
                 }
             }
             Condition::TokenGated { token_id } => {
+                // The token may sit on any input the spender brings: reuse
+                // one when there is one, so a fixed input count still holds.
                 let id = str_of(values, token_id)?;
-                let mut b = MBox::default();
-                b.tokens.push((id, 1));
-                w.extra_inputs.push(b);
+                match w.extra_inputs.first_mut() {
+                    Some(b) => b.tokens.push((id, 1)),
+                    None => w.extra_inputs.push(MBox {
+                        tokens: vec![(id, 1)],
+                        ..MBox::default()
+                    }),
+                }
             }
             Condition::MinerIs(m) => w.miner = Some(str_of(values, m)?),
             Condition::SumPaidTo { key, at_least } => {
@@ -1436,6 +1462,7 @@ fn which_name(w: Which) -> &'static str {
 fn break_box(
     r: &BoxRule,
     b: &mut MBox,
+    self_tokens: &[(String, u64)],
     values: &BTreeMap<String, TypedValue>,
 ) -> Result<(), ComposeError> {
     if let Some(rr) = r.registers.first() {
@@ -1475,7 +1502,11 @@ fn break_box(
     } else if r.no_tokens {
         b.tokens.push((SELF_TOKEN.into(), 1));
     } else if r.keeps_self_tokens {
-        b.tokens.clear();
+        if self_tokens.is_empty() {
+            b.tokens.push((SELF_TOKEN.into(), 1));
+        } else {
+            b.tokens.clear();
+        }
     } else if r.value_at_least.is_some() || r.value_at_least_share.is_some() {
         b.value -= 1;
     } else if r.script.is_some() {
@@ -1521,7 +1552,8 @@ fn violating_world(
                     }
                 }
                 Condition::TokenGated { .. } => {
-                    *counts.entry(Which::Input as u8).or_insert(1) += 1;
+                    let cur = counts.entry(Which::Input as u8).or_insert(1);
+                    *cur = (*cur).max(2);
                 }
                 Condition::SumPaidTo { .. } => {
                     let cur = counts.entry(Which::Output as u8).or_insert(0);
@@ -1541,19 +1573,22 @@ fn violating_world(
         Condition::BoxAge(n) => w.self_box.creation_height = w.height - int_of(values, n)? + 1,
         Condition::InputCount(_) => w.extra_inputs.push(MBox::default()),
         Condition::OutputCount(_) => w.outputs.push(MBox::default()),
-        Condition::Box(r) => match (r.which, r.index) {
-            (Which::SelfBox, _) => break_box(r, &mut w.self_box, values)?,
-            (which, Some(Index::At(i))) => break_box(r, w.slot(which, i), values)?,
-            (which, Some(Index::Word(Word::Any))) => {
-                let (_, at) = any_slots.get(&k).copied().unwrap_or((which, 0));
-                break_box(r, w.slot(which, at), values)?;
+        Condition::Box(r) => {
+            let st = w.self_box.tokens.clone();
+            match (r.which, r.index) {
+                (Which::SelfBox, _) => break_box(r, &mut w.self_box, &st, values)?,
+                (which, Some(Index::At(i))) => break_box(r, w.slot(which, i), &st, values)?,
+                (which, Some(Index::Word(Word::Any))) => {
+                    let (_, at) = any_slots.get(&k).copied().unwrap_or((which, 0));
+                    break_box(r, w.slot(which, at), &st, values)?;
+                }
+                (which, Some(Index::Word(Word::All))) => {
+                    let last = w.list(which).len().saturating_sub(1);
+                    break_box(r, w.slot(which, last), &st, values)?;
+                }
+                (_, None) => unreachable!("slots resolved"),
             }
-            (which, Some(Index::Word(Word::All))) => {
-                let last = w.list(which).len().saturating_sub(1);
-                break_box(r, w.slot(which, last), values)?;
-            }
-            (_, None) => unreachable!("slots resolved"),
-        },
+        }
         Condition::VarEquals { index, .. } => {
             w.vars.remove(index);
         }
@@ -1666,8 +1701,15 @@ fn box_json(b: &MBox, w: &World) -> serde_json::Value {
 fn scenario_json(w: &World) -> serde_json::Value {
     let list = |bs: &[MBox]| -> serde_json::Value { bs.iter().map(|b| box_json(b, w)).collect() };
     let mut sc = serde_json::json!({ "height": w.height, "selfBox": box_json(&w.self_box, w), "outputs": list(&w.outputs) });
+    // Synthetic boxes share an all-zero id unless told otherwise; a token
+    // gate compares ids, so every input gets its own.
+    sc["selfBox"]["boxId"] = serde_json::json!("11".repeat(32));
     if !w.extra_inputs.is_empty() {
-        sc["inputs"] = list(&w.extra_inputs);
+        let mut inputs = list(&w.extra_inputs);
+        for (i, b) in inputs.as_array_mut().unwrap().iter_mut().enumerate() {
+            b["boxId"] = serde_json::json!(format!("{:02x}", 0x20 + i).repeat(32));
+        }
+        sc["inputs"] = inputs;
     }
     if !w.data_inputs.is_empty() {
         sc["dataInputs"] = list(&w.data_inputs);
