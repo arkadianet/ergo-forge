@@ -29,6 +29,7 @@ fn main() -> ExitCode {
         "test" => cmd_test(rest),
         "validate-tx" => cmd_validate_tx(rest),
         "compose" => cmd_compose(rest),
+        "point" => cmd_point(rest),
         "help" | "--help" | "-h" => {
             usage();
             return ExitCode::SUCCESS;
@@ -65,6 +66,7 @@ USAGE:
       input's script runs in the real context; ERG/token conservation is
       checked. Non-zero exit when the transaction would be rejected.
   ergo-es compose <spec.json> [--params p.json] [--suite out.test.json]
+  ergo-es point <secret-hex> [--base <point-hex>]   g^x (or base^x), for scenario secrets
       Assemble ErgoScript from spending paths (who + conditions); with
       --params also generate a test suite whose expectations come from the
       composer's model (write it with --suite, then `ergo-es test` it).
@@ -952,5 +954,24 @@ fn cmd_compose(args: &[String]) -> Result<(), String> {
         std::fs::write(&suite_path, json + "\n").map_err(|e| format!("{suite_path}: {e}"))?;
         eprintln!("wrote {suite_path} ({} cases)", suite.scenarios.len());
     }
+    Ok(())
+}
+
+/// `ergo-es point <secret> [--base <point>]`: the public point of a secret,
+/// so a scenario's `secrets` and its script's constants agree.
+fn cmd_point(args: &[String]) -> Result<(), String> {
+    let Some(secret) = args.iter().find(|a| !a.starts_with("--")) else {
+        return Err("point needs a 32-byte hex secret".into());
+    };
+    let out = match flag_value(args, "--base")? {
+        Some(base) => {
+            let (_, v) =
+                ergo_sandbox::prove::dht_hex(&ergo_sandbox::prove::generator_hex(), &base, secret)
+                    .map_err(|e| e.to_string())?;
+            v
+        }
+        None => ergo_sandbox::prove::pubkey_hex(secret).map_err(|e| e.to_string())?,
+    };
+    println!("{out}");
     Ok(())
 }

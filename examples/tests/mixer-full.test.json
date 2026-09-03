@@ -1,0 +1,134 @@
+{
+  "source": "// A full-mix box (the shape of ZeroJoin / ErgoMixer). Two such boxes are\n// created when a half-mix box is spent: (c1, c2) = (g^y, u^y) and its\n// mirror (u^y, g^y), where u = g^x is the half-mix owner's key and y the\n// spender's secret. Each box can be spent by exactly one of the two: the\n// one whose c2 is g^y by proving its discrete log (the spender), the one\n// whose c2 is c1^x by proving the Diffie-Hellman tuple (the owner). An\n// outsider cannot tell which is which.\n//\n// $u: GroupElement  -- the half-mix owner's key g^x\n{\n  val c1 = SELF.R4[GroupElement].get\n  val c2 = SELF.R5[GroupElement].get\n  proveDlog(c2) || proveDHTuple(groupGenerator, c1, $u, c2)\n}\n",
+  "params": {
+    "u": {
+      "type": "GroupElement",
+      "value": "03069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231"
+    }
+  },
+  "scenarios": [
+    {
+      "name": "box (g^y, u^y): the owner proves the Diffie-Hellman tuple with x",
+      "expect": "proofAccepted",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "registers": {
+          "R4": {
+            "type": "GroupElement",
+            "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+          },
+          "R5": {
+            "type": "GroupElement",
+            "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+          }
+        }
+      },
+      "secrets": [
+        {
+          "dht": {
+            "g": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+            "h": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5",
+            "x": "00000000000000000000000000000000000000000000000000000000001a11ce"
+          }
+        }
+      ]
+    },
+    {
+      "name": "box (g^y, u^y): the spender cannot (c2 = u^y is not his discrete log)",
+      "expect": "needsProof",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "registers": {
+          "R4": {
+            "type": "GroupElement",
+            "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+          },
+          "R5": {
+            "type": "GroupElement",
+            "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+          }
+        }
+      },
+      "secrets": [
+        {
+          "dlog": "0000000000000000000000000000000000000000000000000000000000000b0b"
+        }
+      ]
+    },
+    {
+      "name": "box (u^y, g^y): the spender proves the discrete log of c2 with y",
+      "expect": "proofAccepted",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "registers": {
+          "R4": {
+            "type": "GroupElement",
+            "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+          },
+          "R5": {
+            "type": "GroupElement",
+            "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+          }
+        }
+      },
+      "secrets": [
+        {
+          "dlog": "0000000000000000000000000000000000000000000000000000000000000b0b"
+        }
+      ]
+    },
+    {
+      "name": "box (u^y, g^y): the owner cannot (c2 = g^y is not c1^x)",
+      "expect": "needsProof",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "registers": {
+          "R4": {
+            "type": "GroupElement",
+            "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+          },
+          "R5": {
+            "type": "GroupElement",
+            "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+          }
+        }
+      },
+      "secrets": [
+        {
+          "dht": {
+            "g": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+            "h": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241",
+            "x": "00000000000000000000000000000000000000000000000000000000001a11ce"
+          }
+        }
+      ]
+    },
+    {
+      "name": "a stranger cannot spend either box",
+      "expect": "needsProof",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "registers": {
+          "R4": {
+            "type": "GroupElement",
+            "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+          },
+          "R5": {
+            "type": "GroupElement",
+            "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+          }
+        }
+      },
+      "secrets": [
+        {
+          "dlog": "0000000000000000000000000000000000000000000000000000000000000eee"
+        }
+      ]
+    }
+  ]
+}

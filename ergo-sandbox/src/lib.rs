@@ -42,6 +42,7 @@
 //! ```
 
 pub mod audit;
+pub mod avl;
 pub mod box_build;
 pub mod compile;
 pub mod compose;
@@ -51,6 +52,7 @@ pub mod hot_spots;
 pub mod hunt;
 pub mod inspect;
 pub mod method_names;
+pub mod prove;
 pub mod rent;
 pub mod scenario;
 pub mod testsuite;

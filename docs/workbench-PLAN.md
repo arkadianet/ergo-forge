@@ -317,7 +317,21 @@ Still missing (the actual build list):
     under- and over-collateralised states. Both models and both scripts
     agree on every case; the boundaries (one unit over the curve, one
     nanoERG short of price plus fee) are the teeth.
-14. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
+14. **P4i — proof tooling: DONE 2026-09-03.** The sandbox now PRODUCES
+    what a spender attaches, using capabilities the node had and the forge
+    did not: `secrets` in a scenario make a real spending proof through
+    `ergo-wallet`'s prover (Schnorr / DH tuple / AND / OR / threshold with
+    simulated branches, Fiat-Shamir) and verify it on the consensus path
+    (`proofAccepted`); `avl` declares AVL+ trees built by the
+    `ergo_avltree_rust` prover (the crate whose verifier the evaluator
+    uses) with `@avl.name` / `.after` / `.proof` references and an
+    `AvlTree` typed value. `ergo-es point` derives public points. Two more
+    protocol templates ride on it: a registry (ErgoNames shape, 6 cases,
+    every proof from the prover) and a mixer (ZeroJoin shape, half + full
+    mix, 12 cases, every proof from secrets). Not built: multi-signature
+    hint exchange (the wallet has hints; the sandbox proves alone) and
+    header-chain proofs.
+15. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.
    - **A — DONE 2026-08-31** (`compiler/source-positions`, `8479a58`): every

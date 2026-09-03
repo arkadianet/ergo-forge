@@ -13,6 +13,11 @@ ergo-primitives = { workspace = true }
 ergo-ser        = { workspace = true }
 ergo-sigma      = { workspace = true }
 ergo-compiler   = { workspace = true }
+ergo-wallet     = { workspace = true }
+ergo_avltree_rust = { workspace = true }
+k256            = { workspace = true }
+zeroize         = { workspace = true }
+bytes           = { workspace = true }
 serde           = { workspace = true }
 serde_json      = { workspace = true }
 hex             = { workspace = true }

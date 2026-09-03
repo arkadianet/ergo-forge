@@ -288,7 +288,10 @@ plus `passed`/`failed` totals. Same file shape as `ergo-es test` — see
 Run a scenario — contract plus spending context — on the consensus reducer.
 The body is the scenario JSON itself (the `ergo-es eval` schema in the sandbox
 README): `source` or `tree`, `height`, optional `selfBox` / `inputs` /
-`outputs` / `dataInputs` / `contextVars` / `proof` / `costLimit` / `network`.
+`outputs` / `dataInputs` / `contextVars` / `proof` / `costLimit` / `network`,
+plus `secrets` (the sandbox makes and verifies the spending proof) and
+`avl` (trees built by a real prover, referenced as `@avl.name…`); see the
+engine README. Both also work per case in `POST /api/v1/test`.
 
 ```bash
 curl -s -X POST http://127.0.0.1:8080/api/v1/eval \

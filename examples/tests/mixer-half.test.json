@@ -1,0 +1,367 @@
+{
+  "source": "// A half-mix box (the shape of ZeroJoin / ErgoMixer): funds waiting for a\n// partner. R4 holds the owner's key u = g^x. The owner may take the funds\n// back. Anyone else may spend it only into exactly two full-mix boxes of\n// the same value, (c1, c2) and (c2, c1), and must PROVE that c1 = g^y and\n// c2 = u^y for a y they know (a Diffie-Hellman tuple) \u2014 which is what\n// makes one box the owner's and the other the spender's.\n//\n// $fullMix: Coll[Byte]  -- the full-mix script's bytes (compiled with this u)\n{\n  val u = SELF.R4[GroupElement].get\n  val owner = proveDlog(u)\n  if (OUTPUTS.size != 2) owner else {\n    val o0 = OUTPUTS(0)\n    val o1 = OUTPUTS(1)\n    val ok = o0.R4[GroupElement].isDefined && o0.R5[GroupElement].isDefined &&\n      o1.R4[GroupElement].isDefined && o1.R5[GroupElement].isDefined\n    if (!ok) owner else {\n      val c1 = o0.R4[GroupElement].get\n      val c2 = o0.R5[GroupElement].get\n      val wellFormed =\n        o0.propositionBytes == $fullMix && o1.propositionBytes == $fullMix &&\n        o1.R4[GroupElement].get == c2 && o1.R5[GroupElement].get == c1 &&\n        o0.value == SELF.value && o1.value == SELF.value && c1 != c2\n      owner || (sigmaProp(wellFormed) && proveDHTuple(groupGenerator, u, c1, c2))\n    }\n  }\n}\n",
+  "params": {
+    "fullMix": {
+      "type": "Coll[Byte]",
+      "value": "10010703069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231d801d601e4c6a70507eb02cd7201cedb6a01dde4c6a7040773007201"
+    }
+  },
+  "scenarios": [
+    {
+      "name": "the owner takes the funds back",
+      "expect": "proofAccepted",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "registers": {
+          "R4": {
+            "type": "GroupElement",
+            "value": "03069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231"
+          }
+        }
+      },
+      "secrets": [
+        {
+          "dlog": "00000000000000000000000000000000000000000000000000000000001a11ce"
+        }
+      ]
+    },
+    {
+      "name": "a partner mixes: two full-mix boxes (c1,c2) and (c2,c1), proving c1 = g^y and c2 = u^y",
+      "expect": "proofAccepted",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "registers": {
+          "R4": {
+            "type": "GroupElement",
+            "value": "03069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231"
+          }
+        }
+      },
+      "secrets": [
+        {
+          "dht": {
+            "g": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+            "h": "03069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231",
+            "x": "0000000000000000000000000000000000000000000000000000000000000b0b"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "value": 1000000000,
+          "ergoTree": "10010703069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231d801d601e4c6a70507eb02cd7201cedb6a01dde4c6a7040773007201",
+          "registers": {
+            "R4": {
+              "type": "GroupElement",
+              "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+            },
+            "R5": {
+              "type": "GroupElement",
+              "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+            }
+          }
+        },
+        {
+          "value": 1000000000,
+          "ergoTree": "10010703069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231d801d601e4c6a70507eb02cd7201cedb6a01dde4c6a7040773007201",
+          "registers": {
+            "R4": {
+              "type": "GroupElement",
+              "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+            },
+            "R5": {
+              "type": "GroupElement",
+              "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "a partner who cannot prove the tuple (wrong secret) is refused",
+      "expect": "needsProof",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "registers": {
+          "R4": {
+            "type": "GroupElement",
+            "value": "03069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231"
+          }
+        }
+      },
+      "secrets": [
+        {
+          "dht": {
+            "g": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+            "h": "03069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231",
+            "x": "0000000000000000000000000000000000000000000000000000000000000eee"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "value": 1000000000,
+          "ergoTree": "10010703069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231d801d601e4c6a70507eb02cd7201cedb6a01dde4c6a7040773007201",
+          "registers": {
+            "R4": {
+              "type": "GroupElement",
+              "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+            },
+            "R5": {
+              "type": "GroupElement",
+              "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+            }
+          }
+        },
+        {
+          "value": 1000000000,
+          "ergoTree": "10010703069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231d801d601e4c6a70507eb02cd7201cedb6a01dde4c6a7040773007201",
+          "registers": {
+            "R4": {
+              "type": "GroupElement",
+              "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+            },
+            "R5": {
+              "type": "GroupElement",
+              "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+            }
+          }
+        }
+      ],
+      "expectResidual": "03069207"
+    },
+    {
+      "name": "the mirror box not mirrored: refused",
+      "expect": "needsProof",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "registers": {
+          "R4": {
+            "type": "GroupElement",
+            "value": "03069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231"
+          }
+        }
+      },
+      "secrets": [
+        {
+          "dht": {
+            "g": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+            "h": "03069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231",
+            "x": "0000000000000000000000000000000000000000000000000000000000000b0b"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "value": 1000000000,
+          "ergoTree": "10010703069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231d801d601e4c6a70507eb02cd7201cedb6a01dde4c6a7040773007201",
+          "registers": {
+            "R4": {
+              "type": "GroupElement",
+              "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+            },
+            "R5": {
+              "type": "GroupElement",
+              "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+            }
+          }
+        },
+        {
+          "value": 1000000000,
+          "ergoTree": "10010703069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231d801d601e4c6a70507eb02cd7201cedb6a01dde4c6a7040773007201",
+          "registers": {
+            "R4": {
+              "type": "GroupElement",
+              "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+            },
+            "R5": {
+              "type": "GroupElement",
+              "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+            }
+          }
+        }
+      ],
+      "expectResidual": "03069207"
+    },
+    {
+      "name": "a full-mix box with less value: refused",
+      "expect": "needsProof",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "registers": {
+          "R4": {
+            "type": "GroupElement",
+            "value": "03069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231"
+          }
+        }
+      },
+      "secrets": [
+        {
+          "dht": {
+            "g": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+            "h": "03069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231",
+            "x": "0000000000000000000000000000000000000000000000000000000000000b0b"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "value": 999999999,
+          "ergoTree": "10010703069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231d801d601e4c6a70507eb02cd7201cedb6a01dde4c6a7040773007201",
+          "registers": {
+            "R4": {
+              "type": "GroupElement",
+              "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+            },
+            "R5": {
+              "type": "GroupElement",
+              "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+            }
+          }
+        },
+        {
+          "value": 1000000000,
+          "ergoTree": "10010703069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231d801d601e4c6a70507eb02cd7201cedb6a01dde4c6a7040773007201",
+          "registers": {
+            "R4": {
+              "type": "GroupElement",
+              "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+            },
+            "R5": {
+              "type": "GroupElement",
+              "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+            }
+          }
+        }
+      ],
+      "expectResidual": "03069207"
+    },
+    {
+      "name": "outputs under another script: refused",
+      "expect": "needsProof",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "registers": {
+          "R4": {
+            "type": "GroupElement",
+            "value": "03069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231"
+          }
+        }
+      },
+      "secrets": [
+        {
+          "dht": {
+            "g": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+            "h": "03069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231",
+            "x": "0000000000000000000000000000000000000000000000000000000000000b0b"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "value": 1000000000,
+          "ergoTree": "10010101d17300",
+          "registers": {
+            "R4": {
+              "type": "GroupElement",
+              "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+            },
+            "R5": {
+              "type": "GroupElement",
+              "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+            }
+          }
+        },
+        {
+          "value": 1000000000,
+          "ergoTree": "10010101d17300",
+          "registers": {
+            "R4": {
+              "type": "GroupElement",
+              "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+            },
+            "R5": {
+              "type": "GroupElement",
+              "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+            }
+          }
+        }
+      ],
+      "expectResidual": "03069207"
+    },
+    {
+      "name": "three outputs: only the owner",
+      "expect": "needsProof",
+      "height": 1,
+      "selfBox": {
+        "value": 1000000000,
+        "registers": {
+          "R4": {
+            "type": "GroupElement",
+            "value": "03069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231"
+          }
+        }
+      },
+      "secrets": [
+        {
+          "dht": {
+            "g": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+            "h": "03069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231",
+            "x": "0000000000000000000000000000000000000000000000000000000000000b0b"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "value": 1000000000,
+          "ergoTree": "10010703069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231d801d601e4c6a70507eb02cd7201cedb6a01dde4c6a7040773007201",
+          "registers": {
+            "R4": {
+              "type": "GroupElement",
+              "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+            },
+            "R5": {
+              "type": "GroupElement",
+              "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+            }
+          }
+        },
+        {
+          "value": 1000000000,
+          "ergoTree": "10010703069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231d801d601e4c6a70507eb02cd7201cedb6a01dde4c6a7040773007201",
+          "registers": {
+            "R4": {
+              "type": "GroupElement",
+              "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+            },
+            "R5": {
+              "type": "GroupElement",
+              "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+            }
+          }
+        },
+        {
+          "value": 1000000000,
+          "ergoTree": "10010703069207d0b2a1710302cf0e2eba974d40b1966f606a98795dd6311f4642dcc231d801d601e4c6a70507eb02cd7201cedb6a01dde4c6a7040773007201",
+          "registers": {
+            "R4": {
+              "type": "GroupElement",
+              "value": "03b28afc3c99284ba2f7306bc48271d6dc68a04eeda45de5d702050d055a32e241"
+            },
+            "R5": {
+              "type": "GroupElement",
+              "value": "035d45cb81aa765d69ca52e3869491ecf0e8fdf6a63d64e65b5213647ee4973ae5"
+            }
+          }
+        }
+      ],
+      "expectResidual": "03069207"
+    }
+  ]
+}

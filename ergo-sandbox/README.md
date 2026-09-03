@@ -58,6 +58,45 @@ A register (or context variable) value may be given as the serialized
 constant a node or explorer reports — `{"type": "raw", "value": "040a"}` —
 type descriptor first. This is how a real box reaches a scenario untouched.
 
+### Secrets: proofs the sandbox makes
+
+A scenario may name the spender's secrets; when the script reduces to a
+sigma proposition and no `proof` is given, the sandbox PRODUCES a proof
+with the node's own wallet prover (Schnorr, Diffie-Hellman tuples, AND /
+OR / k-of-n with simulated branches) and verifies it through the consensus
+path, so the verdict is `proofAccepted` rather than `needsProof`:
+
+```json
+{ "secrets": [ { "dlog": "<32-byte hex x, for proveDlog(g^x)>" },
+               { "dht": { "g": "<point>", "h": "<point>", "x": "<hex>" } } ] }
+```
+
+A `dht` secret proves `proveDHTuple(g, h, g^x, h^x)`; `u` and `v` are
+derived. Secrets that cannot prove the proposition leave `needsProof` with
+`error: "no proof from these secrets: …"`. `ergo-es point <x> [--base h]`
+prints `g^x` (or `h^x`) so a script's constants and the secrets agree.
+
+### AVL+ trees: digests and proofs from a real prover
+
+```json
+{ "avl": { "names": { "keyLength": 32, "valueLength": null,
+                      "entries": [["<key hex>", "<value hex>"], …],
+                      "operations": [ { "insert": { "key": "…", "value": "…" } },
+                                      { "update": … }, { "insertOrUpdate": … },
+                                      { "remove": { "key": "…" } }, { "lookup": { "key": "…" } } ],
+                      "insertAllowed": true, "updateAllowed": true, "removeAllowed": true } } }
+```
+
+The sandbox builds the tree with the same AVL+ crate whose verifier the
+node's evaluator uses, applies the operations, and lets typed values refer
+to the result: `{"type": "AvlTree", "value": "@avl.names"}` is the tree
+before the operations (`"@avl.names.after"` after), and
+`{"type": "Coll[Byte]", "value": "@avl.names.proof"}` the proof covering
+them (`.digest` / `.digestAfter` as bytes). An `AvlTree` value may also be
+spelled out: `{"digest", "keyLength", "valueLength", "insertAllowed",
+"updateAllowed", "removeAllowed"}`. An operation the tree itself refuses
+(inserting an existing key) is a scenario error, not a proof of nothing.
+
 ## Decompile (P2)
 
 `ergo_sandbox::decompile` lifts ErgoTree wire bytes to source-like ErgoScript:
