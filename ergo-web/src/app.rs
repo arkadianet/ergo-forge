@@ -10,7 +10,9 @@ use tower_http::trace::TraceLayer;
 use crate::engine::EngineBudget;
 
 /// Largest accepted request body. Real inputs are a few KiB.
-pub const MAX_BODY_BYTES: usize = 64 * 1024;
+/// Model-swept suites (examples/tests/gen) run to ~100 KB; CPU is guarded by
+/// the engine budget, not by this cap.
+pub const MAX_BODY_BYTES: usize = 1024 * 1024;
 
 /// Engine jobs on the blocking pool at once, one shared budget. Each one
 /// holds a large-stack thread, so this is also the bound on those threads.

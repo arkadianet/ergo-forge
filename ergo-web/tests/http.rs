@@ -134,7 +134,7 @@ async fn testnet_network_encodes_a_testnet_address() {
 #[tokio::test]
 async fn oversized_body_413_is_json() {
     let base = spawn().await;
-    let big = "a".repeat(64 * 1024 + 1);
+    let big = "a".repeat(ergo_web::app::MAX_BODY_BYTES + 1);
     let r = reqwest::Client::new()
         .post(format!("{base}/api/v1/inspect"))
         .header("content-type", "application/json")

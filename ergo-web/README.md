@@ -333,7 +333,7 @@ this envelope. Panics never reach the client. An `invalid_input` message for a
 bad tree carries the parser's reason (offset, opcode): it describes the
 caller's own bytes, not server state, and is the useful part of the reply.
 
-Limits: request bodies capped at 64 KiB; at most 64 engine requests (inspect,
+Limits: request bodies capped at 1 MiB (a model-swept suite is ~100 KB); at most 64 engine requests (inspect,
 hunt and eval together, one shared semaphore) in flight, with the rest queued. The
 limit is scoped to the engine routes so the health check and the static UI
 stay answerable while the engine is saturated; it also bounds the number of
