@@ -1,0 +1,22 @@
+{
+  "source": "{\n  val oracle = CONTEXT.dataInputs(0)\n  val isOracle = oracle.tokens(0)._1 == $oracleNFT\n  val price = oracle.R4[Long].get\n  sigmaProp(isOracle && price > $floor)\n}",
+  "params": {
+    "oracleNFT": { "type": "Coll[Byte]", "value": "0000000000000000000000000000000000000000000000000000000000000001" },
+    "floor": { "type": "Long", "value": 100 }
+  },
+  "scenarios": [
+    { "name": "no oracle box at all throws", "expect": "error", "height": 1 },
+    { "name": "price above the floor passes", "expect": "pass", "height": 1,
+      "dataInputs": [ { "value": 1, "ergoTree": "10010101",
+        "tokens": [ { "id": "0000000000000000000000000000000000000000000000000000000000000001", "amount": 1 } ],
+        "registers": { "R4": { "type": "Long", "value": 500 } } } ] },
+    { "name": "price below the floor fails", "expect": "fail", "height": 1,
+      "dataInputs": [ { "value": 1, "ergoTree": "10010101",
+        "tokens": [ { "id": "0000000000000000000000000000000000000000000000000000000000000001", "amount": 1 } ],
+        "registers": { "R4": { "type": "Long", "value": 50 } } } ] },
+    { "name": "a box without the oracle NFT fails", "expect": "fail", "height": 1,
+      "dataInputs": [ { "value": 1, "ergoTree": "10010101",
+        "tokens": [ { "id": "00000000000000000000000000000000000000000000000000000000000000ff", "amount": 1 } ],
+        "registers": { "R4": { "type": "Long", "value": 500 } } } ] }
+  ]
+}

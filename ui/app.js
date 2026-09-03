@@ -533,6 +533,88 @@ $("editor").addEventListener("keydown", (e) => {
 });
 loadExamples();
 
+// ── contract tests ───────────────────────────────────────────────────────
+
+let testsInFlight = false;
+
+/// The suite the panel would run: the editor's contract + the scenarios.
+function currentSuite() {
+  let scenarios;
+  try {
+    scenarios = JSON.parse($("tests").value);
+  } catch (e) {
+    return { error: `Scenarios JSON does not parse: ${e.message}` };
+  }
+  if (!Array.isArray(scenarios)) return { error: "Scenarios must be a JSON array." };
+  return {
+    suite: {
+      source: $("editor").value,
+      params: collectParams(),
+      network: $("write-network").value,
+      scenarios,
+    },
+  };
+}
+
+async function runTests() {
+  if (testsInFlight) return;
+  const status = $("tests-status");
+  const { suite, error } = currentSuite();
+  if (error) { status.textContent = error; status.hidden = false; return; }
+  testsInFlight = true;
+  $("run-tests").disabled = true;
+  status.textContent = "Running…";
+  status.hidden = false;
+  $("tests-result").hidden = true;
+  try {
+    const res = await fetch("/api/v1/test", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify(suite),
+    });
+    const body = await res.json();
+    if (!res.ok) {
+      status.textContent = `Error: ${(body.error && body.error.message) || res.status}`;
+      return;
+    }
+    const sum = $("tests-summary");
+    sum.textContent = `${body.passed} passed, ${body.failed} failed`;
+    sum.className = `hunt-verdict ${body.failed ? "bad" : "ok"}`;
+    const tb = $("tests-rows");
+    tb.textContent = "";
+    for (const c of body.cases) {
+      const tr = document.createElement("tr");
+      tr.dataset.verdict = c.passed ? "ok" : "fail";
+      for (const cell of [c.passed ? "✓" : "✗", c.name, c.expected, c.actual, String(c.cost),
+                          c.error ? c.error : (c.reducedTo && c.actual === "needsProof" ? c.reducedTo : "")]) {
+        const td = document.createElement("td"); td.textContent = cell; tr.appendChild(td);
+      }
+      tb.appendChild(tr);
+    }
+    status.hidden = true;
+    $("tests-result").hidden = false;
+  } catch (e) {
+    status.textContent = `Request failed: ${e}`;
+  } finally {
+    testsInFlight = false;
+    $("run-tests").disabled = false;
+  }
+}
+
+$("run-tests").addEventListener("click", runTests);
+$("export-tests").addEventListener("click", async () => {
+  const { suite, error } = currentSuite();
+  const status = $("tests-status");
+  if (error) { status.textContent = error; status.hidden = false; return; }
+  const text = JSON.stringify(suite, null, 2);
+  try {
+    await navigator.clipboard.writeText(text);
+    status.textContent = "Copied contract.test.json to the clipboard — run it with: ergo-es test contract.test.json";
+  } catch (e) {
+    status.textContent = text;
+  }
+  status.hidden = false;
+});
+
 // ── scenario eval ────────────────────────────────────────────────────────
 
 const EVAL_VERDICTS = {

@@ -239,7 +239,13 @@ Still missing (the actual build list):
    the compile route positions findings in the authored source through the
    compiler's `SourceMap` — the reader selects the cited range in the
    editor. Positions are start offsets (carets, not ranges) per P5-A.
-8. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
+8. **P4c — contract test suites: DONE 2026-09-03** (design:
+   `docs/superpowers/specs/2026-09-03-contract-tests-design.md`). A
+   `contract.test.json` (contract + named scenarios with expected verdicts)
+   runs through `testsuite::run`; `ergo-es test` is the CI entry point
+   (non-zero exit on any failing case), `POST /api/v1/test` and a Tests
+   panel in the playground (export the suite from the editor's contract).
+9. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.
    - **A — DONE 2026-08-31** (`compiler/source-positions`, `8479a58`): every
@@ -267,8 +273,8 @@ Still missing (the actual build list):
   originally planned is **deferred, not cancelled**: it buys nothing until a
   browser build wants decompile without `eval`/`scenario` (P4), and the P2.5
   module split makes extracting it mechanical when that day comes.
-- CLI shell: `ergo-sandbox/src/bin/ergo-es.rs` (`compile` / `eval` /
-  `decompile` / `roundtrip`).
+- CLI shell: `ergo-sandbox/src/bin/ergo-es.rs` (`compile` / `params` /
+  `eval` / `decompile` / `roundtrip` / `audit` / `hunt` / `test`).
 - Web: `ergo-web` (workspace member, P4a) — axum service over `ergo-sandbox`
   plus the no-bundler UI in `ui/`. The WASM build originally planned here is
   blocked (see P4); the HTTP API is the stable boundary in the meantime.

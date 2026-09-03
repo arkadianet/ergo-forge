@@ -41,7 +41,11 @@ pub fn router() -> Router {
         )
         .route(
             "/api/v1/compile",
-            post(crate::routes::compile::compile_route).layer(engine_limit),
+            post(crate::routes::compile::compile_route).layer(engine_limit.clone()),
+        )
+        .route(
+            "/api/v1/test",
+            post(crate::routes::test::test_route).layer(engine_limit),
         )
         .route("/api/v1/examples", get(crate::routes::examples::list))
         .route(

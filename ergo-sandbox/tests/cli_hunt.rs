@@ -69,3 +69,41 @@ fn hunt_mainnet_does_not_read_a_flag_value_as_the_corpus_limit() {
         "{all}"
     );
 }
+
+// ----- ergo-es test -----
+
+#[test]
+fn test_command_prints_a_table_and_exits_nonzero_on_a_failing_case() {
+    let dir = std::env::temp_dir().join(format!("ergo-es-test-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let path = dir.join("contract.test.json");
+    std::fs::write(
+        &path,
+        r#"{ "source": "sigmaProp(HEIGHT > 100)",
+             "scenarios": [
+               { "name": "before", "expect": "fail", "height": 50 },
+               { "name": "after", "expect": "pass", "height": 150 },
+               { "name": "wrong", "expect": "pass", "height": 50 }
+             ] }"#,
+    )
+    .unwrap();
+    let (ok, out, _) = ergo_es(&["test", path.to_str().unwrap()]);
+    assert!(!ok, "a failing case must exit non-zero\n{out}");
+    assert!(
+        out.contains("before") && out.contains("after") && out.contains("wrong"),
+        "{out}"
+    );
+    assert!(
+        out.contains("2 passed") && out.contains("1 failed"),
+        "{out}"
+    );
+    std::fs::write(
+        &path,
+        r#"{ "source": "sigmaProp(HEIGHT > 100)",
+             "scenarios": [ { "name": "after", "expect": "pass", "height": 150 } ] }"#,
+    )
+    .unwrap();
+    let (ok, out, _) = ergo_es(&["test", path.to_str().unwrap()]);
+    assert!(ok, "{out}");
+    let _ = std::fs::remove_dir_all(&dir);
+}

@@ -22,6 +22,7 @@ cargo run -p ergo-sandbox --bin ergo-es -- decompile 100104c801d191a37300
 cargo run -p ergo-sandbox --bin ergo-es -- roundtrip 100104c801d191a37300
 cargo run -p ergo-sandbox --bin ergo-es -- audit 1001040ad191e4c6a704047300
 cargo run -p ergo-sandbox --bin ergo-es -- hunt 1001040ad191e4c6a704047300
+cargo run -p ergo-sandbox --bin ergo-es -- test examples/tests/height-lock.test.json
 cargo run -p ergo-sandbox --features cost-trace --bin ergo-es -- eval scenario.json --hot-spots
 
 cargo run -p ergo-web --bin ergo-web        # http://127.0.0.1:8080 — the reader
@@ -36,6 +37,7 @@ docker build -t ergo-web . && docker run --rm -p 127.0.0.1:8080:8080 ergo-web
 | Is the code fragile? (unguarded `Option.get`, tiered by who controls the value) | `ergo-es audit`, inspect findings |
 | Can someone with **no key** spend this box? | `ergo-es hunt`, `POST /api/v1/hunt`, the reader's Spendability section |
 | Does my contract pass in *this* spending context, and what does it cost? | `ergo-es eval`, `POST /api/v1/eval`, the reader's Scenario panel |
+| Do all my contract's paths still behave after a change? | `ergo-es test contract.test.json` (CI), `POST /api/v1/test`, the Tests panel |
 | Where does the cost go? | `ergo-es eval --hot-spots` (cost-trace build) |
 
 Every answer comes from the node's own compiler and reducer. Verification
