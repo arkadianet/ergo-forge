@@ -121,8 +121,9 @@ to every release alongside the container image.
   snippet.
 - **Storage rent applies to every contract.** After about four years a
   miner may take a size-based fee from any box regardless of its script, and
-  a box holding less than the fee is swept, tokens included. Every answer
-  says so with the estimated fee; a "burn" address is not an exception.
+  a box holding less than the fee is swept, tokens included. The inspect,
+  compile and hunt answers say so with the estimated fee; a "burn" address
+  is not an exception.
 - **Transaction validation checks scripts and balances, not signatures.** An
   input that reduces to a sigma proposition is reported as a signature
   needed.

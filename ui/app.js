@@ -226,7 +226,7 @@ function renderHunt(h) {
   // The real box is the fix; put the form in front of the user.
   if (undeterminedOnSynthetic) $("self-box").closest("details").open = true;
 
-  $("hunt-rent").textContent = h.rent ? rentSentence(h.rent) : "";
+  $("hunt-rent").textContent = h.rent ? rentSentence(h.rent, { network: $("network").value }) : "";
   const res = $("hunt-residuals");
   res.textContent = "";
   for (const r of h.residuals) {
@@ -793,13 +793,15 @@ function describeBuild(params) {
 }
 
 /// Storage rent, in words a non-technical user can act on.
-function rentSentence(r, { forBurn = false, withHeight = true } = {}) {
+function rentSentence(r, { forBurn = false, withHeight = true, network = null } = {}) {
   const erg = (r.feeNanoerg / 1e9).toFixed(3);
   const years = (r.periodBlocks * BLOCK_SECONDS / 86400 / 365.25).toFixed(1);
   let s = `Every box on Ergo pays storage rent: about every ${years} years a miner may take a fee of roughly ${erg} ERG from a box under this contract (based on its size), leaving the rest locked exactly as before. A box holding less than the fee is taken entirely, tokens included, so keep more than ${erg} ERG in it${forBurn ? "" : " if it must survive"}.`;
   if (forBurn) s += " For a burn address that means: ERG above the fee stays locked for decades; tokens in a box with little ERG will eventually be swept by a miner, not destroyed.";
   if (withHeight && r.nextCollectionHeight) {
-    s += datesAvailable() ? ` This box's first rent collection can happen at block ${r.nextCollectionHeight} (about ${dateOfHeight(r.nextCollectionHeight)}).` : ` This box's first rent collection can happen at block ${r.nextCollectionHeight}.`;
+    // A date is only honest for the network whose height we observed.
+    const canDate = chainHeight != null && network != null && network === chainNetwork;
+    s += canDate ? ` This box's first rent collection can happen at block ${r.nextCollectionHeight} (about ${dateOfHeight(r.nextCollectionHeight)}).` : ` This box's first rent collection can happen at block ${r.nextCollectionHeight}.`;
   }
   return s;
 }

@@ -114,6 +114,7 @@ curl -s -X POST http://127.0.0.1:8080/api/v1/hunt \
 
 ```json
 {
+  "rent": { "boxBytes": 66, "feeNanoerg": 82500000, "periodBlocks": 1051200, "feeFactor": 1250000 },
   "treeHex": "1001040ad191e4c6a704047300",
   "address": "8NJuqcG7SdhX7cFKGBmfAkXn",
   "verdict": "spendableByAnyone",

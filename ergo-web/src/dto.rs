@@ -296,12 +296,22 @@ pub fn rent_for(
     match b {
         Some(b) => {
             let amounts: Vec<u64> = b.tokens.iter().map(|t| t.amount).collect();
+            // Each register's canonical serialized constant (type + value),
+            // which is what the box serialization carries.
             let regs: Vec<Vec<u8>> = b
                 .registers
                 .values()
                 .map(|tv| match (tv.r#type.as_str(), tv.value.as_str()) {
                     ("raw", Some(h)) => hex::decode(h).unwrap_or_default(),
-                    _ => vec![0; 8],
+                    _ => ergo_sandbox::parse_typed_value(&tv.r#type, &tv.value)
+                        .ok()
+                        .and_then(|(t, v)| {
+                            let mut w = ergo_primitives::writer::VlqWriter::new();
+                            ergo_ser::sigma_value::write_constant(&mut w, &t, &v)
+                                .ok()
+                                .map(|_| w.result())
+                        })
+                        .unwrap_or_default(),
                 })
                 .collect();
             let created = if b.creation_height > 0 {
