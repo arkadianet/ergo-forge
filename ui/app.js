@@ -1948,6 +1948,18 @@ try { const saved = JSON.parse(localStorage.getItem(PLAY_KEY) || "null"); if (sa
 function savePlay() { try { localStorage.setItem(PLAY_KEY, JSON.stringify(play)); } catch (e) { /* storage blocked */ } }
 const selectedBoxes = new Set();
 const ergOf = (nano) => `${(Number(nano) / 1e9).toLocaleString(undefined, { maximumFractionDigits: 9 })} ERG`;
+/// ERG as typed → nanoERG, exactly: decimal string arithmetic, no floats.
+/// Boxes above 9,007,199 ERG (2^53 nanoERG) are refused so the amount
+/// stays exact through JSON.
+function nanoOf(text) {
+  const t = String(text).trim();
+  const m = /^(\d+)(?:\.(\d{0,9}))?$/.exec(t);
+  if (!m) throw new Error(`"${t}" is not an ERG amount (up to 9 decimals).`);
+  const nano = BigInt(m[1]) * 1000000000n + BigInt((m[2] || "").padEnd(9, "0"));
+  if (nano > BigInt(Number.MAX_SAFE_INTEGER)) throw new Error("The sandbox keeps amounts exact up to 9,007,199 ERG per box.");
+  return Number(nano);
+}
+const ergText = (nano) => (Number(nano) / 1e9).toFixed(9).replace(/\.?0+$/, "");
 
 /// Plain words for a tree, cached per tree.
 async function wordsFor(treeHex) {
@@ -2008,12 +2020,12 @@ $("fund-go").addEventListener("click", async () => {
   const st = $("fund-status");
   try {
     const tree = await resolveContract($("fund-contract").value);
-    const erg = Number($("fund-erg").value);
-    if (!(erg > 0)) throw new Error("An amount in ERG is needed.");
+    const nano = nanoOf($("fund-erg").value);
+    if (!(nano > 0)) throw new Error("An amount in ERG is needed.");
     let regs = {};
     try { regs = JSON.parse($("fund-regs").value || "{}"); } catch (e) { throw new Error("Registers must be JSON."); }
     const tokens = parseTokens($("fund-tokens").value, "ee".repeat(32));
-    await fundBox(tree, Math.round(erg * 1e9), tokens, regs, "");
+    await fundBox(tree, nano, tokens, regs, "");
     st.hidden = true; $("play-fund").hidden = true;
   } catch (e) { st.textContent = e.message; st.hidden = false; }
 });
@@ -2069,7 +2081,7 @@ function renderTxForm() {
     l.innerHTML = `<input type="checkbox" class="tx-di" value="${b.boxId}"> ${ergOf(b.value)} · ${b.boxId.slice(0, 8)}…`;
     di.appendChild(l);
   }
-  if (!txOutputs) txOutputs = [{ dest: "same", erg: total / 1e9, tokens: "", regs: "{}" }];
+  if (!txOutputs) txOutputs = [{ dest: "same", erg: ergText(total), tokens: "", regs: "{}" }];
   renderOutputs(ins);
 }
 function renderOutputs(ins) {
@@ -2088,15 +2100,15 @@ function renderOutputs(ins) {
   });
 }
 function readOutputs() {
-  txOutputs = [...$("tx-outputs").children].map((d) => ({ dest: d.querySelector(".o-dest").value, erg: Number(d.querySelector(".o-erg").value), tokens: d.querySelector(".o-tokens").value, regs: d.querySelector(".o-regs").value }));
+  txOutputs = [...$("tx-outputs").children].map((d) => ({ dest: d.querySelector(".o-dest").value, erg: d.querySelector(".o-erg").value, tokens: d.querySelector(".o-tokens").value, regs: d.querySelector(".o-regs").value }));
 }
 $("tx-add-output").addEventListener("click", () => { readOutputs(); txOutputs.push({ dest: "anyone", erg: 0, tokens: "", regs: "{}" }); renderTxForm(); });
 $("tx-balance").addEventListener("click", () => {
   readOutputs();
   const ins = [...selectedBoxes].map((id) => play.boxes.find((b) => b.boxId === id)).filter(Boolean);
   const total = ins.reduce((s, b) => s + Number(b.value), 0);
-  const others = txOutputs.slice(0, -1).reduce((s, o) => s + Math.round(o.erg * 1e9), 0);
-  if (txOutputs.length) txOutputs[txOutputs.length - 1].erg = Math.max(0, total - others) / 1e9;
+  const others = txOutputs.slice(0, -1).reduce((s, o) => s + nanoOf(o.erg), 0);
+  if (txOutputs.length) txOutputs[txOutputs.length - 1].erg = ergText(Math.max(0, total - others));
   renderTxForm();
 });
 
@@ -2120,7 +2132,7 @@ $("tx-send").addEventListener("click", async () => {
       else tree = await resolveContract(o.dest);
       let regs = {};
       try { regs = JSON.parse(o.regs || "{}"); } catch (e) { throw new Error("Output registers must be JSON."); }
-      outputs.push({ value: Math.round(o.erg * 1e9), ergoTree: tree, tokens: parseTokens(o.tokens, ins[0].boxId), registers: regs });
+      outputs.push({ value: nanoOf(o.erg), ergoTree: tree, tokens: parseTokens(o.tokens, ins[0].boxId), registers: regs });
     }
     const dataInputs = [...document.querySelectorAll(".tx-di:checked")].map((c) => c.value);
     st.textContent = "Checking with the real rules…"; st.hidden = false; res.hidden = true;

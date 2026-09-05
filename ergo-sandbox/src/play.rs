@@ -98,6 +98,17 @@ pub fn apply(req: &PlayRequest) -> Result<PlayResult, SandboxError> {
             "a transaction needs at least one input".into(),
         ));
     }
+    {
+        let mut seen = std::collections::BTreeSet::new();
+        for i in &req.tx.inputs {
+            if !seen.insert(i.box_id.to_lowercase()) {
+                return Err(SandboxError::Scenario(format!(
+                    "input {} is listed twice",
+                    i.box_id
+                )));
+            }
+        }
+    }
     let inputs: Vec<&ScenarioBox> = req
         .tx
         .inputs
@@ -124,6 +135,9 @@ pub fn apply(req: &PlayRequest) -> Result<PlayResult, SandboxError> {
             m.extend_from_slice(b.box_id.as_deref().unwrap_or("").as_bytes());
         }
         m.extend_from_slice(&req.height.to_le_bytes());
+        for id in &req.tx.data_inputs {
+            m.extend_from_slice(id.to_lowercase().as_bytes());
+        }
         m.extend_from_slice(
             serde_json::to_string(&req.tx.outputs)
                 .unwrap_or_default()
@@ -143,6 +157,11 @@ pub fn apply(req: &PlayRequest) -> Result<PlayResult, SandboxError> {
             .map_err(|e| SandboxError::Scenario(format!("output {i} ergoTree hex: {e}")))?;
         o.box_id = None;
         let eb = crate::box_build::build_eval_box_in("outputs", o, Some(&tree), tx_id, i as u16)?;
+        if eb.raw_bytes.is_empty() {
+            return Err(SandboxError::Scenario(format!(
+                "output {i}: ergoTree does not parse as an ErgoTree"
+            )));
+        }
         o.box_id = Some(hex::encode(eb.id));
     }
 
@@ -208,7 +227,12 @@ pub fn apply(req: &PlayRequest) -> Result<PlayResult, SandboxError> {
             *tout.entry(t.id.to_lowercase()).or_default() += t.amount as u128;
         }
     }
-    let mint_id = inputs[0].box_id.as_deref().map(|s| s.to_lowercase());
+    // A mint is a NEW id (the first input's box id) that no input carries.
+    let mint_id = inputs[0]
+        .box_id
+        .as_deref()
+        .map(|s| s.to_lowercase())
+        .filter(|id| !tin.contains_key(id));
     for (id, out_amt) in &tout {
         let in_amt = tin.get(id).copied().unwrap_or(0);
         if *out_amt > in_amt && Some(id) != mint_id.as_ref() {

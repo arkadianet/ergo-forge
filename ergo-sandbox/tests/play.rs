@@ -97,3 +97,35 @@ fn data_inputs_and_missing_boxes_are_handled() {
     ));
     assert!(missing.is_err());
 }
+
+#[test]
+fn duplicate_inputs_malformed_outputs_and_fake_mints_are_refused() {
+    let anyone = tree("sigmaProp(true)");
+    let boxes = serde_json::json!([{ "boxId": "66".repeat(32), "value": 10, "ergoTree": anyone, "tokens": [{ "id": "66".repeat(32), "amount": 1 }] }]);
+    let dup = apply(&req(
+        serde_json::json!({ "height": 1, "boxes": boxes, "tx": { "inputs": [{ "boxId": "66".repeat(32) }, { "boxId": "66".repeat(32) }], "outputs": [{ "value": 20, "ergoTree": anyone }] } }),
+    ));
+    assert!(dup.unwrap_err().to_string().contains("twice"));
+    let bad = apply(&req(
+        serde_json::json!({ "height": 1, "boxes": boxes, "tx": { "inputs": [{ "boxId": "66".repeat(32) }], "outputs": [{ "value": 10, "ergoTree": "10010101", "tokens": [{ "id": "66".repeat(32), "amount": 1 }] }] } }),
+    ));
+    assert!(bad.unwrap_err().to_string().contains("does not parse"));
+    let grow = apply(&req(serde_json::json!({ "height": 1, "boxes": boxes, "tx": { "inputs": [{ "boxId": "66".repeat(32) }], "outputs": [{ "value": 10, "ergoTree": anyone, "tokens": [{ "id": "66".repeat(32), "amount": 5 }] }] } }))).unwrap();
+    assert!(
+        !grow.ok && grow.problems.iter().any(|p| p.contains("token")),
+        "{:?}",
+        grow.problems
+    );
+}
+
+#[test]
+fn data_inputs_are_part_of_the_transaction_id() {
+    let anyone = tree("sigmaProp(true)");
+    let boxes = serde_json::json!([
+        { "boxId": "77".repeat(32), "value": 3, "ergoTree": anyone },
+        { "boxId": "88".repeat(32), "value": 1, "ergoTree": anyone }]);
+    let a = apply(&req(serde_json::json!({ "height": 1, "boxes": boxes, "tx": { "inputs": [{ "boxId": "77".repeat(32) }], "outputs": [{ "value": 3, "ergoTree": anyone }] } }))).unwrap();
+    let b = apply(&req(serde_json::json!({ "height": 1, "boxes": boxes, "tx": { "inputs": [{ "boxId": "77".repeat(32) }], "dataInputs": ["88".repeat(32)], "outputs": [{ "value": 3, "ergoTree": anyone }] } }))).unwrap();
+    assert_ne!(a.tx_id, b.tx_id);
+    assert_ne!(a.outputs[0].box_id, b.outputs[0].box_id);
+}
