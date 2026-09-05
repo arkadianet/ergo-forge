@@ -352,8 +352,9 @@ Still missing (the actual build list):
     had empty `bytes` and zero ids, the compiler's v0 header blocked every
     v6 method, `getVarFromInput` saw no extension on SELF. Deliberate
     parity, not findings: the compiler refuses bitwise operators as Scala
-    6.0.2's GraphBuilding does; `!x.isDefined` needs parentheses here
-    (Scala parses `!(x.isDefined)`) — noted for the compiler.
+    6.0.2's GraphBuilding does; a prefix `!`/`-` binds to the atom before
+    suffixes (`!f(x).y` is `(!f)(x).y`), as Scala's SigmaParser does, so
+    `!(x.isDefined)` needs its parentheses in both.
 16. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.
