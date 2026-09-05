@@ -33,8 +33,9 @@ pub struct Scenario {
     /// with `tree`.
     #[serde(default)]
     pub source: Option<String>,
-    /// Tree version for `source` compilation (default 0).
-    #[serde(default)]
+    /// Tree version for `source` compilation (default 3: every method is
+    /// visible; the header is stamped only when the script needs it).
+    #[serde(default = "default_tree_version")]
     pub tree_version: u8,
     /// Network for `source` compilation address encodings: `mainnet` or
     /// `testnet` (default `mainnet`).
@@ -126,6 +127,10 @@ where
                 .map_err(|_| D::Error::custom(format!("context var id `{k}` is not 0..=255")))
         })
         .collect()
+}
+
+fn default_tree_version() -> u8 {
+    3
 }
 
 /// One entry of `headers`. Hex fields: `id`, `parentId`, `adProofsRoot`,

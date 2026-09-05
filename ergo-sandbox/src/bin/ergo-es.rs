@@ -147,7 +147,7 @@ fn cmd_compile(args: &[String]) -> Result<(), String> {
     let source = read_input(src_ref)?;
     let tree_version: u8 = match flag_value(args, "--tree-version")? {
         Some(v) => v.parse().map_err(|_| format!("bad --tree-version `{v}`"))?,
-        None => 0,
+        None => 3,
     };
     let network = match flag_value(args, "--network")? {
         Some(n) => parse_network(&n)?,
