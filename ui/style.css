@@ -346,6 +346,13 @@ details.dev summary { color: var(--dim); cursor: pointer; }
 
 /* ── composer ── */
 .recipe.custom { border-style: dashed; }
+.plain { padding-left: 1.2rem; }
+.plain li { margin: 0.25rem 0; }
+.plain code { background: var(--panel); padding: 0 0.25rem; border-radius: 4px; }
+.prove-row { display: grid; grid-template-columns: auto 1fr auto; gap: 0.4rem; align-items: center; margin: 0.3rem 0; }
+.prove-row input { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.85rem; }
+.prove-row .derived { font-family: ui-monospace, monospace; font-size: 0.8rem; color: var(--muted); }
+label.inline { display: inline-flex; gap: 0.3rem; align-items: center; margin-left: 0.5rem; }
 .path { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 0.8rem 1rem; margin: 0.6rem 0; }
 .path-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
 .path select, .cond select { width: 100%; box-sizing: border-box; padding: 0.45rem 0.6rem; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; color: var(--text); }

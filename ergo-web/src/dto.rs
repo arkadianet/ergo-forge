@@ -35,6 +35,10 @@ pub struct FindingDto {
 pub struct InspectResponse {
     /// Storage rent for a minimal box under this contract.
     pub rent: ergo_sandbox::rent::RentEstimate,
+    /// The contract in words, one sentence per way to spend; unknown
+    /// clauses are quoted as code and `plainComplete` is false.
+    pub plain: Vec<String>,
+    pub plain_complete: bool,
     pub tree_hex: String,
     pub address: String,
     pub source: String,
@@ -248,6 +252,9 @@ pub struct ParamStatus {
 pub struct CompileResponse {
     /// Storage rent for a minimal box under this contract.
     pub rent: ergo_sandbox::rent::RentEstimate,
+    /// The compiled contract in words (see `InspectResponse::plain`).
+    pub plain: Vec<String>,
+    pub plain_complete: bool,
     pub tree_hex: String,
     pub p2s: String,
     pub p2sh: String,

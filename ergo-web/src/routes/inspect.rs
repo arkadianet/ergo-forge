@@ -42,18 +42,21 @@ pub async fn inspect(
             let lifted = ergo_sandbox::lift_tree(&tree, testnet);
             let source = ergo_sandbox::decompile::print(&lifted.node);
             let report = audit::audit(&lifted);
-            Ok::<_, ergo_sandbox::SandboxError>((source, report))
+            let plain = ergo_sandbox::recognize::plain(&lifted);
+            Ok::<_, ergo_sandbox::SandboxError>((source, report, plain))
         })
         .await
         .ok_or(ApiError::Internal)?;
 
     // The parser's message describes the caller's own bytes (offset, opcode),
     // not server state — it is the useful part of a 400, so it is passed on.
-    let (source, report) = result.map_err(|e| ApiError::InvalidInput(e.to_string()))?;
+    let (source, report, plain) = result.map_err(|e| ApiError::InvalidInput(e.to_string()))?;
     let (completeness, raw_placeholders, truncated) = dto::completeness_parts(&report);
 
     Ok(Json(dto::InspectResponse {
         rent: dto::rent_for(&bytes, None),
+        plain: plain.paths,
+        plain_complete: plain.complete,
         address: ergo_ser::address::encode_p2s(network, &bytes),
         tree_hex,
         source,

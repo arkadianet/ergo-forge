@@ -20,6 +20,7 @@ type Compiled = (
     Vec<dto::FindingDto>,
     Vec<dto::ParamStatus>,
     bool,
+    ergo_sandbox::recognize::Plain,
 );
 
 pub async fn compile_route(
@@ -51,6 +52,7 @@ pub async fn compile_route(
             let lifted = ergo_sandbox::lift_tree(&tree, testnet);
             let roundtrip = ergo_sandbox::decompile::print(&lifted.node);
             let report = audit::audit(&lifted);
+            let plain = ergo_sandbox::recognize::plain(&lifted);
             let walk: Vec<u8> = ergo_ser::opcode::preorder(&tree.body)
                 .map(|(_, e)| ergo_ser::opcode::node_opcode(e))
                 .collect();
@@ -79,12 +81,14 @@ pub async fn compile_route(
                     default: n.default,
                 })
                 .collect();
-            Ok::<Compiled, ParamError>((out, roundtrip, report, findings, statuses, positioned))
+            Ok::<Compiled, ParamError>((
+                out, roundtrip, report, findings, statuses, positioned, plain,
+            ))
         })
         .await
         .ok_or(ApiError::Internal)?;
 
-    let (out, roundtrip, report, findings, statuses, positioned) = match result {
+    let (out, roundtrip, report, findings, statuses, positioned, plain) = match result {
         Ok(v) => v,
         Err(ParamError::Missing(names)) => {
             // Carry the scan's type hints and defaults so the UI can build the form.
@@ -118,6 +122,8 @@ pub async fn compile_route(
     let (completeness, raw_placeholders, truncated) = dto::completeness_parts(&report);
     Ok(Json(dto::CompileResponse {
         rent: dto::rent_for(&out.tree_bytes, None),
+        plain: plain.paths,
+        plain_complete: plain.complete,
         tree_hex: hex::encode(&out.tree_bytes),
         p2s: out.p2s_address,
         p2sh: out.p2sh_address,

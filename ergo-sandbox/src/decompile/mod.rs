@@ -23,7 +23,7 @@
 
 use ergo_ser::opcode::Expr;
 
-mod ast;
+pub mod ast;
 
 pub use ast::{Node, NodeKind, Stmt};
 

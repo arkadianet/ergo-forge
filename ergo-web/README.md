@@ -57,6 +57,11 @@ Versioned under `/api/v1/`. All responses and errors are JSON; every field is ca
 
 ### `POST /api/v1/inspect`
 
+Both `inspect` and `compile` answer with `plain` — the contract in words,
+one sentence per way to spend ("the key 9fSgJ7…HjAV, if from block
+900000") — and `plainComplete`, false when a clause the recognizer does
+not know was quoted as code instead of paraphrased.
+
 `input` accepts a P2S address or raw ErgoTree hex (hex is tried first; the two
 cannot collide). `network` is optional: absent means `mainnet`; the only
 accepted values are exactly `mainnet` and `testnet`, anything else is a 400
@@ -264,6 +269,12 @@ contract must not contain, such as the secret behind a `hashPreimage`. A
 path that anyone may take with no conditions, an empty box rule, and a
 path whose conditions contradict each other (no single transaction can
 meet them) are refused with a message.
+
+### `POST /api/v1/point`
+
+`{secret, base?}` → `{point, generator}`: the public point of a 32-byte
+hex secret — `g^x`, or `base^x` when a compressed base point is given — so
+a scenario's `secrets` and a script's constants agree. For test keys.
 
 ### `POST /api/v1/test`
 

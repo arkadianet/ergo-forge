@@ -94,6 +94,7 @@ pub fn router_with(cfg: AppConfig) -> Router {
         .route("/api/v1/inspect", post(crate::routes::inspect::inspect))
         .route("/api/v1/hunt", post(crate::routes::hunt::hunt_route))
         .route("/api/v1/eval", post(crate::routes::eval::eval_route))
+        .route("/api/v1/point", post(crate::routes::point::point))
         .route(
             "/api/v1/compile",
             post(crate::routes::compile::compile_route),

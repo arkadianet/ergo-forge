@@ -992,3 +992,54 @@ async fn compose_without_values_returns_no_suite_and_rejects_a_bad_spec() {
         .unwrap();
     assert_eq!(r.status(), 400);
 }
+
+// ── /api/v1/point, and the contract in words ────────────────────────────────
+
+#[tokio::test]
+async fn point_derives_the_public_point_of_a_secret() {
+    let base = spawn().await;
+    let res: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/point"))
+        .json(&serde_json::json!({ "secret": "0000000000000000000000000000000000000000000000000000000000000001" }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(res["point"], res["generator"], "{res}");
+    let bad = reqwest::Client::new()
+        .post(format!("{base}/api/v1/point"))
+        .json(&serde_json::json!({ "secret": "00" }))
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(bad.status(), 400);
+}
+
+#[tokio::test]
+async fn inspect_and_compile_put_the_contract_into_words() {
+    let base = spawn().await;
+    let src = "sigmaProp(HEIGHT > 100)";
+    let c: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/compile"))
+        .json(&serde_json::json!({ "source": src }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(c["plain"][0], "anyone, if after block 100", "{c}");
+    assert_eq!(c["plainComplete"], true, "{c}");
+    let i: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/inspect"))
+        .json(&serde_json::json!({ "input": c["treeHex"] }))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(i["plain"][0], "anyone, if after block 100", "{i}");
+}

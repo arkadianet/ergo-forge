@@ -163,6 +163,9 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
         </div>
         <p id="export-status" class="status" hidden></p>
         <p id="c-rent" class="hint"></p>
+        <h2>In plain words</h2>
+        <ul id="c-plain" class="plain"></ul>
+        <p id="c-plain-note" class="hint" hidden>Parts shown as code are clauses the reader could not put into words.</p>
         <h2>What consensus will run</h2>
         <p class="hint">The tree decompiled back to source: constants inlined, sugar gone.</p>
         <pre id="c-source"></pre>
@@ -205,6 +208,9 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
     </div>
 
     <section id="result" hidden>
+      <h2>In plain words</h2>
+      <ul id="plain" class="plain"></ul>
+      <p id="plain-note" class="hint" hidden>Parts shown as code are clauses the reader could not put into words; the source below is the whole truth.</p>
       <h2>Source</h2>
       <pre id="source"></pre>
 
@@ -319,6 +325,13 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
        the sandbox README for the schema.</p>
     <label for="scenario">Scenario JSON</label>
     <textarea id="scenario" rows="6" spellcheck="false">{ "height": 200 }</textarea>
+    <p class="hint">Insert a starting point:
+      <button type="button" class="secondary tiny snip" data-snip="headers">headers</button>
+      <button type="button" class="secondary tiny snip" data-snip="avl">AVL+ tree</button>
+      <button type="button" class="secondary tiny snip" data-snip="secrets">secrets</button>
+      <button type="button" class="secondary tiny snip" data-snip="parties">parties</button>
+      <button type="button" class="secondary tiny snip" data-snip="boxes">boxes</button>
+    </p>
     <button id="run">Run</button>
     <p id="eval-status" class="status" hidden></p>
     <div id="eval-result" hidden>
@@ -333,6 +346,18 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
         <summary>Trace</summary>
         <ul id="eval-trace" class="residuals"></ul>
       </details>
+      <div id="prove" hidden>
+        <h3>Prove it</h3>
+        <p class="hint">The script needs a signature. Give the sandbox the secrets a spender would hold and it makes the proof with the node's own prover, then verifies it. Test keys only — never a wallet's.</p>
+        <div id="prove-rows"></div>
+        <p>
+          <button type="button" id="prove-add-dlog" class="secondary tiny">+ key secret</button>
+          <button type="button" id="prove-add-dht" class="secondary tiny">+ Diffie-Hellman secret</button>
+          <label class="inline"><input type="checkbox" id="prove-parties"> separate parties (one wallet per secret, signing in turn)</label>
+        </p>
+        <button type="button" id="prove-run">Prove</button>
+        <p id="prove-status" class="status" hidden></p>
+      </div>
     </div>
   </section>
 
