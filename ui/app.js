@@ -497,6 +497,37 @@ function selectInEditor(byteOffset, snippet) {
 }
 
 /// Squiggle every positioned finding in the editor (severity-coloured).
+/// After a run: every positioned value becomes a mark on the editor —
+/// red for `false`, green for `true`, neutral otherwise — with the value
+/// as its tooltip. Only when the scenario ran the editor's source.
+let valueMarks = [];
+function markValues(values, fromEditor) {
+  for (const m of valueMarks) m.clear();
+  valueMarks = [];
+  $("eval-values-note").hidden = true;
+  if (!fromEditor) return;
+  const src = editor.getValue();
+  const byOffset = new Map();
+  for (const v of values) {
+    if (v.offset == null) continue;
+    const prev = byOffset.get(v.offset);
+    if (prev) { prev.values.push(v.value); } else byOffset.set(v.offset, { values: [v.value] });
+  }
+  let falses = 0;
+  for (const [off, entry] of byOffset) {
+    const index = byteOffsetToIndex(src, off);
+    const from = editor.posFromIndex(index);
+    const tok = editor.getTokenAt({ line: from.line, ch: from.ch + 1 });
+    const to = { line: from.line, ch: Math.max(tok.end, from.ch + 1) };
+    const last = entry.values[entry.values.length - 1];
+    const cls = last === "Bool(false)" ? "cm-val-false" : last === "Bool(true)" ? "cm-val-true" : "cm-val";
+    if (cls === "cm-val-false") falses++;
+    const title = entry.values.length > 1 ? `${entry.values.length} evaluations, last = ${last}` : `= ${last}`;
+    valueMarks.push(editor.markText(from, to, { className: cls, title }));
+  }
+  if (byOffset.size) { $("eval-values-note").textContent = `${byOffset.size} expressions valued in the editor${falses ? `; ${falses} were false` : ""} — hover them.`; $("eval-values-note").hidden = false; }
+}
+
 function markFindings(findings) {
   const src = editorValue();
   for (const f of findings) {
@@ -1736,7 +1767,13 @@ async function runScenario() {
       status.hidden = false;
       return;
     }
-    scenario.tree = lastCompiled.treeHex;
+    // The editor's own contract: send the source (and its parameter
+    // values) so the run's values can be positioned back onto it.
+    scenario.source = editor.getValue();
+    const params = collectParams();
+    if (Object.keys(params).length) scenario.params = params;
+    scenario.network = scenario.network || $("write-network").value;
+    scenario.fromEditor = true;
   }
   evalInFlight = true;
   $("run").disabled = true;
@@ -1763,6 +1800,7 @@ async function runScenario() {
     $("eval-reduced").textContent = body.reducedTo || "—";
     $("eval-error").textContent = body.error || "—";
     $("eval-address").textContent = body.address;
+    markValues(body.values || [], scenario.fromEditor === true);
     const list = $("eval-trace");
     list.textContent = "";
     for (const t of body.trace) {

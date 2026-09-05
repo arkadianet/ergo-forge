@@ -174,6 +174,7 @@ pub fn hunt(tree_bytes: &[u8], opts: &HuntOptions) -> Result<Hunt, SandboxError>
     for &height in &heights {
         for &(shape, out) in &shapes {
             let sc = Scenario {
+                params: Default::default(),
                 headers: Vec::new(),
                 secrets: Vec::new(),
                 parties: Vec::new(),

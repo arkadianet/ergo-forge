@@ -33,6 +33,9 @@ pub struct Scenario {
     /// with `tree`.
     #[serde(default)]
     pub source: Option<String>,
+    /// Values for the `$name` constants of `source` (as a suite's `params`).
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub params: BTreeMap<String, TypedValue>,
     /// Tree version for `source` compilation (default 3: every method is
     /// visible; the header is stamped only when the script needs it).
     #[serde(default = "default_tree_version")]

@@ -314,7 +314,10 @@ Run a scenario — contract plus spending context — on the consensus reducer.
 The body is the scenario JSON itself (the `ergo-es eval` schema in the sandbox
 README): `source` or `tree`, `height`, optional `selfBox` / `inputs` /
 `outputs` / `dataInputs` / `contextVars` / `proof` / `costLimit` / `network`,
-plus `headers` (`CONTEXT.headers`, newest first), `secrets` (the sandbox makes and verifies the spending proof), `parties` (the multi-party flow, no pooled secrets) and
+plus `headers` (`CONTEXT.headers`, newest first), `values` in the answer
+(every evaluated node's value with its preorder `irId`, positioned by
+`offset`/`line`/`col` when the scenario came from `source` and the source
+map aligned — the workbench marks them over the editor), `secrets` (the sandbox makes and verifies the spending proof), `parties` (the multi-party flow, no pooled secrets) and
 `avl` (trees built by a real prover, referenced as `@avl.name…`); see the
 engine README. Both also work per case in `POST /api/v1/test`.
 

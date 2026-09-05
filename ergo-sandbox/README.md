@@ -79,6 +79,13 @@ header. A plain script keeps its v0 header and therefore its address. Synthetic 
 would compute. The self input's extension is the scenario's `contextVars`,
 so `getVarFromInput(selfIndex, i)` answers like `getVar(i)`.
 
+### Values over the source
+
+`EvalOutcome::values` lists every evaluated node's value (`irId` is the
+node's preorder id, the id the compiler's source map speaks; a node inside
+a lambda appears once per call). It comes from the node's `value-trace`
+feature, a debug-only recorder the sandbox arms per reduction.
+
 ### Headers
 
 `"headers": [ {…newest…}, {…} ]` (at most 10) fills `CONTEXT.headers`;
