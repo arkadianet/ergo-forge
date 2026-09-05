@@ -44,6 +44,15 @@ pub enum Verdict {
 
 /// One evaluator trace step (a `val` binding, an `If` condition, or a
 /// sigma-protocol child result).
+/// A value the evaluator computed for one node of the tree, keyed by the
+/// node's preorder id (the id the compiler's source map speaks).
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ValueLine {
+    pub ir_id: u64,
+    pub value: String,
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct TraceLine {
     /// What was evaluated.
@@ -79,6 +88,9 @@ pub struct EvalOutcome {
     pub reduced_to: Option<String>,
     /// Evaluator trace (bindings, branches, sigma children).
     pub trace: Vec<TraceLine>,
+    /// Every evaluated node's value, in evaluation order (a node inside a
+    /// lambda appears once per call).
+    pub values: Vec<ValueLine>,
     /// Per-step cost breakdown (requires the `cost-trace` feature).
     #[cfg(feature = "cost-trace")]
     pub cost_breakdown: Vec<CostLine>,
@@ -117,12 +129,23 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
             })?
         }
         (None, Some(src)) => {
-            compile::compile_source(
-                src,
-                sc.tree_version,
-                network.unwrap_or(NetworkPrefix::Mainnet),
-            )?
-            .tree_bytes
+            if sc.params.is_empty() {
+                compile::compile_source(
+                    src,
+                    sc.tree_version,
+                    network.unwrap_or(NetworkPrefix::Mainnet),
+                )?
+                .tree_bytes
+            } else {
+                compile::compile_with_params(
+                    src,
+                    &sc.params,
+                    sc.tree_version,
+                    network.unwrap_or(NetworkPrefix::Mainnet),
+                )
+                .map_err(|e| SandboxError::Scenario(e.to_string()))?
+                .tree_bytes
+            }
         }
     };
 
@@ -299,8 +322,17 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
     // global recorder.
     #[cfg(feature = "cost-trace")]
     ergo_sigma::cost_trace::enable();
+    ergo_sigma::value_trace::enable(&tree.body);
     let (reduced, entries) =
         reduce_expr_traced_with_cost(&tree.body, &ctx, &tree.constants, &mut cost);
+    let values: Vec<ValueLine> = ergo_sigma::value_trace::take()
+        .unwrap_or_default()
+        .into_iter()
+        .map(|e| ValueLine {
+            ir_id: e.id,
+            value: e.value,
+        })
+        .collect();
     #[cfg(feature = "cost-trace")]
     let cost_breakdown: Vec<CostLine> = ergo_sigma::cost_trace::take()
         .unwrap_or_default()
@@ -323,6 +355,7 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
             .into_iter()
             .map(|TraceEntry { label, value }| TraceLine { label, value })
             .collect(),
+        values,
         #[cfg(feature = "cost-trace")]
         cost_breakdown,
         tree_hex: hex::encode(&tree_bytes),

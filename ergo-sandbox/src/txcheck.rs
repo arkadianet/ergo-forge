@@ -177,6 +177,7 @@ pub fn check(req: &TxRequest) -> Result<TxCheck, SandboxError> {
             }
         }
         let sc = Scenario {
+            params: Default::default(),
             headers: Vec::new(),
             secrets: Vec::new(),
             parties: Vec::new(),

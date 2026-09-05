@@ -11,7 +11,7 @@ publish    = false
 thiserror       = { workspace = true }
 ergo-primitives = { workspace = true }
 ergo-ser        = { workspace = true }
-ergo-sigma      = { workspace = true }
+ergo-sigma      = { workspace = true, features = ["value-trace"] }
 ergo-compiler   = { workspace = true }
 ergo-wallet     = { workspace = true }
 ergo_avltree_rust = { workspace = true }

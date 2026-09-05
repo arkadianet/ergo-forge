@@ -378,7 +378,14 @@ Still missing (the actual build list):
     editor and parameters on the left, a sticky tabbed panel (Result,
     Scenario, Tests, Validate tx) on the right; Read keeps the developer
     panels below.
-18. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
+18. **P4m — values over the source: DONE 2026-09-05.** Node PR #322 adds
+    a `value-trace` feature to the evaluator (every evaluated node's value
+    by preorder id, thread-local, debug-only, one cfg'd line after
+    `eval_expr`); the sandbox arms it per reduction and returns `values`;
+    the eval route positions them through the source map; after a run
+    the editor marks every valued expression — red for false, green for
+    true — with the value as its tooltip, and says how many were false.
+19. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.
    - **A — DONE 2026-08-31** (`compiler/source-positions`, `8479a58`): every

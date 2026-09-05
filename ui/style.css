@@ -391,3 +391,8 @@ body.wide { max-width: 96rem; }
 .play-box.spent { opacity: 0.45; }
 .tx-out { border-top: 1px dashed var(--line); padding-top: 0.5rem; margin-top: 0.5rem; }
 .tx-in { border-top: 1px dashed var(--line); padding-top: 0.5rem; margin-top: 0.5rem; }
+
+/* values over the source after a run */
+.cm-val { border-bottom: 1px dotted var(--dim); cursor: help; }
+.cm-val-true { background: rgba(80, 200, 120, 0.18); border-bottom: 1px solid rgba(80, 200, 120, 0.7); cursor: help; }
+.cm-val-false { background: rgba(230, 80, 80, 0.2); border-bottom: 1px solid rgba(230, 80, 80, 0.8); cursor: help; }

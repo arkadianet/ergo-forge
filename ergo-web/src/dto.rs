@@ -176,6 +176,9 @@ impl HuntResponse {
 #[serde(rename_all = "camelCase")]
 pub struct EvalResponse {
     pub verdict: &'static str,
+    /// Values the run computed, positioned in the source when the scenario
+    /// was compiled from `source` and the source map aligned.
+    pub values: Vec<ValueDto>,
     pub error: Option<String>,
     pub cost: u64,
     pub cost_limit: u64,
@@ -183,6 +186,19 @@ pub struct EvalResponse {
     pub trace: Vec<TraceDto>,
     pub tree_hex: String,
     pub address: String,
+}
+
+#[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ValueDto {
+    pub ir_id: u64,
+    pub value: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub offset: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub line: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub col: Option<u32>,
 }
 
 #[derive(Serialize)]
@@ -206,6 +222,17 @@ impl EvalResponse {
     pub fn from_engine(o: ergo_sandbox::EvalOutcome) -> Self {
         Self {
             verdict: verdict_str(o.verdict),
+            values: o
+                .values
+                .iter()
+                .map(|v| ValueDto {
+                    ir_id: v.ir_id,
+                    value: v.value.clone(),
+                    offset: None,
+                    line: None,
+                    col: None,
+                })
+                .collect(),
             error: o.error,
             cost: o.cost,
             cost_limit: o.cost_limit,
