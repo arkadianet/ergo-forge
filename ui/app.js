@@ -91,9 +91,28 @@ function showSource(source, snippet) {
 
 let currentSource = "";
 
+/// "In plain words": one line per way to spend; code spans for the parts
+/// the recognizer could not word.
+function renderPlain(listId, noteId, paths, complete) {
+  const ul = $(listId);
+  ul.textContent = "";
+  for (const [i, p] of (paths || []).entries()) {
+    const li = document.createElement("li");
+    const parts = String(p).split("`");
+    li.append(document.createTextNode(paths.length > 1 ? `Way ${i + 1}: ` : ""));
+    parts.forEach((t, k) => {
+      if (k % 2 === 1) { const c = document.createElement("code"); c.textContent = t; li.appendChild(c); }
+      else li.appendChild(document.createTextNode(t));
+    });
+    ul.appendChild(li);
+  }
+  $(noteId).hidden = complete !== false;
+}
+
 function render(r) {
   currentSource = r.source;
   showSource(r.source, "");
+  renderPlain("plain", "plain-note", r.plain, r.plainComplete);
   $("tree-hex").textContent = r.treeHex;
   $("address").textContent = r.address;
 
@@ -478,6 +497,7 @@ function renderCompiled(c) {
   $("c-p2s").textContent = c.p2s;
   $("c-p2sh").textContent = c.p2sh;
   $("c-source").textContent = c.source;
+  renderPlain("c-plain", "c-plain-note", c.plain, c.plainComplete);
   const list = $("c-findings");
   list.textContent = "";
   for (const f of c.findings) {
@@ -1673,7 +1693,7 @@ const EVAL_VERDICTS = {
   fail: ["FAIL — not spendable in this context", "ok"],
   error: ["ERROR — the script threw", "warn"],
   needsProof: ["NEEDS PROOF — a signature is required", "ok"],
-  proofAccepted: ["PROOF ACCEPTED", "bad"],
+  proofAccepted: ["PROOF ACCEPTED — the secrets given sign this spend", "ok"],
   proofRejected: ["PROOF REJECTED", "ok"],
 };
 
@@ -1716,6 +1736,7 @@ async function runScenario() {
       return;
     }
     const [label, cls] = EVAL_VERDICTS[body.verdict] || [body.verdict, "neutral"];
+    $("prove").hidden = !(body.verdict === "needsProof" || body.verdict === "proofAccepted" || body.verdict === "proofRejected");
     const v = $("eval-verdict");
     v.textContent = label;
     v.className = `hunt-verdict ${cls}`;
@@ -1741,6 +1762,81 @@ async function runScenario() {
 }
 
 $("run").addEventListener("click", runScenario);
+
+// ── scenario starting points, and "Prove it" ──────────────────────────────
+
+const SNIPPETS = {
+  headers: { headers: [ { height: 199, timestamp: 1700000120000, votes: [0, 0, 0] }, { height: 198, timestamp: 1700000000000 } ] },
+  avl: { avl: { names: { keyLength: 32, entries: [["11".repeat(32), "aa"]], operations: [ { insert: { key: "22".repeat(32), value: "bb" } } ] } },
+         selfBox: { value: 1000000, registers: { R4: { type: "AvlTree", value: "@avl.names" } } },
+         contextVars: { "0": { type: "Coll[Byte]", value: "@avl.names.proof" } } },
+  secrets: { secrets: [ { dlog: "0000000000000000000000000000000000000000000000000000000000000001" } ] },
+  parties: { parties: [ { name: "alice", secrets: [ { dlog: "0000000000000000000000000000000000000000000000000000000000000001" } ] },
+                        { name: "bob", secrets: [ { dlog: "0000000000000000000000000000000000000000000000000000000000000002" } ] } ] },
+  boxes: { selfBox: { value: 1000000000, tokens: [], registers: {} }, outputs: [ { value: 900000000, ergoTree: "$self" } ], dataInputs: [] },
+};
+for (const b of document.querySelectorAll(".snip")) {
+  b.addEventListener("click", () => {
+    let sc = {};
+    try { sc = JSON.parse($("scenario").value || "{}"); } catch (e) { sc = {}; }
+    for (const [k, v] of Object.entries(SNIPPETS[b.dataset.snip])) if (sc[k] == null) sc[k] = v;
+    $("scenario").value = JSON.stringify(sc, null, 2);
+  });
+}
+
+function addProveRow(kind) {
+  const row = document.createElement("div");
+  row.className = "prove-row";
+  row.dataset.kind = kind;
+  if (kind === "dlog") {
+    row.innerHTML = `<span>key secret</span><input class="p-secret" placeholder="32-byte hex secret x, for proveDlog(g^x)" spellcheck="false"><span class="derived"></span>`;
+    const inp = row.querySelector(".p-secret");
+    inp.addEventListener("change", async () => {
+      const d = row.querySelector(".derived");
+      try {
+        const res = await fetch("/api/v1/point", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ secret: inp.value.trim() }) });
+        const body = await res.json();
+        d.textContent = res.ok ? `key ${body.point.slice(0, 10)}…` : (body.error && body.error.message) || "?";
+      } catch (e) { d.textContent = ""; }
+    });
+  } else {
+    row.innerHTML = `<span>DH secret</span><input class="p-secret" placeholder="x, for proveDHTuple(g, h, g^x, h^x)" spellcheck="false"><input class="p-h" placeholder="h (33-byte hex)" spellcheck="false">`;
+  }
+  const rm = document.createElement("button"); rm.type = "button"; rm.className = "secondary tiny"; rm.textContent = "remove";
+  rm.addEventListener("click", () => row.remove());
+  row.appendChild(rm);
+  $("prove-rows").appendChild(row);
+}
+$("prove-add-dlog").addEventListener("click", () => addProveRow("dlog"));
+$("prove-add-dht").addEventListener("click", () => addProveRow("dht"));
+
+/// Merge the secrets into the scenario and run it again.
+$("prove-run").addEventListener("click", async () => {
+  const status = $("prove-status");
+  const rows = [...$("prove-rows").children];
+  const specs = [];
+  let gen = null;
+  for (const row of rows) {
+    const x = row.querySelector(".p-secret").value.trim();
+    if (!/^[0-9a-fA-F]{64}$/.test(x)) { status.textContent = "A secret is 64 hex characters."; status.hidden = false; return; }
+    if (row.dataset.kind === "dlog") specs.push({ dlog: x });
+    else {
+      const h = row.querySelector(".p-h").value.trim();
+      if (!/^[0-9a-fA-F]{66}$/.test(h)) { status.textContent = "A base point is 66 hex characters."; status.hidden = false; return; }
+      if (!gen) { const r = await (await fetch("/api/v1/point", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ secret: "0".repeat(63) + "1" }) })).json(); gen = r.generator; }
+      specs.push({ dht: { g: gen, h, x } });
+    }
+  }
+  if (!specs.length) { status.textContent = "Add at least one secret."; status.hidden = false; return; }
+  let sc = {};
+  try { sc = JSON.parse($("scenario").value || "{}"); } catch (e) { sc = {}; }
+  delete sc.secrets; delete sc.parties;
+  if ($("prove-parties").checked) sc.parties = specs.map((s, i) => ({ name: `party ${i + 1}`, secrets: [s] }));
+  else sc.secrets = specs;
+  $("scenario").value = JSON.stringify(sc, null, 2);
+  status.hidden = true;
+  await runScenario();
+});
 
 // ── chain lookups (only when the instance is configured with an explorer) ──
 

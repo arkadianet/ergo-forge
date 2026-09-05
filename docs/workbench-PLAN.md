@@ -355,7 +355,15 @@ Still missing (the actual build list):
     6.0.2's GraphBuilding does; a prefix `!`/`-` binds to the atom before
     suffixes (`!f(x).y` is `(!f)(x).y`), as Scala's SigmaParser does, so
     `!(x.isDefined)` needs its parentheses in both.
-16. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
+16. **P4k — the proof tooling in front of people: DONE 2026-09-05.**
+    `recognize::plain` words a lifted contract (every recipe completely;
+    unknown clauses quoted, never paraphrased) and Read/Write show "In
+    plain words". The Scenario panel gained starting points (headers,
+    AVL+ tree, secrets, parties, boxes) and a "Prove it" box: secrets in,
+    proof made by the node's prover, verified, `proofAccepted` out — with
+    "separate parties" running the multi-party flow. `POST /api/v1/point`
+    derives public points for test keys.
+17. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.
    - **A — DONE 2026-08-31** (`compiler/source-positions`, `8479a58`): every

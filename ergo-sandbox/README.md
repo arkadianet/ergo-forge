@@ -58,6 +58,15 @@ A register (or context variable) value may be given as the serialized
 constant a node or explorer reports — `{"type": "raw", "value": "040a"}` —
 type descriptor first. This is how a real box reaches a scenario untouched.
 
+### In plain words
+
+`recognize::plain(&lifted)` puts a lifted contract back into the
+composer's language: one sentence per way to spend — who, then the
+conditions — for keys, thresholds, heights, block times, outputs and
+their scripts, values, tokens and registers, data inputs, attached
+variables and revealed secrets, the miner. A clause it does not know is
+quoted as code and `complete` is false; nothing is paraphrased.
+
 ### Tree version, box bytes
 
 A script that uses a v6 method gets the requested `treeVersion` (CLI

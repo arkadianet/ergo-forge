@@ -53,6 +53,7 @@ pub mod hunt;
 pub mod inspect;
 pub mod method_names;
 pub mod prove;
+pub mod recognize;
 pub mod rent;
 pub mod scenario;
 pub mod testsuite;
