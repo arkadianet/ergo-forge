@@ -24,7 +24,7 @@ async function read() {
   }
 
   inFlight = true;
-  $("read").disabled = true;
+  $("read-go").disabled = true;
   status.textContent = "Reading contract…";
   status.hidden = false;
   banner.hidden = true;
@@ -48,7 +48,7 @@ async function read() {
     status.textContent = `Request failed: ${e}`;
   } finally {
     inFlight = false;
-    $("read").disabled = false;
+    $("read-go").disabled = false;
   }
 }
 
@@ -1769,12 +1769,12 @@ $("export-tests").addEventListener("click", async () => {
 // ── scenario eval ────────────────────────────────────────────────────────
 
 const EVAL_VERDICTS = {
-  pass: ["PASS — spendable in this context", "bad"],
-  fail: ["FAIL — not spendable in this context", "ok"],
-  error: ["ERROR — the script threw", "warn"],
-  needsProof: ["NEEDS PROOF — a signature is required", "ok"],
+  pass: ["PASS — spendable in this context", "ok"],
+  fail: ["FAIL — not spendable in this context", "warn"],
+  error: ["ERROR — the script threw", "bad"],
+  needsProof: ["NEEDS PROOF — a signature is required", "neutral"],
   proofAccepted: ["PROOF ACCEPTED — the secrets given sign this spend", "ok"],
-  proofRejected: ["PROOF REJECTED", "ok"],
+  proofRejected: ["PROOF REJECTED", "bad"],
 };
 
 let evalInFlight = false;
@@ -1998,7 +1998,7 @@ $("examples").addEventListener("change", (e) => {
   e.target.value = "";
   read();
 });
-$("read").addEventListener("click", read);
+$("read-go").addEventListener("click", read);
 $("input").addEventListener("keydown", (e) => {
   if (e.key === "Enter") read();
 });
@@ -2083,7 +2083,8 @@ async function fundBox(treeHex, nano, tokens, registers, note) {
 }
 
 $("play-fund-toggle").addEventListener("click", () => { $("play-fund").hidden = !$("play-fund").hidden; });
-function resetPlay() { play = { height: 1000, boxes: [], history: [], words: {} }; selectedBoxes.clear(); txOutputs = null; $("tx-result").hidden = true; $("tx-status").hidden = true; savePlay(); renderPlay(); }
+function playStartHeight() { try { return chainHeight != null ? heightNow() : 1000; } catch (e) { return 1000; } }
+function resetPlay() { play = { height: playStartHeight(), boxes: [], history: [], words: {} }; selectedBoxes.clear(); txOutputs = null; $("tx-result").hidden = true; $("tx-status").hidden = true; savePlay(); renderPlay(); }
 $("play-reset").addEventListener("click", resetPlay);
 for (const b of document.querySelectorAll("[data-advance]")) b.addEventListener("click", () => { play.height += Number(b.dataset.advance); savePlay(); renderPlay(); });
 $("fund-go").addEventListener("click", async () => {
@@ -2273,13 +2274,19 @@ async function sendTx(secretLines, dest) {
 const TOURS = {
   lock: [
     { text: "Build mode: pick what the contract should do. We'll lock savings until a date, then spend them in a sandbox.", at: "#recipes", do: async () => { setMode("build"); buildStep(1); } },
-    { text: "The recipe asks plain questions. We fill them with a test key we hold the secret for, and block 2000 as the unlock date.", at: "#wizard-fields",
-      do: async () => { clickRecipe("Lock savings"); await sleep(600); $("f-owner").value = await addressOfKey(TEST_SECRET(1)); $("f-unlockHeight").value = "2000"; } },
+    { text: "The recipe asks plain questions. We fill them with a test key we hold the secret for, and an unlock date a week away.", at: "#wizard-fields",
+      do: async () => {
+        clickRecipe("Lock savings"); await sleep(600);
+        $("f-owner").value = await addressOfKey(TEST_SECRET(1));
+        const f = $("f-unlockHeight");
+        if (f.type === "datetime-local") { const d = new Date(Date.now() + 7 * 86400e3); const pad = (n) => String(n).padStart(2, "0"); f.value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T12:00`; }
+        else f.value = String(playStartHeight() + 5000);
+      } },
     { text: "Create it. You get an address, the contract in plain words, and what the checks found — all from the same code the network runs.", at: "#build-step-3",
-      do: async () => { $("build-create").click(); await sleep(3500); } },
+      do: async () => { $("build-create").click(); await sleep(3500); if ($("build-step-3").hidden) throw new Error(`the contract was not created: ${$("build-status").textContent}`); } },
     { text: "Play with it: a sandbox box is funded under your contract. The card reads the contract in words. Nothing here touches the real chain.", at: "#play-boxes",
       do: async () => { resetPlay(); $("build-play").click(); await sleep(2500); } },
-    { text: "Select the box and try to spend it now, at height 1000, signed with the owner's secret. The rules refuse it: it is before block 2000.", at: "#tx-result",
+    { text: "Select the box and try to spend it now, signed with the owner's secret. The rules refuse it: the unlock date has not come.", at: "#tx-result",
       do: async () => { await selectFirstUnspent(); await sendTx([TEST_SECRET(1)], "anyone"); } },
     { text: "Move the clock forward a month and send again. Accepted: the box is spent and a new one appears. That is the whole life of a contract, checked by the real rules.", at: "#play-boxes",
       do: async () => { document.querySelector('[data-advance="21600"]').click(); await sleep(600); await sendTx([TEST_SECRET(1)], "anyone"); } },
