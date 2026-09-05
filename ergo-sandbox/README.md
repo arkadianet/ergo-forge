@@ -60,10 +60,11 @@ type descriptor first. This is how a real box reaches a scenario untouched.
 
 ### Tree version, box bytes
 
-`treeVersion` (CLI `--tree-version`, suites' `treeVersion`, default 3)
-is stamped on the tree header — the compiler alone leaves it at 0, for
-parity with the Scala node's compile route, and the evaluator refuses v6
-methods on a v0 header. Synthetic boxes are serialized like real ones
+A script that uses a v6 method gets the requested `treeVersion` (CLI
+`--tree-version`, suites' `treeVersion`, default 3) stamped on its tree
+header — the compiler alone leaves it at 0, for parity with the Scala
+node's compile route, and the evaluator refuses v6 methods on a v0
+header. A plain script keeps its v0 header and therefore its address. Synthetic boxes are serialized like real ones
 (zero transaction id, index 0), so `bytes`, `bytesWithoutRef` and `id`
 (`blake2b256(bytes)` unless the scenario names an id) are what the chain
 would compute. The self input's extension is the scenario's `contextVars`,

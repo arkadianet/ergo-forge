@@ -23,9 +23,22 @@ fn every_method_evaluates_as_expected() {
         .unwrap();
         match testsuite::run(&suite) {
             Ok(r) if r.failed == 0 => {}
-            Ok(r) => failures.push(format!("{}: {:?}", c["name"], r.cases[0].error.clone().unwrap_or_else(|| r.cases[0].actual.to_string()))),
+            Ok(r) => failures.push(format!(
+                "{}: {:?}",
+                c["name"],
+                r.cases[0]
+                    .error
+                    .clone()
+                    .unwrap_or_else(|| r.cases[0].actual.to_string())
+            )),
             Err(e) => failures.push(format!("{}: {e}", c["name"])),
         }
     }
-    assert!(failures.is_empty(), "{} of {} cases:\n{}", failures.len(), cases.len(), failures.join("\n"));
+    assert!(
+        failures.is_empty(),
+        "{} of {} cases:\n{}",
+        failures.len(),
+        cases.len(),
+        failures.join("\n")
+    );
 }

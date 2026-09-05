@@ -83,19 +83,24 @@ fn compile_env(
     ))
 }
 
-/// Put the requested version on the tree header. The compiler leaves the
-/// header at version 0 on purpose (parity with the Scala node's compile
-/// route, which never forwards `treeVersion` into the header); wallets and
-/// appkit stamp the header themselves, and the evaluator refuses v6 methods
-/// on a v0 header — so a `treeVersion` of 3 here means a v3 tree, as it
-/// would on chain. Versions above 0 carry the size flag, as the format
-/// requires. The P2SH address hashes the proposition and is unchanged.
+/// Put the requested version on the tree header when the tree needs it.
+/// The compiler leaves the header at version 0 on purpose (parity with the
+/// Scala node's compile route, which never forwards `treeVersion` into the
+/// header); wallets stamp the header themselves. A plain script keeps v0
+/// — that is what mainnet trees look like and what its address has always
+/// been — but a script that uses a v6 method would fail the node's own
+/// method-resolution gate under a v0 header, so it gets the requested
+/// version (3 or above) with the size flag the format requires. The P2SH
+/// address hashes the proposition and is unchanged either way.
 pub(crate) fn stamp_version(
     mut out: CompileOutput,
     tree_version: u8,
     network: NetworkPrefix,
 ) -> CompileOutput {
-    if tree_version == 0 || out.ergo_tree.version == tree_version {
+    if tree_version < 3
+        || out.ergo_tree.version == tree_version
+        || ergo_ser::opcode::find_unresolved_v5_method(&out.ergo_tree.body).is_none()
+    {
         return out;
     }
     out.ergo_tree.version = tree_version;

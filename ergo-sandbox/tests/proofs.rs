@@ -305,9 +305,23 @@ fn a_requested_tree_version_is_on_the_header_and_unlocks_v6_methods() {
     )
     .unwrap();
     assert_eq!(
-        v0.tree_bytes[0] & 0x0f,
-        0x00 | (v0.tree_bytes[0] & 0x10 == 0x10) as u8 * 0,
+        v0.tree_bytes[0] & 0x07,
+        0,
         "v0 header untouched: {:02x}",
         v0.tree_bytes[0]
+    );
+    // A plain script keeps its v0 header even when version 3 is requested:
+    // that is what mainnet trees look like, and what its address has been.
+    let plain = ergo_sandbox::compile_source(
+        "sigmaProp(HEIGHT > 1)",
+        3,
+        ergo_ser::address::NetworkPrefix::Mainnet,
+    )
+    .unwrap();
+    assert_eq!(
+        plain.tree_bytes[0] & 0x07,
+        0,
+        "plain script header: {:02x}",
+        plain.tree_bytes[0]
     );
 }
