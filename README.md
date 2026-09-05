@@ -51,7 +51,7 @@ cargo run -p ergo-sandbox --features cost-trace --bin ergo-es -- eval scenario.j
 cargo run -p ergo-web --bin ergo-web        # http://127.0.0.1:8080 — the playground
 EXPLORER_URL=https://api.ergoplatform.com RATE_LIMIT_PER_MINUTE=60 \
   cargo run -p ergo-web --bin ergo-web      # with chain lookups, for a public instance
-docker run --rm -p 127.0.0.1:8080:8080 ghcr.io/arkadianet/ergo-web:0.2.0
+docker run --rm -p 127.0.0.1:8080:8080 ghcr.io/arkadianet/ergo-web:0.3.0
 ```
 
 Without `EXPLORER_URL` the service makes no outbound calls at all. With it,
@@ -101,7 +101,7 @@ table to the job summary:
 - uses: arkadianet/ergo-forge/.github/actions/test@main
   with:
     suites: "contracts/**/contract.test.json"   # default: **/contract.test.json
-    version: latest                             # or a tag, e.g. v0.2.0; 'source' builds from an ergo-forge checkout
+    version: latest                             # or a tag, e.g. v0.3.0; 'source' builds from an ergo-forge checkout
 ```
 
 Prebuilt `ergo-es` binaries (Linux x86_64/aarch64, macOS arm64) are attached
