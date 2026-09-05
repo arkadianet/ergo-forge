@@ -126,3 +126,15 @@ fn unknown_shapes_are_quoted_not_invented() {
         p.paths
     );
 }
+
+#[test]
+fn a_raw_public_key_is_shortened_like_an_address() {
+    let p = words("proveDlog(decodePoint(fromBase16(\"0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798\"))) && sigmaProp(HEIGHT > 100)");
+    assert_eq!(
+        p.paths,
+        vec!["the key 0279be66…1798, if after block 100"],
+        "{:?}",
+        p.paths
+    );
+    assert!(p.complete);
+}

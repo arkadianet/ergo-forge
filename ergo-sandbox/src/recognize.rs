@@ -359,7 +359,7 @@ impl<'a> Cx<'a> {
                 }
             }
             // tokens(i)._1 / ._2
-            if (f == "_1" || f == "_2") && op == "==" || f == "_2" {
+            if f == "_2" || (f == "_1" && op == "==") {
                 if let ApplyFn(tok, idx) = &self.resolve(bx).kind {
                     if let Method(bx2, m, _) = &self.resolve(tok).kind {
                         if m == "tokens" && idx.len() == 1 {
@@ -650,6 +650,12 @@ fn key_name(c: &str) -> String {
 }
 
 fn const_name(c: &str) -> String {
+    if let Some(inner) = c
+        .strip_prefix("decodePoint(")
+        .and_then(|s| s.strip_suffix(')'))
+    {
+        return const_name(inner);
+    }
     if let Some(hex) = c
         .strip_prefix("fromBase16(\"")
         .and_then(|s| s.strip_suffix("\")"))
