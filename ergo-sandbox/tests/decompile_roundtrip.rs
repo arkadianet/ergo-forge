@@ -56,7 +56,7 @@ fn recompile(src: &str, tv: u8, net: NetworkPrefix) -> Result<Vec<u8>, String> {
     // source needs the same stack headroom the decompiler needs.
     let owned = src.to_string();
     decompile::with_large_stack(move || {
-        compile_source(&owned, tv, net)
+        ergo_sandbox::compile_source_raw(&owned, tv, net)
             .map(|o| o.tree_bytes)
             .map_err(|e| e.to_string())
     })

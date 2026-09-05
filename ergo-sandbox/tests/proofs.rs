@@ -259,3 +259,69 @@ fn a_ceremony_has_a_bounded_number_of_parties() {
         r.1
     );
 }
+
+#[test]
+fn a_synthetic_box_has_real_bytes_and_its_id_is_their_hash() {
+    let src = "sigmaProp(blake2b256(SELF.bytes) == SELF.id && SELF.bytes.size == SELF.bytesWithoutRef.size + 33 && blake2b256(OUTPUTS(0).bytes) == OUTPUTS(0).id)";
+    let r = run(
+        src,
+        serde_json::json!({}),
+        serde_json::json!({ "height": 1,
+        "selfBox": { "value": 5, "tokens": [ { "id": "aa".repeat(32), "amount": 7 } ], "registers": { "R4": { "type": "Int", "value": 42 } } },
+        "outputs": [ { "value": 1, "ergoTree": "10010101d17300" } ] }),
+    );
+    assert_eq!(r.0, "pass", "{:?}", r.1);
+    // A supplied id still wins (scenarios may name a real box).
+    let r = run("sigmaProp(SELF.id == fromBase16(\"1111111111111111111111111111111111111111111111111111111111111111\"))", serde_json::json!({}),
+        serde_json::json!({ "height": 1, "selfBox": { "value": 5, "boxId": "11".repeat(32) } }));
+    assert_eq!(r.0, "pass", "{:?}", r.1);
+}
+
+#[test]
+fn a_requested_tree_version_is_on_the_header_and_unlocks_v6_methods() {
+    let out = ergo_sandbox::compile_source(
+        "sigmaProp(Coll(1, 2, 3).reverse == Coll(3, 2, 1))",
+        3,
+        ergo_ser::address::NetworkPrefix::Mainnet,
+    )
+    .unwrap();
+    assert_eq!(
+        out.tree_bytes[0] & 0x07,
+        3,
+        "header {:02x}",
+        out.tree_bytes[0]
+    );
+    assert_ne!(out.tree_bytes[0] & 0x08, 0, "v1+ trees carry the size flag");
+    let r = run(
+        "sigmaProp(Coll(1, 2, 3).reverse == Coll(3, 2, 1))",
+        serde_json::json!({}),
+        serde_json::json!({ "height": 1 }),
+    );
+    assert_eq!(r.0, "pass", "{:?}", r.1);
+    let v0 = ergo_sandbox::compile_source(
+        "sigmaProp(HEIGHT > 1)",
+        0,
+        ergo_ser::address::NetworkPrefix::Mainnet,
+    )
+    .unwrap();
+    assert_eq!(
+        v0.tree_bytes[0] & 0x07,
+        0,
+        "v0 header untouched: {:02x}",
+        v0.tree_bytes[0]
+    );
+    // A plain script keeps its v0 header even when version 3 is requested:
+    // that is what mainnet trees look like, and what its address has been.
+    let plain = ergo_sandbox::compile_source(
+        "sigmaProp(HEIGHT > 1)",
+        3,
+        ergo_ser::address::NetworkPrefix::Mainnet,
+    )
+    .unwrap();
+    assert_eq!(
+        plain.tree_bytes[0] & 0x07,
+        0,
+        "plain script header: {:02x}",
+        plain.tree_bytes[0]
+    );
+}

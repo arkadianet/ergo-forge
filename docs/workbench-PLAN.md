@@ -341,7 +341,21 @@ Still missing (the actual build list):
     that fix pinned, `parties` in a scenario runs the whole flow —
     commitments, partial proof, extraction, completion — with no pooled
     secrets, verified on the consensus path.
-15. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
+15. **P4j — the method sweep: DONE 2026-09-05.** `examples/tests/gen/
+    methods.py` generates one case per method of every ErgoScript type
+    (box, context, header, pre-header, global, AVL tree, group element,
+    sigma prop, option, collection, numerics; 200 cases over tree versions
+    2 and 3) with expectations computed independently;
+    `tests/method_sweep.rs` runs them in CI. First run: node — `SizeOf`
+    over `Coll[Header]` missing (#303), source map asserting on constant
+    collections collapsed by segregation (#321); forge — synthetic boxes
+    had empty `bytes` and zero ids, the compiler's v0 header blocked every
+    v6 method, `getVarFromInput` saw no extension on SELF. Deliberate
+    parity, not findings: the compiler refuses bitwise operators as Scala
+    6.0.2's GraphBuilding does; a prefix `!`/`-` binds to the atom before
+    suffixes (`!f(x).y` is `(!f)(x).y`), as Scala's SigmaParser does, so
+    `!(x.isDefined)` needs its parentheses in both.
+16. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.
    - **A — DONE 2026-08-31** (`compiler/source-positions`, `8479a58`): every

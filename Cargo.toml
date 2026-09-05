@@ -11,14 +11,14 @@ repository = "https://github.com/arkadianet/ergo-forge"
 [workspace.dependencies]
 # Engine crates — consumed from the Rust Ergo node (arkadianet/ergo).
 # Pinned to a main rev for reproducible builds; bump deliberately.
-ergo-primitives = { git = "https://github.com/arkadianet/ergo", rev = "8e2eb13db7c67f0ab2d640e94b0e52b8c051a938" }
-ergo-ser        = { git = "https://github.com/arkadianet/ergo", rev = "8e2eb13db7c67f0ab2d640e94b0e52b8c051a938" }
-ergo-sigma      = { git = "https://github.com/arkadianet/ergo", rev = "8e2eb13db7c67f0ab2d640e94b0e52b8c051a938" }
-ergo-compiler   = { git = "https://github.com/arkadianet/ergo", rev = "8e2eb13db7c67f0ab2d640e94b0e52b8c051a938" }
+ergo-primitives = { git = "https://github.com/arkadianet/ergo", rev = "ab70f436306b709bcebfc7b1b0776cd1d1321724" }
+ergo-ser        = { git = "https://github.com/arkadianet/ergo", rev = "ab70f436306b709bcebfc7b1b0776cd1d1321724" }
+ergo-sigma      = { git = "https://github.com/arkadianet/ergo", rev = "ab70f436306b709bcebfc7b1b0776cd1d1321724" }
+ergo-compiler   = { git = "https://github.com/arkadianet/ergo", rev = "ab70f436306b709bcebfc7b1b0776cd1d1321724" }
 # The node's wallet prover (Schnorr / DH-tuple / AND / OR / threshold) and
 # the AVL+ crate whose verifier the node's evaluator uses — so the sandbox
 # can PRODUCE the proofs a spender attaches, not only check them.
-ergo-wallet     = { git = "https://github.com/arkadianet/ergo", rev = "8e2eb13db7c67f0ab2d640e94b0e52b8c051a938" }
+ergo-wallet     = { git = "https://github.com/arkadianet/ergo", rev = "ab70f436306b709bcebfc7b1b0776cd1d1321724" }
 ergo_avltree_rust = "0.1.1"
 k256       = { version = "0.13", features = ["arithmetic"] }
 zeroize    = "1"

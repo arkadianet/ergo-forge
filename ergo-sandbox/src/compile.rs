@@ -51,6 +51,29 @@ pub struct CompileOutput {
 /// Compile ErgoScript source into tree bytes + addresses, empty environment.
 ///
 /// `network` affects only the address encodings, not the tree bytes.
+/// Compile exactly as the node's compiler does, header untouched
+/// (version 0 whatever `tree_version` says): the decompile round-trip
+/// needs byte parity with trees whose header does not announce the
+/// methods they use.
+pub fn compile_source_raw(
+    source: &str,
+    tree_version: u8,
+    network: NetworkPrefix,
+) -> Result<CompileOutput, CompileError> {
+    let CompileResult {
+        tree_bytes,
+        ergo_tree,
+        p2s_address,
+        p2sh_address,
+    } = ergo_compiler::compile(&ScriptEnv::new(), source, tree_version, network)?;
+    Ok(CompileOutput {
+        tree_bytes,
+        ergo_tree,
+        p2s_address,
+        p2sh_address,
+    })
+}
+
 pub fn compile_source(
     source: &str,
     tree_version: u8,
@@ -71,12 +94,46 @@ fn compile_env(
         p2s_address,
         p2sh_address,
     } = ergo_compiler::compile(env, source, tree_version, network)?;
-    Ok(CompileOutput {
-        tree_bytes,
-        ergo_tree,
-        p2s_address,
-        p2sh_address,
-    })
+    Ok(stamp_version(
+        CompileOutput {
+            tree_bytes,
+            ergo_tree,
+            p2s_address,
+            p2sh_address,
+        },
+        tree_version,
+        network,
+    ))
+}
+
+/// Put the requested version on the tree header when the tree needs it.
+/// The compiler leaves the header at version 0 on purpose (parity with the
+/// Scala node's compile route, which never forwards `treeVersion` into the
+/// header); wallets stamp the header themselves. A plain script keeps v0
+/// — that is what mainnet trees look like and what its address has always
+/// been — but a script that uses a v6 method would fail the node's own
+/// method-resolution gate under a v0 header, so it gets the requested
+/// version (3 or above) with the size flag the format requires. The P2SH
+/// address hashes the proposition and is unchanged either way.
+pub(crate) fn stamp_version(
+    mut out: CompileOutput,
+    tree_version: u8,
+    network: NetworkPrefix,
+) -> CompileOutput {
+    if tree_version < 3
+        || out.ergo_tree.version == tree_version
+        || ergo_ser::opcode::find_unresolved_v5_method(&out.ergo_tree.body).is_none()
+    {
+        return out;
+    }
+    out.ergo_tree.version = tree_version;
+    out.ergo_tree.has_size = true;
+    let mut w = ergo_primitives::writer::VlqWriter::new();
+    if ergo_ser::ergo_tree::write_ergo_tree(&mut w, &out.ergo_tree).is_ok() {
+        out.tree_bytes = w.result();
+        out.p2s_address = encode_p2s(network, &out.tree_bytes);
+    }
+    out
 }
 
 /// Why a parameterised compile failed.
@@ -182,12 +239,16 @@ pub fn compile_with_params_and_map(
                 p2sh_address,
             } = result;
             Ok((
-                CompileOutput {
-                    tree_bytes,
-                    ergo_tree,
-                    p2s_address,
-                    p2sh_address,
-                },
+                stamp_version(
+                    CompileOutput {
+                        tree_bytes,
+                        ergo_tree,
+                        p2s_address,
+                        p2sh_address,
+                    },
+                    tree_version,
+                    network,
+                ),
                 Some(map),
             ))
         }
