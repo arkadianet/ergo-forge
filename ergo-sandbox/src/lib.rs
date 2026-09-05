@@ -52,6 +52,7 @@ pub mod hot_spots;
 pub mod hunt;
 pub mod inspect;
 pub mod method_names;
+pub mod play;
 pub mod prove;
 pub mod recognize;
 pub mod rent;

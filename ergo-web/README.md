@@ -270,6 +270,20 @@ path that anyone may take with no conditions, an empty box rule, and a
 path whose conditions contradict each other (no single transaction can
 meet them) are refused with a message.
 
+### `POST /api/v1/play`
+
+`{height, boxes, tx: {inputs: [{boxId, contextVars?, secrets?, parties?}],
+dataInputs?: [boxId], outputs: [box]}, network?}` →
+`{ok, txId, inputs: [{boxId, verdict, reducedTo?, error?, cost}], outputs,
+problems, ergIn, ergOut}`. The one operation of a sandbox chain, stateless:
+`boxes` are the unspent boxes (each with its `boxId`); every input's script
+is evaluated with `selfIndex`, all inputs, the outputs, the data inputs and
+that input's own context variables and secrets; ERG and tokens must balance
+(one new token named after the first input may be minted); `outputs` come
+back with `boxId` and `creationHeight` set, ready to be the next `boxes`.
+`ok` is true only when every input passed (or its proof was accepted) and
+nothing is unbalanced; nothing is applied server-side.
+
 ### `POST /api/v1/point`
 
 `{secret, base?}` → `{point, generator}`: the public point of a 32-byte

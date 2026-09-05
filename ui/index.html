@@ -11,8 +11,8 @@
   <header>
     <h1>ErgoScript playground</h1>
     <p><strong>Build</strong> a contract by answering a few questions,
-       <strong>Write</strong> one in ErgoScript, or <strong>Read</strong> what
-       an address on the Ergo blockchain actually does. Everything is checked
+       <strong>Write</strong> one in ErgoScript, <strong>Read</strong> what
+       an address on the Ergo blockchain actually does, or <strong>Play</strong> with contracts on a sandbox chain. Everything is checked
        with the same code the Ergo network itself uses.</p>
   </header>
 
@@ -21,6 +21,7 @@
       <button id="mode-build" class="mode" role="tab" aria-selected="false">Build</button>
       <button id="mode-write" class="mode active" role="tab" aria-selected="true">Write</button>
       <button id="mode-read" class="mode" role="tab" aria-selected="false">Read</button>
+      <button id="mode-play" class="mode" role="tab" aria-selected="false">Play</button>
     </nav>
 
     <section id="build" class="pane" hidden>
@@ -104,6 +105,7 @@
           <li>Keep the link to this page (button above): it remembers your answers, and you will want them when you spend.</li>
           <li>To spend later, use a wallet that can spend from contracts (or the Write mode here) with the same answers.</li>
         </ol>
+        <p><button id="build-play" type="button">Play with it — fund a sandbox box and try to spend it</button></p>
         <details class="dev">
           <summary>Details for developers</summary>
           <dl class="wire">
@@ -120,7 +122,8 @@
       </div>
     </section>
 
-    <section id="write" class="pane">
+    <section id="write" class="pane write-grid">
+    <div id="write-left">
       <div class="write-row">
         <select id="example-pick" aria-label="examples">
           <option value="">examples…</option>
@@ -148,7 +151,16 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
            substituted textually inside string literals.</p>
         <table class="params"><tbody id="params-rows"></tbody></table>
       </div>
-
+    </div>
+    <div id="write-right">
+      <nav class="rtabs" role="tablist">
+        <button class="rtab active" data-tab="result" type="button">Result</button>
+        <button class="rtab" data-tab="scenario" type="button">Scenario</button>
+        <button class="rtab" data-tab="tests" type="button">Tests</button>
+        <button class="rtab" data-tab="validate" type="button">Validate tx</button>
+      </nav>
+      <div class="rpanel" data-panel="result">
+      <p id="compiled-empty" class="hint">Compile to see the address, the contract in plain words, findings and spendability here.</p>
       <div id="compiled" hidden>
         <h2>Compiled</h2>
         <dl class="wire">
@@ -175,8 +187,50 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
         <p id="c-positioned" class="hint" hidden>Findings could not be positioned in the source for this compile (templates, or a tree the source map did not align with); the snippets still identify them.</p>
         <h2>Spendability</h2>
         <p id="c-hunt" class="hunt-verdict"></p>
-        <p class="hint">Six probes with no key. Use the Scenario panel below for a specific context.</p>
+        <p class="hint">Six probes with no key. Use the Scenario tab for a specific context, or Play to spend it for real in a sandbox.</p>
       </div>
+      </div>
+      <div id="dev-slot"></div>
+    </div>
+    </section>
+
+    <section id="play" class="pane" hidden>
+      <p class="hint">A sandbox chain in your browser: fund boxes under any contract, build transactions that spend them, and watch what the real rules do. Nothing leaves this page except the check; the boxes are saved in this browser.</p>
+      <div class="play-bar">
+        <span>Height <strong id="play-height">1000</strong></span>
+        <button type="button" class="secondary tiny" data-advance="1">+1 block</button>
+        <button type="button" class="secondary tiny" data-advance="720">+1 day</button>
+        <button type="button" class="secondary tiny" data-advance="21600">+30 days</button>
+        <button type="button" class="secondary tiny" id="play-fund-toggle">+ Fund a box</button>
+        <button type="button" class="secondary tiny" id="play-reset">Reset chain</button>
+      </div>
+      <div id="play-fund" class="play-form" hidden>
+        <h3>Fund a box</h3>
+        <div class="field"><label>Contract: an address, a tree hex, or "compiled" for the editor's last compile</label><input id="fund-contract" placeholder="9f… / 1001… / compiled" spellcheck="false"></div>
+        <div class="field"><label>ERG</label><input id="fund-erg" type="number" step="0.000000001" value="1"></div>
+        <div class="field"><label>Tokens (optional): one per line, <code>tokenId amount</code>; use <code>new</code> as the id to mint a fresh token</label><textarea id="fund-tokens" rows="2" spellcheck="false"></textarea></div>
+        <div class="field"><label>Registers (optional JSON): <code>{"R4": {"type": "Int", "value": 5}}</code></label><textarea id="fund-regs" rows="2" spellcheck="false">{}</textarea></div>
+        <button type="button" id="fund-go">Fund</button>
+        <p id="fund-status" class="status" hidden></p>
+      </div>
+      <h3>Unspent boxes</h3>
+      <div id="play-boxes" class="play-boxes"></div>
+      <p id="play-empty" class="hint">No boxes yet. Fund one above, or build a contract and press "Play with it".</p>
+      <div id="play-tx" class="play-form" hidden>
+        <h3>Spend the selected boxes</h3>
+        <div id="tx-inputs"></div>
+        <div class="field"><label>Data inputs (read-only boxes the scripts may look at)</label><div id="tx-data-inputs"></div></div>
+        <div class="field"><label>Outputs</label><div id="tx-outputs"></div>
+          <button type="button" class="secondary tiny" id="tx-add-output">+ output</button>
+          <button type="button" class="secondary tiny" id="tx-balance">balance ERG into the last output</button></div>
+        <button type="button" id="tx-send">Send</button>
+        <p id="tx-status" class="status" hidden></p>
+        <div id="tx-result" hidden>
+          <table class="probes"><tbody id="tx-result-rows"></tbody></table>
+          <ul id="tx-problems" class="residuals"></ul>
+        </div>
+      </div>
+      <details><summary>History</summary><ul id="play-history" class="residuals"></ul></details>
     </section>
 
     <section id="read" class="pane" hidden>
@@ -271,7 +325,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
   </main>
 
   <div id="dev-panels">
-  <section class="scenario">
+  <section class="scenario" data-panel="validate">
     <h2>Validate a transaction</h2>
     <p class="hint">Will this unsigned transaction validate? Paste the node-format
        transaction (<code>inputs</code>, <code>dataInputs</code>,
@@ -293,7 +347,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
     </div>
   </section>
 
-  <section class="scenario">
+  <section class="scenario" data-panel="tests">
     <h2>Tests</h2>
     <p class="hint">Named scenarios with the verdict each must produce, run
        against the editor's compiled contract. Save the whole thing as
@@ -317,7 +371,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
     </div>
   </section>
 
-  <section class="scenario">
+  <section class="scenario" data-panel="scenario">
     <h2>Scenario</h2>
     <p class="hint">Test a contract against a spending context on the consensus
        reducer. A scenario without <code>source</code> or <code>tree</code>
