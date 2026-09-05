@@ -503,7 +503,7 @@ fn classify_tree(bytes: &[u8], tree_version: u8, network: NetworkPrefix, tally: 
     // large stack for the same reason the decompile runs there.
     let src = decompiled.source;
     let compile_out = ergo_sandbox::decompile::with_large_stack(move || {
-        ergo_sandbox::compile_source(&src, tree_version, network)
+        ergo_sandbox::compile_source_raw(&src, tree_version, network)
             .map(|o| o.tree_bytes)
             .map_err(|e| e.to_string())
     });

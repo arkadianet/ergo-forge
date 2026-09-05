@@ -51,6 +51,29 @@ pub struct CompileOutput {
 /// Compile ErgoScript source into tree bytes + addresses, empty environment.
 ///
 /// `network` affects only the address encodings, not the tree bytes.
+/// Compile exactly as the node's compiler does, header untouched
+/// (version 0 whatever `tree_version` says): the decompile round-trip
+/// needs byte parity with trees whose header does not announce the
+/// methods they use.
+pub fn compile_source_raw(
+    source: &str,
+    tree_version: u8,
+    network: NetworkPrefix,
+) -> Result<CompileOutput, CompileError> {
+    let CompileResult {
+        tree_bytes,
+        ergo_tree,
+        p2s_address,
+        p2sh_address,
+    } = ergo_compiler::compile(&ScriptEnv::new(), source, tree_version, network)?;
+    Ok(CompileOutput {
+        tree_bytes,
+        ergo_tree,
+        p2s_address,
+        p2sh_address,
+    })
+}
+
 pub fn compile_source(
     source: &str,
     tree_version: u8,

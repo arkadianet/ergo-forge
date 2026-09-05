@@ -88,8 +88,22 @@ pub fn build_eval_box(
 
     // Serialize the box the way the chain would, for `bytes`, `bytesWithoutRef`
     // and (unless given) `id`.
-    let ergo_tree = read_ergo_tree(&mut VlqReader::new(&script_bytes))
-        .map_err(|e| SandboxError::Scenario(format!("`{field}` ergoTree does not parse: {e}")))?;
+    // A box whose script does not parse (a placeholder in an old scenario)
+    // keeps the synthetic shape: empty bytes, a zero id unless given.
+    let Ok(ergo_tree) = read_ergo_tree(&mut VlqReader::new(&script_bytes)) else {
+        return Ok(EvalBox {
+            creation_height: sb.creation_height,
+            script_bytes,
+            value: sb.value,
+            id: given_id.unwrap_or([0u8; 32]),
+            transaction_id: [0u8; 32],
+            output_index: 0,
+            registers,
+            tokens,
+            raw_bytes: Vec::new(),
+            register_bytes: Vec::new(),
+        });
+    };
     let additional_registers = AdditionalRegisters {
         registers: registers.iter().flatten().cloned().collect(),
     };

@@ -59,7 +59,7 @@ pub mod testsuite;
 pub mod txcheck;
 
 pub use audit::{Finding, Severity};
-pub use compile::{compile_source, CompileOutput};
+pub use compile::{compile_source, compile_source_raw, CompileOutput};
 pub use decompile::{lift_tree, Lifted, Node, NodeKind};
 pub use eval::{eval_scenario, EvalOutcome, Verdict, DEFAULT_COST_LIMIT};
 pub use hunt::{hunt, Hunt, HuntOptions, HuntVerdict};
