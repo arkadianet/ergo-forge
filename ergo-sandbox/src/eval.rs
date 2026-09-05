@@ -194,7 +194,13 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
             Ok((*id, (tpe, value)))
         })
         .collect::<Result<indexmap::IndexMap<u8, (_, _)>, SandboxError>>()?;
-    let input_extensions = vec![indexmap::IndexMap::new(); inputs.len()];
+    // The spending proof's extension belongs to the SELF input, so
+    // `getVarFromInput(selfIndex, id)` answers like `getVar(id)`.
+    let mut input_extensions = vec![indexmap::IndexMap::new(); inputs.len()];
+    let self_idx = sc.self_index.unwrap_or(0);
+    if let Some(slot) = input_extensions.get_mut(self_idx) {
+        *slot = extension.clone();
+    }
 
     // 4. Pre-header + miner key.
     let miner_pubkey: [u8; 33] = match &sc.miner_pubkey {

@@ -58,6 +58,17 @@ A register (or context variable) value may be given as the serialized
 constant a node or explorer reports — `{"type": "raw", "value": "040a"}` —
 type descriptor first. This is how a real box reaches a scenario untouched.
 
+### Tree version, box bytes
+
+`treeVersion` (CLI `--tree-version`, suites' `treeVersion`, default 3)
+is stamped on the tree header — the compiler alone leaves it at 0, for
+parity with the Scala node's compile route, and the evaluator refuses v6
+methods on a v0 header. Synthetic boxes are serialized like real ones
+(zero transaction id, index 0), so `bytes`, `bytesWithoutRef` and `id`
+(`blake2b256(bytes)` unless the scenario names an id) are what the chain
+would compute. The self input's extension is the scenario's `contextVars`,
+so `getVarFromInput(selfIndex, i)` answers like `getVar(i)`.
+
 ### Headers
 
 `"headers": [ {…newest…}, {…} ]` (at most 10) fills `CONTEXT.headers`;

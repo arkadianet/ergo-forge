@@ -71,12 +71,41 @@ fn compile_env(
         p2s_address,
         p2sh_address,
     } = ergo_compiler::compile(env, source, tree_version, network)?;
-    Ok(CompileOutput {
-        tree_bytes,
-        ergo_tree,
-        p2s_address,
-        p2sh_address,
-    })
+    Ok(stamp_version(
+        CompileOutput {
+            tree_bytes,
+            ergo_tree,
+            p2s_address,
+            p2sh_address,
+        },
+        tree_version,
+        network,
+    ))
+}
+
+/// Put the requested version on the tree header. The compiler leaves the
+/// header at version 0 on purpose (parity with the Scala node's compile
+/// route, which never forwards `treeVersion` into the header); wallets and
+/// appkit stamp the header themselves, and the evaluator refuses v6 methods
+/// on a v0 header — so a `treeVersion` of 3 here means a v3 tree, as it
+/// would on chain. Versions above 0 carry the size flag, as the format
+/// requires. The P2SH address hashes the proposition and is unchanged.
+pub(crate) fn stamp_version(
+    mut out: CompileOutput,
+    tree_version: u8,
+    network: NetworkPrefix,
+) -> CompileOutput {
+    if tree_version == 0 || out.ergo_tree.version == tree_version {
+        return out;
+    }
+    out.ergo_tree.version = tree_version;
+    out.ergo_tree.has_size = true;
+    let mut w = ergo_primitives::writer::VlqWriter::new();
+    if ergo_ser::ergo_tree::write_ergo_tree(&mut w, &out.ergo_tree).is_ok() {
+        out.tree_bytes = w.result();
+        out.p2s_address = encode_p2s(network, &out.tree_bytes);
+    }
+    out
 }
 
 /// Why a parameterised compile failed.
@@ -182,12 +211,16 @@ pub fn compile_with_params_and_map(
                 p2sh_address,
             } = result;
             Ok((
-                CompileOutput {
-                    tree_bytes,
-                    ergo_tree,
-                    p2s_address,
-                    p2sh_address,
-                },
+                stamp_version(
+                    CompileOutput {
+                        tree_bytes,
+                        ergo_tree,
+                        p2s_address,
+                        p2sh_address,
+                    },
+                    tree_version,
+                    network,
+                ),
                 Some(map),
             ))
         }
