@@ -363,7 +363,22 @@ Still missing (the actual build list):
     proof made by the node's prover, verified, `proofAccepted` out — with
     "separate parties" running the multi-party flow. `POST /api/v1/point`
     derives public points for test keys.
-17. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
+17. **P4l — Play, and the workbench layout: DONE 2026-09-05.** The gap
+    against Remix / Marlowe was a world to act in and a layout to work
+    in. `play::apply` is a sandbox chain's one operation (every input's
+    script in the full transaction context with its own secrets, ERG and
+    token conservation with the EIP-4 mint, outputs with real ids from a
+    deterministic tx id); `POST /api/v1/play` is stateless — the browser
+    keeps the chain in localStorage: fund boxes under any contract (an
+    address, a tree, the editor's compile, or "Play with it" from Build),
+    select boxes, build a transaction (destinations, ERG, tokens incl.
+    `new`, registers, data inputs, per-input secrets and context
+    variables), send, see each input's verdict in words, advance the
+    height, continue with the boxes that came out. Write is two columns:
+    editor and parameters on the left, a sticky tabbed panel (Result,
+    Scenario, Tests, Validate tx) on the right; Read keeps the developer
+    panels below.
+18. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.
    - **A — DONE 2026-08-31** (`compiler/source-positions`, `8479a58`): every

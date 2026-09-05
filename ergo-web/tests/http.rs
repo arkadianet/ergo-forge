@@ -1043,3 +1043,44 @@ async fn inspect_and_compile_put_the_contract_into_words() {
         .unwrap();
     assert_eq!(i["plain"][0], "anyone, if after block 100", "{i}");
 }
+
+// ── /api/v1/play ────────────────────────────────────────────────────────────
+
+#[tokio::test]
+async fn play_applies_a_transaction_and_returns_new_boxes() {
+    let base = spawn().await;
+    let lock = hex::encode(
+        ergo_sandbox::compile_source(
+            "sigmaProp(HEIGHT > 100)",
+            3,
+            ergo_ser::address::NetworkPrefix::Mainnet,
+        )
+        .unwrap()
+        .tree_bytes,
+    );
+    let body = serde_json::json!({
+        "height": 200,
+        "boxes": [ { "boxId": "11".repeat(32), "value": 5, "ergoTree": lock } ],
+        "tx": { "inputs": [ { "boxId": "11".repeat(32) } ], "outputs": [ { "value": 5, "ergoTree": lock } ] }
+    });
+    let res: serde_json::Value = reqwest::Client::new()
+        .post(format!("{base}/api/v1/play"))
+        .json(&body)
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(res["ok"], true, "{res}");
+    assert_eq!(res["inputs"][0]["verdict"], "pass", "{res}");
+    assert_eq!(
+        res["outputs"][0]["boxId"].as_str().unwrap().len(),
+        64,
+        "{res}"
+    );
+    assert!(
+        res.get("txId").is_some() && res.get("ergIn").is_some(),
+        "{res}"
+    );
+}

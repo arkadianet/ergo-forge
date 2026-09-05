@@ -296,15 +296,32 @@ let lastCompiled = null; // { treeHex } for the scenario panel
 const paramTypes = ["Int", "Long", "Coll[Byte]", "SigmaProp", "GroupElement", "Boolean", "Byte", "Short", "BigInt", "Coll[Long]", "String"];
 
 function setMode(mode) {
-  for (const m of ["build", "write", "read"]) {
+  for (const m of ["build", "write", "read", "play"]) {
     const on = m === mode;
     $(m).hidden = !on;
     $(`mode-${m}`).classList.toggle("active", on);
     $(`mode-${m}`).setAttribute("aria-selected", String(on));
   }
-  $("dev-panels").hidden = mode === "build";
+  // The developer panels (scenario, tests, validate) live in Write's right
+  // column and below Read; Build and Play do without them.
+  const dev = $("dev-panels");
+  if (mode === "write") { $("dev-slot").appendChild(dev); showTab(document.querySelector(".rtab.active")?.dataset.tab || "result"); }
+  else if (mode === "read") { $("read").appendChild(dev); showTab("all"); }
+  dev.hidden = mode === "build" || mode === "play";
+  document.body.classList.toggle("wide", mode === "write" || mode === "play");
   if (mode === "write") editor.refresh();
+  if (mode === "play") renderPlay();
 }
+$("mode-play").addEventListener("click", () => setMode("play"));
+
+// Right-column tabs in Write.
+function showTab(name) {
+  for (const b of document.querySelectorAll(".rtab")) b.classList.toggle("active", b.dataset.tab === name);
+  for (const p of document.querySelectorAll("[data-panel]")) p.hidden = p.dataset.panel !== name;
+  const dev = $("dev-panels");
+  for (const sec of dev.querySelectorAll("section.scenario")) sec.hidden = sec.dataset.panel !== name && name !== "all";
+}
+for (const b of document.querySelectorAll(".rtab")) b.addEventListener("click", () => showTab(b.dataset.tab));
 $("mode-build").addEventListener("click", () => setMode("build"));
 $("mode-write").addEventListener("click", () => setMode("write"));
 $("mode-read").addEventListener("click", () => setMode("read"));
@@ -429,6 +446,8 @@ async function compile() {
     renderCompiled(body);
     status.hidden = true;
     lastCompiled = body;
+    $("compiled-empty").hidden = true;
+    showTab("result");
     huntTree(body.treeHex, $("write-network").value);
   } catch (e) {
     status.textContent = `Request failed: ${e}`;
@@ -1913,4 +1932,242 @@ $("examples").addEventListener("change", (e) => {
 $("read").addEventListener("click", read);
 $("input").addEventListener("keydown", (e) => {
   if (e.key === "Enter") read();
+});
+
+
+// ── Play: a sandbox chain in the browser ──────────────────────────────────
+//
+// State is a list of boxes (unspent and spent) plus a height and a history,
+// saved in localStorage. The only server call is POST /api/v1/play, which
+// runs every input's script in the transaction's context, checks that ERG
+// and tokens balance, and returns the outputs with their ids.
+
+const PLAY_KEY = "ergo-forge-play";
+let play = { height: 1000, boxes: [], history: [], words: {} };
+try { const saved = JSON.parse(localStorage.getItem(PLAY_KEY) || "null"); if (saved && Array.isArray(saved.boxes)) play = { words: {}, ...saved }; } catch (e) { /* fresh chain */ }
+function savePlay() { try { localStorage.setItem(PLAY_KEY, JSON.stringify(play)); } catch (e) { /* storage blocked */ } }
+const selectedBoxes = new Set();
+const ergOf = (nano) => `${(Number(nano) / 1e9).toLocaleString(undefined, { maximumFractionDigits: 9 })} ERG`;
+/// ERG as typed → nanoERG, exactly: decimal string arithmetic, no floats.
+/// Boxes above 9,007,199 ERG (2^53 nanoERG) are refused so the amount
+/// stays exact through JSON.
+function nanoOf(text) {
+  const t = String(text).trim();
+  const m = /^(\d+)(?:\.(\d{0,9}))?$/.exec(t);
+  if (!m) throw new Error(`"${t}" is not an ERG amount (up to 9 decimals).`);
+  const nano = BigInt(m[1]) * 1000000000n + BigInt((m[2] || "").padEnd(9, "0"));
+  if (nano > BigInt(Number.MAX_SAFE_INTEGER)) throw new Error("The sandbox keeps amounts exact up to 9,007,199 ERG per box.");
+  return Number(nano);
+}
+const ergText = (nano) => (Number(nano) / 1e9).toFixed(9).replace(/\.?0+$/, "");
+
+/// Plain words for a tree, cached per tree.
+async function wordsFor(treeHex) {
+  if (play.words[treeHex]) return play.words[treeHex];
+  try {
+    const res = await fetch("/api/v1/inspect", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ input: treeHex, network: playNetwork() }) });
+    const body = await res.json();
+    if (res.ok) { play.words[treeHex] = { plain: body.plain || [], address: body.address }; savePlay(); return play.words[treeHex]; }
+  } catch (e) { /* offline: no words */ }
+  return { plain: [], address: "" };
+}
+function playNetwork() { return $("write-network") ? $("write-network").value : "mainnet"; }
+
+/// Resolve what the user typed as a contract into tree hex.
+async function resolveContract(text) {
+  const t = text.trim();
+  if (!t || t === "compiled") {
+    if (!lastCompiled) throw new Error("Nothing compiled yet — compile in Write, or give an address or tree hex.");
+    return lastCompiled.treeHex;
+  }
+  if (/^[0-9a-fA-F]+$/.test(t) && t.length % 2 === 0 && t.length > 8) return t.toLowerCase();
+  const res = await fetch("/api/v1/inspect", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ input: t, network: playNetwork() }) });
+  const body = await res.json();
+  if (!res.ok) throw new Error((body.error && body.error.message) || "That is not an address or a tree.");
+  return body.treeHex;
+}
+
+function parseTokens(text, mintId) {
+  const out = [];
+  for (const line of text.split(/\n/)) {
+    const [id, amt] = line.trim().split(/\s+/);
+    if (!id) continue;
+    const n = Number(amt || "1");
+    if (!Number.isInteger(n) || n < 1) throw new Error(`Token amount for ${id.slice(0, 8)}… must be a whole number.`);
+    const tid = id === "new" ? mintId : id.toLowerCase();
+    if (!/^[0-9a-f]{64}$/.test(tid)) throw new Error("A token id is 64 hex characters (or `new`).");
+    out.push({ id: tid, amount: n });
+  }
+  return out;
+}
+
+/// Fund: a box that appears from nowhere (as a wallet deposit would).
+async function fundBox(treeHex, nano, tokens, registers, note) {
+  const seed = (play.boxes.length + 1).toString(16).padStart(2, "0");
+  const boxId = (seed + "0".repeat(64)).slice(0, 64);
+  const b = { boxId, value: nano, ergoTree: treeHex, creationHeight: play.height, tokens, registers, spent: false, note };
+  play.boxes.push(b);
+  play.history.push(`height ${play.height}: funded ${ergOf(nano)} → ${boxId.slice(0, 8)}… ${note || ""}`);
+  savePlay();
+  await renderPlay();
+  return b;
+}
+
+$("play-fund-toggle").addEventListener("click", () => { $("play-fund").hidden = !$("play-fund").hidden; });
+$("play-reset").addEventListener("click", () => { play = { height: 1000, boxes: [], history: [], words: {} }; selectedBoxes.clear(); savePlay(); renderPlay(); });
+for (const b of document.querySelectorAll("[data-advance]")) b.addEventListener("click", () => { play.height += Number(b.dataset.advance); savePlay(); renderPlay(); });
+$("fund-go").addEventListener("click", async () => {
+  const st = $("fund-status");
+  try {
+    const tree = await resolveContract($("fund-contract").value);
+    const nano = nanoOf($("fund-erg").value);
+    if (!(nano > 0)) throw new Error("An amount in ERG is needed.");
+    let regs = {};
+    try { regs = JSON.parse($("fund-regs").value || "{}"); } catch (e) { throw new Error("Registers must be JSON."); }
+    const tokens = parseTokens($("fund-tokens").value, "ee".repeat(32));
+    await fundBox(tree, nano, tokens, regs, "");
+    st.hidden = true; $("play-fund").hidden = true;
+  } catch (e) { st.textContent = e.message; st.hidden = false; }
+});
+
+async function renderPlay() {
+  $("play-height").textContent = String(play.height);
+  const list = $("play-boxes");
+  list.textContent = "";
+  const unspent = play.boxes.filter((b) => !b.spent);
+  $("play-empty").hidden = unspent.length > 0;
+  for (const b of play.boxes) {
+    const card = document.createElement("div");
+    card.className = "play-box" + (b.spent ? " spent" : "") + (selectedBoxes.has(b.boxId) ? " selected" : "");
+    const w = await wordsFor(b.ergoTree);
+    const toks = (b.tokens || []).map((t) => `${t.amount} × ${t.id.slice(0, 8)}…`).join(", ");
+    const regs = Object.entries(b.registers || {}).map(([k, v]) => `${k}=${typeof v.value === "object" ? JSON.stringify(v.value) : v.value}`).join(" ");
+    card.innerHTML = `<div class="amount">${ergOf(b.value)}${toks ? ` <span class="meta">+ ${toks}</span>` : ""}</div>
+      <div class="words">${(w.plain || []).map((p, i) => (w.plain.length > 1 ? `Way ${i + 1}: ` : "") + escapeHtml(p)).join("<br>") || "(no words)"}</div>
+      <div class="meta">${w.address ? shortAddr(w.address) + " · " : ""}box ${b.boxId.slice(0, 10)}… · created at ${b.creationHeight}${regs ? " · " + escapeHtml(regs) : ""}${b.spent ? " · SPENT" : ""}</div>`;
+    if (!b.spent) {
+      const btn = document.createElement("button"); btn.type = "button"; btn.className = "secondary tiny";
+      btn.textContent = selectedBoxes.has(b.boxId) ? "deselect" : "select to spend";
+      btn.addEventListener("click", () => { if (selectedBoxes.has(b.boxId)) selectedBoxes.delete(b.boxId); else selectedBoxes.add(b.boxId); renderPlay(); });
+      card.appendChild(btn);
+    }
+    list.appendChild(card);
+  }
+  renderTxForm();
+  const h = $("play-history"); h.textContent = "";
+  for (const line of play.history.slice().reverse()) { const li = document.createElement("li"); li.textContent = line; h.appendChild(li); }
+}
+function escapeHtml(s) { return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+let txOutputs = null; // persisted between renders while the form is open
+function renderTxForm() {
+  const form = $("play-tx");
+  const ins = [...selectedBoxes].map((id) => play.boxes.find((b) => b.boxId === id)).filter((b) => b && !b.spent);
+  form.hidden = ins.length === 0;
+  if (!ins.length) { txOutputs = null; return; }
+  const total = ins.reduce((s, b) => s + Number(b.value), 0);
+  const inEl = $("tx-inputs"); inEl.textContent = "";
+  ins.forEach((b, i) => {
+    const d = document.createElement("div"); d.className = "tx-in";
+    d.dataset.boxId = b.boxId;
+    d.innerHTML = `<strong>Input ${i}</strong> — ${ergOf(b.value)} · box ${b.boxId.slice(0, 8)}…
+      <div class="field"><label>Secrets this input's spender holds (one 64-hex key secret per line; empty if none needed)</label><textarea class="tx-secrets" rows="1" spellcheck="false"></textarea></div>
+      <div class="field"><label>Context variables (JSON, optional): <code>{"0": {"type": "Coll[Byte]", "value": "…"}}</code></label><textarea class="tx-vars" rows="1" spellcheck="false">{}</textarea></div>`;
+    inEl.appendChild(d);
+  });
+  const di = $("tx-data-inputs"); di.textContent = "";
+  for (const b of play.boxes.filter((b) => !b.spent && !selectedBoxes.has(b.boxId))) {
+    const l = document.createElement("label"); l.className = "inline";
+    l.innerHTML = `<input type="checkbox" class="tx-di" value="${b.boxId}"> ${ergOf(b.value)} · ${b.boxId.slice(0, 8)}…`;
+    di.appendChild(l);
+  }
+  if (!txOutputs) txOutputs = [{ dest: "same", erg: ergText(total), tokens: "", regs: "{}" }];
+  renderOutputs(ins);
+}
+function renderOutputs(ins) {
+  const el = $("tx-outputs"); el.textContent = "";
+  txOutputs.forEach((o, i) => {
+    const d = document.createElement("div"); d.className = "tx-out";
+    d.innerHTML = `<strong>Output ${i}</strong>
+      <div class="field"><label>Goes to</label><input class="o-dest" value="${escapeHtml(o.dest)}" placeholder="same (the first input&#39;s contract), an address, a tree hex, anyone, or compiled" spellcheck="false"></div>
+      <div class="field"><label>ERG</label><input class="o-erg" type="number" step="0.000000001" value="${o.erg}"></div>
+      <div class="field"><label>Tokens (one per line: <code>id amount</code>; <code>new</code> mints, named after input 0)</label><textarea class="o-tokens" rows="1" spellcheck="false">${escapeHtml(o.tokens)}</textarea></div>
+      <div class="field"><label>Registers (JSON)</label><textarea class="o-regs" rows="1" spellcheck="false">${escapeHtml(o.regs)}</textarea></div>`;
+    const rm = document.createElement("button"); rm.type = "button"; rm.className = "secondary tiny"; rm.textContent = "remove output";
+    rm.addEventListener("click", () => { readOutputs(); txOutputs.splice(i, 1); renderOutputs(ins); });
+    d.appendChild(rm);
+    el.appendChild(d);
+  });
+}
+function readOutputs() {
+  txOutputs = [...$("tx-outputs").children].map((d) => ({ dest: d.querySelector(".o-dest").value, erg: d.querySelector(".o-erg").value, tokens: d.querySelector(".o-tokens").value, regs: d.querySelector(".o-regs").value }));
+}
+$("tx-add-output").addEventListener("click", () => { readOutputs(); txOutputs.push({ dest: "anyone", erg: 0, tokens: "", regs: "{}" }); renderTxForm(); });
+$("tx-balance").addEventListener("click", () => {
+  readOutputs();
+  const ins = [...selectedBoxes].map((id) => play.boxes.find((b) => b.boxId === id)).filter(Boolean);
+  const total = ins.reduce((s, b) => s + Number(b.value), 0);
+  const others = txOutputs.slice(0, -1).reduce((s, o) => s + nanoOf(o.erg), 0);
+  if (txOutputs.length) txOutputs[txOutputs.length - 1].erg = ergText(Math.max(0, total - others));
+  renderTxForm();
+});
+
+const ANYONE_TREE = "10010101d17300";
+$("tx-send").addEventListener("click", async () => {
+  const st = $("tx-status"); const res = $("tx-result");
+  try {
+    readOutputs();
+    const ins = [...$("tx-inputs").children].map((d) => {
+      const secrets = d.querySelector(".tx-secrets").value.split(/\n/).map((s) => s.trim()).filter(Boolean).map((x) => ({ dlog: x }));
+      let contextVars = {};
+      try { contextVars = JSON.parse(d.querySelector(".tx-vars").value || "{}"); } catch (e) { throw new Error("Context variables must be JSON."); }
+      return { boxId: d.dataset.boxId, secrets, contextVars };
+    });
+    const first = play.boxes.find((b) => b.boxId === ins[0].boxId);
+    const outputs = [];
+    for (const o of txOutputs) {
+      let tree;
+      if (o.dest.trim() === "same") tree = first.ergoTree;
+      else if (o.dest.trim() === "anyone") tree = ANYONE_TREE;
+      else tree = await resolveContract(o.dest);
+      let regs = {};
+      try { regs = JSON.parse(o.regs || "{}"); } catch (e) { throw new Error("Output registers must be JSON."); }
+      outputs.push({ value: nanoOf(o.erg), ergoTree: tree, tokens: parseTokens(o.tokens, ins[0].boxId), registers: regs });
+    }
+    const dataInputs = [...document.querySelectorAll(".tx-di:checked")].map((c) => c.value);
+    st.textContent = "Checking with the real rules…"; st.hidden = false; res.hidden = true;
+    const r = await fetch("/api/v1/play", { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ height: play.height, network: playNetwork(), boxes: play.boxes.filter((b) => !b.spent).map(({ spent, note, ...b }) => b), tx: { inputs: ins, dataInputs, outputs } }) });
+    const body = await r.json();
+    if (!r.ok) throw new Error((body.error && body.error.message) || r.status);
+    const rows = $("tx-result-rows"); rows.textContent = "";
+    for (const i of body.inputs) {
+      const tr = document.createElement("tr"); tr.dataset.verdict = (i.verdict === "pass" || i.verdict === "proofAccepted") ? "ok" : "fail";
+      const words = { pass: "script satisfied", proofAccepted: "signed and verified", needsProof: "needs a signature", fail: "the script refused", error: "the script threw" }[i.verdict] || i.verdict;
+      const detail = i.verdict === "error" ? ` — ${i.error}` : (i.verdict === "needsProof" && i.reducedTo ? ` — ${i.reducedTo}` : "");
+      for (const cell of [(tr.dataset.verdict === "ok" ? "✓" : "✗"), `input ${i.boxId.slice(0, 8)}…`, words + detail]) { const td = document.createElement("td"); td.textContent = cell; tr.appendChild(td); }
+      rows.appendChild(tr);
+    }
+    const probs = $("tx-problems"); probs.textContent = "";
+    for (const p of body.problems) { const li = document.createElement("li"); li.textContent = p; probs.appendChild(li); }
+    res.hidden = false;
+    if (body.ok) {
+      for (const i of ins) { const b = play.boxes.find((x) => x.boxId === i.boxId); if (b) b.spent = true; }
+      for (const o of body.outputs) play.boxes.push({ ...o, spent: false });
+      play.history.push(`height ${play.height}: spent ${ins.map((i) => i.boxId.slice(0, 8) + "…").join(", ")} → ${body.outputs.length} output(s), tx ${body.txId.slice(0, 8)}…`);
+      selectedBoxes.clear(); txOutputs = null; savePlay();
+      st.textContent = "Accepted. The new boxes are below."; st.hidden = false;
+      await renderPlay();
+      res.hidden = false;
+    } else {
+      st.textContent = "Refused — see why below. Nothing changed."; st.hidden = false;
+    }
+  } catch (e) { st.textContent = e.message || String(e); st.hidden = false; }
+});
+
+// Build → Play: fund a box under the contract just built.
+$("build-play").addEventListener("click", async () => {
+  if (!built) return;
+  await fundBox(built.treeHex, 1_000_000_000, [], {}, "from Build");
+  setMode("play");
 });

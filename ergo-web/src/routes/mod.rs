@@ -6,6 +6,7 @@ pub mod health;
 pub mod hunt;
 pub mod inspect;
 pub mod lookup;
+pub mod play;
 pub mod point;
 pub mod test;
 pub mod validate;

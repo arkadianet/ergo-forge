@@ -5,7 +5,7 @@ contracts on the same compiler and interpreter that run the Rust Ergo node
 ([arkadianet/ergo](https://github.com/arkadianet/ergo)). No second
 interpreter, no second compiler: a verdict here is the consensus verdict.
 
-Three ways in, one engine:
+Four ways in, one engine:
 
 - **Build** — for people who don't write code: pick a recipe, answer its
   questions in plain terms (addresses, dates, amounts), get an address and a
@@ -14,9 +14,13 @@ Three ways in, one engine:
   parameters as a form, the decompiled round-trip of what consensus will
   run, findings underlined in your source, spendability, scenarios, and test
   suites you can run in CI.
-- **Read** — for anyone: paste an address, see the contract as ErgoScript,
-  what's fragile, who can spend it, and whether a transaction you are about
-  to sign would validate.
+- **Read** — for anyone: paste an address, see the contract in plain words
+  and as ErgoScript, what's fragile, who can spend it, and whether a
+  transaction you are about to sign would validate.
+- **Play** — a sandbox chain in the browser: fund boxes under any
+  contract, build transactions that spend them (secrets, data inputs,
+  tokens, registers), watch the real rules accept or refuse, advance the
+  height, and keep going with the boxes that came out.
 
 Layout:
 
@@ -73,6 +77,7 @@ every endpoint and setting.
 | Can someone with **no key** spend this box? | `ergo-es hunt`, `POST /api/v1/hunt`, the reader's Spendability section |
 | Does my contract pass in *this* spending context, and what does it cost? | `ergo-es eval`, `POST /api/v1/eval`, the reader's Scenario panel |
 | Can I work with files? | Open `.es`, `params.json`, `contract.test.json`; save a project zip the CLI runs unchanged; raw `.es` at `/api/v1/examples/{id}.es` |
+| I want to try a contract's whole life: fund it, spend it, spend what came out | **Play**: a sandbox chain in the browser over `POST /api/v1/play` — every input's script runs in the transaction's context, ERG and tokens must balance, outputs get real ids; "Play with it" from Build funds a box under the contract you just made |
 | Will this transaction validate, before I sign it? | `ergo-es validate-tx`, `POST /api/v1/validate-tx`, the Validate section in Read |
 | Do all my contract's paths still behave after a change? | `ergo-es test contract.test.json` (CI), `POST /api/v1/test`, the Tests panel |
 | Where does the cost go? | `ergo-es eval --hot-spots` (cost-trace build) |

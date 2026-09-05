@@ -32,6 +32,18 @@ pub fn build_eval_box(
     sb: &ScenarioBox,
     default_tree_bytes: Option<&[u8]>,
 ) -> Result<EvalBox, SandboxError> {
+    build_eval_box_in(field, sb, default_tree_bytes, [0u8; 32], 0)
+}
+
+/// [`build_eval_box`] for a box created by transaction `tx_id` at output
+/// `index` — what fixes its bytes and therefore its id.
+pub fn build_eval_box_in(
+    field: &'static str,
+    sb: &ScenarioBox,
+    default_tree_bytes: Option<&[u8]>,
+    tx_id: [u8; 32],
+    index: u16,
+) -> Result<EvalBox, SandboxError> {
     let script_bytes: Vec<u8> = match default_tree_bytes {
         Some(bytes) => bytes.to_vec(),
         None => match sb
@@ -130,8 +142,8 @@ pub fn build_eval_box(
     );
     let ergo_box = ErgoBox {
         candidate,
-        transaction_id: ModifierId::from_bytes([0u8; 32]),
-        index: 0,
+        transaction_id: ModifierId::from_bytes(tx_id),
+        index,
     };
     let mut w = VlqWriter::new();
     write_ergo_box(&mut w, &ergo_box)
@@ -147,8 +159,8 @@ pub fn build_eval_box(
         script_bytes,
         value: sb.value,
         id,
-        transaction_id: [0u8; 32],
-        output_index: 0,
+        transaction_id: tx_id,
+        output_index: index,
         registers,
         tokens,
         raw_bytes,
