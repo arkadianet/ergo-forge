@@ -9,7 +9,7 @@ inputs:
     required: false
     default: "**/contract.test.json"
   version:
-    description: "ergo-forge release to use (a tag such as v0.2.0, or 'latest'), or 'source' to build ergo-es from the checked-out ergo-forge workspace (for this repo's own suites)."
+    description: "ergo-forge release to use (a tag such as v0.3.0, or 'latest'), or 'source' to build ergo-es from the checked-out ergo-forge workspace (for this repo's own suites)."
     required: false
     default: "latest"
 runs:
