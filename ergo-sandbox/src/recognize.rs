@@ -530,6 +530,7 @@ impl<'a> Cx<'a> {
             Num(s) => s.trim_end_matches(['L', 'y', 's']).to_string(),
             Bool(b) => b.to_string(),
             Const(c) => const_name(c),
+            Global(f, args) if f == "decodePoint" && args.len() == 1 => self.text(&args[0]),
             Leaf(l) => l.to_string(),
             Infix(op, a, b) if matches!(*op, "+" | "-" | "*" | "/") => {
                 let (a, b) = (self.text(a), self.text(b));
