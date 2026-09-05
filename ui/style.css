@@ -396,3 +396,11 @@ body.wide { max-width: 96rem; }
 .cm-val { border-bottom: 1px dotted var(--dim); cursor: help; }
 .cm-val-true { background: rgba(80, 200, 120, 0.18); border-bottom: 1px solid rgba(80, 200, 120, 0.7); cursor: help; }
 .cm-val-false { background: rgba(230, 80, 80, 0.2); border-bottom: 1px solid rgba(230, 80, 80, 0.8); cursor: help; }
+
+/* walkthroughs */
+.tours { margin: 0.5rem 0 1rem; color: var(--dim); }
+.tour { position: fixed; right: 1rem; bottom: 1rem; max-width: 26rem; background: var(--panel); border: 1px solid var(--accent); border-radius: 10px; padding: 0.9rem 1rem; box-shadow: 0 8px 30px rgba(0,0,0,0.5); z-index: 50; }
+.tour-text { margin-bottom: 0.6rem; }
+.tour-row { display: flex; gap: 0.5rem; align-items: center; justify-content: flex-end; }
+.tour-target { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+#eval-why { margin-top: 0.4rem; }

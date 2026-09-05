@@ -38,6 +38,10 @@ Layout:
   measured record of every phase; design records under
   `docs/superpowers/specs/`.
 
+New to Ergo? Build mode has three-minute walkthroughs that drive the
+real tool: lock savings and spend them in Play, a shared account signed by
+two of three, and a spend gated by an oracle box.
+
 ## Quick start
 
 ```text

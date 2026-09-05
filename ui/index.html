@@ -26,6 +26,11 @@
 
     <section id="build" class="pane" hidden>
       <div id="build-step-1" class="step">
+        <p class="tours">New here? Take a three-minute walkthrough:
+          <button type="button" class="secondary tiny tour-start" data-tour="lock">lock savings, then spend them</button>
+          <button type="button" class="secondary tiny tour-start" data-tour="shared">a shared account, two of three sign</button>
+          <button type="button" class="secondary tiny tour-start" data-tour="oracle">a spend gated by an oracle</button>
+        </p>
         <p class="hint">Step 1 of 3 — What should the contract do?</p>
         <div id="recipes" class="recipes"></div>
       </div>
@@ -324,6 +329,12 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
     </section>
   </main>
 
+  <div id="tour" class="tour" hidden>
+    <div class="tour-text" id="tour-text"></div>
+    <div class="tour-row"><span id="tour-count" class="hint"></span>
+      <button type="button" id="tour-next">Next</button>
+      <button type="button" id="tour-stop" class="secondary">Stop</button></div>
+  </div>
   <div id="dev-panels">
   <section class="scenario" data-panel="validate">
     <h2>Validate a transaction</h2>
@@ -391,6 +402,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
     <div id="eval-result" hidden>
       <p id="eval-verdict" class="hunt-verdict"></p>
       <p id="eval-values-note" class="hint" hidden></p>
+      <p id="eval-why" class="lead" hidden></p>
       <dl class="wire">
         <dt>cost</dt><dd><code id="eval-cost"></code></dd>
         <dt>reduced to</dt><dd><code id="eval-reduced"></code></dd>

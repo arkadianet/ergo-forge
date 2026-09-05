@@ -26,6 +26,11 @@ pub struct PointResponse {
     pub point: String,
     /// The generator, for scripts that spell it out.
     pub generator: String,
+    /// The pay-to-public-key address of `point` (when no base was given).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub address: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub testnet_address: Option<String>,
 }
 
 pub async fn point(ApiJson(req): ApiJson<PointRequest>) -> Result<Json<PointResponse>, ApiError> {
@@ -37,5 +42,27 @@ pub async fn point(ApiJson(req): ApiJson<PointRequest>) -> Result<Json<PointResp
         None => ergo_sandbox::prove::pubkey_hex(&req.secret)
             .map_err(|e| ApiError::InvalidInput(e.to_string()))?,
     };
-    Ok(Json(PointResponse { point, generator }))
+    let pk = hex::decode(&point).unwrap_or_default();
+    let (address, testnet_address) = if req.base.is_none() {
+        (
+            ergo_ser::address::encode_p2pk_from_pubkey(
+                ergo_ser::address::NetworkPrefix::Mainnet,
+                &pk,
+            )
+            .ok(),
+            ergo_ser::address::encode_p2pk_from_pubkey(
+                ergo_ser::address::NetworkPrefix::Testnet,
+                &pk,
+            )
+            .ok(),
+        )
+    } else {
+        (None, None)
+    };
+    Ok(Json(PointResponse {
+        point,
+        generator,
+        address,
+        testnet_address,
+    }))
 }
