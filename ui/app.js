@@ -497,6 +497,36 @@ function selectInEditor(byteOffset, snippet) {
 }
 
 /// Squiggle every positioned finding in the editor (severity-coloured).
+/// "Why not": after a failed run, name the clauses that were false, by the
+/// source line each begins on.
+function explainFailure(body, fromEditor) {
+  const el = $("eval-why");
+  el.hidden = true;
+  if (!fromEditor || body.verdict !== "fail") return;
+  const src = editor.getValue();
+  const seen = new Set();
+  const clauses = [];
+  for (const v of body.values || []) {
+    if (v.offset == null || v.value !== "Bool(false)" || seen.has(v.offset)) continue;
+    seen.add(v.offset);
+    const index = byteOffsetToIndex(src, v.offset);
+    let line = src.slice(index).split("\n")[0].trim().replace(/[{};]+$/, "").trim();
+    // Drop closing parens the clause does not open.
+    let depth = 0, cut = line.length;
+    for (let k = 0; k < line.length; k++) { if (line[k] === "(") depth++; else if (line[k] === ")") { if (depth === 0) { cut = k; break; } depth--; } }
+    line = line.slice(0, cut).trim();
+    if (line) clauses.push({ line: editor.posFromIndex(index).line + 1, text: line.length > 60 ? line.slice(0, 57) + "…" : line });
+  }
+  if (!clauses.length) return;
+  el.textContent = "";
+  el.append(document.createTextNode("Why it failed: these were false — "));
+  clauses.forEach((c, i) => {
+    const code = document.createElement("code"); code.textContent = c.text;
+    el.append(code, document.createTextNode(` (line ${c.line})${i < clauses.length - 1 ? ", " : "."}`));
+  });
+  el.hidden = false;
+}
+
 /// After a run: every positioned value becomes a mark on the editor —
 /// red for `false`, green for `true`, neutral otherwise — with the value
 /// as its tooltip. Only when the scenario ran the editor's source.
@@ -1801,6 +1831,7 @@ async function runScenario() {
     $("eval-error").textContent = body.error || "—";
     $("eval-address").textContent = body.address;
     markValues(body.values || [], scenario.fromEditor === true);
+    explainFailure(body, scenario.fromEditor === true);
     const list = $("eval-trace");
     list.textContent = "";
     for (const t of body.trace) {
@@ -2052,7 +2083,8 @@ async function fundBox(treeHex, nano, tokens, registers, note) {
 }
 
 $("play-fund-toggle").addEventListener("click", () => { $("play-fund").hidden = !$("play-fund").hidden; });
-$("play-reset").addEventListener("click", () => { play = { height: 1000, boxes: [], history: [], words: {} }; selectedBoxes.clear(); savePlay(); renderPlay(); });
+function resetPlay() { play = { height: 1000, boxes: [], history: [], words: {} }; selectedBoxes.clear(); txOutputs = null; $("tx-result").hidden = true; $("tx-status").hidden = true; savePlay(); renderPlay(); }
+$("play-reset").addEventListener("click", resetPlay);
 for (const b of document.querySelectorAll("[data-advance]")) b.addEventListener("click", () => { play.height += Number(b.dataset.advance); savePlay(); renderPlay(); });
 $("fund-go").addEventListener("click", async () => {
   const st = $("fund-status");
@@ -2209,3 +2241,83 @@ $("build-play").addEventListener("click", async () => {
   await fundBox(built.treeHex, 1_000_000_000, [], {}, "from Build");
   setMode("play");
 });
+
+
+// ── walkthroughs: short tours that drive the real UI ───────────────────────
+
+const TEST_SECRET = (n) => n.toString(16).padStart(64, "0");
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function api(path, body) {
+  const res = await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  const json = await res.json();
+  if (!res.ok) throw new Error((json.error && json.error.message) || res.status);
+  return json;
+}
+async function pointHex(secret) { return (await api("/api/v1/point", { secret })).point; }
+async function treeOf(source) { return (await api("/api/v1/compile", { source, network: playNetwork() })).treeHex; }
+async function addressOfKey(secret) { const r = await api("/api/v1/point", { secret }); return playNetwork() === "testnet" ? r.testnetAddress : r.address; }
+function highlight(sel) {
+  for (const e of document.querySelectorAll(".tour-target")) e.classList.remove("tour-target");
+  const el = sel && document.querySelector(sel);
+  if (el) { el.classList.add("tour-target"); el.scrollIntoView({ block: "center", behavior: "smooth" }); }
+}
+function clickRecipe(text) { const b = [...document.querySelectorAll("#recipes .recipe")].find((r) => r.textContent.includes(text)); if (b) b.click(); }
+async function selectFirstUnspent() { const btn = document.querySelector("#play-boxes .play-box:not(.spent) button"); if (btn) btn.click(); await sleep(400); }
+async function sendTx(secretLines, dest) {
+  await sleep(300);
+  const sec = document.querySelector(".tx-secrets"); if (sec) sec.value = secretLines.join("\n");
+  const d = document.querySelector(".o-dest"); if (d) d.value = dest;
+  $("tx-send").click(); await sleep(2500);
+}
+
+const TOURS = {
+  lock: [
+    { text: "Build mode: pick what the contract should do. We'll lock savings until a date, then spend them in a sandbox.", at: "#recipes", do: async () => { setMode("build"); buildStep(1); } },
+    { text: "The recipe asks plain questions. We fill them with a test key we hold the secret for, and block 2000 as the unlock date.", at: "#wizard-fields",
+      do: async () => { clickRecipe("Lock savings"); await sleep(600); $("f-owner").value = await addressOfKey(TEST_SECRET(1)); $("f-unlockHeight").value = "2000"; } },
+    { text: "Create it. You get an address, the contract in plain words, and what the checks found — all from the same code the network runs.", at: "#build-step-3",
+      do: async () => { $("build-create").click(); await sleep(3500); } },
+    { text: "Play with it: a sandbox box is funded under your contract. The card reads the contract in words. Nothing here touches the real chain.", at: "#play-boxes",
+      do: async () => { resetPlay(); $("build-play").click(); await sleep(2500); } },
+    { text: "Select the box and try to spend it now, at height 1000, signed with the owner's secret. The rules refuse it: it is before block 2000.", at: "#tx-result",
+      do: async () => { await selectFirstUnspent(); await sendTx([TEST_SECRET(1)], "anyone"); } },
+    { text: "Move the clock forward a month and send again. Accepted: the box is spent and a new one appears. That is the whole life of a contract, checked by the real rules.", at: "#play-boxes",
+      do: async () => { document.querySelector('[data-advance="21600"]').click(); await sleep(600); await sendTx([TEST_SECRET(1)], "anyone"); } },
+    { text: "Where next: Write shows the ErgoScript and lets you change it; Read explains any address on the chain; the Scenario tab marks every expression's value on the source after a run.", at: "#mode-write" },
+  ],
+  shared: [
+    { text: "A shared account: any two of three keys must sign. We compile one with three test keys and fund it in Play.", at: "#play-boxes",
+      do: async () => { setMode("play"); resetPlay(); const ks = [await pointHex(TEST_SECRET(1)), await pointHex(TEST_SECRET(2)), await pointHex(TEST_SECRET(3))]; const tree = await treeOf(`atLeast(2, Coll(${ks.map((k) => `proveDlog(decodePoint(fromBase16("${k}")))`).join(", ")}))`); await fundBox(tree, 3_000_000_000, [], {}, "shared account"); } },
+    { text: "One secret is not enough: the spend is refused as needing more signatures.", at: "#tx-result",
+      do: async () => { await selectFirstUnspent(); await sendTx([TEST_SECRET(1)], "anyone"); } },
+    { text: "Two secrets, one per line, and the sandbox makes the two-party proof with the node's own prover and verifies it. Accepted.", at: "#play-boxes",
+      do: async () => { await sendTx([TEST_SECRET(1), TEST_SECRET(3)], "anyone"); } },
+    { text: "In Write's Scenario tab, 'Prove it' does the same for any script, and 'separate parties' runs the multi-party flow where no wallet ever holds two secrets.", at: "#mode-write" },
+  ],
+  oracle: [
+    { text: "Some contracts read other boxes without spending them: data inputs. Here a box may be spent only while an oracle box reports a price above 100.", at: "#play-boxes",
+      do: async () => { setMode("play"); resetPlay(); const gate = await treeOf("sigmaProp(CONTEXT.dataInputs(0).R4[Long].get > 100L)"); await fundBox(gate, 1_000_000_000, [], {}, "price-gated"); const anyone = await treeOf("sigmaProp(true)"); await fundBox(anyone, 1_000_000, [], { R4: { type: "Long", value: 50 } }, "oracle says 50"); } },
+    { text: "Select the gated box, tick the oracle as a data input, and send. Refused: the oracle says 50.", at: "#tx-result",
+      do: async () => { await selectFirstUnspent(); const di = document.querySelector(".tx-di"); if (di) di.checked = true; await sendTx([], "anyone"); } },
+    { text: "Fund a second oracle box that says 500, use it as the data input, and the same spend is accepted.", at: "#play-boxes",
+      do: async () => { const anyone = await treeOf("sigmaProp(true)"); await fundBox(anyone, 1_000_000, [], { R4: { type: "Long", value: 500 } }, "oracle says 500"); await selectFirstUnspent(); const dis = document.querySelectorAll(".tx-di"); for (const c of dis) c.checked = false; if (dis.length) dis[dis.length - 1].checked = true; await sendTx([], "anyone"); } },
+    { text: "The Read mode explains data-input rules in words for any address, and the composer's 'Outside information' conditions build them without code.", at: "#mode-read" },
+  ],
+};
+let tour = null;
+async function tourStep() {
+  if (!tour) return;
+  const step = TOURS[tour.name][tour.i];
+  if (!step) { stopTour(); return; }
+  $("tour-text").textContent = step.text;
+  $("tour-count").textContent = `${tour.i + 1} / ${TOURS[tour.name].length}`;
+  $("tour-next").disabled = true;
+  try { if (step.do) await step.do(); } catch (e) { $("tour-text").textContent += ` (something went wrong: ${e.message || e})`; }
+  highlight(step.at);
+  $("tour-next").disabled = false;
+  $("tour-next").textContent = tour.i + 1 === TOURS[tour.name].length ? "Done" : "Next";
+}
+function stopTour() { tour = null; $("tour").hidden = true; highlight(null); }
+for (const b of document.querySelectorAll(".tour-start")) b.addEventListener("click", () => { tour = { name: b.dataset.tour, i: 0 }; $("tour").hidden = false; tourStep(); });
+$("tour-next").addEventListener("click", async () => { if (!tour) return; tour.i += 1; if (tour.i >= TOURS[tour.name].length) { stopTour(); return; } await tourStep(); });
+$("tour-stop").addEventListener("click", stopTour);

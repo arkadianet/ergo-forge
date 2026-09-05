@@ -385,7 +385,12 @@ Still missing (the actual build list):
     the eval route positions them through the source map; after a run
     the editor marks every valued expression — red for false, green for
     true — with the value as its tooltip, and says how many were false.
-19. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
+19. **P4n — walkthroughs and "why it failed": DONE 2026-09-05.** Three
+    tours drive the real UI (lock savings then spend in Play; a shared
+    account signed by two of three; an oracle-gated spend with data
+    inputs), each step doing the clicks and saying what happened. After a
+    failed scenario run, the false clauses are named by source line.
+20. **P5 — positions and editor surface** (node-side, `arkadianet/ergo`). Lets
    tree-level audit findings project back onto authored source — squiggles,
    hovers, eventually LSP.
    - **A — DONE 2026-08-31** (`compiler/source-positions`, `8479a58`): every

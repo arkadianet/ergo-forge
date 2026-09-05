@@ -286,7 +286,7 @@ nothing is unbalanced; nothing is applied server-side.
 
 ### `POST /api/v1/point`
 
-`{secret, base?}` → `{point, generator}`: the public point of a 32-byte
+`{secret, base?}` → `{point, generator, address?, testnetAddress?}`: the public point of a 32-byte
 hex secret — `g^x`, or `base^x` when a compressed base point is given — so
 a scenario's `secrets` and a script's constants agree. For test keys.
 
