@@ -222,6 +222,15 @@ pub struct ScenarioBox {
     /// Box id, 32-byte hex. Defaults to all-zero (synthetic box).
     #[serde(default)]
     pub box_id: Option<String>,
+    /// This input's own context extension (var id → value), what
+    /// `getVarFromInput(i, id)` reads for another input. For the SELF box
+    /// the scenario's `contextVars` apply as well and take precedence.
+    #[serde(
+        default,
+        deserialize_with = "de_var_map",
+        skip_serializing_if = "BTreeMap::is_empty"
+    )]
+    pub extension: BTreeMap<u8, TypedValue>,
 }
 
 /// A (token id, amount) pair.

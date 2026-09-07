@@ -156,6 +156,7 @@ pub fn hunt(tree_bytes: &[u8], opts: &HuntOptions) -> Result<Hunt, SandboxError>
         creation_height: base,
         registers: Default::default(),
         box_id: None,
+        extension: Default::default(),
     };
     let preserve_out = ScenarioBox {
         ergo_tree: Some(tree_hex.clone()),
