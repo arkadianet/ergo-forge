@@ -103,11 +103,29 @@ pub fn check(req: &TxRequest) -> Result<TxCheck, SandboxError> {
         .filter_map(|b| b["boxId"].as_str().map(|id| (id.to_lowercase(), b)))
         .collect();
 
+    // Each input's box carries that input's extension, so a script can
+    // read another input's variables with `getVarFromInput`.
     let input_boxes: Vec<Option<ScenarioBox>> = req
         .tx
         .inputs
         .iter()
-        .map(|i| by_id.get(&i.box_id.to_lowercase()).map(|b| scenario_box(b)))
+        .map(|i| {
+            by_id.get(&i.box_id.to_lowercase()).map(|b| {
+                let mut sb = scenario_box(b);
+                for (k, hex_val) in &i.extension {
+                    if let Ok(id) = k.parse::<u8>() {
+                        sb.extension.insert(
+                            id,
+                            TypedValue {
+                                r#type: "raw".into(),
+                                value: serde_json::Value::String(hex_val.clone()),
+                            },
+                        );
+                    }
+                }
+                sb
+            })
+        })
         .collect();
     let data_boxes: Vec<Option<ScenarioBox>> = req
         .tx
@@ -335,5 +353,6 @@ pub fn scenario_box(b: &serde_json::Value) -> ScenarioBox {
         creation_height: b["creationHeight"].as_u64().unwrap_or(0) as u32,
         registers,
         box_id: b["boxId"].as_str().map(str::to_string),
+        extension: Default::default(),
     }
 }

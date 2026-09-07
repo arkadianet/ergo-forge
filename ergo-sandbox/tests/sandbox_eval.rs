@@ -331,3 +331,22 @@ fn self_index_out_of_range_or_with_self_box_is_an_error() {
     .unwrap();
     assert!(ergo_sandbox::eval_scenario(&sc).is_err());
 }
+
+// ----- other inputs' extensions -----
+
+#[test]
+fn another_inputs_extension_is_visible_through_get_var_from_input() {
+    // Input 0 carries var 0 = 7 in its own spending proof; SELF is input 1.
+    let sc = r#"{
+      "source": "sigmaProp(CONTEXT.getVarFromInput[Int](0, 0).get == 7)",
+      "height": 100, "selfIndex": 1,
+      "inputs": [
+        {"value": 1, "ergoTree": "10010101d17300", "extension": {"0": {"type": "Int", "value": 7}}},
+        {"value": 1}
+      ]
+    }"#;
+    assert_eq!(eval_json(sc).verdict, Verdict::Pass);
+    // Without it, the var is absent and `get` throws.
+    let without = sc.replace(r#", "extension": {"0": {"type": "Int", "value": 7}}"#, "");
+    assert_eq!(eval_json(&without).verdict, Verdict::Error);
+}

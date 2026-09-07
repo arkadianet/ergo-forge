@@ -220,12 +220,28 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
             Ok((*id, (tpe, value)))
         })
         .collect::<Result<indexmap::IndexMap<u8, (_, _)>, SandboxError>>()?;
-    // The spending proof's extension belongs to the SELF input, so
-    // `getVarFromInput(selfIndex, id)` answers like `getVar(id)`.
+    // Every input's own extension (for `getVarFromInput`); the spending
+    // proof's extension belongs to the SELF input, so
+    // `getVarFromInput(selfIndex, id)` answers like `getVar(id)`, with the
+    // scenario's `contextVars` taking precedence there.
     let mut input_extensions = vec![indexmap::IndexMap::new(); inputs.len()];
+    // Scenario inputs map to evaluation inputs directly under `selfIndex`,
+    // and one place later under `selfBox` (which sits at index 0).
+    let shift = usize::from(sc.self_index.is_none());
+    for (i, sb) in sc.inputs.iter().enumerate() {
+        let Some(slot) = input_extensions.get_mut(i + shift) else {
+            break;
+        };
+        for (id, tv) in &sb.extension {
+            let (tpe, value) = crate::scenario::parse_typed_value(&tv.r#type, &tv.value)?;
+            slot.insert(*id, (tpe, value));
+        }
+    }
     let self_idx = sc.self_index.unwrap_or(0);
     if let Some(slot) = input_extensions.get_mut(self_idx) {
-        *slot = extension.clone();
+        for (id, v) in &extension {
+            slot.insert(*id, v.clone());
+        }
     }
 
     // 4. Pre-header + miner key.
