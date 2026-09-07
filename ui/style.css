@@ -347,7 +347,7 @@ details.dev summary { color: var(--dim); cursor: pointer; }
 /* ── composer ── */
 .recipe.custom { border-style: dashed; }
 .plain { padding-left: 1.2rem; }
-.plain li { margin: 0.25rem 0; }
+.plain li { margin: 0.25rem 0; overflow-wrap: anywhere; }
 .plain code { background: var(--panel); padding: 0 0.25rem; border-radius: 4px; }
 .prove-row { display: grid; grid-template-columns: auto 1fr auto; gap: 0.4rem; align-items: center; margin: 0.3rem 0; }
 .prove-row input { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.85rem; }
