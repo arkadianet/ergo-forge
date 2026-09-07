@@ -58,9 +58,10 @@ USAGE:
                   [--params params.json]
       Compile ErgoScript source to ErgoTree bytes + P2S/P2SH addresses.
       --params supplies compile-time constants (JSON: name -> {{type, value}}).
-  ergo-es test <contract.test.json>
+  ergo-es test <contract.test.json> [--json]
       Run a contract test suite (source or tree + named scenarios with
       expected verdicts); one line per case, non-zero exit on any failure.
+      --json prints the stable machine shape (docs/scenario-format.md).
   ergo-es validate-tx <request.json>
       Will this unsigned transaction validate? {{tx, boxes, height?}}: every
       input's script runs in the real context; ERG/token conservation is
@@ -72,7 +73,7 @@ USAGE:
       composer's model (write it with --suite, then `ergo-es test` it).
   ergo-es params <source-file>
       List the $parameters a source needs (with // $name: Type hints).
-  ergo-es eval <scenario.json> [--hot-spots]
+  ergo-es eval <scenario.json> [--hot-spots] [--json]
       Evaluate a scenario: contract (source or tree hex) + spending context
       → verdict, cost, trace. See README scenario schema. --hot-spots ranks
       the operations by cost (needs a --features cost-trace build).
@@ -209,6 +210,26 @@ fn cmd_eval(args: &[String]) -> Result<(), String> {
     let scenario: Scenario =
         serde_json::from_str(&text).map_err(|e| format!("scenario JSON: {e}"))?;
     let outcome = eval_scenario(&scenario).map_err(|e| e.to_string())?;
+    if args.iter().any(|a| a == "--json") {
+        // The stable, comparable shape (docs/scenario-format.md): what a
+        // second reducer prints for the same scenario.
+        let v = serde_json::json!({
+            "formatVersion": 1,
+            "verdict": ergo_sandbox::testsuite::verdict_name(outcome.verdict),
+            "error": outcome.error,
+            "reducedTo": outcome.reduced_to,
+            "cost": outcome.cost,
+            "costLimit": outcome.cost_limit,
+            "proof": outcome.proof,
+            "treeHex": outcome.tree_hex,
+            "p2sAddress": outcome.p2s_address,
+        });
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&v).map_err(|e| e.to_string())?
+        );
+        return Ok(());
+    }
     println!("verdict:  {}", verdict_str(outcome.verdict));
     if let Some(err) = &outcome.error {
         println!("error:    {err}");
@@ -859,7 +880,7 @@ fn hunt_verdict_str(v: ergo_sandbox::hunt::HuntVerdict) -> &'static str {
 
 /// `ergo-es test <suite.json>` — the CI entry point for contract tests.
 fn cmd_test(args: &[String]) -> Result<(), String> {
-    let Some(path) = args.first() else {
+    let Some(path) = args.iter().find(|a| !a.starts_with("--")) else {
         return Err("test needs a suite JSON file (or - for stdin)".into());
     };
     let text = read_input(path)?;
@@ -867,6 +888,28 @@ fn cmd_test(args: &[String]) -> Result<(), String> {
         serde_json::from_str(&text).map_err(|e| format!("suite JSON: {e}"))?;
     let r = ergo_sandbox::decompile::with_large_stack(move || ergo_sandbox::testsuite::run(&suite))
         .map_err(|e| e.to_string())?;
+    if args.iter().any(|a| a == "--json") {
+        let v = serde_json::json!({
+            "formatVersion": 1,
+            "treeHex": r.tree_hex,
+            "address": r.address,
+            "cases": r.cases.iter().map(|c| serde_json::json!({
+                "name": c.name, "expected": c.expected, "actual": c.actual, "passed": c.passed,
+                "error": c.error, "reducedTo": c.reduced_to, "cost": c.cost,
+            })).collect::<Vec<_>>(),
+            "passed": r.passed,
+            "failed": r.failed,
+        });
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&v).map_err(|e| e.to_string())?
+        );
+        return if r.failed > 0 {
+            Err(format!("{} case(s) failed", r.failed))
+        } else {
+            Ok(())
+        };
+    }
     println!("contract: {}", r.address);
     for c in &r.cases {
         let mark = if c.passed { "ok  " } else { "FAIL" };
