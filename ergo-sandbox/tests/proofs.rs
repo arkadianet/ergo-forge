@@ -325,3 +325,30 @@ fn a_requested_tree_version_is_on_the_header_and_unlocks_v6_methods() {
         plain.tree_bytes[0]
     );
 }
+
+#[test]
+fn the_proof_a_run_made_or_used_is_returned() {
+    let g = ergo_sandbox::prove::generator_hex();
+    let sc: ergo_sandbox::Scenario = serde_json::from_value(serde_json::json!({
+        "source": format!("proveDlog(decodePoint(fromBase16(\"{g}\")))"), "height": 1,
+        "message": "0102", "secrets": [ {"dlog": X1} ] }))
+    .unwrap();
+    let out = ergo_sandbox::eval_scenario(&sc).unwrap();
+    assert_eq!(
+        out.verdict,
+        ergo_sandbox::Verdict::ProofAccepted,
+        "{:?}",
+        out.error
+    );
+    let proof = out.proof.expect("proof bytes");
+    assert!(proof.len() >= 2 * 56, "{proof}");
+    // The same proof, supplied, verifies against the same message.
+    let sc2: ergo_sandbox::Scenario = serde_json::from_value(serde_json::json!({
+        "source": format!("proveDlog(decodePoint(fromBase16(\"{g}\")))"), "height": 1,
+        "message": "0102", "proof": proof }))
+    .unwrap();
+    assert_eq!(
+        ergo_sandbox::eval_scenario(&sc2).unwrap().verdict,
+        ergo_sandbox::Verdict::ProofAccepted
+    );
+}

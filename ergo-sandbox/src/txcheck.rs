@@ -296,7 +296,7 @@ pub fn check(req: &TxRequest) -> Result<TxCheck, SandboxError> {
 }
 
 /// Node/explorer box JSON → a scenario box with raw registers.
-fn scenario_box(b: &serde_json::Value) -> ScenarioBox {
+pub fn scenario_box(b: &serde_json::Value) -> ScenarioBox {
     let mut registers = BTreeMap::new();
     if let Some(regs) = b["additionalRegisters"].as_object() {
         for (k, v) in regs {
