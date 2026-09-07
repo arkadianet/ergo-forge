@@ -91,6 +91,9 @@ pub struct EvalOutcome {
     /// Every evaluated node's value, in evaluation order (a node inside a
     /// lambda appears once per call).
     pub values: Vec<ValueLine>,
+    /// The spending proof this run used — supplied, or made from `secrets`
+    /// / `parties` — as hex; what a transaction input would carry.
+    pub proof: Option<String>,
     /// Per-step cost breakdown (requires the `cost-trace` feature).
     #[cfg(feature = "cost-trace")]
     pub cost_breakdown: Vec<CostLine>,
@@ -356,6 +359,7 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
             .map(|TraceEntry { label, value }| TraceLine { label, value })
             .collect(),
         values,
+        proof: None,
         #[cfg(feature = "cost-trace")]
         cost_breakdown,
         tree_hex: hex::encode(&tree_bytes),
@@ -422,6 +426,7 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
         None => None,
     };
     if let Some(proof_bytes) = proof_bytes {
+        outcome.proof = Some(hex::encode(&proof_bytes));
         let mut verify_cost = new_accumulator()?;
         match verify_spending_proof_with_context_and_cost(
             &tree,
