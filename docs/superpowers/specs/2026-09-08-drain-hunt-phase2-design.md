@@ -32,7 +32,11 @@ The concrete case first, because it is funded and unresolved. The USE bank
 vault (`e6162e2aff23…`, 292,615.109709675 ERG plus the ~1e15 USE treasury)
 authorizes a spend when `OUTPUTS(0).tokens(2)._1` is one of four admin NFTs
 (`useFreeMint`, `useArbitrageMint`, `usePayout`, `useUpdateNft` — or the
-never-minted `dbf655…` at `OUTPUTS(2)`, a dead branch). Phase 1 structurally
+never-minted `dbf655…` at `OUTPUTS(2)`, a dead branch). **[Corrected below
+and in the corpus fixture: the deployed tree checks
+`INPUTS(0).tokens(0)._1`, with the dead branch at `INPUTS(2)` and a
+faithful-continuation guard on `OUTPUTS(1)` — see "CORRECTED by
+implementation" in the flagship section.]** Phase 1 structurally
 cannot express that shape: its `OUTPUTS(0)` is always the first protected
 successor, whose token layout the caller declared. The phase-1 hunt therefore
 answers `notUnderProbes` on the vault set — a statement about the probes, not
@@ -77,8 +81,12 @@ freedom, each capped and each recorded in the report:
    - **Companion re-creations with padded token layouts** — a companion box
      rebuilt verbatim (same script, value, tokens) with filler tokens
      inserted so that a carried NFT lands at an attacker-chosen index
-     `i ∈ {0..=3}`. This is the vault move: the whitelisted NFT at
-     `OUTPUTS(k).tokens(2)`.
+     `i ∈ {0..=3}`. Written as *the vault move*: the whitelisted NFT at
+     `OUTPUTS(k).tokens(2)`. [Corrected: the deployed vault checks the
+     whitelist on the **input** side — the vault's own move is spending an
+     authorizer box, not padding an output. The padded re-creation degree
+     stays: output-side token-index checks are a real contract family; the
+     vault was just not one.]
      **The padding has a token source, and saying so is load-bearing.**
      Conservation rejects any output id the inputs do not carry, and a box
      cannot hold one id twice — so reaching index 2 needs *two distinct
@@ -209,19 +217,43 @@ without the decode:
    recorded verdict — the same pattern the USE replay used: the corpus is
    both fixture and answer key.
 
-   **Sources for the whitelist shape** — this spec's flagship hangs on it,
-   so the provenance is stated: the vault box
-   `e6162e2aff23f7c88968cc958541bacfe3ad80d6541befb7231ac3106e966f8b`
-   (carried by the merged map fixture `use-lp.json`), whose deployed
-   ErgoTree constants were hand-decoded during the incident response — the
-   four NFT constants and the dead `dbf655…` branch at `OUTPUTS(2)` are
-   visible in the tree's constant block, and the drain analysis in the
-   incident report records the decode. **Do not confuse this with**
-   `examples/contracts/dexy/bank/bank.es`, the DexyGold fork's bank, which
-   checks `INPUTS(mintInIndex).tokens(0)._1` — an input-side, index-0
-   check; a different contract. Implementation must land the vault's
-   deployed tree as a corpus fixture so the asserted whitelist shape is
-   checkable, not taken on trust from this document.
+    **Sources for the whitelist shape** — this spec's flagship hangs on it,
+    so the provenance is stated: the vault box
+    `e6162e2aff23f7c88968cc958541bacfe3ad80d6541befb7231ac3106e966f8b`
+    (carried by the merged map fixture `use-lp.json`), whose deployed
+    ErgoTree constants were hand-decoded during the incident response — the
+    four NFT constants and the dead `dbf655…` branch at `OUTPUTS(2)` are
+    visible in the tree's constant block, and the drain analysis in the
+    incident report records the decode. **Do not confuse this with**
+    `examples/contracts/dexy/bank/bank.es`, the DexyGold fork's bank, which
+    checks `INPUTS(mintInIndex).tokens(0)._1` — an input-side, index-0
+    check; a different contract. Implementation must land the vault's
+    deployed tree as a corpus fixture so the asserted whitelist shape is
+    checkable, not taken on trust from this document.
+
+    **CORRECTED by implementation (2026-09-08, the fixture doing its job):**
+    landing the corpus fixture showed the hand-decode above was wrong on
+    collection and index. The deployed tree's whitelist is **input-side** —
+    `INPUTS(0).tokens(0)._1` ∈ {useFreeMint, useArbitrageMint, usePayout,
+    useUpdateNft} — with the never-minted `dbf655…` dead branch at
+    `INPUTS(2).tokens(0)._1`, and it requires a faithful continuation at
+    `OUTPUTS(1)` (same script bytes; `tokens(0)` id and amount pinned;
+    `tokens(1)` id only — the treasury amount is *not* pinned by the vault
+    script). The `useUpdateNft` route stands alone outside the continuation
+    guards. Proof: the tree re-serializes byte-identically and
+    `examples/incidents/use-bank-vault.json`'s `mirrorSource` compiles back
+    to the same constants and proposition;
+    `ergo-sandbox/tests/vault_corpus.rs` asserts the decode from the wire
+    bytes. Consequences for the flagship: the vault move is **not** a padded
+    output — the whitelist is satisfiable only by spending a box that
+    carries an authorizer NFT at `tokens(0)` (the authorizer companions, or
+    the admin's P2PK box, which `needsProof` refuses), the continuation must
+    land at `OUTPUTS(1)` (the output-permutation axis earns its place), and
+    the empirical question — do the three script authorizers pass without a
+    key? — stands unchanged. The admin-refusal acceptance below is
+    unaffected. The empirical flagship run is **deliberately not yet run**:
+    it is re-aimed at the corrected shape and gated on disclosure-first
+    sign-off.
 3. **Either outcome is a result.** `drainable` means the vault is a live
    keyless drain of 292,615 ERG + the treasury: **disclosure-first** — the
    operator is the project itself here, but the rule from the phase-1 spec

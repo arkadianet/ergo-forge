@@ -1095,6 +1095,43 @@ fn cmd_drain(args: &[String]) -> Result<(), String> {
         "  probes: {}/{} (capped: {}), hits: {}",
         report.probes_run, report.probes_total, report.capped, report.hits
     );
+    if report.synthesis.enabled {
+        let d = &report.synthesis.degrees;
+        let caps = &report.synthesis.caps;
+        let shapes: Vec<String> = report
+            .synthesis
+            .shapes
+            .iter()
+            .filter(|s| s.run > 0 || s.generated > 0)
+            .map(|s| format!("{}({}/{})", s.shape, s.run, s.generated))
+            .collect();
+        println!(
+            "  synthesis: recreations:{} states:{} splits:{} mints:{} permuteOutputs:{} | caps: newOutputs {}, states {}, outPerms {}, probes {}",
+            d.companion_recreations,
+            d.successor_states,
+            d.splits,
+            d.mints,
+            d.permute_outputs,
+            caps.max_new_outputs,
+            caps.max_successor_states,
+            caps.max_output_permutations,
+            caps.max_probes,
+        );
+        if report.capped {
+            println!(
+                "  TRUNCATED: the probe cap bound — the pinned axis order decided which probes ran"
+            );
+        }
+        if !shapes.is_empty() {
+            println!("  shapes: {}", shapes.join(", "));
+        }
+        if !report.nft_detached.is_empty() {
+            println!(
+                "  nftDetached: {} script-matched output(s) lack the protocol NFT",
+                report.nft_detached.len()
+            );
+        }
+    }
     if let Some(best) = &report.best {
         println!("  best extraction:");
         for (asset, amt) in &best.extracted {
