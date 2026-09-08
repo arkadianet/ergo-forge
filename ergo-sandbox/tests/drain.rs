@@ -71,6 +71,10 @@ fn object(v: Value) -> Value {
 
 fn drain(request: Value) -> ergo_sandbox::drain::DrainReport {
     let req: DrainRequest = serde_json::from_value(request).expect("request parses");
+    drain_request(req)
+}
+
+fn drain_request(req: DrainRequest) -> ergo_sandbox::drain::DrainReport {
     ergo_sandbox::decompile::with_large_stack(move || drain_hunt(&req)).expect("hunt runs")
 }
 
@@ -236,4 +240,97 @@ fn shape_errors_are_verdicts_not_panics() {
     let report = drain(request);
     assert_eq!(report.verdict, DrainVerdict::InvalidShape);
     assert!(report.notes.iter().any(|n| n.contains("unknown")));
+}
+
+// ── The protocol map feeds the hunt (map #63 → drain integration) ────────────
+
+mod map_feed {
+    use super::*;
+    use ergo_sandbox::map::{map, Fixture, MapOptions, ProtocolMap, Seed};
+
+    fn load(name: &str) -> Fixture {
+        let path = format!("{}/tests/fixtures/map/{name}", env!("CARGO_MANIFEST_DIR"));
+        let text = std::fs::read_to_string(&path).expect("read fixture");
+        Fixture::from_json(&text).expect("parse fixture")
+    }
+
+    /// The caps the fixtures were recorded with (tests/map.rs).
+    fn recorded_opts() -> MapOptions {
+        MapOptions {
+            max_depth: 6,
+            max_nodes: 96,
+            ..MapOptions::default()
+        }
+    }
+
+    fn attacker() -> Value {
+        json!({
+            "value": 2000000,
+            "ergoTree": "10010101d17300",
+        })
+    }
+
+    /// The recorded chain state is POST-drain (height 1,868,438 — both pools
+    /// were drained at 1,868,204 and 1,868,221), so the honest assertion is
+    /// that the mapped sets, as they stand today, have nothing left to drain.
+    /// The funded rediscovery is the hand-built positive control above, over
+    /// the same deployed trees the map carries.
+    fn assert_mapped_set_has_nothing_left(name: &str, seed: &str) {
+        let fixture = load(name);
+        let m: ProtocolMap = map(&fixture, &Seed::TokenId(seed.to_string()), &recorded_opts())
+            .expect("map the recorded set");
+        let (mut request, skipped) = ergo_sandbox::drain::request_from_map(
+            &m,
+            serde_json::from_value(attacker()).expect("attacker box"),
+        );
+        // The mapped sets carry a dozen-plus inputs; phase-1 enumeration over
+        // all of them is thousands of full validations. These tests assert the
+        // seam (map roles -> request -> hunt), so the caps are tightened and
+        // the truncation is deterministic.
+        request.max_permutations = Some(24);
+        request.max_probes = Some(500);
+        assert!(
+            !skipped.is_empty(),
+            "the USE/Dexy maps carry unresolved nodes; they are returned, not defaulted"
+        );
+        assert!(
+            request
+                .inputs
+                .iter()
+                .any(|i| i.role == ergo_sandbox::DrainRole::Protected),
+            "the map proposed at least one protected box"
+        );
+        assert!(
+            request
+                .inputs
+                .iter()
+                .any(|i| i.role == ergo_sandbox::DrainRole::Companion),
+            "the map proposed at least one companion box"
+        );
+        let report = drain_request(request);
+        assert_eq!(
+            report.verdict,
+            DrainVerdict::NotUnderProbes,
+            "the mapped {} set is post-drain: {:?}",
+            name,
+            report.best
+        );
+        assert!(report.probes_run > 0, "the hunt actually ran probes");
+    }
+
+    #[test]
+    fn the_mapped_use_set_feeds_the_hunt_and_has_nothing_left_to_drain() {
+        assert_mapped_set_has_nothing_left(
+            "use-lp.json",
+            "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41",
+        );
+    }
+
+    #[test]
+    fn the_mapped_dexy_set_feeds_the_hunt_and_has_nothing_left_to_drain() {
+        assert_mapped_set_has_nothing_left(
+            "dexy-gold.json",
+            "905ecdef97381b92c2f0ea9b516f312bfb18082c61b24b40affa6a55555c77c7",
+        );
+    }
 }

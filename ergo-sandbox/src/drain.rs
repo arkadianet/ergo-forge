@@ -966,6 +966,126 @@ fn witness_bundle(
     }
 }
 
+// ── The protocol map feeds the hunt ──────────────────────────────────────────
+
+/// The map's proposed role as the drain hunt's role. The map never proposes
+/// `attacker` — the attacker box is the hunt's own construct.
+impl From<&crate::map::Role> for DrainRole {
+    fn from(r: &crate::map::Role) -> Self {
+        match r {
+            crate::map::Role::Protected => DrainRole::Protected,
+            crate::map::Role::Companion => DrainRole::Companion,
+            crate::map::Role::External => DrainRole::External,
+            crate::map::Role::Unknown => DrainRole::Unknown,
+        }
+    }
+}
+
+/// A mapped chain box as a scenario box. The archive shape carries no
+/// additional registers, which is a fidelity limit only for scripts that
+/// read R4–R9 of *other* inputs.
+#[must_use]
+pub fn scenario_box_from_chain(b: &crate::map::source::ChainBox) -> ScenarioBox {
+    ScenarioBox {
+        value: b.value.min(i64::MAX as u64) as i64,
+        ergo_tree: Some(b.ergo_tree.clone()),
+        tokens: b
+            .tokens
+            .iter()
+            .map(|t| TokenAmount {
+                id: t.id.clone(),
+                amount: t.amount,
+            })
+            .collect(),
+        creation_height: b.creation_height,
+        registers: Default::default(),
+        box_id: Some(b.box_id.clone()),
+        extension: Default::default(),
+    }
+}
+
+/// Build a phase-1 request from a protocol map — the map spec's promise that
+/// roles are "what stops that being hand work". Every `protected` and
+/// `companion` node becomes an input (the map's proposal, overridable by the
+/// caller afterwards); `external` nodes become data inputs; `unknown` nodes
+/// are skipped and **returned**, never silently defaulted. The template is
+/// the generic honest one: each protected box rebuilt verbatim as its
+/// successor, one free payee as the drain sink carrying the attacker's tree.
+/// Verbatim probes of this template are generally unbalanced (the attacker's
+/// own input has no sanctioned output); the drain-mode construction balances
+/// by taking the remainder, which is the workhorse here.
+///
+/// Nodes the map left `unknown` are returned so the caller resolves them and
+/// re-runs — the hunt would refuse them anyway.
+#[must_use]
+pub fn request_from_map(
+    m: &crate::map::ProtocolMap,
+    attacker: ScenarioBox,
+) -> (DrainRequest, Vec<String>) {
+    let mut inputs = Vec::new();
+    let mut successors = Vec::new();
+    let mut data_inputs = Vec::new();
+    let mut skipped: Vec<String> = Vec::new();
+
+    for node in m.nodes.values() {
+        match node.role {
+            crate::map::Role::Protected | crate::map::Role::Companion => {
+                let b = scenario_box_from_chain(&node.chain_box);
+                if node.role == crate::map::Role::Protected {
+                    successors.push(b.clone());
+                }
+                inputs.push(DrainInput {
+                    role: (&node.role).into(),
+                    box_: b,
+                });
+            }
+            crate::map::Role::External => {
+                data_inputs.push(scenario_box_from_chain(&node.chain_box));
+            }
+            crate::map::Role::Unknown => skipped.push(node.chain_box.box_id.clone()),
+        }
+    }
+
+    inputs.push(DrainInput {
+        role: DrainRole::Attacker,
+        box_: attacker.clone(),
+    });
+
+    let payout_tree = attacker
+        .ergo_tree
+        .clone()
+        .unwrap_or_else(|| "10010101d17300".to_string());
+    let mut outputs: Vec<DrainOutput> = successors
+        .into_iter()
+        .map(|b| DrainOutput {
+            payee: Payee::Fixed,
+            box_: b,
+        })
+        .collect();
+    outputs.push(DrainOutput {
+        payee: Payee::Free,
+        box_: ScenarioBox {
+            value: 0,
+            ergo_tree: Some(payout_tree),
+            ..Default::default()
+        },
+    });
+
+    (
+        DrainRequest {
+            inputs,
+            data_inputs,
+            outputs,
+            protocol_nfts: m.protocol_nfts.iter().cloned().collect(),
+            height: m.height,
+            network: None,
+            attacker_tree: None,
+            max_permutations: None,
+            max_probes: None,
+        },
+        skipped,
+    )
+}
 #[cfg(test)]
 mod tests {
     use super::*;
