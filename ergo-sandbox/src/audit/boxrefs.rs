@@ -50,9 +50,11 @@ pub fn collect_vals<'a>(n: &'a Node, vals: &mut Vals<'a>) {
 /// Follow `val` references to the expression they stand for.
 pub fn deref<'a>(n: &'a Node, vals: &Vals<'a>) -> &'a Node {
     let mut cur = n;
-    // Bounded: `val` definitions cannot be cyclic, but a corrupt tree must
-    // not spin here.
-    for _ in 0..64 {
+    // Bounded by the number of bindings: a chain longer than that must revisit
+    // a name, so it is cyclic. `val` definitions cannot be cyclic in a tree the
+    // lift produced, but a corrupt one must not spin here — and the bound never
+    // cuts a legitimate chain short, however deep the tree.
+    for _ in 0..=vals.len() {
         match &cur.kind {
             NodeKind::Val(name) => match vals.get(name) {
                 Some(d) => cur = d,

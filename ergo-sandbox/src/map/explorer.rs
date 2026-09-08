@@ -75,25 +75,32 @@ impl ExplorerSource {
 }
 
 /// Explorer box JSON → [`ChainBox`], reading only the fields the map needs.
+///
+/// Strict about the fields the map *reasons* with — `boxId`, `ergoTree`,
+/// `value`, and every token's id and amount. A default there would be a
+/// fabricated fact: it would flow into `json::canonical`, into a role
+/// decision, and into a recorded fixture, indistinguishable from something
+/// the chain actually said. `creationHeight`/`settlementHeight` are the
+/// exception and default to 0, which only degrades the selection order to box
+/// id alone — documented on [`ChainBox`].
 fn to_box(v: &Value) -> Option<ChainBox> {
     Some(ChainBox {
         box_id: v.get("boxId")?.as_str()?.to_ascii_lowercase(),
         ergo_tree: v.get("ergoTree")?.as_str()?.to_ascii_lowercase(),
-        value: v.get("value").and_then(Value::as_u64).unwrap_or(0),
-        tokens: v
-            .get("assets")
-            .and_then(Value::as_array)
-            .map(|a| {
-                a.iter()
-                    .filter_map(|t| {
-                        Some(ChainToken {
-                            id: t.get("tokenId")?.as_str()?.to_ascii_lowercase(),
-                            amount: t.get("amount").and_then(Value::as_u64).unwrap_or(0),
-                        })
+        value: v.get("value")?.as_u64()?,
+        tokens: match v.get("assets") {
+            None | Some(Value::Null) => Vec::new(),
+            Some(a) => a
+                .as_array()?
+                .iter()
+                .map(|t| {
+                    Some(ChainToken {
+                        id: t.get("tokenId")?.as_str()?.to_ascii_lowercase(),
+                        amount: t.get("amount")?.as_u64()?,
                     })
-                    .collect()
-            })
-            .unwrap_or_default(),
+                })
+                .collect::<Option<Vec<_>>>()?,
+        },
         creation_height: v.get("creationHeight").and_then(Value::as_u64).unwrap_or(0) as u32,
         // `settlementHeight` is the height the box entered the chain at — the
         // stable half of the map's canonical selection order.
@@ -105,15 +112,25 @@ fn to_box(v: &Value) -> Option<ChainBox> {
     })
 }
 
-fn to_page(v: &Value) -> Page {
-    Page {
-        items: v
-            .get("items")
-            .and_then(Value::as_array)
-            .map(|a| a.iter().filter_map(to_box).collect())
-            .unwrap_or_default(),
+/// A page of boxes. One unusable item fails the whole page: silently dropping
+/// it would shrink a result set the map then reports as complete.
+fn to_page(v: &Value) -> Result<Page, SourceError> {
+    let items = match v.get("items") {
+        None | Some(Value::Null) => Vec::new(),
+        Some(a) => a
+            .as_array()
+            .ok_or_else(|| SourceError::Backend("explorer page `items` is not an array".into()))?
+            .iter()
+            .map(to_box)
+            .collect::<Option<Vec<_>>>()
+            .ok_or_else(|| {
+                SourceError::Backend("explorer page holds a box the map cannot read".into())
+            })?,
+    };
+    Ok(Page {
+        items,
         total: v.get("total").and_then(Value::as_u64).map(|t| t as usize),
-    }
+    })
 }
 
 impl ChainSource for ExplorerSource {
@@ -147,7 +164,7 @@ impl ChainSource for ExplorerSource {
         let v = self.get(&format!(
             "/api/v1/boxes/unspent/byTokenId/{token_id}?offset={offset}&limit={limit}"
         ))?;
-        Ok(to_page(&v))
+        to_page(&v)
     }
 
     fn token_info(&self, token_id: &str) -> Result<TokenInfo, SourceError> {
@@ -167,7 +184,7 @@ impl ChainSource for ExplorerSource {
         let v = self.get(&format!(
             "/api/v1/boxes/unspent/byAddress/{address}?offset={offset}&limit={limit}"
         ))?;
-        Ok(to_page(&v))
+        to_page(&v)
     }
 
     // `boxes_by_script_hash` is deliberately left at the trait default. The
@@ -178,15 +195,22 @@ impl ChainSource for ExplorerSource {
 
     fn transaction(&self, tx_id: &str) -> Result<TxBoxes, SourceError> {
         let v = self.get(&format!("/api/v1/transactions/{tx_id}"))?;
-        let side = |k: &str| {
-            v.get(k)
-                .and_then(Value::as_array)
-                .map(|a| a.iter().filter_map(to_box).collect::<Vec<_>>())
-                .unwrap_or_default()
+        let side = |k: &str| -> Result<Vec<ChainBox>, SourceError> {
+            match v.get(k) {
+                None | Some(Value::Null) => Ok(Vec::new()),
+                Some(a) => a
+                    .as_array()
+                    .and_then(|a| a.iter().map(to_box).collect::<Option<Vec<_>>>())
+                    .ok_or_else(|| {
+                        SourceError::Backend(format!(
+                            "transaction {tx_id}: `{k}` holds a box the map cannot read"
+                        ))
+                    }),
+            }
         };
         Ok(TxBoxes {
-            inputs: side("inputs"),
-            outputs: side("outputs"),
+            inputs: side("inputs")?,
+            outputs: side("outputs")?,
         })
     }
 }

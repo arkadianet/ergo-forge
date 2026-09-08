@@ -36,7 +36,9 @@ fn main() {
                 skip = false;
                 continue;
             }
-            if a.starts_with("--") {
+            if a == "--tx" || a == "--address" {
+                // Selectors take no value.
+            } else if a.starts_with("--") {
                 skip = true;
             } else {
                 out.push(a);
@@ -57,9 +59,12 @@ fn main() {
         opts.max_nodes = n.parse().expect("--max-nodes");
     }
     let base = flag("--explorer").unwrap_or_else(|| DEFAULT_EXPLORER_URL.to_string());
-    let seed = match flag("--tx") {
-        Some(tx) => Seed::TransactionId(tx),
-        None => Seed::guess(seed_text),
+    // `--tx` is a selector, not a flag with a value: the seed is still the
+    // first positional, as it is for `ergo-es map`.
+    let seed = if args.iter().any(|a| a == "--tx") {
+        Seed::TransactionId(seed_text.trim().to_ascii_lowercase())
+    } else {
+        Seed::guess(seed_text)
     };
 
     let recorder = RecordingSource::new(ExplorerSource::new(&base)).expect("reach the explorer");

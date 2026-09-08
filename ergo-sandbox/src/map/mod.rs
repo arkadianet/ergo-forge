@@ -383,13 +383,23 @@ pub fn map(
         truncated: Truncation::default(),
         tokens: BTreeMap::new(),
         token_boxes: BTreeMap::new(),
+        script_hash_boxes: BTreeMap::new(),
+        script_hash_unsupported: false,
     };
 
     let height = source.height()?;
     let frontier = w.seed_frontier(seed)?;
 
     let mut nodes: BTreeMap<String, MapNode> = BTreeMap::new();
-    let mut queue: VecDeque<(ChainBox, u32)> = frontier.into_iter().map(|b| (b, 0u32)).collect();
+    // A box reached by two different references is one box: queued once, and
+    // if the node cap refuses it, counted once.
+    let mut queued: BTreeSet<String> = BTreeSet::new();
+    let mut queue: VecDeque<(ChainBox, u32)> = VecDeque::new();
+    for b in frontier {
+        if queued.insert(b.box_id.clone()) {
+            queue.push_back((b, 0u32));
+        }
+    }
 
     while let Some((b, depth)) = queue.pop_front() {
         if nodes.contains_key(&b.box_id) {
@@ -408,11 +418,17 @@ pub fn map(
             continue;
         }
         for c in &constants {
-            if !matches!(w.classify(c)?, TokenClass::NotAToken) {
-                for holder in w.token_boxes(c)? {
-                    if !nodes.contains_key(&holder.box_id) {
-                        queue.push_back((holder, depth + 1));
-                    }
+            // A constant is followed as a token id when the chain says a token
+            // with that id exists, and otherwise as a candidate script hash —
+            // the two classifications the spec defines, in that order.
+            let holders = if matches!(w.classify(c)?, TokenClass::NotAToken) {
+                w.script_hash_boxes(c)?
+            } else {
+                w.token_boxes(c)?
+            };
+            for holder in holders {
+                if !nodes.contains_key(&holder.box_id) && queued.insert(holder.box_id.clone()) {
+                    queue.push_back((holder, depth + 1));
                 }
             }
         }
@@ -450,8 +466,7 @@ pub fn map(
         node.nft = protocol_nft_of(&node.chain_box, &protocol_nfts);
     }
 
-    let mut truncated = truncated;
-    let mut edges = build_edges(&nodes, &token_boxes, &tokens, source, opts, &mut truncated);
+    let mut edges = build_edges(&nodes, &token_boxes, &tokens);
     add_pairing_edges(&nodes, &mut edges);
     edges.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
     edges.dedup_by(|a, b| a.sort_key() == b.sort_key());
@@ -501,6 +516,10 @@ struct Walk<'a> {
     truncated: Truncation,
     tokens: BTreeMap<String, TokenClass>,
     token_boxes: BTreeMap<String, Vec<ChainBox>>,
+    script_hash_boxes: BTreeMap<String, Vec<ChainBox>>,
+    /// Set once the source has said it has no script-hash index, so the map
+    /// asks once rather than once per constant.
+    script_hash_unsupported: bool,
 }
 
 impl Walk<'_> {
@@ -516,9 +535,11 @@ impl Walk<'_> {
         let mut total: Option<usize> = None;
         let mut offset = 0usize;
         while all.len() < self.opts.max_fetch_per_query {
+            // `max(1)`: a zero page size would ask for nothing forever.
             let limit = self
                 .opts
                 .page_size
+                .max(1)
                 .min(self.opts.max_fetch_per_query - all.len());
             let page = fetch(offset, limit)?;
             let got = page.items.len();
@@ -526,7 +547,7 @@ impl Walk<'_> {
                 total = page.total;
             }
             all.extend(page.items);
-            if got < limit {
+            if got == 0 || got < limit {
                 break;
             }
             offset += got;
@@ -546,8 +567,11 @@ impl Walk<'_> {
         let class = match self.source.token_info(hex) {
             Ok(info) if info.is_singleton() => TokenClass::Singleton,
             Ok(info) => TokenClass::Fungible(info.emission_amount),
+            // Only a chain "no such token" is evidence of absence. A source
+            // that cannot answer at all is a gap in the *source*, and the map
+            // says so rather than recording `notAToken` on evidence it never
+            // got — classification is the one query the map cannot do without.
             Err(SourceError::NotFound(_)) => TokenClass::NotAToken,
-            Err(SourceError::Unsupported(_)) => TokenClass::NotAToken,
             Err(e) => return Err(MapError::Source(e)),
         };
         self.tokens.insert(hex.to_string(), class.clone());
@@ -574,15 +598,51 @@ impl Walk<'_> {
         Ok(selected)
     }
 
+    /// The boxes whose `blake2b256(propositionBytes)` is `hash`, cached.
+    ///
+    /// The *second* way a 32-byte constant resolves. A source without such an
+    /// index says [`SourceError::Unsupported`], and the map then leaves the
+    /// reference to close against trees it already holds, or to stand as an
+    /// unresolved edge — never as an absence.
+    fn script_hash_boxes(&mut self, hash: &str) -> Result<Vec<ChainBox>, MapError> {
+        if self.script_hash_unsupported {
+            return Ok(Vec::new());
+        }
+        if let Some(v) = self.script_hash_boxes.get(hash) {
+            return Ok(v.clone());
+        }
+        let selected = match self.select(self.opts.max_boxes_per_script_hash, |off, lim| {
+            self.source.boxes_by_script_hash(hash, off, lim)
+        }) {
+            Ok((selected, omitted)) => {
+                if omitted > 0 {
+                    self.truncated
+                        .per_script_hash
+                        .insert(hash.to_string(), omitted);
+                }
+                selected
+            }
+            Err(SourceError::Unsupported(_)) => {
+                self.script_hash_unsupported = true;
+                return Ok(Vec::new());
+            }
+            Err(e) => return Err(MapError::Source(e)),
+        };
+        self.script_hash_boxes
+            .insert(hash.to_string(), selected.clone());
+        Ok(selected)
+    }
+
     /// The initial frontier: seed → boxes, bounded and truncation-reported.
     fn seed_frontier(&mut self, seed: &Seed) -> Result<Vec<ChainBox>, MapError> {
         let (mut boxes, omitted) = match seed {
             Seed::TokenId(id) => {
-                let (b, o) = self.select(self.opts.max_frontier, |off, lim| {
+                // Deliberately NOT cached as this token's selection: the
+                // frontier cap and `max_boxes_per_token` are different caps,
+                // and an edge to the seed token must obey the latter.
+                self.select(self.opts.max_frontier, |off, lim| {
                     self.source.boxes_by_token_id(id, off, lim)
-                })?;
-                self.token_boxes.insert(id.clone(), b.clone());
-                (b, o)
+                })?
             }
             Seed::Address(addr) => self.select(self.opts.max_frontier, |off, lim| {
                 self.source.boxes_by_address(addr, off, lim)
@@ -661,9 +721,6 @@ fn build_edges(
     nodes: &BTreeMap<String, MapNode>,
     token_boxes: &BTreeMap<String, Vec<ChainBox>>,
     tokens: &BTreeMap<String, TokenClass>,
-    source: &dyn ChainSource,
-    opts: &MapOptions,
-    trunc: &mut Truncation,
 ) -> Vec<Edge> {
     let by_tree_hash: BTreeMap<&str, Vec<&str>> =
         nodes
@@ -707,34 +764,14 @@ fn build_edges(
             }
 
             for h in &r.script_hashes {
+                // Closed against the trees the map holds. The walk has
+                // already asked the source for boxes with this script, where
+                // the source has such an index at all, so anything it could
+                // find is already a node here.
                 let mut targets: Vec<Target> = by_tree_hash
                     .get(h.as_str())
                     .map(|ids| ids.iter().map(|i| Target::Node((*i).to_string())).collect())
                     .unwrap_or_default();
-                if targets.is_empty() {
-                    // A bounded source lookup, where the source has the index
-                    // at all. `Unsupported` is a gap in the source, not in the
-                    // chain, and either way the edge is kept as unresolved.
-                    if let Ok(page) = source.boxes_by_script_hash(
-                        h,
-                        0,
-                        opts.max_fetch_per_query.min(opts.page_size),
-                    ) {
-                        let mut items = page.items;
-                        items.sort_by(|a, b| a.order_key().cmp(&b.order_key()));
-                        let known = page.total.unwrap_or(items.len()).max(items.len());
-                        items.truncate(opts.max_boxes_per_script_hash);
-                        let omitted = known.saturating_sub(items.len());
-                        if omitted > 0 {
-                            trunc.per_script_hash.insert(h.clone(), omitted);
-                        }
-                        targets = items
-                            .iter()
-                            .filter(|b| nodes.contains_key(&b.box_id))
-                            .map(|b| Target::Node(b.box_id.clone()))
-                            .collect();
-                    }
-                }
                 if targets.is_empty() {
                     targets.push(Target::Unresolved(h.clone()));
                 }

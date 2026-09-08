@@ -47,6 +47,8 @@ pub fn canonical(m: &ProtocolMap) -> Value {
             "maxBoxesPerToken": m.options.max_boxes_per_token,
             "maxBoxesPerScriptHash": m.options.max_boxes_per_script_hash,
             "maxFrontier": m.options.max_frontier,
+            "pageSize": m.options.page_size,
+            "maxFetchPerQuery": m.options.max_fetch_per_query,
         }),
     );
     root.insert(
