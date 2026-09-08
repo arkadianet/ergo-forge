@@ -16,7 +16,9 @@ name = "ergo-web"
 path = "src/main.rs"
 
 [dependencies]
-ergo-sandbox = { path = "../ergo-sandbox" }
+# The web service makes its own outbound calls through reqwest; it does not
+# need the sandbox's `explorer` chain source, so that feature stays off here.
+ergo-sandbox = { path = "../ergo-sandbox", default-features = false }
 ergo-ser     = { workspace = true }
 ergo-primitives = { workspace = true }
 ergo-compiler = { workspace = true }

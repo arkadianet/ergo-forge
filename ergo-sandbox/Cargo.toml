@@ -25,12 +25,19 @@ sha2            = "0.10"
 indexmap        = { workspace = true }
 num-bigint      = { workspace = true }
 bs58            = { workspace = true }
+ureq            = { workspace = true, optional = true }
 
 [[bin]]
 name = "ergo-es"
 path = "src/bin/ergo-es.rs"
 
 [features]
+# The live public-explorer chain source for `ergo-es map`. Off makes the
+# crate network-free: fixtures and any caller-supplied `ChainSource` still
+# work, which is how the map's tests run.
+default = ["explorer"]
+explorer = ["dep:ureq"]
+
 # Passthrough to ergo-sigma's debug cost tracer (global Vec push per cost
 # record — dev/diagnostic builds only, never ship in a consensus path).
 cost-trace = ["ergo-sigma/cost-trace"]

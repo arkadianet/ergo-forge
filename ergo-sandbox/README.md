@@ -26,6 +26,7 @@ assert_eq!(outcome.verdict, Verdict::Pass);
   assembles) → bounded-cost reduce → `EvalOutcome { verdict, cost, trace }`
 - `compile` — thin wrapper over `ergo_compiler::compile`
 - `inspect` — structural view of ErgoTree bytes (P0 spike, productized)
+- `map` — protocol map: one seed → the contract set and its typed edges
 
 ## CLI
 
@@ -34,6 +35,7 @@ cargo run -p ergo-sandbox --bin ergo-es -- compile src/timelock.es
 cargo run -p ergo-sandbox --bin ergo-es -- eval scenario.json
 cargo run -p ergo-sandbox --bin ergo-es -- decompile 100104c801d191a37300
 cargo run -p ergo-sandbox --bin ergo-es -- roundtrip 100104c801d191a37300
+cargo run -p ergo-sandbox --bin ergo-es -- map 4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41
 cargo run -p ergo-sandbox --features cost-trace --bin ergo-es -- eval scenario.json
 cargo run -p ergo-sandbox --features cost-trace --bin ergo-es -- eval scenario.json --hot-spots
 ```
@@ -283,3 +285,112 @@ identified by an `exists`/`forall` search over the inputs rather than by a fixed
 index, are not recognised — those are false positives. A computed index
 (`INPUTS(i)` for a derived `i`) is out of scope, and `val` names are collected
 tree-wide rather than per block (lift assigns globally-unique names).
+
+## Protocol map (`map`)
+
+**Given one artifact of a deployed protocol — an NFT, an address, or a
+transaction — what is the whole contract set, and how does each contract
+identify the others?**
+
+The layer beneath the set-level lints and the drain hunt. It rests on one
+observation: the NFT constants compiled into an ErgoTree *are* the protocol's
+dependency graph. A contract that must recognise another box has that box's
+identity baked into its own bytes. So the map is a breadth-first walk —
+decompile a tree, read its 32-byte constants, recognise them as other
+contracts' NFTs, fetch the boxes holding them, recurse.
+
+Nodes are boxes; **edges** are "contract A recognises box B", and the audit
+runs on the edges. That is the point: a composition bug lives in an edge, not
+a node. The 2026-09-08 USE LP drain happened because the pool referenced the
+swap by NFT while the swap referenced the pool by *position*. Neither tree is
+wrong alone.
+
+Design record: `docs/superpowers/specs/2026-09-08-protocol-map-design.md`.
+
+```text
+cargo run -p ergo-sandbox --bin ergo-es -- map <token-id | address | tx-id> \
+    [--depth N] [--max-nodes N] [--json] \
+    [--source fixture.json | --explorer URL] [--tx | --address]
+```
+
+### Edge typing
+
+For each reference, the map records **how A establishes B's identity**, by
+inspecting A's tree at the site of the reference — and, just as importantly,
+which identity dimensions the binding leaves open.
+
+| Binding | Shape in A | What it pins | `covers` |
+|---|---|---|---|
+| `nft` | `B.tokens(0)._1 == <constant>` | a **token id** — a unique box only with singleton evidence, recorded as `tokenClass: singleton\|fungible` | `tokenId` |
+| `script-hash` | `blake2b256(B.propositionBytes) == <constant>` (a literal script is hashed to the same index) | B's **code**; any box with that script qualifies | `script` |
+| `self-successor` | `B.propositionBytes == SELF.propositionBytes` | B's **script bytes only** — *not* value, tokens or registers | `script` |
+| `positional` | `INPUTS(n)` / `OUTPUTS(n)` with no identity check | **nothing**; whoever builds the transaction chooses what sits there | — |
+| `data-input` | B read via `CONTEXT.dataInputs(n)` | typed by the same rules, emitted **alongside** the identity binding | as the site's |
+
+`valueMath` says whether A does arithmetic or a comparison on B's `.value` or
+a token amount — read by the same code the `unbound-box-reserves` lint uses
+(`audit::boxrefs`), so the two cannot drift apart.
+
+Two set-level findings come out of the graph:
+
+- **`set-unbound-box-reserves`** (High) — a `positional` edge with
+  `valueMath` whose target is a `protected` node. The single-tree lint says
+  "this tree reads an unpinned box"; the map adds "and that box is the pool
+  holding the reserves", which is what turns a lint into a severity.
+- **`set-asymmetric-binding`** (Medium) — A pins B by NFT while B refers back
+  only by position. The authors intended a pairing that one side does not
+  enforce.
+
+Roles (`protected` / `companion` / `external` / `unknown`) are a **proposal**
+the drain hunt consumes. `unknown` is a real answer, never a silent default.
+
+### Offline fixtures
+
+The map's tests never touch a network. A run against the live explorer can be
+**recorded** and committed, and the acceptance criteria then replay it forever:
+
+```text
+cargo run -p ergo-sandbox --example record_map_fixture -- \
+    <seed> ergo-sandbox/tests/fixtures/map/<name>.json --depth 6 --max-nodes 96
+```
+
+`tests/fixtures/map/use-lp.json` and `dexy-gold.json` are two such recordings
+(from `https://api.ergoplatform.com`, read-only). A query the archive cannot
+answer is a **loud error**, never an empty result — a fixture gap must not read
+as "the chain has nothing there" — and a recorded negative is explicit
+(`"tokens": { "<id>": null }` means *asked, and the chain said no*).
+
+Determinism is a property of the map, not of the source: every list is
+re-sorted into `(inclusionHeight, boxId)` order before the caps apply, and
+`json::canonical` is byte-identical for a given chain state and caps. The
+wall clock lives in a separate, explicitly non-canonical `run` block.
+
+The `explorer` feature (on by default) supplies the live chain source through
+`ureq`; build with `--no-default-features` for a network-free crate that still
+maps from fixtures and from any caller-supplied `ChainSource`.
+
+### Honest limits
+
+- **Dynamic references are invisible.** A collaborator found by
+  `INPUTS.exists { … }` or a computed index has no constant to follow; the map
+  records the site as an `unresolved` edge rather than pretending it is absent.
+- **The counterparty of an unpinned site is inferred from the graph**, not
+  from the tree — if P pins A by A's protocol NFT and A pins nothing back,
+  A's open site is attributed to P. That is what makes "the swap references
+  the pool by position" a statement *about the pool*; it is a reading of the
+  authors' intent, and it can over-attribute in a set where one box names
+  many.
+- **A map is of *now***: one chain height, recorded in the output.
+- **Reachability is not completeness.** Absence from a map is not absence from
+  the protocol, and unresolved edges are excluded from any completeness claim.
+- **Classification can be wrong.** A 32-byte constant that coincidentally
+  matches a token id becomes an edge that is not one. The evidence is the
+  archived source, so a human can overrule it.
+- A map is a description, not a verdict.
+
+### Responsible disclosure
+
+Mapping is run against **third-party deployments** by design. A map alone is
+public chain data; a map *plus a set-level finding* is a vulnerability report
+and is treated as one — routed privately to the affected team, never published
+as a feed, with no timeline or attribution claims attached.
