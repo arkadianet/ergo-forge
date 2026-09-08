@@ -4,6 +4,7 @@
 //! both authored source (compile, then lift) and a contract pasted from
 //! chain. See `docs/superpowers/specs/2026-08-31-lift-target-ast-design.md`.
 
+pub mod boxrefs;
 pub mod finding;
 pub mod lints;
 pub mod visit;

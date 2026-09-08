@@ -51,6 +51,7 @@ pub mod eval;
 pub mod hot_spots;
 pub mod hunt;
 pub mod inspect;
+pub mod map;
 pub mod method_names;
 pub mod play;
 pub mod prove;
@@ -66,6 +67,7 @@ pub use decompile::{lift_tree, Lifted, Node, NodeKind};
 pub use eval::{eval_scenario, EvalOutcome, Verdict, DEFAULT_COST_LIMIT};
 pub use hunt::{hunt, Hunt, HuntOptions, HuntVerdict};
 pub use inspect::{sigma_boolean_pretty, tree_report, tree_structure};
+pub use map::{map, map_owned, MapOptions, ProtocolMap, Seed};
 pub use scenario::{parse_typed_value, Scenario, ScenarioBox, TypedValue};
 
 use thiserror::Error;

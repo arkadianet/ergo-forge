@@ -26,6 +26,7 @@ fn main() -> ExitCode {
         "roundtrip" => cmd_roundtrip(rest),
         "audit" => cmd_audit(rest),
         "hunt" => cmd_hunt(rest),
+        "map" => cmd_map(rest),
         "test" => cmd_test(rest),
         "validate-tx" => cmd_validate_tx(rest),
         "compose" => cmd_compose(rest),
@@ -93,6 +94,13 @@ USAGE:
       Spend hunt: can anyone spend this box with no key? Six probes (three
       heights x attacker/preserve output) on the consensus reducer.
       --mainnet tallies the corpus; hits go to stderr for hand checks.
+  ergo-es map <seed> [--depth N] [--max-nodes N] [--json]
+             [--source fixture.json | --explorer URL] [--tx | --address]
+      Protocol map: from one NFT, address or transaction, the whole contract
+      set and how each contract identifies the others. Edges are typed
+      (nft / script-hash / self-successor / positional / data-input) and
+      set-level findings name the box at risk. --source replays a recorded
+      fixture offline; without it the live explorer is used.
 "
     );
 }
@@ -857,6 +865,163 @@ fn cmd_hunt(args: &[String]) -> Result<(), String> {
         }
         _ => Err("hunt needs tree hex or --mainnet [N]".into()),
     }
+}
+
+/// `ergo-es map <seed>` — the protocol map (the layer beneath the set-level
+/// lints and the drain hunt).
+fn cmd_map(args: &[String]) -> Result<(), String> {
+    use ergo_sandbox::map::{json as map_json, MapOptions, Seed};
+
+    let Some(seed_text) = positional_after_flags(
+        args,
+        &[
+            "--depth",
+            "--max-nodes",
+            "--source",
+            "--explorer",
+            "--max-boxes-per-token",
+        ],
+    ) else {
+        return Err("map needs a seed: a token id, an address, or a transaction id".into());
+    };
+    let seed = if args.iter().any(|a| a == "--tx") {
+        Seed::TransactionId(seed_text.trim().to_ascii_lowercase())
+    } else if args.iter().any(|a| a == "--address") {
+        Seed::Address(seed_text.trim().to_string())
+    } else {
+        Seed::guess(seed_text)
+    };
+
+    let mut opts = MapOptions::default();
+    if let Some(v) = flag_value(args, "--depth")? {
+        opts.max_depth = v.parse().map_err(|_| format!("bad --depth `{v}`"))?;
+    }
+    if let Some(v) = flag_value(args, "--max-nodes")? {
+        opts.max_nodes = v.parse().map_err(|_| format!("bad --max-nodes `{v}`"))?;
+    }
+    if let Some(v) = flag_value(args, "--max-boxes-per-token")? {
+        opts.max_boxes_per_token = v
+            .parse()
+            .map_err(|_| format!("bad --max-boxes-per-token `{v}`"))?;
+    }
+
+    let m = match flag_value(args, "--source")? {
+        Some(path) => {
+            let text = std::fs::read_to_string(&path).map_err(|e| format!("{path}: {e}"))?;
+            let fixture = ergo_sandbox::map::Fixture::from_json(&text)?;
+            ergo_sandbox::map::map_owned(fixture, seed, opts).map_err(|e| e.to_string())?
+        }
+        None => live_map(args, &seed, &opts)?,
+    };
+
+    if args.iter().any(|a| a == "--json") {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&map_json::document(&m)).map_err(|e| e.to_string())?
+        );
+        return Ok(());
+    }
+
+    println!(
+        "map: {} node(s), {} edge(s) from {} `{}` at height {}",
+        m.nodes.len(),
+        m.edges.len(),
+        match &m.seed {
+            Seed::TokenId(_) => "token",
+            Seed::Address(_) => "address",
+            Seed::TransactionId(_) => "transaction",
+        },
+        match &m.seed {
+            Seed::TokenId(v) | Seed::Address(v) | Seed::TransactionId(v) => v,
+        },
+        m.height
+    );
+    println!("  source: {}", m.source_kind);
+    for n in m.nodes.values() {
+        println!(
+            "\n  {}  {}  {} nanoERG  {} token(s){}",
+            n.role.as_str(),
+            n.chain_box.box_id,
+            n.chain_box.value,
+            n.chain_box.tokens.len(),
+            if n.complete { "" } else { "  [PARTIAL LIFT]" }
+        );
+        if let Some(nft) = &n.nft {
+            println!("    nft: {nft}");
+        }
+    }
+    println!("\n  edges:");
+    for e in &m.edges {
+        let to = match &e.to {
+            ergo_sandbox::map::Target::Node(id) => id.clone(),
+            ergo_sandbox::map::Target::Unresolved(h) => format!("unresolved:{h}"),
+        };
+        let covers: Vec<&str> = e.covers.iter().map(|c| c.as_str()).collect();
+        println!(
+            "    {} -> {to}  {}  site {}  covers [{}]{}",
+            &e.from[..12.min(e.from.len())],
+            e.binding.as_str(),
+            e.site,
+            covers.join(","),
+            if e.value_math { "  valueMath" } else { "" }
+        );
+    }
+    if m.findings.is_empty() {
+        println!("\n  findings: none");
+    } else {
+        for f in &m.findings {
+            println!(
+                "\n  {}  {}  {} -> {}",
+                f.finding.severity.label(),
+                f.finding.lint,
+                f.from,
+                match &f.to {
+                    ergo_sandbox::map::Target::Node(id) => id.clone(),
+                    ergo_sandbox::map::Target::Unresolved(h) => format!("unresolved:{h}"),
+                }
+            );
+            println!("    {}", f.finding.message);
+        }
+    }
+    if !m.truncated.is_empty() {
+        println!("\n  TRUNCATED — this map is partial, absence proves nothing");
+        println!(
+            "    nodes {} depth {} frontier {} per-token {} per-script-hash {}",
+            m.truncated.nodes,
+            m.truncated.depth,
+            m.truncated.frontier,
+            m.truncated.per_token.len(),
+            m.truncated.per_script_hash.len()
+        );
+    }
+    Ok(())
+}
+
+#[cfg(feature = "explorer")]
+fn live_map(
+    args: &[String],
+    seed: &ergo_sandbox::map::Seed,
+    opts: &ergo_sandbox::map::MapOptions,
+) -> Result<ergo_sandbox::map::ProtocolMap, String> {
+    use ergo_sandbox::map::explorer::{ExplorerSource, DEFAULT_EXPLORER_URL};
+    let base = flag_value(args, "--explorer")?
+        .or_else(|| std::env::var("EXPLORER_URL").ok())
+        .unwrap_or_else(|| DEFAULT_EXPLORER_URL.to_string());
+    let source = ExplorerSource::new(&base);
+    ergo_sandbox::map::map_owned(source, seed.clone(), opts.clone()).map_err(|e| e.to_string())
+}
+
+#[cfg(not(feature = "explorer"))]
+fn live_map(
+    _args: &[String],
+    _seed: &ergo_sandbox::map::Seed,
+    _opts: &ergo_sandbox::map::MapOptions,
+) -> Result<ergo_sandbox::map::ProtocolMap, String> {
+    Err(
+        "this build has no chain source; pass --source <fixture.json>, or build with \
+         --features explorer"
+            .into(),
+    )
 }
 
 /// First positional argument, skipping `--flag value` pairs for the named
