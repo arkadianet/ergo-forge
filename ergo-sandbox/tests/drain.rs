@@ -959,7 +959,7 @@ mod synthesis {
     }
 
     /// Rejection classification: a synthesized probe's rejection is tallied
-    /// as `conservation`, `missingKey`, or `script` — a `notUnderProbes` can
+    /// as `conservation`, `missingKey`, `script`, or `invalid` — a `notUnderProbes` can
     /// never silently mean "conservation blocked us".
     #[test]
     fn synthesized_rejections_are_classified_and_tallied() {
@@ -1045,6 +1045,66 @@ mod synthesis {
         });
         let report = drain(request);
         assert!(report.rejections.script > 0, "{:?}", report.rejections);
+        assert_eq!(report.rejections.invalid, 0);
+    }
+
+    #[test]
+    fn malformed_probes_are_invalid_not_script_rejections() {
+        let request = json!({
+            "inputs": [
+                { "role": "protected", "value": 10000000, "ergoTree": "10010101d17300",
+                  "tokens": [{ "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "amount": 1 }] },
+                { "role": "attacker", "value": 2000000, "ergoTree": "10010101d17300" }
+            ],
+            "outputs": [
+                { "payee": "fixed", "value": 10000000, "ergoTree": "10010101d17300",
+                  "tokens": [{ "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "amount": 1 }] },
+                { "payee": "free", "value": 2000000, "ergoTree": "10010101d17300" }
+            ],
+            "protocolNfts": ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+            "height": 100,
+            "synthesis": { "successorStates": true }
+        });
+        let mut cases = Vec::new();
+        for tree in ["amm-pool", "ff"] {
+            let mut bad_tree = request.clone();
+            bad_tree["inputs"][0]["ergoTree"] = json!(tree);
+            cases.push(bad_tree);
+        }
+        let mut bad_output = request.clone();
+        bad_output["outputs"][0]["ergoTree"] = json!("not-hex");
+        cases.push(bad_output);
+
+        let mut bad_box = request.clone();
+        bad_box["inputs"][0]["boxId"] = json!("abcd");
+        cases.push(bad_box);
+
+        let mut bad_register = request.clone();
+        bad_register["inputs"][0]["registers"] = json!({
+            "R4": { "type": "raw", "value": "not-hex" }
+        });
+        cases.push(bad_register);
+
+        // The drain marshaller requires raw registers; failure happens
+        // before txcheck returns per-input verdicts and must still count.
+        let mut marshalling = request;
+        marshalling["inputs"][0]["registers"] = json!({
+            "R4": { "type": "Long", "value": 1 }
+        });
+        cases.push(marshalling);
+
+        for request in cases {
+            let report = drain(request.clone());
+            assert_eq!(report.verdict, DrainVerdict::NotUnderProbes);
+            assert_eq!(report.hits, 0);
+            assert!(report.probes_run > 0);
+            assert_eq!(report.rejections.invalid, report.probes_run, "{request}");
+            assert_eq!(report.rejections.script, 0);
+            assert_eq!(report.rejections.conservation, 0);
+            assert_eq!(report.rejections.missing_key, 0);
+            let json = serde_json::to_value(&report).unwrap();
+            assert_eq!(json["rejections"]["invalid"], report.probes_run);
+        }
     }
 
     /// Mint probes: conservation allows one minted id — the first input's box

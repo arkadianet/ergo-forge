@@ -1096,6 +1096,13 @@ fn cmd_drain(args: &[String]) -> Result<(), String> {
         report.probes_run, report.probes_total, report.capped, report.hits
     );
     if report.synthesis.enabled {
+        println!(
+            "  rejections: conservation {}, missingKey {}, script {}, invalid {}",
+            report.rejections.conservation,
+            report.rejections.missing_key,
+            report.rejections.script,
+            report.rejections.invalid,
+        );
         let d = &report.synthesis.degrees;
         let caps = &report.synthesis.caps;
         let shapes: Vec<String> = report

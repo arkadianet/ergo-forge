@@ -59,8 +59,8 @@
 //!
 //! A miss says "not under these probes" — never "safe". With synthesis on,
 //! every synthesized probe's rejection is classified (`conservation` /
-//! `missingKey` / `script`) and tallied, so a miss can never silently mean
-//! "conservation blocked us".
+//! `missingKey` / `script` / `invalid`) and tallied, so a miss can never
+//! silently mean "conservation blocked us" or "the probe was malformed".
 
 use std::collections::{BTreeMap, HashSet};
 
@@ -363,7 +363,8 @@ pub struct ShapeTally {
 }
 
 /// Why synthesized probes were rejected (phase-2 report). A `notUnderProbes`
-/// on a synthesized hunt must never silently mean "conservation blocked us".
+/// on a synthesized hunt must never silently mean "conservation blocked us"
+/// or "the probe was malformed".
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Rejections {
@@ -374,6 +375,9 @@ pub struct Rejections {
     pub missing_key: usize,
     /// A protocol script evaluated to false or threw.
     pub script: usize,
+    /// The probe could not be marshalled or evaluated (invalid tree, box,
+    /// hex, or missing input), rather than a script rejecting it.
+    pub invalid: usize,
 }
 
 /// A script-matched output whose protected input's protocol NFT did not ride
@@ -913,11 +917,21 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                                 probe_seq,
                             ) {
                                 Ok(r) => r,
-                                Err(_) => continue,
+                                Err(_) => {
+                                    if syn_enabled {
+                                        rejections.invalid += 1;
+                                    }
+                                    continue;
+                                }
                             };
                             let check = match tx_check(&tx_request) {
                                 Ok(c) => c,
-                                Err(_) => continue,
+                                Err(_) => {
+                                    if syn_enabled {
+                                        rejections.invalid += 1;
+                                    }
+                                    continue;
+                                }
                             };
                             if !check.valid {
                                 if syn_enabled {
@@ -925,6 +939,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                                         Rejection::Conservation => rejections.conservation += 1,
                                         Rejection::MissingKey => rejections.missing_key += 1,
                                         Rejection::Script => rejections.script += 1,
+                                        Rejection::Invalid => rejections.invalid += 1,
                                     }
                                 }
                                 continue;
@@ -1469,15 +1484,24 @@ fn shrink_successor(b: &mut ScenarioBox) {
 /// Why the oracle rejected a synthesized probe (phase-2 spec, Decision 1).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Rejection {
+    Invalid,
     Conservation,
     MissingKey,
     Script,
 }
 
 /// Classify a rejected transaction from `txcheck`'s problems and per-input
-/// verdicts. Conservation first: it is the vacuity risk the classification
-/// exists to expose.
+/// verdicts. Malformed probes take precedence: even if their balances also
+/// fail, they cannot provide evidence of a script or conservation refusal.
+/// Otherwise retain conservation → missing key → script precedence.
 fn classify_rejection(check: &crate::txcheck::TxCheck) -> Rejection {
+    if check
+        .inputs
+        .iter()
+        .any(|ic| matches!(ic.verdict, "invalid" | "missing"))
+    {
+        return Rejection::Invalid;
+    }
     let conservation = check
         .problems
         .iter()
@@ -1488,7 +1512,17 @@ fn classify_rejection(check: &crate::txcheck::TxCheck) -> Rejection {
     if check.inputs.iter().any(|ic| ic.verdict == "needsProof") {
         return Rejection::MissingKey;
     }
-    Rejection::Script
+    if check
+        .inputs
+        .iter()
+        .any(|ic| matches!(ic.verdict, "fail" | "error"))
+    {
+        Rejection::Script
+    } else {
+        // No script rejection was reported: do not invent one for a
+        // transaction-level refusal the oracle could not evaluate.
+        Rejection::Invalid
+    }
 }
 
 /// Materialize one synthesized probe. Returns `None` when the shape cannot

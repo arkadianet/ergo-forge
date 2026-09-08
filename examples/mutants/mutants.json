@@ -18,6 +18,7 @@
  "mutants": [
   {
    "id": "M1",
+   "baselineNote": "Baseline observation (2026-09-09): the template singleton id is 64 non-hex v characters. All 868 synthesis-on probes are invalid, not script/key refusals. The independently validated witness remains keyed-insider; this additional fixture defect is recorded without changing its token id or attacker model.",
    "contract": "vesting",
    "operator": "weaken-comparison",
    "defect": "the linear-vesting remainder guard no longer binds value: everything drains in one draw",
@@ -578,6 +579,7 @@
   },
   {
    "id": "M5",
+   "baselineNote": "Baseline repair (2026-09-09): the corpus adapter now serializes typed registers to raw hex for both ScenarioBox.registers and node additionalRegisters; input R4/R5, successor R4/R5, and oracle R4 now reach the hunt. Declared successor value corrected from 0 to 10000000000 nanoERG, matching witnessTx. The witness still demonstrates bank-NFT removal through a changed successor token layout; the missing axis is unchanged.",
    "contract": "bank (AgeUSD shape)",
    "operator": "delete-nft-check",
    "defect": "the bank successor no longer must carry the bank NFT: the attacker walks the box identity out the door (a junk token takes tokens(0)'s place)",
@@ -701,7 +703,7 @@
     "outputs": [
      {
       "roleRef": "fixed",
-      "value": 0,
+      "value": 10000000000,
       "ergoTree": "$mutant",
       "creationHeight": 5000,
       "tokens": [
@@ -1016,6 +1018,7 @@
   },
   {
    "id": "M7",
+   "baselineNote": "Baseline repair (2026-09-09): template pool references now use $amm-pool; witnessTx already used $amm-pool on input and output. The corrected hunt still misses the out-of-family successor-tree change. The swap role mismatch is deferred in REVIEW-FINDINGS.md; no roles or objective were changed.",
    "contract": "use-lp-swap (the fixed incident contract)",
    "operator": "drop-successor-script",
    "defect": "the swap successor can be re-treed: the locked order value (1 ERG + the swap NFT) ends the transaction under the attacker's tree",
@@ -1053,7 +1056,7 @@
      {
       "roleRef": "protected",
       "value": 1000000000,
-      "ergoTree": "amm-pool",
+      "ergoTree": "$amm-pool",
       "creationHeight": 1,
       "tokens": [
        {
@@ -1093,7 +1096,7 @@
      {
       "roleRef": "fixed",
       "value": 1000000000,
-      "ergoTree": "amm-pool",
+      "ergoTree": "$amm-pool",
       "creationHeight": 5000,
       "tokens": [
        {
