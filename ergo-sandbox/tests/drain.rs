@@ -424,16 +424,23 @@ mod synthesis {
 
     /// Truncation is the normal case, so the pinned axis order decides which
     /// probes exist at all: synthesized-output shapes outermost (none →
-    /// companion re-creations → sinks), the phase-1 axes innermost. With a cap
-    /// that truncates inside the first re-creation's inner space, the run must
-    /// contain shape-`none` probes AND companion re-creation probes — the
-    /// phase-1 space must never starve the new degrees.
+    /// companion re-creations → sinks), the phase-1 axes innermost, filler
+    /// counts innermost of all. With a cap that truncates inside the first
+    /// re-creation's inner space, the run must contain shape-`none` probes,
+    /// the unpadded re-creation, AND the padded ones — no degree may starve
+    /// another.
+    ///
+    /// The companion qualifies through its OWN singleton (amount 1), not
+    /// through `protocolNfts`, which names only the protected box's NFT —
+    /// that overloading was the one field-tested way to fire this axis, and
+    /// it is exactly what this test no longer does.
     #[test]
     fn the_pinned_axis_order_survives_truncation() {
-        // One protected box, one companion carrying a protocol NFT, one
+        // One protected box, one companion carrying its own singleton, one
         // attacker slot. Recreations + output permutation only, so the space
-        // is exactly: [none] × 2 outperms × 8 combos × 2 payouts = 32 probes,
-        // then four re-creation shapes × 6 outperms × 8 combos × 2 payouts.
+        // is exactly: [none] × 2 outperms × 8 combos × 2 payouts = 32 runs,
+        // then the re-creation shape × 6 outperms × 8 combos × 2 payouts ×
+        // 4 filler counts.
         let request = json!({
             "inputs": [
                 { "role": "protected", "value": 100000000i64, "ergoTree": "10010101d17300",
@@ -448,8 +455,7 @@ mod synthesis {
                 { "payee": "free", "value": 3000000i64, "ergoTree": "10010101d17300", "tokens": [] },
             ],
             "protocolNfts": [
-                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
             ],
             "height": 100,
             "network": "mainnet",
@@ -460,22 +466,38 @@ mod synthesis {
         let report = drain(request);
         // The verdict is incidental here (the protected box carries no
         // guard): this test pins the AXIS ORDER under truncation.
-        assert!(report.capped, "the cap must bind: 32 + 4×96 >> 60");
+        assert!(report.capped, "the cap must bind: 32 + 384 >> 60");
         let shapes = &report.synthesis.shapes;
         assert_eq!(shapes[0].shape, "none");
         assert!(shapes[0].run > 0);
+        // The blocking-bug regression: protocolNfts names ONLY the protected
+        // box's NFT, yet re-creation shapes must fire — the companion's own
+        // amount-1 token is what drives them.
         assert!(
-            shapes[1].shape.starts_with("recreate(companion=1"),
-            "the first re-creation shape must be reached: {:?}",
             shapes
+                .iter()
+                .any(|t| t.shape.starts_with("recreate(") && t.run > 0),
+            "re-creations must fire on a request whose protocolNfts is just the protected NFT: {shapes:?}"
         );
+        // Padded shapes are reachable by construction: the filler count is
+        // the innermost axis, so fillers=1..3 run inside the first
+        // re-creation's budget instead of starving behind the unpadded one.
+        for f in 1..=3 {
+            let bucket = format!("recreate(companion=1,nft=0,fillers={f})");
+            assert!(
+                shapes.iter().any(|t| t.shape == bucket && t.run > 0),
+                "padded shape {bucket} must run under truncation: {shapes:?}"
+            );
+        }
+        // Truncation still stops inside the first re-creation's inner space:
+        // later shapes (the +sink variants, then the bare sink) never run.
         assert!(
-            shapes[1].run > 0,
-            "the phase-1 space must not starve the re-creation: {shapes:?}"
-        );
-        assert!(
-            shapes.iter().skip(2).all(|t| t.run == 0),
-            "truncation stops inside the first re-creation's inner space: {shapes:?}"
+            shapes
+                .iter()
+                .skip_while(|t| !t.shape.starts_with("recreate("))
+                .skip(4)
+                .all(|t| t.run == 0),
+            "truncation stops inside the first re-creation shape's inner space: {shapes:?}"
         );
         // The caps and the pinned order are recorded with the miss.
         assert_eq!(report.synthesis.caps.max_probes, 60);
@@ -489,7 +511,48 @@ mod synthesis {
                 "value splits",
                 "mint variants",
                 "input permutation + decoy combinations",
+                "filler counts (re-creation shapes, innermost)",
             ]
+        );
+    }
+
+    /// The field-shaped control for the re-creation axis: a request whose
+    /// `protocolNfts` is exactly the protected box's NFT — as every
+    /// naturally-constructed request is — must still generate re-creation
+    /// shapes. This is the assertion the axis's first version could not
+    /// pass (it gated on `protocolNfts`, which no companion satisfies).
+    #[test]
+    fn recreations_fire_without_overloading_protocol_nfts() {
+        let request = json!({
+            "inputs": [
+                { "role": "protected", "value": 10000000i64, "ergoTree": "10010101d17300",
+                  "tokens": [{ "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "amount": 1 }] },
+                { "role": "companion", "value": 1000000i64, "ergoTree": "10010101d17300",
+                  "tokens": [{ "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "amount": 1 }] },
+                { "role": "attacker", "value": 2000000i64, "ergoTree": "10010101d17300" },
+            ],
+            "outputs": [
+                { "payee": "fixed", "value": 10000000i64, "ergoTree": "10010101d17300",
+                  "tokens": [{ "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "amount": 1 }] },
+                { "payee": "free", "value": 4000000i64, "ergoTree": "10010101d17300", "tokens": [] },
+            ],
+            "protocolNfts": [
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            ],
+            "height": 100,
+            "network": "mainnet",
+            "maxPermutations": 1,
+            "synthesis": { "companionRecreations": true },
+        });
+        let report = drain(request);
+        assert!(
+            report
+                .synthesis
+                .shapes
+                .iter()
+                .any(|t| t.shape.starts_with("recreate(") && t.generated > 0 && t.run > 0),
+            "the axis must fire on the natural request: {:?}",
+            report.synthesis.shapes
         );
     }
 
@@ -546,6 +609,15 @@ mod synthesis {
         // The refusal is the gate, not the script: some probe must have put
         // the admin box at INPUTS(0) (whitelist satisfied) and been
         // disqualified for holding a key the attacker does not have.
+        //
+        // What this test can and cannot catch, on purpose: every probe here
+        // dies on that P2PK gate (rejections come back ~all missingKey), so
+        // the test can only regress on the GATE — a change that let a
+        // needsProof companion pass. It cannot speak to the three script
+        // authorizers at all: they are deliberately absent from the input
+        // set, so the empirical flagship question (do freeMint/arbMint/
+        // payout constrain the bank's value?) is not exercised in CI, and
+        // this test structurally cannot surface a live vault drain.
         assert!(
             report
                 .notes

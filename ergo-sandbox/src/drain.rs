@@ -96,13 +96,14 @@ pub const MINT_SENTINEL: &str = "*mint-first-input-box-id*";
 
 /// The pinned probe-axis order, outermost first (phase-2 spec, Decision 1).
 /// Recorded in every report.
-pub const AXIS_ORDER: [&str; 6] = [
+pub const AXIS_ORDER: [&str; 7] = [
     "synthesized-output shapes",
     "output permutation",
     "per-successor states",
     "value splits",
     "mint variants",
     "input permutation + decoy combinations",
+    "filler counts (re-creation shapes, innermost)",
 ];
 
 // ── Phase-2 synthesis request ────────────────────────────────────────────────
@@ -619,7 +620,6 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
         req,
         &roles,
         &declared,
-        &nfts,
         req.outputs.len(),
         req.outputs
             .iter()
@@ -639,7 +639,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                     "output permutations capped at {} ({} outputs, shape '{}'), sampled lexicographically",
                     syn.max_output_permutations.max(1),
                     req.outputs.len() + axes.shapes[s].new_count(),
-                    axes.shapes[s].label
+                    axes.shapes[s].static_label
                 ));
             }
         }
@@ -652,15 +652,23 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
     let mut seen: HashSet<String> = HashSet::new();
     let mut capped = false;
     let mut rejections = Rejections::default();
-    let mut shape_tallies: Vec<ShapeTally> = axes
-        .shapes
-        .iter()
-        .map(|s| ShapeTally {
-            shape: s.label.clone(),
-            generated: 0,
-            run: 0,
-        })
-        .collect();
+    // One tally bucket per (shape, filler count) — the filler dimension is
+    // part of the reported label, which is what makes padded reachability
+    // observable in the report.
+    let mut shape_tallies: Vec<ShapeTally> = Vec::new();
+    let mut tally_of: Vec<Vec<usize>> = Vec::with_capacity(axes.shapes.len());
+    for (si, s) in axes.shapes.iter().enumerate() {
+        let mut per_f = Vec::with_capacity(axes.filler_domains[si].len());
+        for &f in &axes.filler_domains[si] {
+            per_f.push(shape_tallies.len());
+            shape_tallies.push(ShapeTally {
+                shape: s.tally_label(f),
+                generated: 0,
+                run: 0,
+            });
+        }
+        tally_of.push(per_f);
+    }
     let mut nft_detached: Vec<NftDetached> = Vec::new();
     let mut detached_seen: HashSet<String> = HashSet::new();
     const DETACHED_CAP: usize = 16;
@@ -689,192 +697,202 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                     })
                     .collect();
                 for &payout in &payout_modes {
-                    probes_total += 1;
-                    if probes_run >= max_probes {
-                        capped = true;
-                        break 'points;
-                    }
-                    // Realized input order: external slots keep their positions;
-                    // permutable positions take the arrangement's slots in order.
-                    let mut slot_at_position = vec![usize::MAX; roles.len()];
-                    for (k, &pos) in permutable.iter().enumerate() {
-                        slot_at_position[pos] = arrangement[k];
-                    }
-                    for &pos in permutable.iter() {
-                        if slot_at_position[pos] == usize::MAX {
-                            slot_at_position[pos] = pos; // unreachable for full arrangements
+                    // The re-creation family's innermost axis: filler counts
+                    // (a single 0 for shapes without a re-creation).
+                    for (f_idx, &fillers) in point.filler_domain.iter().enumerate() {
+                        probes_total += 1;
+                        if probes_run >= max_probes {
+                            capped = true;
+                            break 'points;
                         }
-                    }
-                    for i in (0..roles.len()).filter(|&i| roles[i] == DrainRole::External) {
-                        slot_at_position[i] = i;
-                    }
-                    let position_roles: Vec<DrainRole> =
-                        slot_at_position.iter().map(|&slot| roles[slot]).collect();
-
-                    let realized_inputs: Vec<ScenarioBox> = (0..roles.len())
-                        .map(|pos| {
-                            let slot = slot_at_position[pos];
-                            combo[slot].1.clone()
-                        })
-                        .collect();
-                    let (realized_outputs, _synthesized) = if point.is_phase1() {
-                        match realize_outputs(req, &realized_inputs, payout, &attacker_tree) {
-                            Some(o) => {
-                                let flags = vec![false; o.len()];
-                                if syn_enabled {
-                                    shape_tallies[point.shape_index].generated += 1;
-                                }
-                                (o, flags)
+                        // Realized input order: external slots keep their positions;
+                        // permutable positions take the arrangement's slots in order.
+                        let mut slot_at_position = vec![usize::MAX; roles.len()];
+                        for (k, &pos) in permutable.iter().enumerate() {
+                            slot_at_position[pos] = arrangement[k];
+                        }
+                        for &pos in permutable.iter() {
+                            if slot_at_position[pos] == usize::MAX {
+                                slot_at_position[pos] = pos; // unreachable for full arrangements
                             }
-                            None => {
-                                notes.push(
+                        }
+                        for i in (0..roles.len()).filter(|&i| roles[i] == DrainRole::External) {
+                            slot_at_position[i] = i;
+                        }
+                        let position_roles: Vec<DrainRole> =
+                            slot_at_position.iter().map(|&slot| roles[slot]).collect();
+
+                        let realized_inputs: Vec<ScenarioBox> = (0..roles.len())
+                            .map(|pos| {
+                                let slot = slot_at_position[pos];
+                                combo[slot].1.clone()
+                            })
+                            .collect();
+                        let tally = tally_of[point.shape_index][f_idx];
+                        let (realized_outputs, _synthesized) = if point.is_phase1() {
+                            match realize_outputs(req, &realized_inputs, payout, &attacker_tree) {
+                                Some(o) => {
+                                    let flags = vec![false; o.len()];
+                                    if syn_enabled {
+                                        shape_tallies[tally].generated += 1;
+                                    }
+                                    (o, flags)
+                                }
+                                None => {
+                                    notes.push(
                                 "drain-mode payout not constructible (negative remainder); skipping it"
                                     .into(),
                             );
-                                continue;
+                                    continue;
+                                }
                             }
+                        } else {
+                            match materialize_synthesized(
+                                req,
+                                payout,
+                                &point,
+                                fillers,
+                                &realized_inputs,
+                                &combo,
+                                &attacker_slot_tokens,
+                                &protected_trees,
+                                free_output,
+                                &attacker_tree,
+                            ) {
+                                Some((o, flags)) => {
+                                    shape_tallies[tally].generated += 1;
+                                    (o, flags)
+                                }
+                                // Unsourced padding or an unfundable shape: not
+                                // generated at all (never a conservation tally).
+                                None => continue,
+                            }
+                        };
+
+                        // Deduplicate: identical (inputs, outputs) shapes are one probe.
+                        let key =
+                            match serde_json::to_string(&(&realized_inputs, &realized_outputs)) {
+                                Ok(k) => k,
+                                Err(_) => continue,
+                            };
+                        if !seen.insert(key) {
+                            continue;
                         }
-                    } else {
-                        match materialize_synthesized(
+                        probes_run += 1;
+                        if syn_enabled {
+                            shape_tallies[tally].run += 1;
+                        }
+
+                        // ── oracle: full transaction validation ──
+                        let probe_seq = probes_run;
+                        let (tx_request, oracle_outputs) = match build_tx_request(
                             req,
-                            payout,
-                            &point,
                             &realized_inputs,
-                            &combo,
-                            &attacker_slot_tokens,
-                            &protected_trees,
-                            free_output,
-                            &attacker_tree,
+                            &realized_outputs,
+                            probe_seq,
                         ) {
-                            Some((o, flags)) => {
-                                shape_tallies[point.shape_index].generated += 1;
-                                (o, flags)
-                            }
-                            // Unsourced padding or an unfundable shape: not
-                            // generated at all (never a conservation tally).
-                            None => continue,
-                        }
-                    };
-
-                    // Deduplicate: identical (inputs, outputs) shapes are one probe.
-                    let key = match serde_json::to_string(&(&realized_inputs, &realized_outputs)) {
-                        Ok(k) => k,
-                        Err(_) => continue,
-                    };
-                    if !seen.insert(key) {
-                        continue;
-                    }
-                    probes_run += 1;
-                    if syn_enabled {
-                        shape_tallies[point.shape_index].run += 1;
-                    }
-
-                    // ── oracle: full transaction validation ──
-                    let probe_seq = probes_run;
-                    let (tx_request, oracle_outputs) =
-                        match build_tx_request(req, &realized_inputs, &realized_outputs, probe_seq)
-                        {
                             Ok(r) => r,
                             Err(_) => continue,
                         };
-                    let check = match tx_check(&tx_request) {
-                        Ok(c) => c,
-                        Err(_) => continue,
-                    };
-                    if !check.valid {
-                        if syn_enabled {
-                            match classify_rejection(&check) {
-                                Rejection::Conservation => rejections.conservation += 1,
-                                Rejection::MissingKey => rejections.missing_key += 1,
-                                Rejection::Script => rejections.script += 1,
-                            }
-                        }
-                        continue;
-                    }
-                    let mut disqualified = false;
-                    let mut refused_key = false;
-                    for ic in &check.inputs {
-                        let pos = ic.index;
-                        let accepted = match position_roles[pos] {
-                            DrainRole::Protected | DrainRole::Companion | DrainRole::External => {
-                                ic.verdict == "pass"
-                            }
-                            // The attacker signs their own boxes.
-                            DrainRole::Attacker => {
-                                ic.verdict == "pass" || ic.verdict == "needsProof"
-                            }
-                            DrainRole::Unknown => false,
+                        let check = match tx_check(&tx_request) {
+                            Ok(c) => c,
+                            Err(_) => continue,
                         };
-                        if !accepted {
-                            if ic.verdict == "needsProof" {
-                                refused_key = true;
-                                notes.push(format!(
-                                    "input {pos} ({}) needs a key the attacker does not hold",
-                                    position_roles[pos].as_str()
-                                ));
+                        if !check.valid {
+                            if syn_enabled {
+                                match classify_rejection(&check) {
+                                    Rejection::Conservation => rejections.conservation += 1,
+                                    Rejection::MissingKey => rejections.missing_key += 1,
+                                    Rejection::Script => rejections.script += 1,
+                                }
                             }
-                            disqualified = true;
-                            break;
+                            continue;
                         }
-                    }
-                    if disqualified {
-                        if syn_enabled && refused_key {
-                            rejections.missing_key += 1;
+                        let mut disqualified = false;
+                        let mut refused_key = false;
+                        for ic in &check.inputs {
+                            let pos = ic.index;
+                            let accepted = match position_roles[pos] {
+                                DrainRole::Protected
+                                | DrainRole::Companion
+                                | DrainRole::External => ic.verdict == "pass",
+                                // The attacker signs their own boxes.
+                                DrainRole::Attacker => {
+                                    ic.verdict == "pass" || ic.verdict == "needsProof"
+                                }
+                                DrainRole::Unknown => false,
+                            };
+                            if !accepted {
+                                if ic.verdict == "needsProof" {
+                                    refused_key = true;
+                                    notes.push(format!(
+                                        "input {pos} ({}) needs a key the attacker does not hold",
+                                        position_roles[pos].as_str()
+                                    ));
+                                }
+                                disqualified = true;
+                                break;
+                            }
                         }
-                        continue;
-                    }
+                        if disqualified {
+                            if syn_enabled && refused_key {
+                                rejections.missing_key += 1;
+                            }
+                            continue;
+                        }
 
-                    // ── objective: leak by identity and amount ──
-                    let (extracted, detached) = leak(
-                        &position_roles,
-                        &realized_inputs,
-                        &oracle_outputs,
-                        &protected_trees,
-                        &declared_free,
-                        if syn_enabled { Some(&riders) } else { None },
-                    );
-                    if syn_enabled {
-                        for d in detached {
-                            if detached_seen.insert(d.detail.clone())
-                                && nft_detached.len() < DETACHED_CAP
-                            {
-                                nft_detached.push(d);
+                        // ── objective: leak by identity and amount ──
+                        let (extracted, detached) = leak(
+                            &position_roles,
+                            &realized_inputs,
+                            &oracle_outputs,
+                            &protected_trees,
+                            &declared_free,
+                            if syn_enabled { Some(&riders) } else { None },
+                        );
+                        if syn_enabled {
+                            for d in detached {
+                                if detached_seen.insert(d.detail.clone())
+                                    && nft_detached.len() < DETACHED_CAP
+                                {
+                                    nft_detached.push(d);
+                                }
                             }
                         }
-                    }
-                    if extracted.is_empty() {
-                        continue;
-                    }
-                    hits += 1;
-                    let total: u128 = extracted.values().sum();
-                    if best.as_ref().map(|(t, _)| total > *t).unwrap_or(true) {
-                        let decoy_labels: Vec<String> = attacker_slots
-                            .iter()
-                            .map(|&s| format!("input {s}: {}", combo[s].0))
-                            .collect();
-                        best = Some((
-                            total,
-                            DrainHit {
-                                extracted: extracted
-                                    .into_iter()
-                                    .map(|(k, v)| (k, v.to_string()))
-                                    .collect(),
-                                permutation: permutable
-                                    .iter()
-                                    .map(|&pos| slot_at_position[pos])
-                                    .collect(),
-                                decoys: decoy_labels,
-                                payout,
-                                shape: point.shape.label.clone(),
-                                witness: witness_bundle(
-                                    req,
-                                    &position_roles,
-                                    &realized_inputs,
-                                    &oracle_outputs,
-                                    &tx_request,
-                                ),
-                            },
-                        ));
+                        if extracted.is_empty() {
+                            continue;
+                        }
+                        hits += 1;
+                        let total: u128 = extracted.values().sum();
+                        if best.as_ref().map(|(t, _)| total > *t).unwrap_or(true) {
+                            let decoy_labels: Vec<String> = attacker_slots
+                                .iter()
+                                .map(|&s| format!("input {s}: {}", combo[s].0))
+                                .collect();
+                            best = Some((
+                                total,
+                                DrainHit {
+                                    extracted: extracted
+                                        .into_iter()
+                                        .map(|(k, v)| (k, v.to_string()))
+                                        .collect(),
+                                    permutation: permutable
+                                        .iter()
+                                        .map(|&pos| slot_at_position[pos])
+                                        .collect(),
+                                    decoys: decoy_labels,
+                                    payout,
+                                    shape: shape_tallies[tally].shape.clone(),
+                                    witness: witness_bundle(
+                                        req,
+                                        &position_roles,
+                                        &realized_inputs,
+                                        &oracle_outputs,
+                                        &tx_request,
+                                    ),
+                                },
+                            ));
+                        }
                     }
                 }
             }
@@ -939,27 +957,60 @@ fn synthesis_record(
 }
 
 /// One companion re-creation: the companion box rebuilt verbatim (same
-/// script, value, tokens) with `fillers` sourced tokens inserted before its
-/// NFT at `nft_index`, moving the NFT to `nft_index + fillers`.
+/// script, value, tokens) with sourced filler tokens inserted before its
+/// singleton at `nft_index`, moving that token to `nft_index + fillers`.
+/// The filler count is the family's own innermost axis (see
+/// [`AXIS_ORDER`]), so padded shapes share every re-creation shape's budget
+/// instead of starving behind the unpadded one.
 #[derive(Debug, Clone)]
 struct Recreate {
     slot: usize,
     nft_index: usize,
-    fillers: usize,
 }
 
 /// A synthesized-output shape: at most one companion re-creation plus
-/// attacker sinks (`recreations.len() + sinks ≤ maxNewOutputs`).
+/// attacker sinks (`new_count() ≤ maxNewOutputs`).
 #[derive(Debug, Clone)]
 struct ShapeDesc {
-    label: String,
-    recreations: Vec<Recreate>,
+    /// The re-creation, if any: the companion slot and the token index to
+    /// move. A companion qualifies through any token it carries at amount 1
+    /// — the syntactic shape of a box-identifying singleton. (The map's
+    /// `TokenClass::Singleton` is the semantic source of the same fact when
+    /// a map is available; the request carries only the boxes, so the
+    /// amount-1 shape is the honest request-local proxy. This is
+    /// deliberately NOT `protocolNfts`, which the phase-1 validation pins
+    /// to the protected boxes' own `tokens(0)` — a companion naturally
+    /// carries its own singleton, never a protected box's NFT.)
+    recreate: Option<Recreate>,
     sinks: usize,
+    /// The label without the filler count (`none`, `sinks(1)`,
+    /// `recreate(companion=1,nft=0)`).
+    static_label: String,
 }
 
 impl ShapeDesc {
     fn new_count(&self) -> usize {
-        self.recreations.len() + self.sinks
+        usize::from(self.recreate.is_some()) + self.sinks
+    }
+
+    /// The reported shape label for one filler count. Re-creation shapes
+    /// embed it — the per-filler-count tally bucket is what makes padded
+    /// reachability observable; other shapes have no filler dimension.
+    fn tally_label(&self, fillers: usize) -> String {
+        match &self.recreate {
+            Some(rc) => {
+                let base = format!(
+                    "recreate(companion={},nft={},fillers={})",
+                    rc.slot, rc.nft_index, fillers
+                );
+                if self.sinks > 0 {
+                    format!("{base}+sink")
+                } else {
+                    base
+                }
+            }
+            None => self.static_label.clone(),
+        }
     }
 }
 
@@ -981,6 +1032,10 @@ struct ProbePoint<'a> {
     succ: &'a SuccState,
     split: bool,
     mint: Option<u64>,
+    /// The filler counts this shape materializes over (the family's
+    /// innermost axis; `[0]` without a re-creation). Owned, so the caller
+    /// can iterate it while holding the point.
+    filler_domain: Vec<usize>,
 }
 
 impl ProbePoint<'_> {
@@ -1013,6 +1068,9 @@ struct AxisIter {
     succs: Vec<SuccState>,
     splits: Vec<Vec<bool>>,
     mints: Vec<Vec<Option<u64>>>,
+    /// Per shape: the filler counts its re-creation materializes over
+    /// (innermost axis — `[0]` for shapes without a re-creation).
+    filler_domains: Vec<Vec<usize>>,
     i: [usize; 5],
     started: bool,
     exhausted: bool,
@@ -1025,18 +1083,19 @@ impl AxisIter {
         req: &DrainRequest,
         roles: &[DrainRole],
         declared: &[ScenarioBox],
-        nfts: &HashSet<String>,
         template_outputs: usize,
         successor_count: usize,
     ) -> Self {
         let max_new = syn.resolved_max_new_outputs();
 
         // Axis 1: synthesized-output shapes, in the pinned order — none →
-        // companion re-creations → re-creation + sink → sinks.
+        // companion re-creations → re-creation + sink → sinks. A companion
+        // qualifies through any token it carries at amount 1 (see
+        // `ShapeDesc.recreate` — deliberately not `protocolNfts`).
         let mut shapes: Vec<ShapeDesc> = vec![ShapeDesc {
-            label: "none".to_string(),
-            recreations: Vec::new(),
+            recreate: None,
             sinks: 0,
+            static_label: "none".to_string(),
         }];
         let mut recreations: Vec<Recreate> = Vec::new();
         if syn.companion_recreations {
@@ -1044,60 +1103,49 @@ impl AxisIter {
                 if *role != DrainRole::Companion {
                     continue;
                 }
-                // The vault move: a companion carrying a protocol NFT, moved
-                // by insertion to an attacker-chosen index. Insertion only
-                // moves a token rightward: targets are `j..=3`.
-                if let Some(j) = declared[slot]
-                    .tokens
-                    .iter()
-                    .position(|t| nfts.contains(&t.id.to_lowercase()))
-                {
-                    if j <= 3 {
-                        for fillers in 0..=(3 - j) {
-                            recreations.push(Recreate {
-                                slot,
-                                nft_index: j,
-                                fillers,
-                            });
-                        }
+                // Insertion only moves a token rightward: reachable targets
+                // are `j..=3`. The filler count is not part of the shape —
+                // it is the family's innermost axis, so the unpadded
+                // re-creation never starves the padded ones (both review
+                // passes' sourcing work stays reachable by construction).
+                for (j, t) in declared[slot].tokens.iter().enumerate() {
+                    if t.amount == 1 && j <= 3 {
+                        recreations.push(Recreate { slot, nft_index: j });
                     }
                 }
             }
         }
         for rc in &recreations {
             shapes.push(ShapeDesc {
-                label: format!(
-                    "recreate(companion={},nft={},fillers={})",
-                    rc.slot, rc.nft_index, rc.fillers
-                ),
-                recreations: vec![rc.clone()],
+                recreate: Some(rc.clone()),
                 sinks: 0,
+                static_label: format!("recreate(companion={},nft={})", rc.slot, rc.nft_index),
             });
         }
         if syn.companion_recreations && max_new >= 2 {
             for rc in &recreations {
                 shapes.push(ShapeDesc {
-                    label: format!(
-                        "recreate(companion={},nft={},fillers={})+sink",
-                        rc.slot, rc.nft_index, rc.fillers
-                    ),
-                    recreations: vec![rc.clone()],
+                    recreate: Some(rc.clone()),
                     sinks: 1,
+                    static_label: format!(
+                        "recreate(companion={},nft={})+sink",
+                        rc.slot, rc.nft_index
+                    ),
                 });
             }
         }
         if max_new >= 1 {
             shapes.push(ShapeDesc {
-                label: "sinks(1)".to_string(),
-                recreations: Vec::new(),
+                recreate: None,
                 sinks: 1,
+                static_label: "sinks(1)".to_string(),
             });
         }
         if syn.splits && max_new >= 2 {
             shapes.push(ShapeDesc {
-                label: "sinks(2)".to_string(),
-                recreations: Vec::new(),
+                recreate: None,
                 sinks: 2,
+                static_label: "sinks(2)".to_string(),
             });
         }
 
@@ -1150,6 +1198,21 @@ impl AxisIter {
             })
             .collect();
 
+        // The re-creation family's own innermost axis: filler counts. It is
+        // deliberately NOT a shape dimension — sequenced shapes would let the
+        // unpadded re-creation eat the whole budget (the one reachability
+        // bug both review passes would have shipped). Innermost, every
+        // (outperm, successor, split, mint, perm, combo, payout) point tries
+        // every filler count, so the sourcing machinery executes on real
+        // requests whenever any budget reaches a re-creation shape.
+        let filler_domains: Vec<Vec<usize>> = shapes
+            .iter()
+            .map(|s| match &s.recreate {
+                Some(rc) => (0..=(3 - rc.nft_index)).collect(),
+                None => vec![0],
+            })
+            .collect();
+
         AxisIter {
             shapes,
             out_perms,
@@ -1157,6 +1220,7 @@ impl AxisIter {
             succs,
             splits,
             mints,
+            filler_domains,
             i: [0; 5],
             started: false,
             exhausted: false,
@@ -1207,6 +1271,7 @@ impl AxisIter {
             succ: &self.succs[self.i[2]],
             split: self.splits[self.i[0]][self.i[3]],
             mint: self.mints[self.i[0]][self.i[4]],
+            filler_domain: self.filler_domains[self.i[0]].clone(),
         })
     }
 }
@@ -1254,6 +1319,7 @@ fn materialize_synthesized(
     req: &DrainRequest,
     payout: &str,
     point: &ProbePoint,
+    fillers_count: usize,
     realized_inputs: &[ScenarioBox],
     combo: &[(String, ScenarioBox)],
     attacker_slot_tokens: &[Vec<String>],
@@ -1308,29 +1374,30 @@ fn materialize_synthesized(
     //    twice and conservation rejects any output id the inputs do not
     //    carry, so unsourced padding is not generated at all.
     let mut new_boxes: Vec<ScenarioBox> = Vec::new();
-    for rc in &shape.recreations {
+    if let Some(rc) = &shape.recreate {
         let companion = &combo[rc.slot].1;
         let mut exclude: HashSet<String> = companion
             .tokens
             .iter()
             .map(|t| t.id.to_lowercase())
             .collect();
-        let mut fillers: Vec<String> = Vec::with_capacity(rc.fillers);
+        let mut fillers: Vec<String> = Vec::with_capacity(fillers_count);
         'source: for slot_ids in attacker_slot_tokens {
             for id in slot_ids {
                 if !exclude.contains(id) {
                     exclude.insert(id.clone());
                     fillers.push(id.clone());
-                    if fillers.len() == rc.fillers {
+                    if fillers.len() == fillers_count {
                         break 'source;
                     }
                 }
             }
         }
-        if fillers.len() < rc.fillers {
+        if fillers.len() < fillers_count {
             return None;
         }
-        let mut tokens: Vec<TokenAmount> = Vec::with_capacity(companion.tokens.len() + rc.fillers);
+        let mut tokens: Vec<TokenAmount> =
+            Vec::with_capacity(companion.tokens.len() + fillers_count);
         for (idx, t) in companion.tokens.iter().enumerate() {
             if idx == rc.nft_index {
                 tokens.extend(fillers.iter().map(|id| TokenAmount {
@@ -2293,7 +2360,7 @@ mod tests {
             permute_outputs: true,
             ..Synthesis::default()
         };
-        // 1 protected, 1 companion carrying a protocol NFT, 1 attacker.
+        // 1 protected, 1 companion carrying its own singleton, 1 attacker.
         let roles = [
             DrainRole::Protected,
             DrainRole::Companion,
@@ -2317,19 +2384,24 @@ mod tests {
             },
             ScenarioBox::default(),
         ];
-        let nfts: HashSet<String> = [nft.to_string()].into_iter().collect();
-        let axes = AxisIter::build(&syn, &dummy_request(), &roles, &declared, &nfts, 2, 1);
+        // The companion qualifies through its amount-1 token — not through
+        // `protocolNfts` (the dummy request names the protected NFT only).
+        let axes = AxisIter::build(&syn, &dummy_request(), &roles, &declared, 2, 1);
 
-        // Shapes: none, then the companion's re-creations (NFT at index 0 →
-        // fillers 0..=3), then sinks(1). The odometer must walk shapes
-        // outermost, then output permutations, then successor states, then
-        // splits, then mints — the phase-1 axes innermost.
-        let labels: Vec<String> = Vec::new();
-        let _ = labels;
+        // Shapes: none, then the companion's re-creation (singleton at index
+        // 0; the filler count is NOT a shape — it is the family's innermost
+        // axis), its +sink variant, then sinks(1). The odometer must walk
+        // shapes outermost, then output permutations, then successor states,
+        // then splits, then mints — the phase-1 axes innermost.
         let mut seen: Vec<(String, Vec<usize>, bool, Option<u64>)> = Vec::new();
         let mut iter = axes;
         while let Some(p) = iter.next() {
-            seen.push((p.shape.label.clone(), p.out_perm.to_vec(), p.split, p.mint));
+            seen.push((
+                p.shape.static_label.clone(),
+                p.out_perm.to_vec(),
+                p.split,
+                p.mint,
+            ));
         }
         // Each shape's points are contiguous (the shape axis is outermost);
         // first-occurrence order is the pinned shape order.
@@ -2339,15 +2411,16 @@ mod tests {
                 shape_order.push(l.as_str());
             }
         }
-        let expected_shapes = [
-            "none",
-            "recreate(companion=1,nft=0,fillers=0)",
-            "recreate(companion=1,nft=0,fillers=1)",
-            "recreate(companion=1,nft=0,fillers=2)",
-            "recreate(companion=1,nft=0,fillers=3)",
-            "sinks(1)",
-        ];
+        // maxNewOutputs is Some(1): the +sink variant (which needs 2) and
+        // sinks(2) are absent.
+        let expected_shapes = ["none", "recreate(companion=1,nft=0)", "sinks(1)"];
         assert_eq!(shape_order, expected_shapes);
+        // The filler counts ride inside the re-creation shape's points.
+        assert_eq!(
+            axes_dummy_fillers(&syn, &roles, &declared),
+            vec![0, 1, 2, 3],
+            "the re-creation family's filler domain is 0..=3 for a singleton at index 0"
+        );
         // Within the `none` shape: 2 output permutations, no mint variants
         // (a mint attaches only to a synthesized output).
         let none_points: Vec<_> = seen.iter().filter(|(l, ..)| l == "none").collect();
@@ -2357,12 +2430,22 @@ mod tests {
         // mint variants; mints vary inside a fixed outperm, outperms after.
         let rc0: Vec<_> = seen
             .iter()
-            .filter(|(l, ..)| l == "recreate(companion=1,nft=0,fillers=0)")
+            .filter(|(l, ..)| l == "recreate(companion=1,nft=0)")
             .collect();
         assert_eq!(rc0.len(), 6 * 2);
         assert_eq!(rc0[0].3, None, "no mint first");
         assert!(rc0[1].3.is_some(), "mints vary inside a fixed outperm");
         assert_eq!(rc0[2].1, vec![0, 2, 1], "outperm varies after mints");
+    }
+
+    /// The filler domain the axis builder derives for the unit fixture.
+    fn axes_dummy_fillers(
+        syn: &Synthesis,
+        roles: &[DrainRole],
+        declared: &[ScenarioBox],
+    ) -> Vec<usize> {
+        let axes = AxisIter::build(syn, &dummy_request(), roles, declared, 2, 1);
+        axes.filler_domains[1].clone()
     }
 
     /// A minimal valid request for the axis builder's mint-amount probe.

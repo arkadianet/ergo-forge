@@ -81,12 +81,16 @@ freedom, each capped and each recorded in the report:
    - **Companion re-creations with padded token layouts** — a companion box
      rebuilt verbatim (same script, value, tokens) with filler tokens
      inserted so that a carried NFT lands at an attacker-chosen index
-     `i ∈ {0..=3}`. Written as *the vault move*: the whitelisted NFT at
-     `OUTPUTS(k).tokens(2)`. [Corrected: the deployed vault checks the
-     whitelist on the **input** side — the vault's own move is spending an
-     authorizer box, not padding an output. The padded re-creation degree
-     stays: output-side token-index checks are a real contract family; the
-     vault was just not one.]
+     `i ∈ {0..=3}`. [Justification, restated after the decode correction:
+     the vault was originally cited as *the* instance of this shape and the
+     decode correction retired it — padding exists for the family of
+     protocols that pin an output's token layout **by index**
+     (`OUTPUTS(k).tokens(i)._1 == X`), where the attacker must insert
+     filler to reach index `i`. No concrete target is claimed; the degree
+     stays because the family is real and the sourcing machinery keeps it
+     honest. Reachability is by construction: the filler count is the
+     family's innermost axis, so padded shapes share every re-creation
+     shape's budget instead of starving behind the unpadded one.]
      **The padding has a token source, and saying so is load-bearing.**
      Conservation rejects any output id the inputs do not carry, and a box
      cannot hold one id twice — so reaching index 2 needs *two distinct
@@ -258,6 +262,22 @@ without the decode:
     unaffected. The empirical flagship run is **deliberately not yet run**:
     it is re-aimed at the corrected shape and gated on disclosure-first
     sign-off.
+
+    **The question has since sharpened further (review, implementation PR):**
+    the vault's own script pins its successor's *identity* — script bytes,
+    bank NFT id **and** amount — but pins neither the successor's ERG value
+    nor the treasury token's *amount* (`tokens(1)` by id only). A dust
+    successor is permitted by the vault script alone: the vault delegates
+    every reserve guarantee to the three script authorizers. The
+    `unbound-box-reserves` lint (run on the deployed tree, recorded in the
+    corpus fixture) says **clean** — the vault has exactly the NFT-binding
+    shape the lint rewards — which is a statement about the lint's pattern,
+    not about value-binding completeness. The flagship question therefore
+    collapses to a single, sharper one: **do `useFreeMint`, `useArbitrageMint`
+    and `usePayout` constrain the bank's value?** The empirical run needs
+    those three companions as inputs; the admin box contributes nothing (the
+    gate refuses it). Until that run, the corpus record and this note are
+    the only claims.
 3. **Either outcome is a result.** `drainable` means the vault is a live
    keyless drain of 292,615 ERG + the treasury: **disclosure-first** — the
    operator is the project itself here, but the rule from the phase-1 spec

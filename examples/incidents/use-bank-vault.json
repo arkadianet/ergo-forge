@@ -113,5 +113,13 @@
    "inclusionHeight": 1668385
   }
  ],
- "deployedTree": "100e04020400040004000400040204020e2040db16e1ed50b16077b19102390f36b41ca35c64af87426d04af3b93408590510e20c79bef6fe21c788546beab08c963999d5ef74151a9b7fd6c1843f626eea0ecf5040404000e20dbf655f0f6101cb03316e931a689412126fefbfb7c78bd9869ad6a1a58c1b4240e20a2482fca4ca774ef9d3896977e3677b031597c6e312b0c10d47157bb0d6ed69f0e20f77b3cac4f77a31aeffaf716070345b3b04330bbba02e27671015129fb74e883d804d601b2a5730000d602db63087201d603db6308a7d6048cb2db6308b2a473010073020001d1ecededed93b27202730300b2720373040093c27201c2a7938cb27202730500018cb2720373060001ececec93720473079372047308938cb2db6308b2a4730900730a0001730b937204730c937204730d"
+ "deployedTree": "100e04020400040004000400040204020e2040db16e1ed50b16077b19102390f36b41ca35c64af87426d04af3b93408590510e20c79bef6fe21c788546beab08c963999d5ef74151a9b7fd6c1843f626eea0ecf5040404000e20dbf655f0f6101cb03316e931a689412126fefbfb7c78bd9869ad6a1a58c1b4240e20a2482fca4ca774ef9d3896977e3677b031597c6e312b0c10d47157bb0d6ed69f0e20f77b3cac4f77a31aeffaf716070345b3b04330bbba02e27671015129fb74e883d804d601b2a5730000d602db63087201d603db6308a7d6048cb2db6308b2a473010073020001d1ecededed93b27202730300b2720373040093c27201c2a7938cb27202730500018cb2720373060001ececec93720473079372047308938cb2db6308b2a4730900730a0001730b937204730c937204730d",
+ "lint": {
+  "lint": "unbound-box-reserves",
+  "verdict": "clean",
+  "findings": [],
+  "ranOn": "the deployed tree's decompiled proposition, recompiled at treeVersion 3 and audited (audit::audit, Completeness::Complete)",
+  "recorded": "2026-09-08",
+  "note": "CLEAN IS NOT SAFE. The lint keys on reserve math with positional box reads and NFT-binding fixes; the vault HAS the NFT-binding shape (OUTPUTS(1) pins the script bytes and the bank NFT's id AND amount), so it passes. What the lint does not check - and what the vault script leaves unpinned - is the successor's ERG value and the treasury token's AMOUNT (tokens(1) is compared by id only). The vault's own script therefore permits a dust successor carrying the bank NFT and one treasury token: every reserve guarantee is delegated to the three script authorizers. This is the sharpened flagship question: do useFreeMint/useArbitrageMint/usePayout constrain the bank's value? The empirical run needs those three companions as inputs (the admin box is P2PK and refused by the gate, so it contributes nothing)."
+ }
 }

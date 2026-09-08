@@ -128,6 +128,49 @@ fn the_whitelist_is_input_side_index_zero_with_a_continuation_guard() {
     );
 }
 
+/// The recorded lint verdict is checkable too: `unbound-box-reserves` on the
+/// deployed tree's decompiled proposition. The record carries the
+/// interpretation, which the test keeps honest.
+#[test]
+fn the_recorded_lint_verdict_matches_a_live_run() {
+    let corpus: serde_json::Value = serde_json::from_str(CORPUS).expect("corpus parses");
+    let lint = &corpus["lint"];
+    assert_eq!(lint["lint"], "unbound-box-reserves");
+    assert_eq!(lint["verdict"], "clean");
+
+    // Re-run: decompile the deployed tree, recompile the proposition,
+    // audit it.
+    let bytes = hex::decode(corpus["vault"]["ergoTree"].as_str().unwrap()).expect("tree is hex");
+    let source = decompile_bytes(&bytes).expect("tree decompiles");
+    let compiled = ergo_sandbox::compile::compile_source(
+        &source,
+        3,
+        ergo_ser::address::NetworkPrefix::Mainnet,
+    )
+    .expect("decompiled proposition recompiles");
+    let tree = ergo_sandbox::inspect::parse_tree(&compiled.tree_bytes).expect("tree parses");
+    let lifted = ergo_sandbox::decompile::lift_tree(&tree, false);
+    let a = ergo_sandbox::audit::audit(&lifted);
+    assert!(
+        a.findings.is_empty(),
+        "the recorded verdict is clean; live findings: {:?}",
+        a.findings
+    );
+
+    // Clean is not safe: the lint keys on reserve math and NFT-binding
+    // identity. The vault binds its successor's identity (script bytes;
+    // bank NFT id AND amount) but pins neither the successor's ERG value
+    // nor the treasury token's amount — a dust successor is permitted by
+    // the vault script alone, and every reserve guarantee is delegated to
+    // the three script authorizers. The corpus record says so; this
+    // assertion pins that the interpretation stays attached to the verdict.
+    let note = lint["note"].as_str().unwrap();
+    assert!(
+        note.contains("CLEAN IS NOT SAFE") && note.contains("tokens(1) is compared by id only"),
+        "the lint record must carry the unpinned-value caveat"
+    );
+}
+
 /// The corpus carries the people of the whitelist: the three script
 /// authorizers (the empirical routes) and the admin's P2PK box (the refused
 /// route — `needsProof`, disqualified by the phase-1 gate).

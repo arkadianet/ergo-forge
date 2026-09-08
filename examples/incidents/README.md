@@ -92,6 +92,16 @@ wrong on collection and index. The deployed tree asserts, mechanically
 - the `useUpdateNft` route stands **alone**, outside the continuation guards
   — which is exactly why the admin's P2PK box (needsProof) is the route the
   hunt refuses by construction.
+- **The lint record.** `unbound-box-reserves` on the deployed tree says
+  **clean** — the vault has the NFT-binding shape the lint rewards — but
+  clean is not safe: the vault pins its successor's *identity*, not its
+  value (the treasury token is compared by id only, the successor's ERG
+  value not at all). A dust successor is permitted by the vault script
+  alone; every reserve guarantee is delegated to the three script
+  authorizers. That collapses the flagship question to a single sharper
+  one: **do `useFreeMint`/`useArbitrageMint`/`usePayout` constrain the
+  bank's value?** The empirical run needs those three companions; the admin
+  box contributes nothing.
 
 The tree re-serializes byte-identically and the fixture's `mirrorSource`
 compiles back to the same constants and proposition, so the decode is a fact
