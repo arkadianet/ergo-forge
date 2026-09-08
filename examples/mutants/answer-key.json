@@ -1,0 +1,248 @@
+{
+ "recorded": "2026-09-08",
+ "runner": "ergo-sandbox/tests/mutation_corpus.rs (debug build)",
+ "methodology": "docs/superpowers/specs/2026-09-08-mutation-corpus-design.md",
+ "detectionRate": 0.0,
+ "provenMutants": 4,
+ "found": 0,
+ "denominatorNote": "proven = a hand-built KEYLESS drain witness validated by txcheck before the hunt ran. M1-M3 were initially misproven (their witnesses validated under txcheck but carry needsProof on the protected input \u2014 the residual requires the beneficiary's/receiver's key): reclassified as keyed-insider, outside the hunt's attacker model, never in the denominator.",
+ "caps": {
+  "maxProbes": 50000,
+  "maxPermutations": 120,
+  "synthesis": {
+   "maxNewOutputs": 2,
+   "companionRecreations": true,
+   "successorStates": true,
+   "splits": true,
+   "mints": true,
+   "permuteOutputs": true,
+   "maxOutputPermutations": 24
+  }
+ },
+ "perMutant": [
+  {
+   "id": "M1",
+   "proven": false,
+   "attackerModel": "keyed-insider",
+   "synthesisOff": {
+    "verdict": "notunderprobes",
+    "probesRun": 28,
+    "capped": false
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes",
+    "probesRun": 868,
+    "capped": false
+   }
+  },
+  {
+   "id": "M2",
+   "proven": false,
+   "attackerModel": "keyed-insider",
+   "synthesisOff": {
+    "verdict": "notunderprobes",
+    "probesRun": 28,
+    "capped": false
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes",
+    "probesRun": 2856,
+    "capped": false
+   }
+  },
+  {
+   "id": "M3",
+   "proven": false,
+   "attackerModel": "keyed-insider",
+   "synthesisOff": {
+    "verdict": "notunderprobes",
+    "probesRun": 28,
+    "capped": false
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes",
+    "probesRun": 2856,
+    "capped": false
+   }
+  },
+  {
+   "id": "M4",
+   "proven": true,
+   "found": false,
+   "synthesisOff": {
+    "verdict": "notunderprobes",
+    "probesRun": 28,
+    "capped": false
+   },
+   "synthesisOn": {
+    "verdict": "drainable",
+    "probesRun": 4512,
+    "capped": false
+   },
+   "note": "found only with synthesis on: the drain needs a NEW output (the attacker's payment box at the sale's price position) while the stock returns to the sale box \u2014 out of phase-1's fixed output set. CONFOUNDED: the same drainable verdict fires on the unmutated original (see escalatedFindings), so it is not attributable to the mutation. The hunt's objective has no conditional sanction, so overpayment probes score as drains; the real 1-nanoERG drain IS in family (710 hits), but the verdict alone cannot discriminate.",
+   "confounded": true,
+   "rawDrainable": true
+  },
+  {
+   "id": "M5",
+   "proven": true,
+   "found": false,
+   "synthesisOff": {
+    "verdict": "notunderprobes",
+    "probesRun": 28,
+    "capped": false
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes",
+    "probesRun": 3416,
+    "capped": false
+   },
+   "missClass": "out-of-family",
+   "missDetail": "the witness moves the bank NFT out of the successor's tokens(0) (a junk token takes its slot): a token-LAYOUT variation of a FIXED output. No synthesis degree re-pads a template output \u2014 only companion RE-CREATIONS get padding. The phase-1 fixed shape cannot express it either."
+  },
+  {
+   "id": "M6",
+   "proven": true,
+   "found": false,
+   "synthesisOff": {
+    "verdict": "notunderprobes",
+    "probesRun": 28,
+    "capped": false
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes",
+    "probesRun": 1652,
+    "capped": false
+   },
+   "missClass": "out-of-family",
+   "missDetail": "the witness re-trees the pool SUCCESSOR (a fixed output) to the attacker's script with reserves intact: drain mode re-trees only the FREE payee, and no synthesis degree modifies a template output's tree. Same missing axis as M5: fixed-output re-pad/re-tree."
+  },
+  {
+   "id": "M7",
+   "proven": true,
+   "found": false,
+   "synthesisOff": {
+    "verdict": "notunderprobes",
+    "probesRun": 84,
+    "capped": false
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes",
+    "probesRun": 29448,
+    "capped": false
+   },
+   "missClass": "out-of-family",
+   "missDetail": "same missing axis as M6, on the incident's own fixed contract: the swap successor must be re-treed to steal the locked order value. The hunt spends 29,448 probes in family and misses \u2014 the axis, not the budget, is the gap."
+  }
+ ],
+ "missTable": {
+  "out-of-family": [
+   "M5",
+   "M6",
+   "M7 \u2014 one missing probe axis: re-pad / re-tree a FIXED (template) output. Phase-3 backlog entry #1; would likely convert all three."
+  ],
+  "keyed-insider (out of attacker model)": [
+   "M1",
+   "M2",
+   "M3 \u2014 residuals require the beneficiary's/receiver's key; the hunt refuses needsProof on protected inputs by contract. A keyed-insider hunt is a phase-3+ attacker-model extension, not a coverage fix."
+  ],
+  "cap-truncation": [],
+  "role-labelling": [],
+  "arithmetic": []
+ },
+ "negativeControls": [
+  {
+   "id": "M1",
+   "synthesisOff": {
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes"
+   }
+  },
+  {
+   "id": "M2",
+   "synthesisOff": {
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes"
+   }
+  },
+  {
+   "id": "M3",
+   "synthesisOff": {
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes"
+   }
+  },
+  {
+   "id": "M4",
+   "synthesisOff": {
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "verdict": "drainable"
+   },
+   "escalated": "see escalatedFindings - the firing is recorded, the fixture untouched"
+  },
+  {
+   "id": "M5",
+   "synthesisOff": {
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes"
+   }
+  },
+  {
+   "id": "M6",
+   "synthesisOff": {
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes"
+   }
+  },
+  {
+   "id": "M7",
+   "synthesisOff": {
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes"
+   }
+  }
+ ],
+ "escalatedFindings": [
+  {
+   "raisedBy": "the negative control itself",
+   "original": "token-sale (M4's unmutated original)",
+   "verdict": "drainable (synthesis on, 4512 probes)",
+   "what": "the winning probe has the attacker OVERPAY the seller (20M of the attacker's own nanoERG into the seller's P2PK box) so `paid` passes legitimately and the stock leaves the sale box with it. The seller is fully paid; the attacker loses money. No exploit.",
+   "why": "the leak objective counts protected value that LEFT the protected box, sanctioned only at the free payee's DECLARED amounts, and never subtracts what the attacker SPENT. An overpayment that empties a protected box into a protocol-designated payee scores as a drain.",
+   "disposition": "ESCALATED, not fixed: attacker-cost accounting is the roadmap's parked 'pricing / worth-weighted objectives; economic probes \u2014 separate spec' (phase 2 spec, non-goals). This firing is the concrete evidence for that spec. The fixture is untouched.",
+   "consequence": "M4's `found` is confounded: the mutant IS really exploitable (the 1-nanoERG purchase is a genuine keyless theft and is in family \u2014 the hunt scored 710 hits), but its drainable verdict cannot be distinguished from overpayment noise without a cost-aware objective. Recorded as rawDrainable=true, confounded=true, attributable=false.",
+   "mutant": "M4"
+  }
+ ],
+ "negativeControlsNote": "every original runs in both configurations, asserted in the harness; a drainable original must be pre-recorded in escalatedFindings (M4) or the run fails. Six of seven originals are clean; M4's firing is the corpus's escalated finding.",
+ "harnessValidity": {
+  "knownDetectableControl": {
+   "id": "C-incident",
+   "what": "delete-nft-check applied to examples/incidents/fixed/use-lp-swap.es reconstructs the DEPLOYED vulnerable useLpSwap (both halves of the NFT binding deleted - exactly what the deployed contract lacked). Ground truth: it drained 284,695 ERG on mainnet at height 1,868,204.",
+   "expected": "drainable from the honest shape (synthesis off - phase 1 rediscovers it)",
+   "result": "FOUND",
+   "note": "a pass/fail on the APPARATUS, reported separately - never a corpus mutant, never in the rate's denominator (a found control would move the rate without the hunt changing). Landing this control caught a fixture bug in the control's own template (the swap successor initially lacked the swap NFT, failing swapSucc.tokens == SELF.tokens on every probe) - the control doing its job."
+  }
+ },
+ "detectionRateNote": "attributable detections / proven mutants. A drainable verdict counts only when the mutant's own unmutated control is CLEAN in the same configuration \u2014 a hit that also fires on the original says nothing about the mutation. Derived by the harness, not flagged by hand.",
+ "attributableDetections": 0,
+ "rawDrainableOnProven": 1,
+ "confounded": [
+  "M4"
+ ],
+ "foundNote": "raw drainable verdicts on proven mutants: see rawDrainableOnProven (1, all confounded)"
+}

@@ -32,7 +32,11 @@ The concrete case first, because it is funded and unresolved. The USE bank
 vault (`e6162e2aff23…`, 292,615.109709675 ERG plus the ~1e15 USE treasury)
 authorizes a spend when `OUTPUTS(0).tokens(2)._1` is one of four admin NFTs
 (`useFreeMint`, `useArbitrageMint`, `usePayout`, `useUpdateNft` — or the
-never-minted `dbf655…` at `OUTPUTS(2)`, a dead branch). Phase 1 structurally
+never-minted `dbf655…` at `OUTPUTS(2)`, a dead branch). **[Corrected below
+and in the corpus fixture: the deployed tree checks
+`INPUTS(0).tokens(0)._1`, with the dead branch at `INPUTS(2)` and a
+faithful-continuation guard on `OUTPUTS(1)` — see "CORRECTED by
+implementation" in the flagship section.]** Phase 1 structurally
 cannot express that shape: its `OUTPUTS(0)` is always the first protected
 successor, whose token layout the caller declared. The phase-1 hunt therefore
 answers `notUnderProbes` on the vault set — a statement about the probes, not
@@ -77,8 +81,16 @@ freedom, each capped and each recorded in the report:
    - **Companion re-creations with padded token layouts** — a companion box
      rebuilt verbatim (same script, value, tokens) with filler tokens
      inserted so that a carried NFT lands at an attacker-chosen index
-     `i ∈ {0..=3}`. This is the vault move: the whitelisted NFT at
-     `OUTPUTS(k).tokens(2)`.
+     `i ∈ {0..=3}`. [Justification, restated after the decode correction:
+     the vault was originally cited as *the* instance of this shape and the
+     decode correction retired it — padding exists for the family of
+     protocols that pin an output's token layout **by index**
+     (`OUTPUTS(k).tokens(i)._1 == X`), where the attacker must insert
+     filler to reach index `i`. No concrete target is claimed; the degree
+     stays because the family is real and the sourcing machinery keeps it
+     honest. Reachability is by construction: the filler count is the
+     family's innermost axis, so padded shapes share every re-creation
+     shape's budget instead of starving behind the unpadded one.]
      **The padding has a token source, and saying so is load-bearing.**
      Conservation rejects any output id the inputs do not carry, and a box
      cannot hold one id twice — so reaching index 2 needs *two distinct
@@ -141,11 +153,50 @@ spends its budget varying the phase-1 space inside each synthesis shape,
 instead of the reverse. Caps: `maxNewOutputs` (2), successor states (8),
 output permutations (24 default), total probes (50,000 default) — every cap
 a parameter, every cap recorded in the report alongside the pinned order.
-With the default caps the sampled prefix covers a bounded slice, so the
-flagship vault run **declares larger caps explicitly** (~200,000 probes —
-minutes, not hours) and records them. The honesty rule from phase 1 carries:
+
+**Budget allocation across shapes (implementation correction, review round
+2):** the total-probe cap is **allocated across synthesis shapes, not spent
+depth-first**. Shape `none` alone can produce more points than the whole
+budget on a real set (12,615 points on the 12-input mapped USE set), so
+spending depth-first zeroes every synthesis shape exactly when they matter —
+the pinned order's promise ("truncation preserves the new degrees") is
+delivered by the allocator, not the order alone. Policy: equal slices per
+shape (cumulative ceilings; a shape that exhausts its slice is skipped, never
+steals from later shapes; a shape that finishes early leaves its remainder to
+later shapes). With one shape this is exactly the phase-1 cap. The policy is
+recorded in the report next to the axis order, and each shape's slice is
+recorded per tally bucket — under truncation it is as load-bearing as the
+order itself. Companion visibility rides in the same record: companions
+*considered* vs *qualified* for re-creation (an axis that will generate
+nothing — e.g. a request whose only companion carries its singleton at
+amount 3 — is readable, not discoverable by instrumenting the run). The honesty rule from phase 1 carries:
 a miss says "not under these probes", names which synthesis degrees were
 enabled, and names the caps and the truncation order.
+
+**Two consequences the allocator carries, recorded (review round 3):**
+
+- **A capped synthesis-on run does not subsume phase 1.** Allocation is what
+  makes the synthesis degrees reachable, and it is paid for out of shape
+  `none` — the phase-1 point. On the mapped USE set at a 3,000-probe cap,
+  `none` went from 3,000 probes (depth-first) to 158 (allocated): correct,
+  and a ~1.25% sample of a space phase 1 would have swept whole. A drain
+  phase 1 alone would find can therefore be missed by a capped
+  synthesis-on run. **On a real target, run both**: synthesis off, then
+  synthesis on. One run is not two answers, and the report's per-shape
+  slice is what makes the difference legible.
+- **Breadth the budget cannot pay for is named.** A shape cut off with less
+  room than one input arrangement's decoy sweep (`decoy combinations ×
+  payout modes`) *ran* while covering less than a single arrangement — "it
+  ran" and "it explored something" are different claims, and this document's
+  honesty rule does not let them blur. Thinness is judged on **effective
+  capacity**, not the nominal slice: unused quota flows forward, so a later
+  shape often has more room than its slice, and a shape that merely
+  exhausted its own family was never starved at all — counting either as
+  thin would raise a false alarm. The report records `sliceFloor`,
+  `thinSlices`, and each shape's `budget` (nominal) beside its `capacity`
+  (effective, the gap being what the allocator handed forward); the CLI
+  prints a `THIN SLICES` line. The remedy is a larger `maxProbes` or fewer
+  enabled degrees, and the report says which.
 
 The anti-cheat carries too, sharpened: the vault acceptance below must be
 won by the **generic family** — a hand-fed `OUTPUTS(0)` with the right NFT at
@@ -209,19 +260,63 @@ without the decode:
    recorded verdict — the same pattern the USE replay used: the corpus is
    both fixture and answer key.
 
-   **Sources for the whitelist shape** — this spec's flagship hangs on it,
-   so the provenance is stated: the vault box
-   `e6162e2aff23f7c88968cc958541bacfe3ad80d6541befb7231ac3106e966f8b`
-   (carried by the merged map fixture `use-lp.json`), whose deployed
-   ErgoTree constants were hand-decoded during the incident response — the
-   four NFT constants and the dead `dbf655…` branch at `OUTPUTS(2)` are
-   visible in the tree's constant block, and the drain analysis in the
-   incident report records the decode. **Do not confuse this with**
-   `examples/contracts/dexy/bank/bank.es`, the DexyGold fork's bank, which
-   checks `INPUTS(mintInIndex).tokens(0)._1` — an input-side, index-0
-   check; a different contract. Implementation must land the vault's
-   deployed tree as a corpus fixture so the asserted whitelist shape is
-   checkable, not taken on trust from this document.
+    **Sources for the whitelist shape** — this spec's flagship hangs on it,
+    so the provenance is stated. The vault box
+    `e6162e2aff23f7c88968cc958541bacfe3ad80d6541befb7231ac3106e966f8b`
+    (carried by the merged map fixture `use-lp.json`) had its ErgoTree
+    constants hand-decoded during the incident response, and that hand-decode
+    was **wrong**: it read the whitelist at `OUTPUTS(0).tokens(2)._1` with a
+    dead `dbf655…` branch at `OUTPUTS(2)`. Landing the corpus fixture
+    (implementation, 2026-09-08) corrected it from the wire bytes — the
+    deployed tree re-serializes byte-identically and a mirror source compiles
+    back to the same constants and proposition — and the decode below is the
+    normative one. (The correction also retires this document's warning about
+    `examples/contracts/dexy/bank/bank.es`, the DexyGold fork's bank: the
+    deployed USE vault checks **`INPUTS(0).tokens(0)._1`** — an input-side,
+    index-0 whitelist — exactly the shape that warning called "a different
+    contract".) Implementation landed the vault's deployed tree as
+    `examples/incidents/use-bank-vault.json` with
+    `ergo-sandbox/tests/vault_corpus.rs` asserting the shape mechanically, so
+    the whitelist is checkable, not taken on trust from any document.
+
+    **The corrected decode, normative:** the deployed tree's whitelist is
+    **input-side** —
+    `INPUTS(0).tokens(0)._1` ∈ {useFreeMint, useArbitrageMint, usePayout,
+    useUpdateNft} — with the never-minted `dbf655…` dead branch at
+    `INPUTS(2).tokens(0)._1`, and it requires a faithful continuation at
+    `OUTPUTS(1)` (same script bytes; `tokens(0)` id and amount pinned;
+    `tokens(1)` id only — the treasury amount is *not* pinned by the vault
+    script). The `useUpdateNft` route stands alone outside the continuation
+    guards. Proof: the tree re-serializes byte-identically and
+    `examples/incidents/use-bank-vault.json`'s `mirrorSource` compiles back
+    to the same constants and proposition;
+    `ergo-sandbox/tests/vault_corpus.rs` asserts the decode from the wire
+    bytes. Consequences for the flagship: the vault move is **not** a padded
+    output — the whitelist is satisfiable only by spending a box that
+    carries an authorizer NFT at `tokens(0)` (the authorizer companions, or
+    the admin's P2PK box, which `needsProof` refuses), the continuation must
+    land at `OUTPUTS(1)` (the output-permutation axis earns its place), and
+    the empirical question — do the three script authorizers pass without a
+    key? — stands unchanged. The admin-refusal acceptance below is
+    unaffected. The empirical flagship run is **deliberately not yet run**:
+    it is re-aimed at the corrected shape and gated on disclosure-first
+    sign-off.
+
+    **The question has since sharpened further (review, implementation PR):**
+    the vault's own script pins its successor's *identity* — script bytes,
+    bank NFT id **and** amount — but pins neither the successor's ERG value
+    nor the treasury token's *amount* (`tokens(1)` by id only). A dust
+    successor is permitted by the vault script alone: the vault delegates
+    every reserve guarantee to the three script authorizers. The
+    `unbound-box-reserves` lint (run on the deployed tree, recorded in the
+    corpus fixture) says **clean** — the vault has exactly the NFT-binding
+    shape the lint rewards — which is a statement about the lint's pattern,
+    not about value-binding completeness. The flagship question therefore
+    collapses to a single, sharper one: **do `useFreeMint`, `useArbitrageMint`
+    and `usePayout` constrain the bank's value?** The empirical run needs
+    those three companions as inputs; the admin box contributes nothing (the
+    gate refuses it). Until that run, the corpus record and this note are
+    the only claims.
 3. **Either outcome is a result.** `drainable` means the vault is a live
    keyless drain of 292,615 ERG + the treasury: **disclosure-first** — the
    operator is the project itself here, but the rule from the phase-1 spec
