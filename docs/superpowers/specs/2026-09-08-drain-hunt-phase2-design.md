@@ -130,8 +130,10 @@ realistic set the product exceeds the total-probe cap — **truncation is the
 normal case, not the overflow case**. "Exhaustive over the family" therefore
 means: exhaustive within the sampled prefix, where the prefix is defined by a
 **pinned axis order**, outermost first: (1) synthesized-output shapes (none →
-sinks → companion re-creations, the vault move first — it is the class the
-incident left open); (2) output permutation; (3) per-successor states;
+companion re-creations → sinks — the re-creations come before the sinks
+because the vault move is the class the incident left open, and axis (1) is
+the first axis truncation reaches); (2) output permutation; (3) per-successor
+states;
 (4) value splits; (5) mint variants; (6) input permutation and decoy
 combinations, the phase-1 axes, innermost. Synthesis axes iterate outermost
 and input axes innermost: truncation then preserves the new degrees and
