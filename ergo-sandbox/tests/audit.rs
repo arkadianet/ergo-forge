@@ -426,6 +426,40 @@ fn the_deployed_use_bank_contract_is_clean() {
     );
 }
 
+/// **Incident-corpus linkage.** The patched swap shipped in
+/// `examples/incidents/fixed/use-lp-swap.es` is the same maths as the deployed
+/// swap (which `the_deployed_use_lp_swap_contract_is_flagged` proves the lint
+/// flags) with the one missing check restored: `INPUTS(0).tokens(0)._1 ==
+/// $lpNft`. The lint must clear it — this ties the replay corpus to the audit
+/// layer, so a redeployment of the drained shape cannot pass review.
+#[test]
+fn the_incident_corpus_fixed_swap_is_clean() {
+    use std::collections::BTreeMap;
+    // The LP singleton NFT the fixed swap binds the pool by.
+    let mut params = BTreeMap::new();
+    params.insert(
+        "lpNft".to_string(),
+        ergo_sandbox::TypedValue {
+            r#type: "Coll[Byte]".to_string(),
+            value: serde_json::json!(
+                "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41"
+            ),
+        },
+    );
+    let src = include_str!("../../examples/incidents/fixed/use-lp-swap.es");
+    let bytes = ergo_sandbox::compile::compile_with_params(src, &params, 3, NetworkPrefix::Mainnet)
+        .expect("compile fixed swap")
+        .tree_bytes;
+    let tree = ergo_sandbox::inspect::parse_tree(&bytes).expect("parse");
+    let a = audit::audit(&lift_tree(&tree, false));
+    let lints: Vec<&str> = a.findings.iter().map(|f| f.lint).collect();
+    assert_eq!(a.completeness, Completeness::Complete);
+    assert!(
+        !lints.contains(&"unbound-box-reserves"),
+        "the fixed swap binds INPUTS(0) by the LP NFT: {lints:?}"
+    );
+}
+
 /// Binding by the whole `(id, amount)` pair pins `tokens(0)` just as an `._1`
 /// equality does — the oracle-pool refresh shape.
 #[test]

@@ -1,0 +1,136 @@
+{
+  "source": "// USE LP swap \u2014 FIXED shape (regression fixture for the 2026-09-08 drain).\n//\n// This is the deployed useLpSwap logic, decompiled from mainnet swap-NFT box\n// ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf, with the\n// ONE missing check restored: the box the swap does its constant-product math\n// on must carry the LP singleton NFT. The deployed contract read the pool\n// positionally as INPUTS(0)/OUTPUTS(0) and never asserted which box that was,\n// so an attacker put a decoy at index 0 and drained the real pool spent\n// alongside it. Binding by the singleton NFT closes the substitution: only the\n// genuine pool holds that token.\n//\n// $lpNft: Coll[Byte]  -- the LP pool's singleton NFT (tokens(0) of the pool)\n{\n  val poolIn      = INPUTS(0)\n  val poolInToks  = poolIn.tokens\n  val poolOut     = OUTPUTS(0)\n  val poolOutToks = poolOut.tokens\n\n  // THE FIX: bind the pool the maths runs on by its singleton NFT, at both the\n  // spent box and its successor. A decoy cannot hold the unique LP token.\n  val poolBound =\n    poolInToks(0)._1  == $lpNft &&\n    poolOutToks(0)._1 == $lpNft\n\n  val ergIn      = poolIn.value\n  val ergDelta   = poolOut.value - ergIn\n  val tokenInY   = poolInToks(2)._2\n  val tokenDelta = poolOutToks(2)._2 - tokenInY\n  val swapSucc   = OUTPUTS(1)\n\n  val validSwap =\n    (poolInToks(1)._2 - poolOutToks(1)._2 == 0L) &&\n    (if (ergDelta > 0L)\n        tokenInY.toBigInt * ergDelta.toBigInt * 997.toBigInt >=\n          (-tokenDelta).toBigInt *\n            (ergIn.toBigInt * 1000.toBigInt + ergDelta.toBigInt * 997.toBigInt)\n     else\n        ergIn.toBigInt * tokenDelta.toBigInt * 997.toBigInt >=\n          (-ergDelta).toBigInt *\n            (tokenInY.toBigInt * 1000.toBigInt + tokenDelta.toBigInt * 997.toBigInt)) &&\n    swapSucc.propositionBytes == SELF.propositionBytes &&\n    swapSucc.value >= SELF.value &&\n    swapSucc.tokens == SELF.tokens\n\n  sigmaProp(poolBound && validSwap)\n}\n",
+  "params": {
+    "lpNft": {
+      "type": "Coll[Byte]",
+      "value": "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41"
+    }
+  },
+  "network": "mainnet",
+  "scenarios": [
+    {
+      "name": "fixed useLpSwap FAILS on the same drain context \u2014 INPUTS(0).tokens(0)._1 != LP NFT, so the decoy substitution is rejected",
+      "expect": "fail",
+      "height": 1868204,
+      "selfIndex": 1,
+      "inputs": [
+        {
+          "value": 2000000,
+          "ergoTree": "0008cd03eba1dbe56504389ed03b5d63f052ba88d2d9951443b0dd2c51d7b14806f76961",
+          "tokens": [
+            {
+              "id": "bb370e49ca8172af57d49fe37fb3410f7961a5d060f479c45cd72481acb27c31",
+              "amount": 1
+            },
+            {
+              "id": "e66ecb5533b50a61b2660fa67c5e995ed57c33006027cd54513b43ec76de1108",
+              "amount": 1
+            },
+            {
+              "id": "eb9bc070fde8f196f54a52183b614f8c7d2b689641352e33d53914743e42954c",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "value": 1000000000,
+          "ergoTree": "100f04000400040404040402040204020500050005ca0f05d00f05ca0f05ca0f05d00f05ca0fd809d601b2a4730000d602db63087201d603b2a5730100d604db63087203d605c17201d60699c172037205d6078cb2720273020002d608998cb27204730300027207d609b2a5730400d1eded93998cb27202730500028cb27204730600027307959172067308929c9c7e7207067e7206067e7309069c7ef07208069a9c7e7205067e730a067e9c7206730b06929c9c7e7205067e7208067e730c069c7ef07206069a9c7e7207067e730d067e9c7208730e06eded93c27209c2a792c17209c1a793db63087209db6308a7",
+          "tokens": [
+            {
+              "id": "ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "value": 284695585089453,
+          "ergoTree": "1013040004020402040404020400040004000404040404060e20ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf0e202cf9fb512f487254777ac1d086a55cda9e74a1009fe0d30390a3792f050de58f0e201bfea21924f670ca5f13dd6819ed3bf833ec5a3113d5b6ae87d806db29b94b9a040004000e20dbf655f0f6101cb03316e931a689412126fefbfb7c78bd9869ad6a1a58c1b4240e20bc685d6ad1703ba5775736308fd892807edc04f48ba7a52e802fab241a59962c0500d807d601b2a5730000d602db6308a7d603db63087201d604b27203730100d605b27202730200d606db6308b2a4730300d6078cb2db6308b2a473040073050001d1ededededed93c27201c2a793b27202730600b27203730700938c7204018c720501938cb27203730800018cb272027309000193b17203730aececec937207730b937207730c937207730dedeced91b17206730e938cb27206730f00017310937207731193998c7205028c7204027312",
+          "tokens": [
+            {
+              "id": "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41",
+              "amount": 1
+            },
+            {
+              "id": "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099",
+              "amount": 9223371891826792210
+            },
+            {
+              "id": "a55b8735ed1a99e46c2c89f8994aacdf4b1109bdcf682f1e5b34479c6e392669",
+              "amount": 74519919
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "raw",
+              "value": "0e034d6577"
+            }
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "value": 2000000,
+          "ergoTree": "1013040004020402040404020400040004000404040404060e20ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf0e202cf9fb512f487254777ac1d086a55cda9e74a1009fe0d30390a3792f050de58f0e201bfea21924f670ca5f13dd6819ed3bf833ec5a3113d5b6ae87d806db29b94b9a040004000e20dbf655f0f6101cb03316e931a689412126fefbfb7c78bd9869ad6a1a58c1b4240e20bc685d6ad1703ba5775736308fd892807edc04f48ba7a52e802fab241a59962c0500d807d601b2a5730000d602db6308a7d603db63087201d604b27203730100d605b27202730200d606db6308b2a4730300d6078cb2db6308b2a473040073050001d1ededededed93c27201c2a793b27202730600b27203730700938c7204018c720501938cb27203730800018cb272027309000193b17203730aececec937207730b937207730c937207730dedeced91b17206730e938cb27206730f00017310937207731193998c7205028c7204027312",
+          "tokens": [
+            {
+              "id": "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41",
+              "amount": 1
+            },
+            {
+              "id": "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099",
+              "amount": 1
+            },
+            {
+              "id": "a55b8735ed1a99e46c2c89f8994aacdf4b1109bdcf682f1e5b34479c6e392669",
+              "amount": 1
+            }
+          ],
+          "creationHeight": 1868202
+        },
+        {
+          "value": 1000000000,
+          "ergoTree": "100f04000400040404040402040204020500050005ca0f05d00f05ca0f05ca0f05d00f05ca0fd809d601b2a4730000d602db63087201d603b2a5730100d604db63087203d605c17201d60699c172037205d6078cb2720273020002d608998cb27204730300027207d609b2a5730400d1eded93998cb27202730500028cb27204730600027307959172067308929c9c7e7207067e7206067e7309069c7ef07208069a9c7e7205067e730a067e9c7206730b06929c9c7e7205067e7208067e730c069c7ef07206069a9c7e7207067e730d067e9c7208730e06eded93c27209c2a792c17209c1a793db63087209db6308a7",
+          "tokens": [
+            {
+              "id": "ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf",
+              "amount": 1
+            }
+          ],
+          "creationHeight": 1868202
+        },
+        {
+          "value": 284695583089453,
+          "ergoTree": "0008cd03eba1dbe56504389ed03b5d63f052ba88d2d9951443b0dd2c51d7b14806f76961",
+          "tokens": [
+            {
+              "id": "bb370e49ca8172af57d49fe37fb3410f7961a5d060f479c45cd72481acb27c31",
+              "amount": 1
+            },
+            {
+              "id": "e66ecb5533b50a61b2660fa67c5e995ed57c33006027cd54513b43ec76de1108",
+              "amount": 1
+            },
+            {
+              "id": "eb9bc070fde8f196f54a52183b614f8c7d2b689641352e33d53914743e42954c",
+              "amount": 1
+            },
+            {
+              "id": "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099",
+              "amount": 9223371891826792209
+            },
+            {
+              "id": "a55b8735ed1a99e46c2c89f8994aacdf4b1109bdcf682f1e5b34479c6e392669",
+              "amount": 74519918
+            }
+          ],
+          "creationHeight": 1868202
+        },
+        {
+          "value": 2000000,
+          "ergoTree": "1005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a57304",
+          "creationHeight": 1868202
+        }
+      ]
+    }
+  ]
+}
