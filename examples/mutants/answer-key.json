@@ -71,7 +71,8 @@
     "probesRun": 4512,
     "capped": false
    },
-   "note": "found only with synthesis on: the drain needs a NEW output (the attacker's payment box at the sale's price position) while the stock returns to the sale box \u2014 out of phase-1's fixed output set"
+   "note": "found only with synthesis on: the drain needs a NEW output (the attacker's payment box at the sale's price position) while the stock returns to the sale box \u2014 out of phase-1's fixed output set CONFOUNDED: the same drainable verdict fires on the unmutated original (see escalatedFindings) \u2014 the hunt's objective has no attacker-cost accounting, so overpayment probes score as drains. The real 1-nanoERG drain IS in family (710 hits), but the verdict alone cannot discriminate.",
+   "foundConfounded": true
   },
   {
    "id": "M5",
@@ -140,5 +141,91 @@
   "role-labelling": [],
   "arithmetic": []
  },
- "negativeControls": "all seven unmutated originals returned notUnderProbes in both configurations"
+ "negativeControls": [
+  {
+   "id": "M1",
+   "synthesisOff": {
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes"
+   }
+  },
+  {
+   "id": "M2",
+   "synthesisOff": {
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes"
+   }
+  },
+  {
+   "id": "M3",
+   "synthesisOff": {
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes"
+   }
+  },
+  {
+   "id": "M4",
+   "synthesisOff": {
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "verdict": "drainable"
+   },
+   "escalated": "see escalatedFindings - the firing is recorded, the fixture untouched"
+  },
+  {
+   "id": "M5",
+   "synthesisOff": {
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes"
+   }
+  },
+  {
+   "id": "M6",
+   "synthesisOff": {
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes"
+   }
+  },
+  {
+   "id": "M7",
+   "synthesisOff": {
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "verdict": "notunderprobes"
+   }
+  }
+ ],
+ "escalatedFindings": [
+  {
+   "raisedBy": "the negative control itself",
+   "original": "token-sale (M4's unmutated original)",
+   "verdict": "drainable (synthesis on, 4512 probes)",
+   "what": "the winning probe has the attacker OVERPAY the seller (20M of the attacker's own nanoERG into the seller's P2PK box) so `paid` passes legitimately and the stock leaves the sale box with it. The seller is fully paid; the attacker loses money. No exploit.",
+   "why": "the leak objective counts protected value that LEFT the protected box, sanctioned only at the free payee's DECLARED amounts, and never subtracts what the attacker SPENT. An overpayment that empties a protected box into a protocol-designated payee scores as a drain.",
+   "disposition": "ESCALATED, not fixed: attacker-cost accounting is the roadmap's parked 'pricing / worth-weighted objectives; economic probes \u2014 separate spec' (phase 2 spec, non-goals). This firing is the concrete evidence for that spec. The fixture is untouched.",
+   "consequence": "M4's `found` is confounded: the mutant IS really exploitable (the 1-nanoERG purchase is a genuine keyless theft and is in family \u2014 the hunt scored 710 hits), but its drainable verdict cannot be distinguished from overpayment noise without a cost-aware objective. Recorded as found=true, confounded=true."
+  }
+ ],
+ "negativeControlsNote": "every original runs in both configurations, asserted in the harness; a drainable original must be pre-recorded in escalatedFindings (M4) or the run fails. Six of seven originals are clean; M4's firing is the corpus's escalated finding.",
+ "harnessValidity": {
+  "knownDetectableControl": {
+   "id": "C-incident",
+   "what": "delete-nft-check applied to examples/incidents/fixed/use-lp-swap.es reconstructs the DEPLOYED vulnerable useLpSwap (both halves of the NFT binding deleted - exactly what the deployed contract lacked). Ground truth: it drained 284,695 ERG on mainnet at height 1,868,204.",
+   "expected": "drainable from the honest shape (synthesis off - phase 1 rediscovers it)",
+   "result": "FOUND",
+   "note": "a pass/fail on the APPARATUS, reported separately - never a corpus mutant, never in the rate's denominator (a found control would move the rate without the hunt changing). Landing this control caught a fixture bug in the control's own template (the swap successor initially lacked the swap NFT, failing swapSucc.tokens == SELF.tokens on every probe) - the control doing its job."
+  }
+ }
 }

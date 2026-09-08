@@ -124,6 +124,9 @@
       "ergoTree": "10010101d17300",
       "creationHeight": 5000
      }
+    ],
+    "attackerInputs": [
+     1
     ]
    },
    "witnessNote": "the guard-deleted vesting box re-built at dust; 9.998 ERG keyless",
@@ -270,6 +273,9 @@
       "value": 9000000000,
       "ergoTree": "p2pk-receiver"
      }
+    ],
+    "attackerInputs": [
+     1
     ]
    },
    "witnessNote": "receiver claims 1ERG + sweeps the pot minus dust; needsProof on both inputs (protocol residual + own key)",
@@ -412,6 +418,9 @@
       "value": 10000000000,
       "ergoTree": "p2pk-receiver"
      }
+    ],
+    "attackerInputs": [
+     1
     ]
    },
    "witnessNote": "OUTPUTS(0) satisfies both the payment and the (mis-indexed) guard; pot successor dust",
@@ -509,7 +518,8 @@
    "witness": {
     "note": "sold=stock=10, paid passes at 1 nanoERG, soldOut returns the stock to the sale box; the ERG leaves to the attacker payee",
     "extracted": {
-     "nanoErg": "2999998"
+     "nanoErg": "999999",
+     "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "10"
     }
    },
    "missHint": null,
@@ -535,12 +545,8 @@
     ],
     "outputs": [
      {
-      "value": 1,
-      "ergoTree": "p2pk-seller"
-     },
-     {
-      "value": 1,
-      "ergoTree": "$mutant",
+      "value": 3000000,
+      "ergoTree": "p2pk-seller",
       "tokens": [
        {
         "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
@@ -549,12 +555,25 @@
       ]
      },
      {
-      "value": 2999998,
+      "value": 0,
+      "ergoTree": "$mutant",
+      "tokens": [
+       {
+        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "amount": 0
+       }
+      ]
+     },
+     {
+      "value": 0,
       "ergoTree": "10010101d17300"
      }
+    ],
+    "attackerInputs": [
+     1
     ]
    },
-   "witnessNote": "soldOut at 1 nanoERG: stock returns to the sale box, the sale's ERG leaves",
+   "witnessNote": "the hunt's own winning shape: the seller's payment box receives everything (paid passes at the weakened `>= 0L`; sold=stock=10 with restStock=0) and the stock rides in the payment box the attacker can only fill, not spend \u2014 but the SALE box's 1M ERG rides with it, and the attacker's own 2M remainder too. The residual reduces to a clean pass on every input (no key).",
    "originalSource": "/**\n * Sell tokens at a fixed price. Buyers may take some or all of the tokens\n * as long as you are paid for what they take; unsold tokens stay for sale.\n * You can cancel and take everything back at any time.\n * @param seller Who receives the payments? \u2014 Your Ergo address.\n * @param tokenId Which token are you selling? \u2014 The token id (64 characters), from your wallet or an explorer.\n * @param pricePerToken Price per token, in nanoERG \u2014 1 ERG = 1,000,000,000 nanoERG.\n */\n@contract def tokenSale(seller: SigmaProp, tokenId: Coll[Byte], pricePerToken: Long) = {\n  val forSale = SELF.tokens(0)\n  val stock = if (forSale._1 == tokenId) forSale._2 else 0L\n  val payment = OUTPUTS(0)\n  val restStock =\n    if (OUTPUTS.size > 1 && OUTPUTS(1).tokens.size > 0 && OUTPUTS(1).tokens(0)._1 == tokenId) OUTPUTS(1).tokens(0)._2\n    else 0L\n  val sold = stock - restStock\n  val paid = payment.propositionBytes == seller.propBytes && payment.value >= sold * pricePerToken\n  val restKept = OUTPUTS.size > 1 &&\n                 OUTPUTS(1).propositionBytes == SELF.propositionBytes &&\n                 OUTPUTS(1).value >= SELF.value\n  val partial = sold > 0L && sold < stock && paid && restKept\n  val soldOut = sold == stock && stock > 0L && paid\n  seller || sigmaProp(partial || soldOut)\n}\n"
   },
   {
@@ -820,6 +839,9 @@
        }
       ]
      }
+    ],
+    "attackerInputs": [
+     1
     ]
    },
    "witnessNote": "one honest SC redeem (deltaSc=-1: SC conservation via the attacker's 1 SC input); the bank NFT leaves to the attacker; successor.tokens(0) = junk",
@@ -984,6 +1006,9 @@
       "value": 2000000,
       "ergoTree": "10010101d17300"
      }
+    ],
+    "attackerInputs": [
+     1
     ]
    },
    "witnessNote": "no-op swap (deltas 0) passes; pool successor re-treed with the full reserves",
@@ -1197,10 +1222,33 @@
       "value": 2000000,
       "ergoTree": "10010101d17300"
      }
+    ],
+    "attackerInputs": [
+     2
     ]
    },
    "witnessNote": "pool successor verbatim (the swap maths see deltas 0); swap successor re-treed with the swap's value + NFT",
    "originalSource": "// USE LP swap \u2014 FIXED shape (regression fixture for the 2026-09-08 drain).\n//\n// This is the deployed useLpSwap logic, decompiled from mainnet swap-NFT box\n// ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf, with the\n// ONE missing check restored: the box the swap does its constant-product math\n// on must carry the LP singleton NFT. The deployed contract read the pool\n// positionally as INPUTS(0)/OUTPUTS(0) and never asserted which box that was,\n// so an attacker put a decoy at index 0 and drained the real pool spent\n// alongside it. Binding by the singleton NFT closes the substitution: only the\n// genuine pool holds that token.\n//\n// $lpNft: Coll[Byte]  -- the LP pool's singleton NFT (tokens(0) of the pool)\n{\n  val poolIn      = INPUTS(0)\n  val poolInToks  = poolIn.tokens\n  val poolOut     = OUTPUTS(0)\n  val poolOutToks = poolOut.tokens\n\n  // THE FIX: bind the pool the maths runs on by its singleton NFT, at both the\n  // spent box and its successor. A decoy cannot hold the unique LP token.\n  val poolBound =\n    poolInToks(0)._1  == $lpNft &&\n    poolOutToks(0)._1 == $lpNft\n\n  val ergIn      = poolIn.value\n  val ergDelta   = poolOut.value - ergIn\n  val tokenInY   = poolInToks(2)._2\n  val tokenDelta = poolOutToks(2)._2 - tokenInY\n  val swapSucc   = OUTPUTS(1)\n\n  val validSwap =\n    (poolInToks(1)._2 - poolOutToks(1)._2 == 0L) &&\n    (if (ergDelta > 0L)\n        tokenInY.toBigInt * ergDelta.toBigInt * 997.toBigInt >=\n          (-tokenDelta).toBigInt *\n            (ergIn.toBigInt * 1000.toBigInt + ergDelta.toBigInt * 997.toBigInt)\n     else\n        ergIn.toBigInt * tokenDelta.toBigInt * 997.toBigInt >=\n          (-ergDelta).toBigInt *\n            (tokenInY.toBigInt * 1000.toBigInt + tokenDelta.toBigInt * 997.toBigInt)) &&\n    swapSucc.propositionBytes == SELF.propositionBytes &&\n    swapSucc.value >= SELF.value &&\n    swapSucc.tokens == SELF.tokens\n\n  sigmaProp(poolBound && validSwap)\n}\n"
   }
- ]
+ ],
+ "knownDetectableControl": {
+  "id": "C-incident",
+  "operator": "delete-nft-check",
+  "what": "delete-nft-check applied to examples/incidents/fixed/use-lp-swap.es reconstructs the DEPLOYED vulnerable useLpSwap \u2014 the contract that drained 284,695 ERG at height 1,868,204. Ground truth is certain (it drained on mainnet; phase 1 rediscovers it today from the honest shape). Reported as a HARNESS-VALIDITY CHECK: a pass/fail on the apparatus, a separate line and a separate assertion \u2014 never a corpus mutant, never in the rate's denominator (a found control would move the rate without the hunt changing).",
+  "originalSource": "// USE LP swap \u2014 FIXED shape (regression fixture for the 2026-09-08 drain).\n//\n// This is the deployed useLpSwap logic, decompiled from mainnet swap-NFT box\n// ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf, with the\n// ONE missing check restored: the box the swap does its constant-product math\n// on must carry the LP singleton NFT. The deployed contract read the pool\n// positionally as INPUTS(0)/OUTPUTS(0) and never asserted which box that was,\n// so an attacker put a decoy at index 0 and drained the real pool spent\n// alongside it. Binding by the singleton NFT closes the substitution: only the\n// genuine pool holds that token.\n//\n// $lpNft: Coll[Byte]  -- the LP pool's singleton NFT (tokens(0) of the pool)\n{\n  val poolIn      = INPUTS(0)\n  val poolInToks  = poolIn.tokens\n  val poolOut     = OUTPUTS(0)\n  val poolOutToks = poolOut.tokens\n\n  // THE FIX: bind the pool the maths runs on by its singleton NFT, at both the\n  // spent box and its successor. A decoy cannot hold the unique LP token.\n  val poolBound =\n    poolInToks(0)._1  == $lpNft &&\n    poolOutToks(0)._1 == $lpNft\n\n  val ergIn      = poolIn.value\n  val ergDelta   = poolOut.value - ergIn\n  val tokenInY   = poolInToks(2)._2\n  val tokenDelta = poolOutToks(2)._2 - tokenInY\n  val swapSucc   = OUTPUTS(1)\n\n  val validSwap =\n    (poolInToks(1)._2 - poolOutToks(1)._2 == 0L) &&\n    (if (ergDelta > 0L)\n        tokenInY.toBigInt * ergDelta.toBigInt * 997.toBigInt >=\n          (-tokenDelta).toBigInt *\n            (ergIn.toBigInt * 1000.toBigInt + ergDelta.toBigInt * 997.toBigInt)\n     else\n        ergIn.toBigInt * tokenDelta.toBigInt * 997.toBigInt >=\n          (-ergDelta).toBigInt *\n            (tokenInY.toBigInt * 1000.toBigInt + tokenDelta.toBigInt * 997.toBigInt)) &&\n    swapSucc.propositionBytes == SELF.propositionBytes &&\n    swapSucc.value >= SELF.value &&\n    swapSucc.tokens == SELF.tokens\n\n  sigmaProp(poolBound && validSwap)\n}\n",
+  "diff": {
+   "find": "poolInToks(0)._1  == $lpNft &&\n    poolOutToks(0)._1 == $lpNft",
+   "replace": "true"
+  },
+  "params": {
+   "lpNft": {
+    "type": "Coll[Byte]",
+    "value": "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41"
+   }
+  },
+  "swapNft": {
+   "type": "Coll[Byte]",
+   "value": "ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf"
+  }
+ }
 }

@@ -21,6 +21,8 @@ const ANSWER_KEY: &str = include_str!("../../examples/mutants/answer-key.json");
 
 /// The corpus's seller/receiver key tree (`028333f9…` P2PK).
 const P2PK: &str = "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197";
+/// `sigmaProp(true)`.
+const PASS_TREE: &str = "10010101d17300";
 
 fn label_placeholder() -> String {
     "<extra tree>".to_string()
@@ -205,17 +207,58 @@ fn build_request(m: &Value, synthesis_on: bool) -> DrainRequest {
     serde_json::from_value(text).expect("request builds")
 }
 
-/// A proven mutant's witness must validate before the hunt runs — the
-/// denominator is only honest if every entry is a real keyless drain.
-/// Witness boxes name the same tree references as templates (`$mutant`,
-/// `$<extra>`, `p2pk-*`, literal hex), resolved identically.
+/// The mechanical witness gate, mirroring the hunt's own gate in `drain.rs`:
+/// a witness counts as a KEYLESS drain only when every input's verdict is
+/// `pass`, or `needsProof` on an input the attacker owns (the attacker signs
+/// their own boxes). `needsProof` anywhere else means the residual requires
+/// a key — a keyed-insider witness — and cannot enter the denominator. This
+/// makes `keyed-insider` a classification the harness DERIVES, not a
+/// judgment someone remembered to make.
+fn witness_is_keyless(w: &Value, check: &ergo_sandbox::txcheck::TxCheck) -> Result<(), String> {
+    let attacker: Vec<usize> = w
+        .get("attackerInputs")
+        .and_then(|v| v.as_array())
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_u64().map(|n| n as usize))
+                .collect()
+        })
+        .unwrap_or_default();
+    for ic in &check.inputs {
+        let ok = match ic.verdict {
+            "pass" => true,
+            "needsProof" => attacker.contains(&ic.index),
+            _ => false,
+        };
+        if !ok {
+            return Err(if ic.verdict == "needsProof" {
+                format!(
+                    "input {} needsProof on a non-attacker input: the residual requires a key",
+                    ic.index
+                )
+            } else {
+                format!(
+                    "input {} verdict `{}`: the witness input did not pass",
+                    ic.index, ic.verdict
+                )
+            });
+        }
+    }
+    Ok(())
+}
+
+/// A proven mutant's witness must validate AND pass the keyless gate before
+/// the hunt runs. Every mutant's witness (when present) is classified
+/// mechanically: `keyless` or `keyed-insider`. The corpus's `proven` flag
+/// must agree with the mechanical classification — a misproof cannot enter
+/// by accident, and the M1-M3 reclassification is pinned by assertion.
 fn witnesses_validate(corpus: &Value) {
     for m in corpus["mutants"].as_array().unwrap() {
-        if m["proven"].as_bool() != Some(true) {
-            continue;
-        }
         let Some(w) = m.get("witnessTx") else {
-            panic!("{}: proven mutant carries no witnessTx", m["id"]);
+            if m["proven"].as_bool() == Some(true) {
+                panic!("{}: proven mutant carries no witnessTx", m["id"]);
+            }
+            continue;
         };
         let extra: serde_json::Map<String, Value> = m
             .get("extraTrees")
@@ -284,6 +327,37 @@ fn witnesses_validate(corpus: &Value) {
                     .collect::<Vec<_>>()
             );
         }
+        let keyless = witness_is_keyless(w, &c);
+        let proven = m["proven"].as_bool() == Some(true);
+        match &keyless {
+            Ok(()) => assert!(
+                proven,
+                "{}: the witness is keyless but the mutant is not marked proven — reclassify",
+                m["id"]
+            ),
+            Err(reason) => {
+                // The mechanical rule reproduces the hand reclassification.
+                assert_eq!(
+                    m["attackerModel"].as_str(),
+                    Some("keyed-insider"),
+                    "{}: witness is keyed ({}), so the mutant must be classified keyed-insider",
+                    m["id"],
+                    reason
+                );
+                eprintln!(
+                    "{}: classified keyed-insider mechanically ({})",
+                    m["id"], reason
+                );
+            }
+        }
+        if proven {
+            assert!(
+                keyless.is_ok(),
+                "{} is marked proven but the mechanical gate rejects its witness: {:?}",
+                m["id"],
+                keyless
+            );
+        }
     }
 }
 
@@ -312,40 +386,194 @@ fn run_one(m: &Value, synthesis_on: bool) -> Value {
     })
 }
 
+/// The must-find control (harness validity, NOT a corpus mutant): the
+/// `delete-nft-check` operator applied to the incident's own FIXED contract
+/// reconstructs the deployed vulnerable `useLpSwap` — the contract that
+/// drained 284,695 ERG on mainnet at height 1,868,204. Phase 1 rediscovers
+/// it today from the honest shape (permutation [2,1,0], drain payout, the
+/// incident's extraction). Ground truth is certain, so this is a pass/fail
+/// on the apparatus: if it ever stops being found, the harness or the hunt
+/// regressed. It never enters the detection-rate denominator — if it did,
+/// the rate would move without the hunt changing.
+fn known_detectable_control_is_found(corpus: &Value) {
+    let control = &corpus["knownDetectableControl"];
+    let find = control["diff"]["find"].as_str().unwrap();
+    let replace = control["diff"]["replace"].as_str().unwrap();
+    let original = control["originalSource"].as_str().unwrap();
+    // One replacement: both halves of the NFT binding (input-side and
+    // successor-side) go at once.
+    let vulnerable = original.replacen(find, replace, 1);
+    assert_ne!(vulnerable, original, "the control's diff must apply");
+    assert_ne!(vulnerable, original, "the control's diff must apply");
+    let params: BTreeMap<String, TypedValue> = control["params"]
+        .as_object()
+        .expect("control params")
+        .iter()
+        .map(|(k, tv)| {
+            (
+                k.clone(),
+                TypedValue {
+                    r#type: tv["type"].as_str().expect("type").to_string(),
+                    value: tv["value"].clone(),
+                },
+            )
+        })
+        .collect();
+    let vulnerable_tree = hex::encode(
+        ergo_sandbox::compile::compile_with_params(
+            &vulnerable,
+            &params,
+            3,
+            ergo_ser::address::NetworkPrefix::Mainnet,
+        )
+        .expect("the deployed-vulnerable contract compiles")
+        .tree_bytes,
+    );
+    // The pool box needs a trivially-passing tree that is NOT the attacker's
+    // default `sigmaProp(true)` hex: drain mode re-trees the free payee to
+    // the attacker tree, and if that equals a protected tree the free payee
+    // counts as a script-matched successor and shields the whole drain (leak
+    // = 0). Distinct script, same semantics.
+    let pool_tree = hex::encode(
+        ergo_sandbox::compile::compile_source(
+            "sigmaProp(HEIGHT >= 0)",
+            3,
+            ergo_ser::address::NetworkPrefix::Mainnet,
+        )
+        .expect("pool tree compiles")
+        .tree_bytes,
+    );
+
+    // The honest fill shape (the phase-1 test's template): the pool
+    // protected, the (vulnerable) swap companion, the attacker's own box.
+    let request: DrainRequest = serde_json::from_value(json!({
+        "inputs": [
+            { "role": "protected", "value": 1000000000i64, "ergoTree": &pool_tree,
+              "tokens": [
+                { "id": control["params"]["lpNft"]["value"], "amount": 1i64 },
+                { "id": "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099", "amount": 1000000i64 },
+                { "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "amount": 5000000000i64 }] },
+            { "role": "companion", "value": 1000000i64, "ergoTree": &vulnerable_tree,
+              "tokens": [{ "id": control["swapNft"]["value"], "amount": 1i64 }] },
+            { "role": "attacker", "value": 2000000i64, "ergoTree": PASS_TREE },
+        ],
+        "outputs": [
+            { "payee": "fixed", "value": 1000000000i64, "ergoTree": &pool_tree,
+              "tokens": [
+                { "id": control["params"]["lpNft"]["value"], "amount": 1i64 },
+                { "id": "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099", "amount": 1000000i64 },
+                { "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "amount": 5000000000i64 }] },
+            // The swap successor MUST carry the vulnerable swap tree AND
+            // the swap NFT — the contract checks swapSucc.propositionBytes
+            // == SELF and swapSucc.tokens == SELF.tokens.
+            { "payee": "fixed", "value": 2000000i64, "ergoTree": &vulnerable_tree,
+              "tokens": [{ "id": control["swapNft"]["value"], "amount": 1i64 }] },
+            { "payee": "free", "value": 0, "ergoTree": PASS_TREE, "tokens": [] },
+            { "payee": "fixed", "value": 2000000i64, "ergoTree": PASS_TREE, "tokens": [] },
+        ],
+        "protocolNfts": [control["params"]["lpNft"]["value"]],
+        "height": 1868204u32,
+        "network": "mainnet",
+    }))
+    .expect("control request builds");
+    let report = ergo_sandbox::decompile::with_large_stack(move || drain_hunt(&request))
+        .expect("control hunt runs");
+    assert_eq!(
+        verdict_name(&report.verdict),
+        "drainable",
+        "the known-detectable control was NOT found — probes {} notes {:?} shapes {:?}",
+        report.probes_run,
+        report.notes,
+        report
+            .synthesis
+            .shapes
+            .iter()
+            .map(|t| (t.shape.clone(), t.run))
+            .collect::<Vec<_>>()
+    );
+}
+
 #[test]
 fn the_corpus_is_measured_and_does_not_regress() {
     let corpus: Value = serde_json::from_str(CORPUS).expect("corpus parses");
     witnesses_validate(&corpus);
+    let key: Value = serde_json::from_str(ANSWER_KEY).expect("answer key parses");
+    let key_escalated: Vec<String> = key["escalatedFindings"]
+        .as_array()
+        .map(|a| {
+            a.iter()
+                .filter(|f| {
+                    f["original"]
+                        .as_str()
+                        .unwrap_or("")
+                        .starts_with("token-sale")
+                })
+                .map(|_| "M4".to_string())
+                .collect()
+        })
+        .unwrap_or_default();
 
-    let mut records = Vec::new();
+    // ── one pass over the corpus: mutants and their negative controls ──
+    let mut results: BTreeMap<String, Value> = BTreeMap::new();
     let mut found = 0usize;
     let mut proven = 0usize;
     for m in corpus["mutants"].as_array().unwrap() {
+        let id = m["id"].as_str().unwrap().to_string();
         let off = run_one(m, false);
         let on = run_one(m, true);
         if m["proven"].as_bool() == Some(true) {
             proven += 1;
             // A proven mutant is "found" when the hunt reports drainable.
-            let hit = off["verdict"] == "drainable" || on["verdict"] == "drainable";
-            if hit {
+            if off["verdict"] == "drainable" || on["verdict"] == "drainable" {
                 found += 1;
             }
         }
-        records.push(json!({
-            "id": m["id"],
-            "proven": m["proven"],
-            "synthesisOff": off,
-            "synthesisOn": on,
-        }));
+        // Negative control: the UNMUTATED original, both configurations,
+        // asserted and recorded. A drainable original is either a real
+        // finding in a contract we ship as an example (escalate — record it
+        // in the answer key's escalatedFindings; do not edit the fixture)
+        // or a harness bug. Escalations must be pre-recorded: an
+        // unrecorded drainable original fails the run.
+        let mut o = m.clone();
+        o["mutatedSource"] = m["originalSource"].clone();
+        let ctrl_off = run_one(&o, false);
+        let ctrl_on = run_one(&o, true);
+        let escalated = key_escalated.contains(&id);
+        for (cfg, r) in [("synthesisOff", &ctrl_off), ("synthesisOn", &ctrl_on)] {
+            let v = r["verdict"].as_str().unwrap();
+            if v == "drainable" {
+                assert!(
+                    escalated,
+                    "{}: the UNMUTATED original reported drainable ({}) and is NOT recorded \
+                     in the answer key's escalatedFindings — escalate it there (real finding \
+                     in a shipped example) or fix the harness; do not edit the fixture",
+                    id, cfg
+                );
+            } else {
+                assert_eq!(
+                    v, "notunderprobes",
+                    "{}: unexpected original verdict {} ({})",
+                    id, v, cfg
+                );
+            }
+        }
         eprintln!(
             "{}: off[{} probes={} capped={}] on[{} probes={} capped={}]",
-            m["id"],
+            id,
             off["verdict"],
             off["probesRun"],
             off["capped"],
             on["verdict"],
             on["probesRun"],
             on["capped"],
+        );
+        results.insert(
+            id,
+            json!({
+                "proven": m["proven"],
+                "synthesisOff": off,
+                "synthesisOn": on,
+            }),
         );
     }
     let rate = if proven == 0 {
@@ -355,8 +583,10 @@ fn the_corpus_is_measured_and_does_not_regress() {
     };
     println!("DETECTION RATE: {found}/{proven} = {rate:.2} (proven mutants only)");
 
+    // ── the must-find control: a pass/fail on the apparatus ──
+    known_detectable_control_is_found(&corpus);
+
     // ── the answer key: no regression against the recorded run ──
-    let key: Value = serde_json::from_str(ANSWER_KEY).expect("answer key parses");
     let key_rate = key["detectionRate"].as_f64().expect("recorded rate");
     assert!(
         rate + 1e-9 >= key_rate,
@@ -364,25 +594,37 @@ fn the_corpus_is_measured_and_does_not_regress() {
     );
     for kr in key["perMutant"].as_array().expect("per-mutant records") {
         let id = kr["id"].as_str().unwrap();
-        let m = corpus["mutants"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .find(|x| x["id"] == id)
-            .unwrap_or_else(|| panic!("{id} missing from corpus"));
-        let off = run_one(m, false);
-        let on = run_one(m, true);
-        let recorded_off = kr["synthesisOff"]["verdict"].as_str().unwrap();
-        let recorded_on = kr["synthesisOn"]["verdict"].as_str().unwrap();
+        let r = results
+            .get(id)
+            .unwrap_or_else(|| panic!("{id} missing from the run"));
         assert_eq!(
-            off["verdict"].as_str().unwrap(),
-            recorded_off,
+            r["synthesisOff"]["verdict"].as_str().unwrap(),
+            kr["synthesisOff"]["verdict"].as_str().unwrap(),
             "{id}: synthesis-off verdict regressed"
         );
         assert_eq!(
-            on["verdict"].as_str().unwrap(),
-            recorded_on,
+            r["synthesisOn"]["verdict"].as_str().unwrap(),
+            kr["synthesisOn"]["verdict"].as_str().unwrap(),
             "{id}: synthesis-on verdict regressed"
+        );
+    }
+    // The negative controls are recorded too — their section in the key
+    // must exist and every recorded verdict must stay notUnderProbes.
+    for kr in key["negativeControls"]
+        .as_array()
+        .expect("recorded controls")
+    {
+        let id = kr["id"].as_str().unwrap();
+        let r = &results[id];
+        assert_eq!(
+            r["synthesisOff"]["verdict"].as_str().unwrap(),
+            kr["synthesisOff"]["verdict"].as_str().unwrap(),
+            "{id}: negative-control verdict changed"
+        );
+        assert_eq!(
+            r["synthesisOn"]["verdict"].as_str().unwrap(),
+            kr["synthesisOn"]["verdict"].as_str().unwrap(),
+            "{id}: negative-control verdict changed"
         );
     }
 }

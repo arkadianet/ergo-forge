@@ -117,6 +117,53 @@ fully on in the second configuration).
 per-mutant verdicts must not degrade; never an absolute floor (a hard
 threshold turns into a fixture that gets tuned).
 
+### The operator matrix — read the rate next to it
+
+| operator | proven | found |
+|----------|--------|-------|
+| delete-nft-check (M5) | 1 | 0 |
+| drop-successor-script (M6, M7) | 2 | 0 |
+| weaken-comparison (M4) | 1 | 1 |
+| **flip-index** | **0** | — |
+| **positional ↔ unbound-search** | **0** | — |
+
+0.25 is a rate over **three of the five operators**. flip-index's only
+candidate (M3) turned out keyed-insider, and positional ↔ unbound-search —
+the USE incident's own class — has no mutant at all yet. Keyless mutants
+for the two uncovered operators are the next increment and are deliberately
+**not** in this PR (candidate sketches: an amm-pool index flip whose
+successor reads land on an attacker-controlled output; a positional →
+unbound-search mutant on the fixed swap's pool binding). If they push the
+rate down, that is also the finding.
+
+### The must-find control (harness validity, not a mutant)
+
+`knownDetectableControl` in `mutants.json`: the `delete-nft-check` operator
+applied to the incident's own FIXED contract reconstructs the **deployed
+vulnerable `useLpSwap`** — the contract that drained 284,695 ERG on mainnet.
+Ground truth is certain; phase 1 rediscovers it today from the honest shape.
+The harness asserts it as a **separate pass/fail on the apparatus**, outside
+the rate: a found control would move 0.25 → 0.4 without the hunt changing,
+which would read as improvement. Landing it caught a fixture bug in its own
+template (the swap successor initially lacked the swap NFT, failing
+`swapSucc.tokens == SELF.tokens` on every probe) — the control doing its job.
+
+### The negative control that fired
+
+M4's unmutated original reports `drainable` with synthesis on — recorded in
+`escalatedFindings`, not softened: the winning probe has the attacker
+**overpay the seller** (20M of the attacker's own nanoERG into the seller's
+P2PK box) so `paid` passes legitimately and the stock leaves with the
+payment. The seller is fully paid; the attacker loses money. No exploit —
+**the leak objective has no attacker-cost accounting**: protected value that
+empties into a protocol-designated payee scores as a drain. That objective
+limitation is the roadmap's parked "pricing / worth-weighted objectives;
+economic probes — separate spec", and this firing is its concrete evidence.
+Consequence recorded honestly: M4's `found` is **confounded** — the mutant
+IS really exploitable (the 1-nanoERG purchase is a genuine keyless theft in
+family), but the verdict alone cannot discriminate real drains from
+overpayment noise until the objective knows what the attacker spent.
+
 What the run actually showed, beyond the number:
 
 - **M4 is found, and only with synthesis on** (4,512 probes vs 28): the
