@@ -17,12 +17,17 @@
 - **The spend hunt** (`hunt.rs`) asks of one box: can anyone spend it?
 - **The drain hunt** (`drain.rs`, #64) asks of a set: can anyone extract
   value? Phase 1 varies input order, attacker-slot contents and free-payee
-  recipients. Phase 2 (#65) adds bounded output synthesis.
+  recipients. Phase 2 (#65, implemented #67, #68) adds bounded output
+  synthesis.
+- **The scoreboard** (#70) — the mutation corpus, phase 2.5 below. As of
+  2026-09-08 it reads **0 attributable detections of 4 proven mutants**.
 
 That is a real instrument and it rediscovered a real 284,695 ERG drain. The
-roadmap's premise is a limitation, not a complaint:
+roadmap's premise was a limitation rather than a complaint — and phase 2.5
+has now turned that premise from an argument into a measurement:
 
-**The evidence that the hunt generalizes is one incident.** The family it
+**The evidence that the hunt generalizes was one incident — and the first
+attempt to widen it returned zero.** The family it
 enumerates was drawn from that incident — `filler tokens 0..=3` exists
 because the USE attacker used three junk tokens so `tokens(1)`/`tokens(2)`
 would exist. The generator is honestly blind to the target (`decoy_variants`
@@ -32,7 +37,7 @@ of the bug space. And the negative controls do not correct for it: a hunt
 that found nothing anywhere would pass `the_gallery_amm_pair_is_not_drainable`
 identically. Every phase below is ordered by that.
 
-## Phase 2.5 — the measurement phase (next; parallel-safe today)
+## Phase 2.5 — the measurement phase (DONE, #70)
 
 **The problem it solves.** We cannot currently answer "did that change make
 the hunt better?" Every phase after this one is a bet placed without a
@@ -69,16 +74,77 @@ protocol families, with each miss classified by *why* (out of family, cap
 truncation, role labelling, arithmetic). The misses are the phase-3 backlog,
 and they are worth more than the hits.
 
+### What it actually returned (#70, merged 2026-09-08)
+
+Seven mutants over six contracts — short of the ≥20 the exit criteria asked
+for, so the numbers below are a first pass, not a coverage claim.
+
+**0 attributable detections of 4 proven mutants.** One raw `drainable`
+verdict (M4), **confounded**: the same verdict fires on the unmutated
+original, so it cannot be attributed to the mutation. Three of the five
+mutation operators are represented; `flip-index` has no proven mutant and
+`positional ↔ unbound-search` — the USE incident's own class — has none at
+all.
+
+Three findings came out of it, and they reorder everything below:
+
+1. **One missing probe axis explains three of the four misses** (#72).
+   Phase-2 synthesis adds outputs but never modifies a *declared* one:
+   template outputs' token layouts and trees are fixed for the whole probe
+   space. M5, M6 and M7 all want a re-padded or re-treed template output.
+   M7 ran **29,448 probes in family and missed** — an axis gap, not a
+   budget gap, and steering would not have helped.
+2. **The leak objective inverts on exchange-shaped protocols** (#71).
+   It assumes custody — value must stay in the box — and `sanctioned` is a
+   declared static amount, so it cannot say "sanctioned *iff* the payment
+   condition holds". For sales, orders and swaps, an honest transaction is
+   indistinguishable from a drain. This is why M4's control fires.
+3. **The keyless attacker model is a real boundary, not an oversight.**
+   Three mutants turned out to need the beneficiary's or receiver's key.
+   They are reported outside the denominator, and a keyed-insider hunt is
+   its own project with a different oracle story (signed witnesses).
+
+**Methodological note worth carrying forward.** Five separate defects in
+that PR were recorded policies that nothing enforced: a negative-control
+loop that silently no-opped, control assertions that compared the mutant
+against itself, probe caps read from a null field, an unchecked synthesis
+policy, and an unpinned headline count. **If an artifact states a policy,
+the harness must read it.** That rule is cheap and it has already paid for
+itself more than any single axis in this document.
+
 **Secondary yield.** Every mutant the hunt misses but a static reader would
 catch is a candidate lint; every mutant the lints catch and the hunt misses
 tells us the two layers are complementary rather than redundant, which is
 currently an assumption.
 
-## Phase 3 — guided search, and two axes we never varied
+## Phase 3 — the axes, then the objective, then steering
 
-The phase-2 spec defers "coverage-guided steering over cost hot spots" to
-phase 3. Keep that, and add two things the incident-derived family left out
-entirely — both are bug classes, not performance knobs:
+**Reordered after phase 2.5 (2026-09-08).** This section originally led with
+coverage-guided steering, on the reasoning that synthesis multiplies the
+space and guidance makes it tractable. The corpus says otherwise, and the
+evidence is specific: M7 ran 29,448 probes **inside its family** and missed,
+because the witness needs a shape the generator cannot build. Steering makes
+a search of a complete family faster; it does not add a missing axis, and it
+does not repair an objective that scores honest transactions as drains.
+Search efficiency was not the constraint. It is third here now, and it has to
+earn its place against a measurable rate rather than against intuition.
+
+**3a. The missing output axis — re-pad / re-tree a declared output** (#72).
+Three of four proven misses want exactly this, and the corpus can measure
+whether it converts them. Filler sourcing, script-independence and the
+budget accounting from #67/#68 all carry over unchanged. Highest expected
+return in this document, and the cheapest to state.
+
+**3b. The objective's custody assumption** (#71). `drainable` verdicts on
+sale-, order- and swap-shaped sets are not trustworthy today, and the mapped
+USE/Dexy sets carry order boxes. This blocks the corpus from ever scoring a
+whole protocol family, and it would feed non-findings into a phase-6 sweep's
+disclosure pipeline. Conditional sanction is the real requirement; attacker-
+cost accounting alone suppresses the symptom while hiding an attacker who
+profits at a bad price.
+
+**3c. Two axes the incident-derived family left out** — both bug classes,
+not performance knobs:
 
 1. **Register variation.** Today the only variant is `registers cleared`
    (`drain.rs:760`); register *values* are never varied. Our own flagship
@@ -91,16 +157,26 @@ entirely — both are bug classes, not performance knobs:
    reference often can. Varying data inputs across the boxes the map
    actually found is bounded and honest.
 
-**Steering.** `hot_spots.rs` already folds the per-step cost trace into a
-ranked view; the input for coverage feedback exists. The steering rule
-stays subordinate to the honesty rule: a guided miss is still
-`notUnderProbes`, and the report must say the space was steered rather than
-enumerated, because those are different claims.
+**3d. Steering, last.** `hot_spots.rs` already folds the per-step cost trace
+into a ranked view; the feedback signal exists. The steering rule stays
+subordinate to the honesty rule: a guided miss is still `notUnderProbes`,
+and the report must say the space was steered rather than enumerated,
+because those are different claims. Do this after 3a–3c, and only if the
+corpus then shows probe budget — rather than expressiveness — as the binding
+constraint. Right now nothing in the evidence says it is.
 
-**Exit criteria.** Detection rate on the phase-2.5 corpus improves, and the
-register/data-input mutant classes (added to the corpus in this phase) are
-detected at all. If steering does not move the rate, it was a bet we can now
-prove we lost — say so and keep the axes.
+**Corpus debt to clear alongside.** The scoreboard is thinner than its exit
+criteria: seven mutants where ≥20 was asked, and three of five operators.
+`flip-index` needs a keyless mutant and `positional ↔ unbound-search` needs
+any mutant at all — it is the USE incident's own class, and its absence is
+the most conspicuous hole in the denominator. Register and data-input mutant
+classes arrive with 3c.
+
+**Exit criteria.** The attributable rate on the phase-2.5 corpus improves
+from 0/4, measured before and after each of 3a–3d separately so the credit
+is attributable to a change rather than to the batch. If steering does not
+move the rate, that is a bet we can now prove we lost — say so, and keep the
+axes.
 
 ## Phase 4 — solver-assisted values (the qualitative jump)
 
@@ -193,7 +269,10 @@ increment.
 
 That the phases are independent — 4 depends on 2.5 for its exit criteria,
 5 depends on 3 having worked. That the order is fixed — a live incident
-re-orders everything, on the 24-hour rule. That the ceiling is known: phase
+re-orders everything, on the 24-hour rule, and phase 2.5's own results
+already reordered phase 3 once (steering demoted from first to last). This
+document is expected to be rewritten by evidence; that is what having a
+scoreboard is for. That the ceiling is known: phase
 4 may prove the arithmetic class is out of reach with this architecture, in
 which case the honest outcome is a documented boundary, and a tool that is
 excellent at binding bugs and explicitly silent on value bugs.
