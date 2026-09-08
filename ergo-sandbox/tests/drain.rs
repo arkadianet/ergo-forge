@@ -333,6 +333,96 @@ mod map_feed {
             "905ecdef97381b92c2f0ea9b516f312bfb18082c61b24b40affa6a55555c77c7",
         );
     }
+
+    /// THE FIELD ASSERTION — the one that would have caught both rounds of
+    /// the budget bug. On a real mapped set (12 inputs, not a hand-built
+    /// 3-input fixture), shape `none` alone produces more points than any
+    /// sane cap; depth-first spending therefore zeroed every synthesis
+    /// shape. With the allocator, under a binding cap, synthesis shapes
+    /// must still run.
+    #[test]
+    fn the_mapped_use_set_runs_synthesis_shapes_under_a_binding_cap() {
+        let fixture = load("use-lp.json");
+        let m: ProtocolMap = map(
+            &fixture,
+            &Seed::TokenId(
+                "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41".to_string(),
+            ),
+            &recorded_opts(),
+        )
+        .expect("map the recorded set");
+        let (mut request, _skipped) = ergo_sandbox::drain::request_from_map(
+            &m,
+            serde_json::from_value(attacker()).expect("attacker box"),
+        );
+        request.max_probes = Some(900);
+        // (The review harness used 3000; 900 binds identically on this set —
+        // shape `none` alone has >12k points — and keeps the debug-build CI
+        // cost at ~40 s instead of ~2 min.)
+        request.synthesis = serde_json::from_value(json!({
+            "maxNewOutputs": 2, "companionRecreations": true, "successorStates": true,
+            "splits": true, "mints": true, "permuteOutputs": true
+        }))
+        .expect("synthesis block");
+        let report = drain_request(request);
+
+        assert!(report.capped, "3000 probes must bind on a 12-input set");
+        assert!(
+            report.probes_run <= 3000,
+            "the cap is respected: {}",
+            report.probes_run
+        );
+        // The phase-1 point gets a slice, not the whole budget.
+        let none = report
+            .synthesis
+            .shapes
+            .iter()
+            .find(|t| t.shape == "none")
+            .expect("the none tally");
+        assert!(
+            none.run < 3000,
+            "shape `none` must not consume the whole budget: run={} of {}",
+            none.run,
+            report.probes_run
+        );
+        // At least one re-creation shape ran — on a mapped set, with the
+        // request's own protocolNfts (the protected pools' NFTs) untouched.
+        let recreates: Vec<_> = report
+            .synthesis
+            .shapes
+            .iter()
+            .filter(|t| t.shape.starts_with("recreate("))
+            .collect();
+        assert!(
+            !recreates.is_empty(),
+            "re-creation shapes must exist on the mapped set: {:?}",
+            report.synthesis.shapes
+        );
+        assert!(
+            recreates.iter().any(|t| t.run > 0),
+            "at least one re-creation shape must run under a binding cap: {recreates:?}"
+        );
+        // Every enabled shape got a slice of the cap.
+        assert!(
+            report.synthesis.shapes.iter().all(|t| t.run > 0),
+            "allocation must reach every synthesis shape: {:?}",
+            report.synthesis.shapes
+        );
+        // The allocator policy is recorded next to the pinned order.
+        assert!(
+            report.synthesis.allocation.contains("allocated across"),
+            "{}",
+            report.synthesis.allocation
+        );
+        // Companion visibility: the mapped set's companions (order boxes
+        // with their own amount-1 singletons) are considered and qualify.
+        assert!(
+            report.synthesis.companions_considered > 0 && report.synthesis.companions_qualified > 0,
+            "mapped companions carry amount-1 singletons: considered={} qualified={}",
+            report.synthesis.companions_considered,
+            report.synthesis.companions_qualified
+        );
+    }
 }
 
 // ── Phase 2: output synthesis ─────────────────────────────────────────────────
@@ -465,11 +555,20 @@ mod synthesis {
         });
         let report = drain(request);
         // The verdict is incidental here (the protected box carries no
-        // guard): this test pins the AXIS ORDER under truncation.
+        // guard): this test pins the AXIS ORDER and the BUDGET ALLOCATION
+        // under truncation.
         assert!(report.capped, "the cap must bind: 32 + 384 >> 60");
         let shapes = &report.synthesis.shapes;
         assert_eq!(shapes[0].shape, "none");
         assert!(shapes[0].run > 0);
+        // ALLOCATION, not depth-first spending: shape `none` alone has 32
+        // unique points on this request — it must NOT eat the budget. (This
+        // is the field assertion: depth-first spending made `none` consume
+        // everything and every synthesis shape came back run=0.)
+        assert!(
+            shapes[0].run < 32,
+            "shape `none` must not consume the whole budget: {shapes:?}"
+        );
         // The blocking-bug regression: protocolNfts names ONLY the protected
         // box's NFT, yet re-creation shapes must fire — the companion's own
         // amount-1 token is what drives them.
@@ -489,16 +588,19 @@ mod synthesis {
                 "padded shape {bucket} must run under truncation: {shapes:?}"
             );
         }
-        // Truncation still stops inside the first re-creation's inner space:
-        // later shapes (the +sink variants, then the bare sink) never run.
+        // ALLOCATION: under a binding cap every synthesis shape keeps a
+        // slice — truncation preserves the degrees instead of letting the
+        // first shape (or the first shapes) consume everything.
         assert!(
-            shapes
-                .iter()
-                .skip_while(|t| !t.shape.starts_with("recreate("))
-                .skip(4)
-                .all(|t| t.run == 0),
-            "truncation stops inside the first re-creation shape's inner space: {shapes:?}"
+            shapes.iter().all(|t| t.run > 0),
+            "every synthesis shape must get budget under truncation: {shapes:?}"
         );
+        // The slices are recorded per shape (buckets of one shape share
+        // that shape's slice): 4 shapes — none, recreate, recreate+sink,
+        // sinks(1) — split the 60-probe cap evenly; the 10 tally buckets
+        // each report their shape's 15-probe slice.
+        assert!(shapes.iter().all(|t| t.budget == 60 / 4));
+        assert!(shapes.iter().all(|t| t.run <= t.budget));
         // The caps and the pinned order are recorded with the miss.
         assert_eq!(report.synthesis.caps.max_probes, 60);
         assert_eq!(report.synthesis.caps.max_new_outputs, 2);
@@ -625,6 +727,32 @@ mod synthesis {
                 .any(|n| n.contains("needs a key the attacker does not hold")),
             "the admin route must be tried and refused: {:?}",
             report.notes
+        );
+        // Companion visibility, recorded per the review: the corpus request's
+        // only companion is the admin box, whose useUpdateNft sits at AMOUNT
+        // 3 — above the amount-1 singleton shape — so the re-creation axis
+        // generates nothing on this request. That is correct under the
+        // corrected decode (the vault whitelist is input-side; the vault
+        // needs no output padding), and the report says so instead of
+        // leaving a silently-empty axis.
+        assert_eq!(report.synthesis.companions_considered, 1);
+        assert_eq!(report.synthesis.companions_qualified, 0);
+        assert!(
+            report
+                .notes
+                .iter()
+                .any(|n| n.contains("0 qualified") && n.contains("axis will generate nothing")),
+            "the empty axis must be readable in the report: {:?}",
+            report.notes
+        );
+        assert!(
+            report
+                .synthesis
+                .shapes
+                .iter()
+                .all(|t| !t.shape.starts_with("recreate(")),
+            "no re-creation shape is generated on the corpus request: {:?}",
+            report.synthesis.shapes
         );
     }
 

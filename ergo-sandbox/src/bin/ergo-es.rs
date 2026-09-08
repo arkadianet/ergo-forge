@@ -1125,6 +1125,13 @@ fn cmd_drain(args: &[String]) -> Result<(), String> {
         if !shapes.is_empty() {
             println!("  shapes: {}", shapes.join(", "));
         }
+        if d.companion_recreations {
+            println!(
+                "  recreations: {} companion(s) considered, {} qualified (amount-1 token at index 0..=3)",
+                report.synthesis.companions_considered,
+                report.synthesis.companions_qualified
+            );
+        }
         if !report.nft_detached.is_empty() {
             println!(
                 "  nftDetached: {} script-matched output(s) lack the protocol NFT",

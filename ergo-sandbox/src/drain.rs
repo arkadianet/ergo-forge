@@ -350,6 +350,10 @@ pub struct ShapeTally {
     pub generated: usize,
     /// Probes executed against the oracle (post dedup).
     pub run: usize,
+    /// This shape's slice of the total-probe cap (the allocator's ceiling
+    /// minus the previous shape's). With synthesis off, the single shape's
+    /// budget is the whole cap.
+    pub budget: usize,
 }
 
 /// Why synthesized probes were rejected (phase-2 report). A `notUnderProbes`
@@ -385,6 +389,18 @@ pub struct SynthesisRecord {
     pub degrees: SynthesisDegrees,
     pub caps: SynthesisCaps,
     pub axis_order: Vec<&'static str>,
+    /// How the total-probe cap was shared across the shapes in `shapes`:
+    /// as load-bearing as the axis order itself under truncation, and
+    /// recorded next to it.
+    pub allocation: String,
+    /// Companion inputs the re-creation axis considered (the degree's
+    /// candidate set; 0 when the degree is off).
+    pub companions_considered: usize,
+    /// Of those, how many qualified: carrying at least one token at
+    /// amount 1 within token index 0..=3 (the syntactic shape of a
+    /// box-identifying singleton). An axis that will generate nothing is
+    /// visible here instead of only in zero tallies.
+    pub companions_qualified: usize,
     pub shapes: Vec<ShapeTally>,
 }
 
@@ -533,7 +549,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
             hits: 0,
             best: None,
             notes: shape_errors,
-            synthesis: synthesis_record(&req.synthesis, max_probe_cap(req), Vec::new()),
+            synthesis: synthesis_record(&req.synthesis, max_probe_cap(req), 1, 0, 0, Vec::new()),
             rejections: Rejections::default(),
             nft_detached: Vec::new(),
         });
@@ -632,6 +648,24 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
             })
             .count(),
     );
+    // Companion visibility for the re-creation axis: who was considered,
+    // who qualified. An axis that will generate nothing (e.g. a request
+    // whose only companion carries its singleton at amount 3) is readable
+    // here instead of discoverable only by instrumenting the run.
+    let companions_considered = usize::from(syn.companion_recreations)
+        * roles.iter().filter(|&&r| r == DrainRole::Companion).count();
+    let companions_qualified = usize::from(syn.companion_recreations)
+        * (0..roles.len())
+            .filter(|&i| {
+                roles[i] == DrainRole::Companion
+                    && declared[i].tokens.iter().take(4).any(|t| t.amount == 1)
+            })
+            .count();
+    if syn.companion_recreations && companions_considered > 0 && companions_qualified == 0 {
+        notes.push(format!(
+            "companion re-creations: {companions_considered} companion(s) considered, 0 qualified              (no companion carries an amount-1 token at index 0..=3); the axis will generate nothing"
+        ));
+    }
     if syn_enabled {
         for (s, truncated) in axes.out_perms_truncated.iter().enumerate() {
             if *truncated {
@@ -652,12 +686,33 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
     let mut seen: HashSet<String> = HashSet::new();
     let mut capped = false;
     let mut rejections = Rejections::default();
+    // ── the cap is ALLOCATED, not spent depth-first ──
+    // Truncation is the normal case, and shape `none` (the phase-1 point)
+    // can alone produce more points than the whole budget on a real set —
+    // depth-first spending would zero every synthesis shape exactly when
+    // they matter. The pinned order's promise is that truncation *preserves
+    // the new degrees*; the allocator is what delivers it: the budget is
+    // split evenly across synthesis shapes (cumulative ceilings), each
+    // shape runs inside its slice, and a shape that finishes early leaves
+    // its remainder to later shapes. With one shape this is exactly the
+    // phase-1 cap, byte-identical.
+    let shape_count = axes.shapes.len();
+    let base_slice = max_probes / shape_count;
+    let extra = max_probes % shape_count;
+    let mut shape_ceilings: Vec<usize> = Vec::with_capacity(shape_count);
+    let mut acc = 0usize;
+    for i in 0..shape_count {
+        acc += base_slice + usize::from(i < extra);
+        shape_ceilings.push(acc);
+    }
+
     // One tally bucket per (shape, filler count) — the filler dimension is
     // part of the reported label, which is what makes padded reachability
     // observable in the report.
     let mut shape_tallies: Vec<ShapeTally> = Vec::new();
     let mut tally_of: Vec<Vec<usize>> = Vec::with_capacity(axes.shapes.len());
     for (si, s) in axes.shapes.iter().enumerate() {
+        let budget = shape_ceilings[si] - if si == 0 { 0 } else { shape_ceilings[si - 1] };
         let mut per_f = Vec::with_capacity(axes.filler_domains[si].len());
         for &f in &axes.filler_domains[si] {
             per_f.push(shape_tallies.len());
@@ -665,6 +720,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                 shape: s.tally_label(f),
                 generated: 0,
                 run: 0,
+                budget,
             });
         }
         tally_of.push(per_f);
@@ -674,235 +730,254 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
     const DETACHED_CAP: usize = 16;
 
     let mut axes = axes;
-    'points: while let Some(point) = axes.next() {
-        for arrangement in &perms {
-            for combo_idx in ComboCounter::new(&combo_lengths) {
-                let combo: Vec<(String, ScenarioBox)> = combo_idx
-                    .iter()
-                    .enumerate()
-                    .map(|(slot, &vi)| decoys[slot][vi].clone())
-                    .collect();
-                // The combo's attacker-slot token ids, in slot order — the
-                // only source for re-creation padding (phase-2 spec: the
-                // padding is sourced, never conjured).
-                let attacker_slot_tokens: Vec<Vec<String>> = attacker_slots
-                    .iter()
-                    .map(|&s| {
-                        combo[s]
-                            .1
-                            .tokens
-                            .iter()
-                            .map(|t| t.id.to_lowercase())
-                            .collect()
-                    })
-                    .collect();
-                for &payout in &payout_modes {
-                    // The re-creation family's innermost axis: filler counts
-                    // (a single 0 for shapes without a re-creation).
-                    for (f_idx, &fillers) in point.filler_domain.iter().enumerate() {
-                        probes_total += 1;
-                        if probes_run >= max_probes {
-                            capped = true;
-                            break 'points;
-                        }
-                        // Realized input order: external slots keep their positions;
-                        // permutable positions take the arrangement's slots in order.
-                        let mut slot_at_position = vec![usize::MAX; roles.len()];
-                        for (k, &pos) in permutable.iter().enumerate() {
-                            slot_at_position[pos] = arrangement[k];
-                        }
-                        for &pos in permutable.iter() {
-                            if slot_at_position[pos] == usize::MAX {
-                                slot_at_position[pos] = pos; // unreachable for full arrangements
+    while let Some(point) = axes.next() {
+        // This shape's slice is spent: skip its remaining points (never
+        // run them), let the odometer advance to the next shape.
+        if probes_run >= shape_ceilings[point.shape_index] {
+            capped = true;
+            continue;
+        }
+        let shape_ceiling = shape_ceilings[point.shape_index];
+        'shape: {
+            for arrangement in &perms {
+                for combo_idx in ComboCounter::new(&combo_lengths) {
+                    let combo: Vec<(String, ScenarioBox)> = combo_idx
+                        .iter()
+                        .enumerate()
+                        .map(|(slot, &vi)| decoys[slot][vi].clone())
+                        .collect();
+                    // The combo's attacker-slot token ids, in slot order — the
+                    // only source for re-creation padding (phase-2 spec: the
+                    // padding is sourced, never conjured).
+                    let attacker_slot_tokens: Vec<Vec<String>> = attacker_slots
+                        .iter()
+                        .map(|&s| {
+                            combo[s]
+                                .1
+                                .tokens
+                                .iter()
+                                .map(|t| t.id.to_lowercase())
+                                .collect()
+                        })
+                        .collect();
+                    for &payout in &payout_modes {
+                        // The re-creation family's innermost axis: filler counts
+                        // (a single 0 for shapes without a re-creation).
+                        for (f_idx, &fillers) in point.filler_domain.iter().enumerate() {
+                            probes_total += 1;
+                            if probes_run >= shape_ceiling {
+                                capped = true;
+                                break 'shape;
                             }
-                        }
-                        for i in (0..roles.len()).filter(|&i| roles[i] == DrainRole::External) {
-                            slot_at_position[i] = i;
-                        }
-                        let position_roles: Vec<DrainRole> =
-                            slot_at_position.iter().map(|&slot| roles[slot]).collect();
-
-                        let realized_inputs: Vec<ScenarioBox> = (0..roles.len())
-                            .map(|pos| {
-                                let slot = slot_at_position[pos];
-                                combo[slot].1.clone()
-                            })
-                            .collect();
-                        let tally = tally_of[point.shape_index][f_idx];
-                        let (realized_outputs, _synthesized) = if point.is_phase1() {
-                            match realize_outputs(req, &realized_inputs, payout, &attacker_tree) {
-                                Some(o) => {
-                                    let flags = vec![false; o.len()];
-                                    if syn_enabled {
-                                        shape_tallies[tally].generated += 1;
-                                    }
-                                    (o, flags)
+                            // Realized input order: external slots keep their positions;
+                            // permutable positions take the arrangement's slots in order.
+                            let mut slot_at_position = vec![usize::MAX; roles.len()];
+                            for (k, &pos) in permutable.iter().enumerate() {
+                                slot_at_position[pos] = arrangement[k];
+                            }
+                            for &pos in permutable.iter() {
+                                if slot_at_position[pos] == usize::MAX {
+                                    slot_at_position[pos] = pos; // unreachable for full arrangements
                                 }
-                                None => {
-                                    notes.push(
+                            }
+                            for i in (0..roles.len()).filter(|&i| roles[i] == DrainRole::External) {
+                                slot_at_position[i] = i;
+                            }
+                            let position_roles: Vec<DrainRole> =
+                                slot_at_position.iter().map(|&slot| roles[slot]).collect();
+
+                            let realized_inputs: Vec<ScenarioBox> = (0..roles.len())
+                                .map(|pos| {
+                                    let slot = slot_at_position[pos];
+                                    combo[slot].1.clone()
+                                })
+                                .collect();
+                            let tally = tally_of[point.shape_index][f_idx];
+                            let (realized_outputs, _synthesized) = if point.is_phase1() {
+                                match realize_outputs(req, &realized_inputs, payout, &attacker_tree)
+                                {
+                                    Some(o) => {
+                                        let flags = vec![false; o.len()];
+                                        if syn_enabled {
+                                            shape_tallies[tally].generated += 1;
+                                        }
+                                        (o, flags)
+                                    }
+                                    None => {
+                                        notes.push(
                                 "drain-mode payout not constructible (negative remainder); skipping it"
                                     .into(),
                             );
-                                    continue;
+                                        continue;
+                                    }
                                 }
-                            }
-                        } else {
-                            match materialize_synthesized(
-                                req,
-                                payout,
-                                &point,
-                                fillers,
-                                &realized_inputs,
-                                &combo,
-                                &attacker_slot_tokens,
-                                &protected_trees,
-                                free_output,
-                                &attacker_tree,
-                            ) {
-                                Some((o, flags)) => {
-                                    shape_tallies[tally].generated += 1;
-                                    (o, flags)
+                            } else {
+                                match materialize_synthesized(
+                                    req,
+                                    payout,
+                                    &point,
+                                    fillers,
+                                    &realized_inputs,
+                                    &combo,
+                                    &attacker_slot_tokens,
+                                    &protected_trees,
+                                    free_output,
+                                    &attacker_tree,
+                                ) {
+                                    Some((o, flags)) => {
+                                        shape_tallies[tally].generated += 1;
+                                        (o, flags)
+                                    }
+                                    // Unsourced padding or an unfundable shape: not
+                                    // generated at all (never a conservation tally).
+                                    None => continue,
                                 }
-                                // Unsourced padding or an unfundable shape: not
-                                // generated at all (never a conservation tally).
-                                None => continue,
-                            }
-                        };
+                            };
 
-                        // Deduplicate: identical (inputs, outputs) shapes are one probe.
-                        let key =
-                            match serde_json::to_string(&(&realized_inputs, &realized_outputs)) {
-                                Ok(k) => k,
+                            // Deduplicate: identical (inputs, outputs) shapes are one probe.
+                            let key =
+                                match serde_json::to_string(&(&realized_inputs, &realized_outputs))
+                                {
+                                    Ok(k) => k,
+                                    Err(_) => continue,
+                                };
+                            if !seen.insert(key) {
+                                continue;
+                            }
+                            probes_run += 1;
+                            if syn_enabled {
+                                shape_tallies[tally].run += 1;
+                            }
+
+                            // ── oracle: full transaction validation ──
+                            let probe_seq = probes_run;
+                            let (tx_request, oracle_outputs) = match build_tx_request(
+                                req,
+                                &realized_inputs,
+                                &realized_outputs,
+                                probe_seq,
+                            ) {
+                                Ok(r) => r,
                                 Err(_) => continue,
                             };
-                        if !seen.insert(key) {
-                            continue;
-                        }
-                        probes_run += 1;
-                        if syn_enabled {
-                            shape_tallies[tally].run += 1;
-                        }
-
-                        // ── oracle: full transaction validation ──
-                        let probe_seq = probes_run;
-                        let (tx_request, oracle_outputs) = match build_tx_request(
-                            req,
-                            &realized_inputs,
-                            &realized_outputs,
-                            probe_seq,
-                        ) {
-                            Ok(r) => r,
-                            Err(_) => continue,
-                        };
-                        let check = match tx_check(&tx_request) {
-                            Ok(c) => c,
-                            Err(_) => continue,
-                        };
-                        if !check.valid {
-                            if syn_enabled {
-                                match classify_rejection(&check) {
-                                    Rejection::Conservation => rejections.conservation += 1,
-                                    Rejection::MissingKey => rejections.missing_key += 1,
-                                    Rejection::Script => rejections.script += 1,
-                                }
-                            }
-                            continue;
-                        }
-                        let mut disqualified = false;
-                        let mut refused_key = false;
-                        for ic in &check.inputs {
-                            let pos = ic.index;
-                            let accepted = match position_roles[pos] {
-                                DrainRole::Protected
-                                | DrainRole::Companion
-                                | DrainRole::External => ic.verdict == "pass",
-                                // The attacker signs their own boxes.
-                                DrainRole::Attacker => {
-                                    ic.verdict == "pass" || ic.verdict == "needsProof"
-                                }
-                                DrainRole::Unknown => false,
+                            let check = match tx_check(&tx_request) {
+                                Ok(c) => c,
+                                Err(_) => continue,
                             };
-                            if !accepted {
-                                if ic.verdict == "needsProof" {
-                                    refused_key = true;
-                                    notes.push(format!(
+                            if !check.valid {
+                                if syn_enabled {
+                                    match classify_rejection(&check) {
+                                        Rejection::Conservation => rejections.conservation += 1,
+                                        Rejection::MissingKey => rejections.missing_key += 1,
+                                        Rejection::Script => rejections.script += 1,
+                                    }
+                                }
+                                continue;
+                            }
+                            let mut disqualified = false;
+                            let mut refused_key = false;
+                            for ic in &check.inputs {
+                                let pos = ic.index;
+                                let accepted = match position_roles[pos] {
+                                    DrainRole::Protected
+                                    | DrainRole::Companion
+                                    | DrainRole::External => ic.verdict == "pass",
+                                    // The attacker signs their own boxes.
+                                    DrainRole::Attacker => {
+                                        ic.verdict == "pass" || ic.verdict == "needsProof"
+                                    }
+                                    DrainRole::Unknown => false,
+                                };
+                                if !accepted {
+                                    if ic.verdict == "needsProof" {
+                                        refused_key = true;
+                                        notes.push(format!(
                                         "input {pos} ({}) needs a key the attacker does not hold",
                                         position_roles[pos].as_str()
                                     ));
+                                    }
+                                    disqualified = true;
+                                    break;
                                 }
-                                disqualified = true;
-                                break;
                             }
-                        }
-                        if disqualified {
-                            if syn_enabled && refused_key {
-                                rejections.missing_key += 1;
+                            if disqualified {
+                                if syn_enabled && refused_key {
+                                    rejections.missing_key += 1;
+                                }
+                                continue;
                             }
-                            continue;
-                        }
 
-                        // ── objective: leak by identity and amount ──
-                        let (extracted, detached) = leak(
-                            &position_roles,
-                            &realized_inputs,
-                            &oracle_outputs,
-                            &protected_trees,
-                            &declared_free,
-                            if syn_enabled { Some(&riders) } else { None },
-                        );
-                        if syn_enabled {
-                            for d in detached {
-                                if detached_seen.insert(d.detail.clone())
-                                    && nft_detached.len() < DETACHED_CAP
-                                {
-                                    nft_detached.push(d);
+                            // ── objective: leak by identity and amount ──
+                            let (extracted, detached) = leak(
+                                &position_roles,
+                                &realized_inputs,
+                                &oracle_outputs,
+                                &protected_trees,
+                                &declared_free,
+                                if syn_enabled { Some(&riders) } else { None },
+                            );
+                            if syn_enabled {
+                                for d in detached {
+                                    if detached_seen.insert(d.detail.clone())
+                                        && nft_detached.len() < DETACHED_CAP
+                                    {
+                                        nft_detached.push(d);
+                                    }
                                 }
                             }
-                        }
-                        if extracted.is_empty() {
-                            continue;
-                        }
-                        hits += 1;
-                        let total: u128 = extracted.values().sum();
-                        if best.as_ref().map(|(t, _)| total > *t).unwrap_or(true) {
-                            let decoy_labels: Vec<String> = attacker_slots
-                                .iter()
-                                .map(|&s| format!("input {s}: {}", combo[s].0))
-                                .collect();
-                            best = Some((
-                                total,
-                                DrainHit {
-                                    extracted: extracted
-                                        .into_iter()
-                                        .map(|(k, v)| (k, v.to_string()))
-                                        .collect(),
-                                    permutation: permutable
-                                        .iter()
-                                        .map(|&pos| slot_at_position[pos])
-                                        .collect(),
-                                    decoys: decoy_labels,
-                                    payout,
-                                    shape: shape_tallies[tally].shape.clone(),
-                                    witness: witness_bundle(
-                                        req,
-                                        &position_roles,
-                                        &realized_inputs,
-                                        &oracle_outputs,
-                                        &tx_request,
-                                    ),
-                                },
-                            ));
+                            if extracted.is_empty() {
+                                continue;
+                            }
+                            hits += 1;
+                            let total: u128 = extracted.values().sum();
+                            if best.as_ref().map(|(t, _)| total > *t).unwrap_or(true) {
+                                let decoy_labels: Vec<String> = attacker_slots
+                                    .iter()
+                                    .map(|&s| format!("input {s}: {}", combo[s].0))
+                                    .collect();
+                                best = Some((
+                                    total,
+                                    DrainHit {
+                                        extracted: extracted
+                                            .into_iter()
+                                            .map(|(k, v)| (k, v.to_string()))
+                                            .collect(),
+                                        permutation: permutable
+                                            .iter()
+                                            .map(|&pos| slot_at_position[pos])
+                                            .collect(),
+                                        decoys: decoy_labels,
+                                        payout,
+                                        shape: shape_tallies[tally].shape.clone(),
+                                        witness: witness_bundle(
+                                            req,
+                                            &position_roles,
+                                            &realized_inputs,
+                                            &oracle_outputs,
+                                            &tx_request,
+                                        ),
+                                    },
+                                ));
+                            }
                         }
                     }
                 }
             }
-        }
+        } // 'shape
     }
 
     if capped {
-        notes.push(format!(
-            "probe cap {max_probes} reached; the space was truncated"
-        ));
+        if shape_count == 1 {
+            notes.push(format!(
+                "probe cap {max_probes} reached; the space was truncated"
+            ));
+        } else {
+            notes.push(format!(
+                "probe cap {max_probes} allocated across {shape_count} synthesis shapes \
+                 (~{base_slice} probes each, unused budget flows to later shapes); \
+                 the space was truncated"
+            ));
+        }
     }
     notes.dedup();
     let verdict = if hits > 0 {
@@ -918,7 +993,14 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
         hits,
         best: best.map(|(_, h)| h),
         notes,
-        synthesis: synthesis_record(syn, max_probes, shape_tallies),
+        synthesis: synthesis_record(
+            syn,
+            max_probes,
+            shape_count,
+            companions_considered,
+            companions_qualified,
+            shape_tallies,
+        ),
         rejections,
         nft_detached,
     })
@@ -934,6 +1016,9 @@ fn max_probe_cap(req: &DrainRequest) -> usize {
 fn synthesis_record(
     syn: &Synthesis,
     max_probes: usize,
+    shape_count: usize,
+    companions_considered: usize,
+    companions_qualified: usize,
     shapes: Vec<ShapeTally>,
 ) -> SynthesisRecord {
     SynthesisRecord {
@@ -952,6 +1037,11 @@ fn synthesis_record(
             max_probes,
         },
         axis_order: AXIS_ORDER.to_vec(),
+        allocation: format!(
+            "the probe cap is allocated across {shape_count} synthesis shapes in the pinned order              (equal slices, unused budget flows to later shapes); a shape that exhausts its slice              is skipped, never steals from later shapes"
+        ),
+        companions_considered,
+        companions_qualified,
         shapes,
     }
 }

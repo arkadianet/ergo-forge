@@ -153,9 +153,23 @@ spends its budget varying the phase-1 space inside each synthesis shape,
 instead of the reverse. Caps: `maxNewOutputs` (2), successor states (8),
 output permutations (24 default), total probes (50,000 default) — every cap
 a parameter, every cap recorded in the report alongside the pinned order.
-With the default caps the sampled prefix covers a bounded slice, so the
-flagship vault run **declares larger caps explicitly** (~200,000 probes —
-minutes, not hours) and records them. The honesty rule from phase 1 carries:
+
+**Budget allocation across shapes (implementation correction, review round
+2):** the total-probe cap is **allocated across synthesis shapes, not spent
+depth-first**. Shape `none` alone can produce more points than the whole
+budget on a real set (12,615 points on the 12-input mapped USE set), so
+spending depth-first zeroes every synthesis shape exactly when they matter —
+the pinned order's promise ("truncation preserves the new degrees") is
+delivered by the allocator, not the order alone. Policy: equal slices per
+shape (cumulative ceilings; a shape that exhausts its slice is skipped, never
+steals from later shapes; a shape that finishes early leaves its remainder to
+later shapes). With one shape this is exactly the phase-1 cap. The policy is
+recorded in the report next to the axis order, and each shape's slice is
+recorded per tally bucket — under truncation it is as load-bearing as the
+order itself. Companion visibility rides in the same record: companions
+*considered* vs *qualified* for re-creation (an axis that will generate
+nothing — e.g. a request whose only companion carries its singleton at
+amount 3 — is readable, not discoverable by instrumenting the run). The honesty rule from phase 1 carries:
 a miss says "not under these probes", names which synthesis degrees were
 enabled, and names the caps and the truncation order.
 
