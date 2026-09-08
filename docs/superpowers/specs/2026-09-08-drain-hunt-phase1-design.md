@@ -60,9 +60,13 @@ attacker controls, and the hunt refuses to guess.
 | `attacker` | The attacker's own funds — decoy material. | reorder, substitute contents from the decoy family, or omit |
 | `external` | Data inputs and pinned boxes (oracles). Fixed on-chain facts. | nothing |
 
-Unlabelled inputs are rejected: the hunt will not analyse a set it cannot
-attribute. Data inputs, height and network are carried verbatim as in the
-spend hunt — on-chain facts, not spender secrets.
+Roles apply to the declared **`inputs` list only**. `data_inputs` are
+`external` by definition — pinned by box id, carried verbatim, never permuted
+and never re-addressed (a probe that swaps in a different oracle box is a
+different protocol instance, which is out of scope and recorded as a limit
+below). Unlabelled inputs are rejected: the hunt will not analyse a set it
+cannot attribute. Data inputs, height and network are carried verbatim as in
+the spend hunt — on-chain facts, not spender secrets.
 
 Outputs keep the caller's shape (this is what makes it *phase 1*), except that
 any output the caller marks `payee: free` may have its recipient tree
@@ -75,18 +79,24 @@ free payee.
 A probe is one candidate transaction built from the template by applying only
 the moves an attacker genuinely controls. Two axes, multiplied:
 
-1. **Input permutation** — every ordering of the declared inputs. The whole
-   exploit is "put the decoy at `INPUTS(0)`, the real pool at `INPUTS(2)`":
-   order *is* the attack surface. Cap: inputs ≤ 5 → at most 120 permutations;
-   the cap is a parameter, and overflow samples deterministically (seeded,
-   ordered), never silently.
+1. **Input permutation** — every ordering of the declared `protected`,
+   `companion` and `attacker` inputs. The whole exploit is "put the decoy at
+   `INPUTS(0)`, the real pool at `INPUTS(2)`": order *is* the attack surface.
+   `external` entries keep their absolute positions and contents, so the hunt
+   only ever evaluates shapes the attacker can actually build. Cap: inputs
+   ≤ 5 → at most 120 permutations; the cap is a parameter, and overflow
+   samples deterministically (seeded, ordered), never silently.
 2. **Decoy substitution** — for each `attacker` slot, the decoy family:
    - the caller's declared decoys, plus
-   - the generic family: `{declared reserves} × k` for `k ∈ {0, 1,
-     match-the-script's-implied-minimum}`; filler tokens of amount 1 at every
-     token index `0..3`; token reordering; registers zeroed and copied.
+   - the generic family, a **finite, script-independent** enumeration:
+     `{declared reserves} × k` for `k ∈ {0, 1, 10}`; one fixed dummy token id
+     (32 zero bytes) placed as amount 1 at every token index `0..3`; token
+     reordering (declared order, reversed); registers absent or zeroed.
 
-The generic family is deliberately boring. **It must include, without any
+The generic family never reads the target script, its trees, or its state —
+a script-adaptive decoy (one "matched to the script's implied minimum") would
+make the family non-reproducible and void the anti-cheat. The generic family
+is deliberately boring. **It must include, without any
 special-casing, the exact shape that drained USE** — a 2-ERG wallet box
 carrying three amount-1 filler tokens. The incident replay (below) is the test
 that the boring family is sufficient; if it ever is not, the family grows and
@@ -104,14 +114,21 @@ records its six probes.
 ## Objective — measuring a leak by identity, not position
 
 A probe is scored by how much value **left the protected set to outputs that do
-not faithfully recreate it**. Define, over one candidate transaction:
+not faithfully recreate it**. Roles — not token ids — define the protected set;
+the protocol-NFT set is used to *validate identity*, never to classify:
 
 - `protectedIn(asset)` = the sum of `asset` (nanoErg, or a token amount) over
-  every **input** box whose `tokens(0)._1` is a protocol NFT.
+  every **input labelled `protected`**. `companion` boxes never enter the sum,
+  regardless of what their `tokens(0)._1` happens to be — the USE order box
+  carries the swap NFT at index 0, and that NFT is an authorization flag, not
+  reserve.
+- Identity check (separate step): every `protected` box must carry its
+  declared singleton protocol NFT at `tokens(0)._1`; a mismatch is
+  `invalidShape`, not a leak.
 - `protectedOut(asset)` = the same sum over every **output** box that
-  **faithfully recreates** a protected box: same `propositionBytes`, same token
-  ids and amounts, value no smaller — the successor test the static lint and the
-  P3b hunt already use.
+  **faithfully recreates** a `protected` input: same `propositionBytes`, same
+  token ids and amounts, value no smaller — the successor test the static lint
+  and the P3b hunt already use.
 
 ```
 extracted = Σ_asset max(0, protectedIn(asset) − protectedOut(asset))
@@ -122,12 +139,14 @@ Value moving between protected boxes, or into a faithful recreation, does not
 count. Fees are not subtracted — the attacker's problem; the report is gross.
 
 The measurement is keyed on **identity, not position**: the decoy at
-`INPUTS(0)` has junk `tokens(0)._1`, so it never enters `protectedIn`, and the
+`INPUTS(0)` is labelled `attacker`, so it never enters `protectedIn`, and the
 leak is scored against the pool wherever it actually sits. That is precisely
 the property the deployed swap lacked, which is why measuring it this way finds
 the bug the swap could not see. For the USE drain, `protectedIn` is
-284,695.585 ERG plus the full `useErgLp` and `USE` reserves; `protectedOut` is
-the 0.002-ERG drained successor; `extracted` is essentially the whole reserve.
+284,695.585 ERG plus the full `useErgLp` and `USE` reserves (the pool box
+alone — the order box is `companion` and contributes nothing);
+`protectedOut` is the 0.002-ERG drained successor; `extracted` is essentially
+the whole reserve.
 
 Phase 1 does not price tokens: a positive `extracted` in **any** asset is a
 hit. A worth-weighted objective is a later refinement.
@@ -138,17 +157,22 @@ A probe is a finding only if consensus would accept its transaction. The
 existing reducer is the oracle, reused with no new evaluator entry (the
 one-primitive rule the spend hunt already holds). A probe **drains** when both:
 
-1. **Every protocol input script passes.** Each `protected` and `companion`
-   box, evaluated by `eval_scenario` in the candidate context, returns `pass`
-   (reduced to `true`) or `needsProof` (a sigma proposition — the attacker
-   signs their own decoy, no obstacle). A `fail` or `error` on any
-   protocol/companion input disqualifies the probe. `attacker` inputs are the
-   spender's own and need not be modelled as scripts.
+1. **The full transaction validates.** `txcheck::check` runs over the whole
+   probe — per-input script verdicts, ERG/token conservation, output rules:
+   the same surface `validate-tx` uses, not script behaviour alone. On every
+   `protected` and `companion` input the verdict must be **`pass`** —
+   `needsProof` is *never* accepted for these roles, because a residual sigma
+   proposition is a key the attacker does not hold (only `attacker` inputs may
+   reduce to a proof: their own key, no obstacle). A `fail`, `error` or
+   `needsProof` on any protocol/companion input disqualifies the probe, and
+   the residual is reported with the miss. The USE replay is unaffected by
+   this rule: in the drain layout the deployed pool and order box both reduce
+   to `true`.
 2. **`extracted` is positive** under the objective above.
 
 Millisecond reducer feedback makes exhaustive enumeration over the capped space
 practical. Using cost-trace / `--hot-spots` hot spots to *steer* which probes to
-try is phase 2, explicitly not phase 1.
+try is phase 3, explicitly not phase 1.
 
 ## Verdict
 
@@ -165,12 +189,23 @@ Carried over from the hunt vocabulary, priority order:
 
 ## Witness
 
-The witness is a plain scenario JSON — the same artifact `ergo-es eval` and
-`validate-tx` consume, with the roles recorded alongside. Anyone can reproduce
-the verdict with the CLI and diff it against the mainnet transaction it mirrors.
-For the incident corpus the witness is byte-comparable in *effect* (same box
-ids where inputs are pinned, same extraction) to the on-chain drain, and must
-match `examples/incidents/use-lp-drain.deployed-swap.test.json`.
+The witness is a **bundle**, because the two CLI validators consume different
+representations: `ergo-es eval` reads a `Scenario`, `ergo-es validate-tx`
+reads a `TxRequest` (`tx`, `boxes`, optional `height`). The bundle carries all
+three, plus the role labels:
+
+- `scenario` — the probe as a `Scenario`, with roles recorded alongside;
+- `txRequest` — derived mechanically from the scenario: the boxes are
+  realised with real bytes via `box_build` (so box ids are chain-faithful),
+  and the `TxRequest` references those ids;
+- the conversion is a pure function, part of the `drainhunt` module, so
+  `scenario` and `txRequest` cannot drift.
+
+Anyone can reproduce the verdict with either CLI and diff it against the
+mainnet transaction it mirrors. For the incident corpus the witness is
+byte-comparable in *effect* (same box ids where inputs are pinned, same
+extraction) to the on-chain drain, and must match
+`examples/incidents/use-lp-drain.deployed-swap.test.json`.
 
 Delta-debug minimisation to a smallest witness is included only if it falls out
 of the report plumbing for free; it is **not** required for acceptance (phase 3
@@ -196,8 +231,10 @@ concolic minimisation is the real treatment).
    the broken one, so both are used.
 3. **Boundedness and determinism.** Caps enforced; same input → same probes →
    same verdict, seeded sampling included.
-4. **Witness portability.** Every reported witness re-evaluates to `pass` with
-   the same extraction via `ergo-es eval` and validates via `validate-tx`.
+4. **Witness portability.** Every reported witness bundle re-evaluates to
+   `pass` with the same extraction via `ergo-es eval`, and its derived
+   `TxRequest` — not a hand-written copy — validates via `validate-tx`, with
+   the role labels preserved in the bundle.
 
 Rediscovering a known drain from trees + NFTs alone is the bar; the incident
 corpus is both the fixture and the answer key.
@@ -231,6 +268,9 @@ Phase 1 is a *finder of one class*, not a proof of safety. It **cannot** find:
 - **Anything needing output synthesis** — drains that require inventing outputs
   beyond the template's slots. Deferred by construction.
 - **Multi-transaction drains** — setup-then-strike sequences.
+- **Swapped oracles** — `external`/data inputs are pinned by box id and held
+  fixed; a drain that requires substituting a *different* on-chain oracle box
+  is a different protocol instance and is out of scope here.
 
 A miss is "not drainable under these phase-1 probes", never "safe" — the same
 honesty the spend hunt's `notUnderProbes` verdict carries.
