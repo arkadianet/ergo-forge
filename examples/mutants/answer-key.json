@@ -2,9 +2,9 @@
  "recorded": "2026-09-08",
  "runner": "ergo-sandbox/tests/mutation_corpus.rs (debug build)",
  "methodology": "docs/superpowers/specs/2026-09-08-mutation-corpus-design.md",
- "detectionRate": 0.25,
+ "detectionRate": 0.0,
  "provenMutants": 4,
- "found": 1,
+ "found": 0,
  "denominatorNote": "proven = a hand-built KEYLESS drain witness validated by txcheck before the hunt ran. M1-M3 were initially misproven (their witnesses validated under txcheck but carry needsProof on the protected input \u2014 the residual requires the beneficiary's/receiver's key): reclassified as keyed-insider, outside the hunt's attacker model, never in the denominator.",
  "caps": {
   "maxProbes": 50000,
@@ -215,7 +215,8 @@
    "what": "the winning probe has the attacker OVERPAY the seller (20M of the attacker's own nanoERG into the seller's P2PK box) so `paid` passes legitimately and the stock leaves the sale box with it. The seller is fully paid; the attacker loses money. No exploit.",
    "why": "the leak objective counts protected value that LEFT the protected box, sanctioned only at the free payee's DECLARED amounts, and never subtracts what the attacker SPENT. An overpayment that empties a protected box into a protocol-designated payee scores as a drain.",
    "disposition": "ESCALATED, not fixed: attacker-cost accounting is the roadmap's parked 'pricing / worth-weighted objectives; economic probes \u2014 separate spec' (phase 2 spec, non-goals). This firing is the concrete evidence for that spec. The fixture is untouched.",
-   "consequence": "M4's `found` is confounded: the mutant IS really exploitable (the 1-nanoERG purchase is a genuine keyless theft and is in family \u2014 the hunt scored 710 hits), but its drainable verdict cannot be distinguished from overpayment noise without a cost-aware objective. Recorded as found=true, confounded=true."
+   "consequence": "M4's `found` is confounded: the mutant IS really exploitable (the 1-nanoERG purchase is a genuine keyless theft and is in family \u2014 the hunt scored 710 hits), but its drainable verdict cannot be distinguished from overpayment noise without a cost-aware objective. Recorded as found=true, confounded=true.",
+   "mutant": "M4"
   }
  ],
  "negativeControlsNote": "every original runs in both configurations, asserted in the harness; a drainable original must be pre-recorded in escalatedFindings (M4) or the run fails. Six of seven originals are clean; M4's firing is the corpus's escalated finding.",
@@ -227,5 +228,12 @@
    "result": "FOUND",
    "note": "a pass/fail on the APPARATUS, reported separately - never a corpus mutant, never in the rate's denominator (a found control would move the rate without the hunt changing). Landing this control caught a fixture bug in the control's own template (the swap successor initially lacked the swap NFT, failing swapSucc.tokens == SELF.tokens on every probe) - the control doing its job."
   }
- }
+ },
+ "detectionRateNote": "attributable detections / proven mutants. A drainable verdict counts only when the mutant's own unmutated control is CLEAN in the same configuration \u2014 a hit that also fires on the original says nothing about the mutation. Derived by the harness, not flagged by hand.",
+ "attributableDetections": 0,
+ "rawDrainableOnProven": 1,
+ "confounded": [
+  "M4"
+ ],
+ "foundNote": "raw drainable verdicts on proven mutants: see rawDrainableOnProven (1, all confounded)"
 }

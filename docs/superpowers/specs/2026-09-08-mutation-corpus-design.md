@@ -111,23 +111,40 @@ both configurations); every mutant runs twice (synthesis off/on); one cap
 policy for all (`maxProbes` 50,000, `maxPermutations` 120, synthesis
 fully on in the second configuration).
 
-**The rate: 1 found / 4 proven = 0.25.** Recorded in
-`examples/mutants/answer-key.json` and asserted by
+**The rate: 0 attributable / 4 proven = 0.00**, with one raw drainable
+verdict, confounded.
+
+A drainable verdict counts **only when the mutant's own unmutated control is
+clean in the same configuration** — that is the entire reason the control
+exists, and a hit that also fires on the original says nothing about the
+mutation. M4 is the case: the hunt reports `drainable` on the mutant *and*
+on the unmutated token-sale (see the escalation below), so its verdict is
+not attributable. It is reported separately, never in the rate.
+
+The harness **derives** attribution from the two runs rather than taking a
+recorded flag: the last hand-held guarantee here (the keyless proof) had
+already been promoted to a mechanical check for the same reason, and a
+number this document leans on should not depend on someone remembering to
+set a boolean.
+
+Recorded in `examples/mutants/answer-key.json` and asserted by
 `ergo-sandbox/tests/mutation_corpus.rs` as **no regression** — the recorded
-per-mutant verdicts must not degrade; never an absolute floor (a hard
-threshold turns into a fixture that gets tuned).
+per-mutant verdicts must not degrade, the confounded set is pinned exactly
+(a mutant becoming confounded, or ceasing to be, changes what the number
+means), and never an absolute floor (a hard threshold turns into a fixture
+that gets tuned).
 
 ### The operator matrix — read the rate next to it
 
-| operator | proven | found |
-|----------|--------|-------|
-| delete-nft-check (M5) | 1 | 0 |
-| drop-successor-script (M6, M7) | 2 | 0 |
-| weaken-comparison (M4) | 1 | 1 |
-| **flip-index** | **0** | — |
-| **positional ↔ unbound-search** | **0** | — |
+| operator | proven | attributable | raw drainable |
+|----------|--------|--------------|---------------|
+| delete-nft-check (M5) | 1 | 0 | 0 |
+| drop-successor-script (M6, M7) | 2 | 0 | 0 |
+| weaken-comparison (M4) | 1 | 0 | 1 (confounded) |
+| **flip-index** | **0** | — | — |
+| **positional ↔ unbound-search** | **0** | — | — |
 
-0.25 is a rate over **three of the five operators**. flip-index's only
+0.00 is a rate over **three of the five operators**. flip-index's only
 candidate (M3) turned out keyed-insider, and positional ↔ unbound-search —
 the USE incident's own class — has no mutant at all yet. Keyless mutants
 for the two uncovered operators are the next increment and are deliberately
@@ -143,7 +160,7 @@ applied to the incident's own FIXED contract reconstructs the **deployed
 vulnerable `useLpSwap`** — the contract that drained 284,695 ERG on mainnet.
 Ground truth is certain; phase 1 rediscovers it today from the honest shape.
 The harness asserts it as a **separate pass/fail on the apparatus**, outside
-the rate: a found control would move 0.25 → 0.4 without the hunt changing,
+the rate: a found control would move the rate without the hunt changing,
 which would read as improvement. Landing it caught a fixture bug in its own
 template (the swap successor initially lacked the swap NFT, failing
 `swapSucc.tokens == SELF.tokens` on every probe) — the control doing its job.
@@ -163,6 +180,29 @@ Consequence recorded honestly: M4's `found` is **confounded** — the mutant
 IS really exploitable (the 1-nanoERG purchase is a genuine keyless theft in
 family), but the verdict alone cannot discriminate real drains from
 overpayment noise until the objective knows what the attacker spent.
+
+**This is structural, not a missing cost term.** The leak objective assumes a
+**custody-shaped** protocol — value must stay in the box — and `sanctioned`
+is a *declared static amount* on a free payee, so it cannot express
+"sanctioned **iff** the payment condition holds". For **exchange-shaped**
+protocols (sales, orders, swaps where assets legitimately leave against
+payment) the honest transaction is indistinguishable from a drain: the goods
+leave the protected box (counted as leak) and the payment lands in a box that
+is not script-matched to it (counted as nothing).
+
+That is exactly why the token-sale original fires and
+`the_gallery_amm_pair_is_not_drainable` does not: the pool keeps its reserves
+in a script-matched successor, so `protectedOut` stays high. Change the shape
+from custody to exchange and the objective inverts.
+
+The consequence reaches past this corpus: **`drainable` verdicts on order- or
+sale-shaped sets are not trustworthy today**, and the mapped USE/Dexy sets
+carry swap and order boxes. They return `notUnderProbes` at present, so
+nothing in CI is wrong — but a continuous sweep (roadmap phase 6) over
+exchange-shaped protocols would produce this noise at scale, and a
+disclosure pipeline fed by it would be reporting non-findings. Tracked
+separately; until a conditional-sanction model exists, an exchange-shaped set
+deserves a flag rather than a silent score.
 
 What the run actually showed, beyond the number:
 
@@ -186,8 +226,10 @@ What the run actually showed, beyond the number:
   beneficiary overdraws) is dark to it. Extending the attacker model is
   phase-3+ work with a different oracle story (signed witnesses).
 
-A rate of 0.25 on the first pass is the finding, and it ships as the
-finding. The corpus is not tuned until it looks good; the miss table below
+A rate of 0.00 on the first pass is the finding, and it ships as the
+finding. The one raw hit is confounded rather than promising: it is the
+corpus's own control telling us the objective, not the mutation, produced
+the verdict. The corpus is not tuned until it looks good; the miss table below
 is the hand-off to phase 3.
 
 ## What this corpus does NOT cover

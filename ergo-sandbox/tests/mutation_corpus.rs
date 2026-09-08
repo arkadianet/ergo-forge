@@ -404,7 +404,6 @@ fn known_detectable_control_is_found(corpus: &Value) {
     // successor-side) go at once.
     let vulnerable = original.replacen(find, replace, 1);
     assert_ne!(vulnerable, original, "the control's diff must apply");
-    assert_ne!(vulnerable, original, "the control's diff must apply");
     let params: BTreeMap<String, TypedValue> = control["params"]
         .as_object()
         .expect("control params")
@@ -502,32 +501,29 @@ fn the_corpus_is_measured_and_does_not_regress() {
         .as_array()
         .map(|a| {
             a.iter()
-                .filter(|f| {
-                    f["original"]
-                        .as_str()
-                        .unwrap_or("")
-                        .starts_with("token-sale")
-                })
-                .map(|_| "M4".to_string())
+                .filter_map(|f| f["mutant"].as_str().map(str::to_string))
                 .collect()
         })
         .unwrap_or_default();
 
     // ── one pass over the corpus: mutants and their negative controls ──
     let mut results: BTreeMap<String, Value> = BTreeMap::new();
-    let mut found = 0usize;
+    let mut controls: BTreeMap<String, Value> = BTreeMap::new();
+    // `attributable` is the headline: a hit counts only when the mutant's own
+    // negative control is clean in the SAME configuration. A hit that fires on
+    // the unmutated original too says nothing about the mutation — the whole
+    // reason the control exists — so it is counted separately, never in the
+    // rate. Derived here rather than flagged by hand: the last hand-held
+    // guarantee in this harness (the keyless proof) was already promoted to a
+    // mechanical check for the same reason.
+    let mut attributable = 0usize;
+    let mut confounded: Vec<String> = Vec::new();
+    let mut raw_drainable = 0usize;
     let mut proven = 0usize;
     for m in corpus["mutants"].as_array().unwrap() {
         let id = m["id"].as_str().unwrap().to_string();
         let off = run_one(m, false);
         let on = run_one(m, true);
-        if m["proven"].as_bool() == Some(true) {
-            proven += 1;
-            // A proven mutant is "found" when the hunt reports drainable.
-            if off["verdict"] == "drainable" || on["verdict"] == "drainable" {
-                found += 1;
-            }
-        }
         // Negative control: the UNMUTATED original, both configurations,
         // asserted and recorded. A drainable original is either a real
         // finding in a contract we ship as an example (escalate — record it
@@ -557,6 +553,30 @@ fn the_corpus_is_measured_and_does_not_regress() {
                 );
             }
         }
+        // ── attribution: a hit counts only against a clean control ──
+        let hit_off = off["verdict"] == "drainable";
+        let hit_on = on["verdict"] == "drainable";
+        let ctrl_hit_off = ctrl_off["verdict"] == "drainable";
+        let ctrl_hit_on = ctrl_on["verdict"] == "drainable";
+        let is_attributable = (hit_off && !ctrl_hit_off) || (hit_on && !ctrl_hit_on);
+        let is_confounded = (hit_off || hit_on) && !is_attributable;
+        if m["proven"].as_bool() == Some(true) {
+            proven += 1;
+            if hit_off || hit_on {
+                raw_drainable += 1;
+            }
+            if is_attributable {
+                attributable += 1;
+            }
+            if is_confounded {
+                confounded.push(id.clone());
+            }
+        }
+        controls.insert(
+            id.clone(),
+            json!({ "synthesisOff": ctrl_off, "synthesisOn": ctrl_on }),
+        );
+
         eprintln!(
             "{}: off[{} probes={} capped={}] on[{} probes={} capped={}]",
             id,
@@ -573,15 +593,21 @@ fn the_corpus_is_measured_and_does_not_regress() {
                 "proven": m["proven"],
                 "synthesisOff": off,
                 "synthesisOn": on,
+                "attributable": is_attributable,
+                "confounded": is_confounded,
             }),
         );
     }
     let rate = if proven == 0 {
         0.0
     } else {
-        found as f64 / proven as f64
+        attributable as f64 / proven as f64
     };
-    println!("DETECTION RATE: {found}/{proven} = {rate:.2} (proven mutants only)");
+    println!(
+        "DETECTION RATE (attributable): {attributable}/{proven} = {rate:.2}\n\
+         \traw drainable verdicts on proven mutants: {raw_drainable}\n\
+         \tconfounded (drainable, but the unmutated control is drainable too): {confounded:?}"
+    );
 
     // ── the must-find control: a pass/fail on the apparatus ──
     known_detectable_control_is_found(&corpus);
@@ -590,7 +616,28 @@ fn the_corpus_is_measured_and_does_not_regress() {
     let key_rate = key["detectionRate"].as_f64().expect("recorded rate");
     assert!(
         rate + 1e-9 >= key_rate,
-        "the detection rate regressed: {rate} < recorded {key_rate}"
+        "the attributable detection rate regressed: {rate} < recorded {key_rate}"
+    );
+    // The confounded set is part of the meaning of the rate, not a footnote:
+    // a mutant becoming confounded (or ceasing to be) changes what the number
+    // says, so it is pinned exactly rather than bounded.
+    let key_confounded: Vec<String> = key["confounded"]
+        .as_array()
+        .expect("recorded confounded set")
+        .iter()
+        .map(|v| v.as_str().expect("confounded id").to_string())
+        .collect();
+    assert_eq!(
+        confounded, key_confounded,
+        "the confounded set changed: a drainable verdict is attributable to the mutation \
+         only when the unmutated control is clean in the same configuration"
+    );
+    assert_eq!(
+        raw_drainable,
+        key["rawDrainableOnProven"]
+            .as_u64()
+            .expect("recorded raw drainable count") as usize,
+        "raw drainable count on proven mutants changed"
     );
     for kr in key["perMutant"].as_array().expect("per-mutant records") {
         let id = kr["id"].as_str().unwrap();
@@ -607,6 +654,13 @@ fn the_corpus_is_measured_and_does_not_regress() {
             kr["synthesisOn"]["verdict"].as_str().unwrap(),
             "{id}: synthesis-on verdict regressed"
         );
+        if let Some(recorded) = kr["foundConfounded"].as_bool() {
+            assert_eq!(
+                r["confounded"].as_bool().unwrap(),
+                recorded,
+                "{id}: the DERIVED confounding disagrees with the recorded flag"
+            );
+        }
     }
     // The negative controls are recorded too — their section in the key
     // must exist and every recorded verdict must stay notUnderProbes.
@@ -615,16 +669,22 @@ fn the_corpus_is_measured_and_does_not_regress() {
         .expect("recorded controls")
     {
         let id = kr["id"].as_str().unwrap();
-        let r = &results[id];
+        // The CONTROL's results, not the mutant's — these are different runs,
+        // and comparing the mutant against the control's record passed only by
+        // coincidence (both sides were `notunderprobes` on six of seven, and
+        // both `drainable` on the seventh).
+        let c = controls
+            .get(id)
+            .unwrap_or_else(|| panic!("{id}: no control result"));
         assert_eq!(
-            r["synthesisOff"]["verdict"].as_str().unwrap(),
+            c["synthesisOff"]["verdict"].as_str().unwrap(),
             kr["synthesisOff"]["verdict"].as_str().unwrap(),
-            "{id}: negative-control verdict changed"
+            "{id}: negative-control verdict changed (synthesis off)"
         );
         assert_eq!(
-            r["synthesisOn"]["verdict"].as_str().unwrap(),
+            c["synthesisOn"]["verdict"].as_str().unwrap(),
             kr["synthesisOn"]["verdict"].as_str().unwrap(),
-            "{id}: negative-control verdict changed"
+            "{id}: negative-control verdict changed (synthesis on)"
         );
     }
 }
