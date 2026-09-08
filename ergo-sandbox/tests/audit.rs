@@ -295,11 +295,13 @@ fn a_finding_carries_the_ir_id_of_its_node() {
 // maths on a box it picked by *position*, with nothing saying which box that
 // index must hold.
 
-/// Lint ids reported for a deployed ErgoTree, given as wire hex.
+/// Lint ids reported for a deployed ErgoTree, given as wire hex. Lifted with
+/// the mainnet prefix — these fixtures are mainnet boxes, and it is what
+/// `ergo-es audit --mainnet` uses.
 fn lints_of_tree(tree_hex: &str) -> (Vec<&'static str>, Completeness) {
     let bytes = hex::decode(tree_hex).expect("hex");
     let tree = ergo_sandbox::inspect::parse_tree(&bytes).expect("parse");
-    let a = audit::audit(&lift_tree(&tree, true));
+    let a = audit::audit(&lift_tree(&tree, false));
     (a.findings.iter().map(|f| f.lint).collect(), a.completeness)
 }
 
