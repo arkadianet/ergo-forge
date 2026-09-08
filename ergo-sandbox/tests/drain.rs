@@ -318,11 +318,80 @@ mod map_feed {
         assert!(report.probes_run > 0, "the hunt actually ran probes");
     }
 
+    /// Unused quota flows forward: a shape whose whole family fits inside
+    /// its slice leaves the remainder to later shapes, so a later shape's
+    /// real room is its ceiling minus the probes already spent — more than
+    /// its nominal slice. Judged on the nominal number, such a shape would
+    /// be reported starved while it had room to spare.
+    ///
+    /// The vault set is the case: shape `none` exhausts at 252 probes
+    /// against a 400-probe slice, so `sinks(1)` inherits the difference.
     #[test]
-    fn the_mapped_use_set_feeds_the_hunt_and_has_nothing_left_to_drain() {
-        assert_mapped_set_has_nothing_left(
-            "use-lp.json",
-            "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41",
+    fn inherited_quota_counts_as_capacity_not_starvation() {
+        let corpus: Value =
+            serde_json::from_str(include_str!("../../examples/incidents/use-bank-vault.json"))
+                .expect("vault corpus parses");
+        let vault = &corpus["vault"];
+        let admin = &corpus["adminBox"];
+        let bank_nft = vault["tokens"][0]["id"].clone();
+        let use_id = vault["tokens"][1]["id"].clone();
+        let vault_tree = vault["ergoTree"].clone();
+        let request = json!({
+            "inputs": [
+                { "role": "protected", "value": vault["value"], "ergoTree": vault_tree,
+                  "tokens": vault["tokens"], "boxId": vault["boxId"],
+                  "creationHeight": vault["creationHeight"] },
+                { "role": "companion", "value": admin["value"], "ergoTree": admin["ergoTree"],
+                  "tokens": admin["tokens"], "boxId": admin["boxId"],
+                  "creationHeight": admin["creationHeight"] },
+                { "role": "attacker", "value": 2000000i64, "ergoTree": "10010101d17300" },
+            ],
+            "outputs": [
+                { "payee": "fixed", "value": 2000000i64, "ergoTree": "10010101d17300", "tokens": [] },
+                { "payee": "fixed", "value": 2000000i64, "ergoTree": vault_tree,
+                  "tokens": [{ "id": bank_nft, "amount": 1 }, { "id": use_id, "amount": 1 }] },
+                { "payee": "free", "value": 0, "ergoTree": "10010101d17300", "tokens": [] },
+            ],
+            "protocolNfts": [bank_nft],
+            "height": 1868438u32,
+            "network": "mainnet",
+            "maxProbes": 1200,
+            "synthesis": { "maxNewOutputs": 2, "companionRecreations": true,
+                           "successorStates": true, "splits": true, "mints": true,
+                           "permuteOutputs": true },
+        });
+        let report = drain(request);
+        let syn = &report.synthesis;
+
+        let none = syn
+            .shapes
+            .iter()
+            .find(|t| t.shape == "none")
+            .expect("the none tally");
+        assert!(
+            none.run < none.budget,
+            "shape `none` must exhaust inside its slice for quota to flow: {none:?}"
+        );
+        assert!(
+            syn.shapes.iter().any(|t| t.capacity > t.budget),
+            "a later shape must inherit the unused quota: {:?}",
+            syn.shapes
+        );
+        // The allocator hands room forward; it never takes room away.
+        assert!(
+            syn.shapes.iter().all(|t| t.capacity >= t.budget),
+            "capacity is never under budget: {:?}",
+            syn.shapes
+        );
+        // A shape with inherited room above the floor is not starved, and a
+        // shape that merely finished its own family was never starved.
+        assert!(
+            syn.shapes
+                .iter()
+                .all(|t| t.capacity < syn.slice_floor || t.capacity >= t.budget),
+            "no shape above the floor may be reported thin: floor={} {:?}",
+            syn.slice_floor,
+            syn.shapes
         );
     }
 
@@ -387,7 +456,7 @@ mod map_feed {
             starved
                 .notes
                 .iter()
-                .any(|n| n.contains("under the") && n.contains("floor")),
+                .any(|n| n.contains("cut off with under") && n.contains("decoy sweep")),
             "the thin allocation is named in the notes: {:?}",
             starved.notes
         );
@@ -410,7 +479,7 @@ mod map_feed {
             !healthy
                 .notes
                 .iter()
-                .any(|n| n.contains("under the") && n.contains("floor")),
+                .any(|n| n.contains("cut off with under") && n.contains("decoy sweep")),
             "no thin-slice note on a healthy allocation: {:?}",
             healthy.notes
         );

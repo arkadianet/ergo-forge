@@ -354,6 +354,12 @@ pub struct ShapeTally {
     /// minus the previous shape's). With synthesis off, the single shape's
     /// budget is the whole cap.
     pub budget: usize,
+    /// The room this shape actually had: its ceiling minus the probes
+    /// already run when it started. Earlier shapes that exhaust their own
+    /// family leave their remainder behind, so `capacity >= budget` — this
+    /// is the number thinness is judged on, and the gap between the two is
+    /// how much the allocator handed forward.
+    pub capacity: usize,
 }
 
 /// Why synthesized probes were rejected (phase-2 report). A `notUnderProbes`
@@ -402,14 +408,18 @@ pub struct SynthesisRecord {
     /// visible here instead of only in zero tallies.
     pub companions_qualified: usize,
     /// The probes one shape needs to cover a single input arrangement's
-    /// decoy sweep (`decoy combinations × payout modes`). A shape whose
-    /// slice is under this ran, but cannot have covered even one
+    /// decoy sweep (`decoy combinations × payout modes`). A shape cut off
+    /// with less room than this ran, but cannot have covered even one
     /// arrangement — "it ran" and "it explored something" are different
     /// claims, and the report must not blur them.
     pub slice_floor: usize,
-    /// How many shape slices fell under `slice_floor`. Non-zero means the
-    /// allocation is spread thinner than it can usefully explore: raise
-    /// `maxProbes`, or narrow the enabled degrees.
+    /// How many shapes were **cut off by the allocator** with an effective
+    /// capacity (see [`ShapeTally::capacity`]) under `slice_floor`. Judged
+    /// on effective capacity, not the nominal slice: unused quota flows
+    /// forward, so a later shape often has more room than its slice, and a
+    /// shape that simply exhausted its own family was never starved at all.
+    /// Non-zero means the allocation is spread thinner than it can usefully
+    /// explore: raise `maxProbes`, or narrow the enabled degrees.
     pub thin_slices: usize,
     pub shapes: Vec<ShapeTally>,
 }
@@ -737,19 +747,15 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
         .try_fold(1usize, |a, &b| a.checked_mul(b))
         .and_then(|c| c.checked_mul(payout_modes.len()))
         .unwrap_or(usize::MAX);
-    let thin_slices = (0..shape_count)
-        .filter(|&i| {
-            let budget = shape_ceilings[i] - if i == 0 { 0 } else { shape_ceilings[i - 1] };
-            budget < slice_floor
-        })
-        .count();
-    if thin_slices > 0 && shape_count > 1 {
-        notes.push(format!(
-            "{thin_slices} of {shape_count} shape slices are under the {slice_floor}-probe \
-             floor (one arrangement's decoy sweep): those shapes ran without covering a \
-             single input arrangement — raise maxProbes or narrow the enabled degrees"
-        ));
-    }
+    // Thinness is judged on EFFECTIVE capacity, not the nominal slice: a
+    // shape that exhausts its points early leaves its remainder to later
+    // shapes, so a later shape's real room is `ceiling - probes_run when it
+    // started`, which is >= its nominal slice. Judging on the nominal number
+    // would report shapes as starved that in fact had room to spare.
+    // `shape_starved` records the other half: a shape only lacked coverage if
+    // the allocator actually cut it off with points left to run.
+    let mut shape_started_at: Vec<Option<usize>> = vec![None; shape_count];
+    let mut shape_starved: Vec<bool> = vec![false; shape_count];
 
     let mut shape_tallies: Vec<ShapeTally> = Vec::new();
     let mut tally_of: Vec<Vec<usize>> = Vec::with_capacity(axes.shapes.len());
@@ -763,6 +769,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                 generated: 0,
                 run: 0,
                 budget,
+                capacity: budget,
             });
         }
         tally_of.push(per_f);
@@ -775,8 +782,14 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
     while let Some(point) = axes.next() {
         // This shape's slice is spent: skip its remaining points (never
         // run them), let the odometer advance to the next shape.
+        if shape_started_at[point.shape_index].is_none() {
+            shape_started_at[point.shape_index] = Some(probes_run);
+        }
         if probes_run >= shape_ceilings[point.shape_index] {
             capped = true;
+            // Cut off with points still on the odometer: this shape's
+            // coverage is bounded by the allocator, not by its own family.
+            shape_starved[point.shape_index] = true;
             continue;
         }
         let shape_ceiling = shape_ceilings[point.shape_index];
@@ -1006,6 +1019,34 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                 }
             }
         } // 'shape
+    }
+
+    // Effective capacity per shape, and the thin-slice verdict.
+    let mut capacities: Vec<usize> = Vec::with_capacity(shape_count);
+    for i in 0..shape_count {
+        let nominal = shape_ceilings[i] - if i == 0 { 0 } else { shape_ceilings[i - 1] };
+        let cap = match shape_started_at[i] {
+            Some(start) => shape_ceilings[i].saturating_sub(start),
+            // Never reached by the odometer: it had its nominal room.
+            None => nominal,
+        };
+        capacities.push(cap);
+    }
+    for (si, per_f) in tally_of.iter().enumerate() {
+        for &ti in per_f {
+            shape_tallies[ti].capacity = capacities[si];
+        }
+    }
+    let thin_slices = (0..shape_count)
+        .filter(|&i| shape_starved[i] && capacities[i] < slice_floor)
+        .count();
+    if thin_slices > 0 && shape_count > 1 {
+        notes.push(format!(
+            "{thin_slices} of {shape_count} shape slices were cut off with under \
+             {slice_floor} probes of room (one arrangement's decoy sweep): those shapes \
+             ran without covering a single input arrangement — raise maxProbes or narrow \
+             the enabled degrees"
+        ));
     }
 
     if capped {

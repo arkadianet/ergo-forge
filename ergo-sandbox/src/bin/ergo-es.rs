@@ -1134,9 +1134,9 @@ fn cmd_drain(args: &[String]) -> Result<(), String> {
         }
         if report.synthesis.thin_slices > 0 {
             println!(
-                "  THIN SLICES: {} shape slice(s) got fewer than {} probes (one \
-                 arrangement's decoy sweep) — they ran without covering a single input \
-                 arrangement",
+                "  THIN SLICES: {} shape(s) were cut off with under {} probes of room \
+                 (one arrangement's decoy sweep) — they ran without covering a single \
+                 input arrangement",
                 report.synthesis.thin_slices, report.synthesis.slice_floor
             );
         }
