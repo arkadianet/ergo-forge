@@ -73,6 +73,42 @@ it, and the positional substitution is closed. This is the same principle the
 USE **bank** already follows (it binds every box it touches by unique NFT), and
 why the bank was assessed as not vulnerable to this technique.
 
+## USE bank vault — funded target, corrected decode (2026-09-08)
+
+`use-bank-vault.json` is not a replay suite; it is the **checkable decode** of
+the still-funded vault (box `e6162e2aff23f7c88968cc958541bacfe3ad80d6541befb7231ac3106e966f8b`,
+292,615.109709675 ERG + the USE treasury, untouched since height 1,867,725).
+Landing it was the phase-2 spec's own gate — and it caught an error: the
+design doc's hand-decode of the whitelist (`OUTPUTS(0).tokens(2)._1`) was
+wrong on collection and index. The deployed tree asserts, mechanically
+(`ergo-sandbox/tests/vault_corpus.rs`):
+
+- the whitelist is **input-side**: `INPUTS(0).tokens(0)._1` ∈ {useFreeMint,
+  useArbitrageMint, usePayout, useUpdateNft};
+- the never-minted `dbf655…` dead branch reads `INPUTS(2).tokens(0)._1`;
+- a faithful continuation is required at `OUTPUTS(1)` (same script bytes,
+  `tokens(0)` id **and amount** pinned, `tokens(1)` id only — the treasury
+  amount is *not* pinned by the vault script itself);
+- the `useUpdateNft` route stands **alone**, outside the continuation guards
+  — which is exactly why the admin's P2PK box (needsProof) is the route the
+  hunt refuses by construction.
+- **The lint record.** `unbound-box-reserves` on the deployed tree says
+  **clean** — the vault has the NFT-binding shape the lint rewards — but
+  clean is not safe: the vault pins its successor's *identity*, not its
+  value (the treasury token is compared by id only, the successor's ERG
+  value not at all). A dust successor is permitted by the vault script
+  alone; every reserve guarantee is delegated to the three script
+  authorizers. That collapses the flagship question to a single sharper
+  one: **do `useFreeMint`/`useArbitrageMint`/`usePayout` constrain the
+  bank's value?** The empirical run needs those three companions; the admin
+  box contributes nothing.
+
+The tree re-serializes byte-identically and the fixture's `mirrorSource`
+compiles back to the same constants and proposition, so the decode is a fact
+about the wire bytes, not a reading. The flagship empirical run (are the
+three script authorizers satisfiable without a key?) is deliberately not
+pinned here yet — see the phase-2 spec's disclosure-first rule.
+
 ## How to run
 
 ```sh

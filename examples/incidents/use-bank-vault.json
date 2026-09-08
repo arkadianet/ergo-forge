@@ -1,0 +1,125 @@
+{
+ "recorded": "2026-09-08",
+ "what": "USE bank vault - the funded keyless-drain target, with the deployed contract decode. The phase-2 flagship rests on this decode; it is landed as a checkable fixture, not taken on trust from the design doc.",
+ "decode": {
+  "whitelist": {
+   "reads": "INPUTS(0).tokens(0)._1",
+   "nfts": [
+    {
+     "name": "useFreeMint",
+     "id": "40db16e1ed50b16077b19102390f36b41ca35c64af87426d04af3b9340859051"
+    },
+    {
+     "name": "useArbitrageMint",
+     "id": "c79bef6fe21c788546beab08c963999d5ef74151a9b7fd6c1843f626eea0ecf5"
+    },
+    {
+     "name": "usePayout",
+     "id": "a2482fca4ca774ef9d3896977e3677b031597c6e312b0c10d47157bb0d6ed69f"
+    },
+    {
+     "name": "useUpdateNft",
+     "id": "f77b3cac4f77a31aeffaf716070345b3b04330bbba02e27671015129fb74e883"
+    }
+   ]
+  },
+  "deadBranch": {
+   "reads": "INPUTS(2).tokens(0)._1",
+   "nft": "dbf655f0f6101cb03316e931a689412126fefbfb7c78bd9869ad6a1a58c1b424",
+   "note": "never minted; no input can carry it; the branch is dead"
+  },
+  "continuation": {
+   "reads": "OUTPUTS(1)",
+   "guards": [
+    "tokens(0) == SELF.tokens(0) (id AND amount - the bank NFT, amount pinned to 1)",
+    "propositionBytes == SELF.propositionBytes",
+    "tokens(1)._1 == SELF.tokens(1)._1 (the USE treasury id; the AMOUNT is NOT pinned)"
+   ]
+  },
+  "provenance": "Decompile of the deployed tree (byte-identical re-serialization) plus a round-trip proof: mirrorSource below compiles back to this tree's constants byte-for-byte and to the same proposition (modulo the implicit BoolToSigmaProp lift count, which differs between the deploying compiler and this workbench's compiler). CORRECTION: the phase-2 design doc's hand-decode ('OUTPUTS(0).tokens(2)._1' whitelist, dead branch at OUTPUTS(2)) was wrong on collection and index; the deployed contract checks the whitelist on the INPUT side at index 0 and requires the faithful continuation at OUTPUTS(1). Discovered while landing this fixture, per the fixture's purpose.",
+  "mirrorSource": "{\n  val cont = OUTPUTS(1)\n  val contTokens = cont.tokens\n  val selfTokens = SELF.tokens\n  val adminId = INPUTS(0).tokens(0)._1\n  contTokens(0) == selfTokens(0) &&\n  cont.propositionBytes == SELF.propositionBytes &&\n  contTokens(1)._1 == selfTokens(1)._1 &&\n  (adminId == fromBase16(\"40db16e1ed50b16077b19102390f36b41ca35c64af87426d04af3b9340859051\") ||\n   adminId == fromBase16(\"c79bef6fe21c788546beab08c963999d5ef74151a9b7fd6c1843f626eea0ecf5\") ||\n   INPUTS(2).tokens(0)._1 == fromBase16(\"dbf655f0f6101cb03316e931a689412126fefbfb7c78bd9869ad6a1a58c1b424\") ||\n   adminId == fromBase16(\"a2482fca4ca774ef9d3896977e3677b031597c6e312b0c10d47157bb0d6ed69f\") ||\n   adminId == fromBase16(\"f77b3cac4f77a31aeffaf716070345b3b04330bbba02e27671015129fb74e883\"))\n}"
+ },
+ "vault": {
+  "boxId": "e6162e2aff23f7c88968cc958541bacfe3ad80d6541befb7231ac3106e966f8b",
+  "ergoTree": "100e04020400040004000400040204020e2040db16e1ed50b16077b19102390f36b41ca35c64af87426d04af3b93408590510e20c79bef6fe21c788546beab08c963999d5ef74151a9b7fd6c1843f626eea0ecf5040404000e20dbf655f0f6101cb03316e931a689412126fefbfb7c78bd9869ad6a1a58c1b4240e20a2482fca4ca774ef9d3896977e3677b031597c6e312b0c10d47157bb0d6ed69f0e20f77b3cac4f77a31aeffaf716070345b3b04330bbba02e27671015129fb74e883d804d601b2a5730000d602db63087201d603db6308a7d6048cb2db6308b2a473010073020001d1ecededed93b27202730300b2720373040093c27201c2a7938cb27202730500018cb2720373060001ececec93720473079372047308938cb2db6308b2a4730900730a0001730b937204730c937204730d",
+  "value": 292615109709675,
+  "tokens": [
+   {
+    "id": "78c24bdf41283f45208664cd8eb78e2ffa7fbb29f26ebb43e6b31a46b3b975ae",
+    "amount": 1
+   },
+   {
+    "id": "a55b8735ed1a99e46c2c89f8994aacdf4b1109bdcf682f1e5b34479c6e392669",
+    "amount": 999999999857417104
+   }
+  ],
+  "creationHeight": 1867723,
+  "inclusionHeight": 1867725
+ },
+ "adminBox": {
+  "boxId": "1ee201520f4353b3d619ccbca8c5432f1ab2fa855db858bfca5f56cf989f4688",
+  "ergoTree": "0008cd03ff71c397ce77130349773ed64818e7c084845ba8b27fcd097ed989e063afc3d8",
+  "value": 2000000,
+  "tokens": [
+   {
+    "id": "f77b3cac4f77a31aeffaf716070345b3b04330bbba02e27671015129fb74e883",
+    "amount": 3
+   }
+  ],
+  "creationHeight": 1665352,
+  "inclusionHeight": 1665353
+ },
+ "authorizers": [
+  {
+   "name": "useFreeMint",
+   "boxId": "79b3fde556efddbc02a96018b7f6523273b94200cb16e5ee858e3a165fbe1126",
+   "ergoTree": "101d04020402040204020402040405c80104000404040005d00f04d00f040404000e2078c24bdf41283f45208664cd8eb78e2ffa7fbb29f26ebb43e6b31a46b3b975ae04000e204ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d4104000e206a2b821b5727e85beb5e78b4efb9f0250d59cd48481d2ded2c23e91ba1d07c6604000e20dcce07af04ea4f9b7979336476594dc16321547bcc9c6b95a67cb1a94192da4f04d005040a04d60f05000404050005c80105c401d812d601b2a4730000d602db63087201d603b2a5730100d604998cb27202730200028cb2db6308720373030002d605e4c6a70404d606db6501fed607b27206730400d608db63087207d6098cb2720873050002d60a9591a372059d72097306e4c6a70505d60bb27206730700d60cb2a4730800d60db2a5730900d60ee4c6720d0404d60f99c17203c17201d6109de4c6720b0405730ad611730bd61299c1b2a5730c00c1720cd1ededededededed907204720a938cb27202730d0001730e938cb27208730f00017310938cb2db6308720b731100017312938cb2db6308720c731300017314edededed93db6308720ddb6308a793c2720dc2a792c1720dc1a793e4c6720d050599720a72049590a3720593720e7205d801d6139aa37315ed92720e721390720e9a72137316eded92720f9c72049d9c72107e7317057e72110591720f7318ed9272129c72049d9c72107e7319057e721105917212731a919c9dc172077209731b9c7210731c",
+   "value": 1000000000,
+   "tokens": [
+    {
+     "id": "40db16e1ed50b16077b19102390f36b41ca35c64af87426d04af3b9340859051",
+     "amount": 1
+    }
+   ],
+   "creationHeight": 1867723,
+   "inclusionHeight": 1867725
+  },
+  {
+   "name": "useArbitrageMint",
+   "boxId": "46adbcec741acaba4e371e6b756800b345381e7e0cb9692f3f5144fcf1cbe843",
+   "ergoTree": "1020040404020404040005d00f04d00f04d60f04040402040204020402040404000404043c05c80104ca0104000e2078c24bdf41283f45208664cd8eb78e2ffa7fbb29f26ebb43e6b31a46b3b975ae04000e204ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d4104000e20dcce07af04ea4f9b7979336476594dc16321547bcc9c6b95a67cb1a94192da4f04000e206a2b821b5727e85beb5e78b4efb9f0250d59cd48481d2ded2c23e91ba1d07c6604000e20fec586b8d7b92b336a5fea060556cbb4ced15d5334dcb7ca9f9a7bb6ca866c42043c040a05000500d817d601db6501fed602b27201730000d603b27201730100d604c17203d605db63087203d6068cb2720573020002d607b27201730300d6089de4c6720704057304d6097305d60a9d9c72087e7306057e720905d60b9d9c72087e7307057e720905d60c9a720a720bd60db2a4730800d60edb6308720dd60fb2a5730900d610998cb2720e730a00028cb2db6308720f730b0002d611e4c6a70404d6129591a372119d9972049c720c7206720ce4c6a70505d613b2a4730c00d614b2a5730d00d615e4c672140404d61699c1720fc1720dd61799c1b2a5730e00c17213d1ededededededededed8fe4c67202070499a3730f919c9d7204720673109c7e731105720c9072107212938cb2720e731200017313938cb27205731400017315938cb2db63087213731600017317938cb2db63087207731800017319938cb2db63087202731a0001731bedededed93db63087214db6308a793c27214c2a792c17214c1a793e4c67214050599721272109590a372119372157211d801d6189aa3731ced92721572189072159a7218731deded9272169c7210720a917216731eed9272179c7210720b917217731f",
+   "value": 1000000000,
+   "tokens": [
+    {
+     "id": "c79bef6fe21c788546beab08c963999d5ef74151a9b7fd6c1843f626eea0ecf5",
+     "amount": 1
+    }
+   ],
+   "creationHeight": 1867386,
+   "inclusionHeight": 1867387
+  },
+  {
+   "name": "usePayout",
+   "boxId": "7c5beb36ebb7373f049da8c8688ac6a8240cb7a53bb03b776e06b1512f6e58e4",
+   "ergoTree": "101204020402040004040400040a04000e20dcce07af04ea4f9b7979336476594dc16321547bcc9c6b95a67cb1a94192da4f05d00f058080a0f6f4acdbe01b04020518050005d00f040404e04e04000e206a2b821b5727e85beb5e78b4efb9f0250d59cd48481d2ded2c23e91ba1d07c66d808d601b2a5730000d602b2a4730100d603db63087202d604b2a5730200d605b2a4730300d606b2db6501fe730400d607c17202d608997207c17201d1ededed93db630872017203ededed93c27204c2a793db63087204db6308a792c17204c1a792e4c67204040499a37305ededed938cb2db630872057306000173078f9c9c9de4c67206040573089973098cb27203730a0002730b7207eded917208730c9072089d7207730d9399c1b2a5730e00c172057208909ae4c6a70404730fa3938cb2db63087206731000017311",
+   "value": 10000000000,
+   "tokens": [
+    {
+     "id": "a2482fca4ca774ef9d3896977e3677b031597c6e312b0c10d47157bb0d6ed69f",
+     "amount": 1
+    }
+   ],
+   "creationHeight": 1668384,
+   "inclusionHeight": 1668385
+  }
+ ],
+ "deployedTree": "100e04020400040004000400040204020e2040db16e1ed50b16077b19102390f36b41ca35c64af87426d04af3b93408590510e20c79bef6fe21c788546beab08c963999d5ef74151a9b7fd6c1843f626eea0ecf5040404000e20dbf655f0f6101cb03316e931a689412126fefbfb7c78bd9869ad6a1a58c1b4240e20a2482fca4ca774ef9d3896977e3677b031597c6e312b0c10d47157bb0d6ed69f0e20f77b3cac4f77a31aeffaf716070345b3b04330bbba02e27671015129fb74e883d804d601b2a5730000d602db63087201d603db6308a7d6048cb2db6308b2a473010073020001d1ecededed93b27202730300b2720373040093c27201c2a7938cb27202730500018cb2720373060001ececec93720473079372047308938cb2db6308b2a4730900730a0001730b937204730c937204730d",
+ "lint": {
+  "lint": "unbound-box-reserves",
+  "verdict": "clean",
+  "findings": [],
+  "ranOn": "the deployed tree's decompiled proposition, recompiled at treeVersion 3 and audited (audit::audit, Completeness::Complete)",
+  "recorded": "2026-09-08",
+  "note": "CLEAN IS NOT SAFE. The lint keys on reserve math with positional box reads and NFT-binding fixes; the vault HAS the NFT-binding shape (OUTPUTS(1) pins the script bytes and the bank NFT's id AND amount), so it passes. What the lint does not check - and what the vault script leaves unpinned - is the successor's ERG value and the treasury token's AMOUNT (tokens(1) is compared by id only). The vault's own script therefore permits a dust successor carrying the bank NFT and one treasury token: every reserve guarantee is delegated to the three script authorizers. This is the sharpened flagship question: do useFreeMint/useArbitrageMint/usePayout constrain the bank's value? The empirical run needs those three companions as inputs (the admin box is P2PK and refused by the gate, so it contributes nothing)."
+ }
+}
