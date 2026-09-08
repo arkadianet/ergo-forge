@@ -407,6 +407,19 @@ mod synthesis {
             serde_json::to_value(&explicit_zero.best).unwrap()
         );
         assert_eq!(explicit_zero.synthesis.caps.max_new_outputs, 0);
+
+        // An explicit cap alone is NOT a degree: with every degree off the
+        // block is inactive, no shape beyond `none` exists, and the report
+        // is phase 1's — byte for byte.
+        let cap_only = drain(with_synthesis(
+            minimal_request(),
+            json!({ "maxNewOutputs": 2 }),
+        ));
+        assert_eq!(
+            serde_json::to_value(&cap_only).unwrap(),
+            a,
+            "an inactive block with an explicit cap must be byte-identical to phase 1"
+        );
     }
 
     /// Truncation is the normal case, so the pinned axis order decides which

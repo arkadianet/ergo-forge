@@ -218,22 +218,26 @@ without the decode:
    both fixture and answer key.
 
     **Sources for the whitelist shape** — this spec's flagship hangs on it,
-    so the provenance is stated: the vault box
+    so the provenance is stated. The vault box
     `e6162e2aff23f7c88968cc958541bacfe3ad80d6541befb7231ac3106e966f8b`
-    (carried by the merged map fixture `use-lp.json`), whose deployed
-    ErgoTree constants were hand-decoded during the incident response — the
-    four NFT constants and the dead `dbf655…` branch at `OUTPUTS(2)` are
-    visible in the tree's constant block, and the drain analysis in the
-    incident report records the decode. **Do not confuse this with**
-    `examples/contracts/dexy/bank/bank.es`, the DexyGold fork's bank, which
-    checks `INPUTS(mintInIndex).tokens(0)._1` — an input-side, index-0
-    check; a different contract. Implementation must land the vault's
-    deployed tree as a corpus fixture so the asserted whitelist shape is
-    checkable, not taken on trust from this document.
+    (carried by the merged map fixture `use-lp.json`) had its ErgoTree
+    constants hand-decoded during the incident response, and that hand-decode
+    was **wrong**: it read the whitelist at `OUTPUTS(0).tokens(2)._1` with a
+    dead `dbf655…` branch at `OUTPUTS(2)`. Landing the corpus fixture
+    (implementation, 2026-09-08) corrected it from the wire bytes — the
+    deployed tree re-serializes byte-identically and a mirror source compiles
+    back to the same constants and proposition — and the decode below is the
+    normative one. (The correction also retires this document's warning about
+    `examples/contracts/dexy/bank/bank.es`, the DexyGold fork's bank: the
+    deployed USE vault checks **`INPUTS(0).tokens(0)._1`** — an input-side,
+    index-0 whitelist — exactly the shape that warning called "a different
+    contract".) Implementation landed the vault's deployed tree as
+    `examples/incidents/use-bank-vault.json` with
+    `ergo-sandbox/tests/vault_corpus.rs` asserting the shape mechanically, so
+    the whitelist is checkable, not taken on trust from any document.
 
-    **CORRECTED by implementation (2026-09-08, the fixture doing its job):**
-    landing the corpus fixture showed the hand-decode above was wrong on
-    collection and index. The deployed tree's whitelist is **input-side** —
+    **The corrected decode, normative:** the deployed tree's whitelist is
+    **input-side** —
     `INPUTS(0).tokens(0)._1` ∈ {useFreeMint, useArbitrageMint, usePayout,
     useUpdateNft} — with the never-minted `dbf655…` dead branch at
     `INPUTS(2).tokens(0)._1`, and it requires a faithful continuation at

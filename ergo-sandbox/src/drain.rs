@@ -185,18 +185,14 @@ impl Synthesis {
     }
 
     /// The resolved synthesized-output cap: explicit, or the spec default
-    /// when the block is active, else 0 (nothing is synthesized).
+    /// when the block is active, else 0 (nothing is synthesized). An
+    /// inactive block resolves to 0 even with an explicit cap — a cap is
+    /// not a degree, and only degrees turn shapes on.
     pub fn resolved_max_new_outputs(&self) -> usize {
-        match self.max_new_outputs {
-            Some(n) => n,
-            None => {
-                if self.active() {
-                    DEFAULT_MAX_NEW_OUTPUTS
-                } else {
-                    0
-                }
-            }
+        if !self.active() {
+            return 0;
         }
+        self.max_new_outputs.unwrap_or(DEFAULT_MAX_NEW_OUTPUTS)
     }
 }
 
@@ -725,6 +721,9 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                         match realize_outputs(req, &realized_inputs, payout, &attacker_tree) {
                             Some(o) => {
                                 let flags = vec![false; o.len()];
+                                if syn_enabled {
+                                    shape_tallies[point.shape_index].generated += 1;
+                                }
                                 (o, flags)
                             }
                             None => {
@@ -2268,6 +2267,12 @@ mod tests {
             "splits": false, "mints": false, "permuteOutputs": false
         }))
         .expect("parses");
+        assert!(!syn.active());
+        assert_eq!(syn.resolved_max_new_outputs(), 0);
+
+        // An explicit cap alone is not a degree: an inactive block never
+        // synthesizes, whatever cap it names.
+        let syn: Synthesis = serde_json::from_value(json!({ "maxNewOutputs": 2 })).expect("parses");
         assert!(!syn.active());
         assert_eq!(syn.resolved_max_new_outputs(), 0);
 
