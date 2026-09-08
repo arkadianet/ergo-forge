@@ -1,0 +1,1206 @@
+{
+ "formatVersion": 1,
+ "note": "Phase-2.5 mutation corpus. See docs/superpowers/specs/2026-09-08-mutation-corpus-design.md. proven=true mutants carry a witness validated by txcheck before the hunt runs; they form the detection-rate denominator. unproven mutants are reported, never in the denominator.",
+ "caps": {
+  "maxProbes": 50000,
+  "maxPermutations": 120,
+  "synthesis": {
+   "maxNewOutputs": 2,
+   "companionRecreations": true,
+   "successorStates": true,
+   "splits": true,
+   "mints": true,
+   "permuteOutputs": true,
+   "maxOutputPermutations": 24
+  },
+  "note": "one cap policy for the whole corpus; caps are part of the measurement"
+ },
+ "mutants": [
+  {
+   "id": "M1",
+   "contract": "vesting",
+   "operator": "weaken-comparison",
+   "defect": "the linear-vesting remainder guard no longer binds value: everything drains in one draw",
+   "params": {
+    "beneficiary": {
+     "type": "SigmaProp",
+     "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+    },
+    "startHeight": {
+     "type": "Int",
+     "value": 1000
+    },
+    "endHeight": {
+     "type": "Int",
+     "value": 2000
+    }
+   },
+   "diff": {
+    "find": "remainder.value >= total - vested",
+    "replace": "remainder.value >= 0L"
+   },
+   "mutatedSource": "/**\n * Release funds to someone gradually between two dates. Before the start\n * nothing can be taken; in between they may withdraw the vested share, and\n * the rest stays locked; after the end everything is theirs.\n * @param beneficiary Who receives the funds? \u2014 Their Ergo address.\n * @param startHeight When does vesting start? \u2014 Nothing vests before this.\n * @param endHeight When has everything vested? \u2014 After this they may take it all.\n */\n@contract def vesting(beneficiary: SigmaProp, startHeight: Int, endHeight: Int) = {\n  val total = SELF.value\n  val span = (endHeight - startHeight).toLong\n  val elapsed = (HEIGHT - startHeight).toLong\n  val fullyVested = HEIGHT >= endHeight\n  // Vested share so far, in nanoERG (linear between start and end).\n  val vested = if (fullyVested) total else if (HEIGHT < startHeight) 0L else total * elapsed / span\n  val remainder = OUTPUTS(0)\n  val keepsRest = remainder.propositionBytes == SELF.propositionBytes &&\n                  remainder.value >= 0L &&\n                  remainder.tokens.size == 0 && remainder.R4[Int].isDefined == false\n  beneficiary && sigmaProp(fullyVested || keepsRest)\n}\n",
+   "roles": {
+    "protected": [
+     {
+      "index": 0,
+      "why": "the vesting box; its value must not leave"
+     }
+    ],
+    "attacker": [
+     {
+      "index": 1,
+      "why": "the beneficiary's own funding box (the drain needs no key: the residual is a bool)"
+     }
+    ]
+   },
+   "template": {
+    "inputs": [
+     {
+      "roleRef": "protected",
+      "value": 10000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 100,
+      "tokens": [
+       {
+        "id": "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv",
+        "amount": 1
+       }
+      ]
+     },
+     {
+      "roleRef": "attacker",
+      "value": 2000000,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 1
+     }
+    ],
+    "outputs": [
+     {
+      "payee": "fixed",
+      "value": 2000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 5001
+     },
+     {
+      "roleRef": "free",
+      "value": 0,
+      "ergoTree": "10010101d17300"
+     }
+    ],
+    "height": 5000
+   },
+   "extraTrees": {},
+   "proven": false,
+   "witness": {
+    "note": "hand-built from the honest template; validates; input0 needsProof = keyless residual; input1 = attacker's own box",
+    "extracted": {
+     "nanoErg": "10000000000"
+    }
+   },
+   "missHint": null,
+   "witnessTx": {
+    "height": 5000,
+    "inputs": [
+     {
+      "value": 10000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 100
+     },
+     {
+      "value": 2000000,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 1
+     }
+    ],
+    "outputs": [
+     {
+      "value": 2000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 5001
+     },
+     {
+      "value": 10000000000,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 5000
+     }
+    ]
+   },
+   "witnessNote": "the guard-deleted vesting box re-built at dust; 9.998 ERG keyless",
+   "labellingNote": "the vesting box carries a synthetic singleton (vvvv\u2026) so the hunt can bind the protected box; the contract itself checks no tokens and the honest successor carries none (tokens.size == 0), so the singleton is released in any spend \u2014 including the honest one",
+   "attackerModel": "keyed-insider",
+   "keyedNote": "exploitable only by the beneficiary: the residual is `beneficiary && sigmaProp(...)` \u2014 needsProof on the protected input. The keyless hunt refuses it by design; this is an insider-drain class the hunt does not model (phase 3+ attacker-model work).",
+   "originalSource": "/**\n * Release funds to someone gradually between two dates. Before the start\n * nothing can be taken; in between they may withdraw the vested share, and\n * the rest stays locked; after the end everything is theirs.\n * @param beneficiary Who receives the funds? \u2014 Their Ergo address.\n * @param startHeight When does vesting start? \u2014 Nothing vests before this.\n * @param endHeight When has everything vested? \u2014 After this they may take it all.\n */\n@contract def vesting(beneficiary: SigmaProp, startHeight: Int, endHeight: Int) = {\n  val total = SELF.value\n  val span = (endHeight - startHeight).toLong\n  val elapsed = (HEIGHT - startHeight).toLong\n  val fullyVested = HEIGHT >= endHeight\n  // Vested share so far, in nanoERG (linear between start and end).\n  val vested = if (fullyVested) total else if (HEIGHT < startHeight) 0L else total * elapsed / span\n  val remainder = OUTPUTS(0)\n  val keepsRest = remainder.propositionBytes == SELF.propositionBytes &&\n                  remainder.value >= total - vested &&\n                  remainder.tokens.size == 0 && remainder.R4[Int].isDefined == false\n  beneficiary && sigmaProp(fullyVested || keepsRest)\n}\n"
+  },
+  {
+   "id": "M2",
+   "contract": "subscription",
+   "operator": "weaken-comparison",
+   "defect": "the pot-kept guard passes at dust: the receiver drains the pot through repeated claims",
+   "params": {
+    "receiver": {
+     "type": "SigmaProp",
+     "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+    },
+    "funder": {
+     "type": "SigmaProp",
+     "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+    },
+    "amount": {
+     "type": "Long",
+     "value": 100
+    },
+    "periodBlocks": {
+     "type": "Int",
+     "value": 720
+    }
+   },
+   "diff": {
+    "find": "OUTPUTS(1).value >= SELF.value - amount",
+    "replace": "OUTPUTS(1).value >= 0L"
+   },
+   "mutatedSource": "/**\n * Pay someone a fixed amount at most once every so many blocks, from a\n * pot you fund up front. The receiver claims one payment per period; the\n * rest stays in the pot. You can take back whatever is left at any time.\n * @param receiver Who gets paid? \u2014 Their Ergo address.\n * @param funder Who funded the pot and may cancel? \u2014 Your own address.\n * @param amount How much per payment, in nanoERG \u2014 1 ERG = 1,000,000,000 nanoERG.\n * @param periodBlocks How many blocks between payments? \u2014 About 720 per day, 21,600 per month.\n */\n@contract def subscription(receiver: SigmaProp, funder: SigmaProp, amount: Long, periodBlocks: Int) = {\n  // R4 of the pot records the height of the last claim (absent = never).\n  val lastClaim = SELF.R4[Int].getOrElse(0)\n  val due = HEIGHT >= lastClaim + periodBlocks\n  val payment = OUTPUTS(0)\n  val paidReceiver = payment.propositionBytes == receiver.propBytes && payment.value >= amount\n  val potKept = OUTPUTS.size > 1 &&\n                OUTPUTS(1).propositionBytes == SELF.propositionBytes &&\n                OUTPUTS(1).value >= 0L &&\n                OUTPUTS(1).R4[Int].getOrElse(0) == HEIGHT\n  val lastPayment = SELF.value <= amount && payment.propositionBytes == receiver.propBytes && payment.value >= SELF.value\n  funder || (receiver && sigmaProp(due && ((paidReceiver && potKept) || lastPayment)))\n}\n",
+   "roles": {
+    "protected": [
+     {
+      "index": 0,
+      "why": "the subscription pot"
+     }
+    ],
+    "attacker": [
+     {
+      "index": 1,
+      "why": "the receiver's own box (the receiver is the drain's principal)"
+     }
+    ]
+   },
+   "template": {
+    "inputs": [
+     {
+      "roleRef": "protected",
+      "value": 10000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 100,
+      "registers": {
+       "R4": {
+        "type": "Int",
+        "value": 100
+       }
+      },
+      "tokens": [
+       {
+        "id": "7777777777777777777777777777777777777777777777777777777777777777",
+        "amount": 1
+       }
+      ]
+     },
+     {
+      "roleRef": "attacker",
+      "value": 2000000,
+      "ergoTree": "p2pk-receiver",
+      "creationHeight": 1
+     }
+    ],
+    "outputs": [
+     {
+      "roleRef": "freePayment",
+      "value": 1000000000,
+      "ergoTree": "p2pk-receiver"
+     },
+     {
+      "roleRef": "fixed",
+      "value": 0,
+      "ergoTree": "$mutant",
+      "creationHeight": 5001,
+      "registers": {
+       "R4": {
+        "type": "Int",
+        "value": 5000
+       }
+      }
+     },
+     {
+      "roleRef": "free",
+      "value": 0,
+      "ergoTree": "10010101d17300"
+     }
+    ],
+    "height": 5000
+   },
+   "extraTrees": {},
+   "proven": false,
+   "witness": {
+    "note": "receiver claims 1 payment, pot successor keeps DRAIN_KEEP_VALUE dust; receiver = attacker's own key (needsProof accepted on attacker boxes)",
+    "extracted": {
+     "nanoErg": "8998000000"
+    }
+   },
+   "missHint": null,
+   "witnessTx": {
+    "height": 5000,
+    "inputs": [
+     {
+      "value": 10000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 100,
+      "additionalRegisters": {
+       "R4": "04c0cf24"
+      }
+     },
+     {
+      "value": 2000000,
+      "ergoTree": "p2pk-receiver",
+      "creationHeight": 1
+     }
+    ],
+    "outputs": [
+     {
+      "value": 1000000000,
+      "ergoTree": "p2pk-receiver"
+     },
+     {
+      "value": 2000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 5001,
+      "additionalRegisters": {
+       "R4": "04904e"
+      }
+     },
+     {
+      "value": 9000000000,
+      "ergoTree": "p2pk-receiver"
+     }
+    ]
+   },
+   "witnessNote": "receiver claims 1ERG + sweeps the pot minus dust; needsProof on both inputs (protocol residual + own key)",
+   "labellingNote": "the pot carries a synthetic singleton (7777\u2026) so the hunt can bind the protected box; the subscription contract checks no tokens, so carrying it is semantics-neutral",
+   "attackerModel": "keyed-insider",
+   "keyedNote": "exploitable only by the receiver: the residual is `funder || (receiver && ...)` \u2014 needsProof on the pot. Insider drain, outside the keyless model.",
+   "originalSource": "/**\n * Pay someone a fixed amount at most once every so many blocks, from a\n * pot you fund up front. The receiver claims one payment per period; the\n * rest stays in the pot. You can take back whatever is left at any time.\n * @param receiver Who gets paid? \u2014 Their Ergo address.\n * @param funder Who funded the pot and may cancel? \u2014 Your own address.\n * @param amount How much per payment, in nanoERG \u2014 1 ERG = 1,000,000,000 nanoERG.\n * @param periodBlocks How many blocks between payments? \u2014 About 720 per day, 21,600 per month.\n */\n@contract def subscription(receiver: SigmaProp, funder: SigmaProp, amount: Long, periodBlocks: Int) = {\n  // R4 of the pot records the height of the last claim (absent = never).\n  val lastClaim = SELF.R4[Int].getOrElse(0)\n  val due = HEIGHT >= lastClaim + periodBlocks\n  val payment = OUTPUTS(0)\n  val paidReceiver = payment.propositionBytes == receiver.propBytes && payment.value >= amount\n  val potKept = OUTPUTS.size > 1 &&\n                OUTPUTS(1).propositionBytes == SELF.propositionBytes &&\n                OUTPUTS(1).value >= SELF.value - amount &&\n                OUTPUTS(1).R4[Int].getOrElse(0) == HEIGHT\n  val lastPayment = SELF.value <= amount && payment.propositionBytes == receiver.propBytes && payment.value >= SELF.value\n  funder || (receiver && sigmaProp(due && ((paidReceiver && potKept) || lastPayment)))\n}\n"
+  },
+  {
+   "id": "M3",
+   "contract": "subscription",
+   "operator": "flip-index",
+   "defect": "the pot-kept guard reads the payment output; the pot successor is unconstrained",
+   "params": {
+    "receiver": {
+     "type": "SigmaProp",
+     "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+    },
+    "funder": {
+     "type": "SigmaProp",
+     "value": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+    },
+    "amount": {
+     "type": "Long",
+     "value": 100
+    },
+    "periodBlocks": {
+     "type": "Int",
+     "value": 720
+    }
+   },
+   "diff": {
+    "find": "OUTPUTS(1).value >= SELF.value - amount",
+    "replace": "OUTPUTS(0).value >= SELF.value - amount"
+   },
+   "mutatedSource": "/**\n * Pay someone a fixed amount at most once every so many blocks, from a\n * pot you fund up front. The receiver claims one payment per period; the\n * rest stays in the pot. You can take back whatever is left at any time.\n * @param receiver Who gets paid? \u2014 Their Ergo address.\n * @param funder Who funded the pot and may cancel? \u2014 Your own address.\n * @param amount How much per payment, in nanoERG \u2014 1 ERG = 1,000,000,000 nanoERG.\n * @param periodBlocks How many blocks between payments? \u2014 About 720 per day, 21,600 per month.\n */\n@contract def subscription(receiver: SigmaProp, funder: SigmaProp, amount: Long, periodBlocks: Int) = {\n  // R4 of the pot records the height of the last claim (absent = never).\n  val lastClaim = SELF.R4[Int].getOrElse(0)\n  val due = HEIGHT >= lastClaim + periodBlocks\n  val payment = OUTPUTS(0)\n  val paidReceiver = payment.propositionBytes == receiver.propBytes && payment.value >= amount\n  val potKept = OUTPUTS.size > 1 &&\n                OUTPUTS(1).propositionBytes == SELF.propositionBytes &&\n                OUTPUTS(0).value >= SELF.value - amount &&\n                OUTPUTS(1).R4[Int].getOrElse(0) == HEIGHT\n  val lastPayment = SELF.value <= amount && payment.propositionBytes == receiver.propBytes && payment.value >= SELF.value\n  funder || (receiver && sigmaProp(due && ((paidReceiver && potKept) || lastPayment)))\n}\n",
+   "roles": {
+    "protected": [
+     {
+      "index": 0,
+      "why": "the subscription pot"
+     }
+    ],
+    "attacker": [
+     {
+      "index": 1,
+      "why": "the receiver's own box"
+     }
+    ]
+   },
+   "template": {
+    "inputs": [
+     {
+      "roleRef": "protected",
+      "value": 10000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 100,
+      "registers": {
+       "R4": {
+        "type": "Int",
+        "value": 100
+       }
+      },
+      "tokens": [
+       {
+        "id": "7777777777777777777777777777777777777777777777777777777777777777",
+        "amount": 1
+       }
+      ]
+     },
+     {
+      "roleRef": "attacker",
+      "value": 2000000,
+      "ergoTree": "p2pk-receiver",
+      "creationHeight": 1
+     }
+    ],
+    "outputs": [
+     {
+      "roleRef": "freePayment",
+      "value": 1000000000,
+      "ergoTree": "p2pk-receiver"
+     },
+     {
+      "roleRef": "fixed",
+      "value": 0,
+      "ergoTree": "$mutant",
+      "creationHeight": 5001,
+      "registers": {
+       "R4": {
+        "type": "Int",
+        "value": 5000
+       }
+      }
+     },
+     {
+      "roleRef": "free",
+      "value": 0,
+      "ergoTree": "10010101d17300"
+     }
+    ],
+    "height": 5000
+   },
+   "extraTrees": {},
+   "proven": false,
+   "witness": {
+    "note": "OUTPUTS(0) is both the payment and the guard target; the pot successor carries dust with R4 stamped",
+    "extracted": {
+     "nanoErg": "7998000000"
+    }
+   },
+   "missHint": null,
+   "witnessTx": {
+    "height": 5000,
+    "inputs": [
+     {
+      "value": 10000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 100,
+      "additionalRegisters": {
+       "R4": "04c0cf24"
+      }
+     },
+     {
+      "value": 2000000,
+      "ergoTree": "p2pk-receiver",
+      "creationHeight": 1
+     }
+    ],
+    "outputs": [
+     {
+      "value": 2000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 5001,
+      "additionalRegisters": {
+       "R4": "04904e"
+      }
+     },
+     {
+      "value": 10000000000,
+      "ergoTree": "p2pk-receiver"
+     }
+    ]
+   },
+   "witnessNote": "OUTPUTS(0) satisfies both the payment and the (mis-indexed) guard; pot successor dust",
+   "labellingNote": "the pot carries a synthetic singleton (7777\u2026) so the hunt can bind the protected box; the subscription contract checks no tokens, so carrying it is semantics-neutral",
+   "attackerModel": "keyed-insider",
+   "keyedNote": "same as M2: the receiver-keyed residual.",
+   "originalSource": "/**\n * Pay someone a fixed amount at most once every so many blocks, from a\n * pot you fund up front. The receiver claims one payment per period; the\n * rest stays in the pot. You can take back whatever is left at any time.\n * @param receiver Who gets paid? \u2014 Their Ergo address.\n * @param funder Who funded the pot and may cancel? \u2014 Your own address.\n * @param amount How much per payment, in nanoERG \u2014 1 ERG = 1,000,000,000 nanoERG.\n * @param periodBlocks How many blocks between payments? \u2014 About 720 per day, 21,600 per month.\n */\n@contract def subscription(receiver: SigmaProp, funder: SigmaProp, amount: Long, periodBlocks: Int) = {\n  // R4 of the pot records the height of the last claim (absent = never).\n  val lastClaim = SELF.R4[Int].getOrElse(0)\n  val due = HEIGHT >= lastClaim + periodBlocks\n  val payment = OUTPUTS(0)\n  val paidReceiver = payment.propositionBytes == receiver.propBytes && payment.value >= amount\n  val potKept = OUTPUTS.size > 1 &&\n                OUTPUTS(1).propositionBytes == SELF.propositionBytes &&\n                OUTPUTS(1).value >= SELF.value - amount &&\n                OUTPUTS(1).R4[Int].getOrElse(0) == HEIGHT\n  val lastPayment = SELF.value <= amount && payment.propositionBytes == receiver.propBytes && payment.value >= SELF.value\n  funder || (receiver && sigmaProp(due && ((paidReceiver && potKept) || lastPayment)))\n}\n"
+  },
+  {
+   "id": "M4",
+   "contract": "token-sale",
+   "operator": "weaken-comparison",
+   "defect": "the price guard is gone: the whole stock is sold for dust (soldOut path)",
+   "params": {
+    "seller": {
+     "type": "SigmaProp",
+     "value": "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+    },
+    "tokenId": {
+     "type": "Coll[Byte]",
+     "value": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    },
+    "pricePerToken": {
+     "type": "Long",
+     "value": 1000000
+    }
+   },
+   "diff": {
+    "find": "payment.value >= sold * pricePerToken",
+    "replace": "payment.value >= 0L"
+   },
+   "mutatedSource": "/**\n * Sell tokens at a fixed price. Buyers may take some or all of the tokens\n * as long as you are paid for what they take; unsold tokens stay for sale.\n * You can cancel and take everything back at any time.\n * @param seller Who receives the payments? \u2014 Your Ergo address.\n * @param tokenId Which token are you selling? \u2014 The token id (64 characters), from your wallet or an explorer.\n * @param pricePerToken Price per token, in nanoERG \u2014 1 ERG = 1,000,000,000 nanoERG.\n */\n@contract def tokenSale(seller: SigmaProp, tokenId: Coll[Byte], pricePerToken: Long) = {\n  val forSale = SELF.tokens(0)\n  val stock = if (forSale._1 == tokenId) forSale._2 else 0L\n  val payment = OUTPUTS(0)\n  val restStock =\n    if (OUTPUTS.size > 1 && OUTPUTS(1).tokens.size > 0 && OUTPUTS(1).tokens(0)._1 == tokenId) OUTPUTS(1).tokens(0)._2\n    else 0L\n  val sold = stock - restStock\n  val paid = payment.propositionBytes == seller.propBytes && payment.value >= 0L\n  val restKept = OUTPUTS.size > 1 &&\n                 OUTPUTS(1).propositionBytes == SELF.propositionBytes &&\n                 OUTPUTS(1).value >= SELF.value\n  val partial = sold > 0L && sold < stock && paid && restKept\n  val soldOut = sold == stock && stock > 0L && paid\n  seller || sigmaProp(partial || soldOut)\n}\n",
+   "roles": {
+    "protected": [
+     {
+      "index": 0,
+      "why": "the sale box (stock)"
+     }
+    ],
+    "attacker": [
+     {
+      "index": 1,
+      "why": "the buyer's box"
+     }
+    ]
+   },
+   "template": {
+    "inputs": [
+     {
+      "roleRef": "protected",
+      "value": 1000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "amount": 10
+       }
+      ]
+     },
+     {
+      "roleRef": "attacker",
+      "value": 2000000,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 1
+     }
+    ],
+    "outputs": [
+     {
+      "roleRef": "freePayment",
+      "value": 0,
+      "ergoTree": "p2pk-seller"
+     },
+     {
+      "roleRef": "fixedRest",
+      "value": 0,
+      "ergoTree": "$mutant",
+      "tokens": [
+       {
+        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "amount": 0
+       }
+      ]
+     },
+     {
+      "roleRef": "free",
+      "value": 0,
+      "ergoTree": "10010101d17300"
+     }
+    ],
+    "height": 500
+   },
+   "extraTrees": {},
+   "proven": true,
+   "witness": {
+    "note": "sold=stock=10, paid passes at 1 nanoERG, soldOut returns the stock to the sale box; the ERG leaves to the attacker payee",
+    "extracted": {
+     "nanoErg": "2999998"
+    }
+   },
+   "missHint": null,
+   "witnessTx": {
+    "height": 500,
+    "inputs": [
+     {
+      "value": 1000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "amount": 10
+       }
+      ]
+     },
+     {
+      "value": 2000000,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 1
+     }
+    ],
+    "outputs": [
+     {
+      "value": 1,
+      "ergoTree": "p2pk-seller"
+     },
+     {
+      "value": 1,
+      "ergoTree": "$mutant",
+      "tokens": [
+       {
+        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "amount": 10
+       }
+      ]
+     },
+     {
+      "value": 2999998,
+      "ergoTree": "10010101d17300"
+     }
+    ]
+   },
+   "witnessNote": "soldOut at 1 nanoERG: stock returns to the sale box, the sale's ERG leaves",
+   "originalSource": "/**\n * Sell tokens at a fixed price. Buyers may take some or all of the tokens\n * as long as you are paid for what they take; unsold tokens stay for sale.\n * You can cancel and take everything back at any time.\n * @param seller Who receives the payments? \u2014 Your Ergo address.\n * @param tokenId Which token are you selling? \u2014 The token id (64 characters), from your wallet or an explorer.\n * @param pricePerToken Price per token, in nanoERG \u2014 1 ERG = 1,000,000,000 nanoERG.\n */\n@contract def tokenSale(seller: SigmaProp, tokenId: Coll[Byte], pricePerToken: Long) = {\n  val forSale = SELF.tokens(0)\n  val stock = if (forSale._1 == tokenId) forSale._2 else 0L\n  val payment = OUTPUTS(0)\n  val restStock =\n    if (OUTPUTS.size > 1 && OUTPUTS(1).tokens.size > 0 && OUTPUTS(1).tokens(0)._1 == tokenId) OUTPUTS(1).tokens(0)._2\n    else 0L\n  val sold = stock - restStock\n  val paid = payment.propositionBytes == seller.propBytes && payment.value >= sold * pricePerToken\n  val restKept = OUTPUTS.size > 1 &&\n                 OUTPUTS(1).propositionBytes == SELF.propositionBytes &&\n                 OUTPUTS(1).value >= SELF.value\n  val partial = sold > 0L && sold < stock && paid && restKept\n  val soldOut = sold == stock && stock > 0L && paid\n  seller || sigmaProp(partial || soldOut)\n}\n"
+  },
+  {
+   "id": "M5",
+   "contract": "bank (AgeUSD shape)",
+   "operator": "delete-nft-check",
+   "defect": "the bank successor no longer must carry the bank NFT: the attacker walks the box identity out the door (a junk token takes tokens(0)'s place)",
+   "params": {
+    "oracleNft": {
+     "type": "Coll[Byte]",
+     "value": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    },
+    "minRatioPercent": {
+     "type": "Int",
+     "value": 400
+    },
+    "maxRatioPercent": {
+     "type": "Int",
+     "value": 800
+    },
+    "feePercent": {
+     "type": "Int",
+     "value": 2
+    },
+    "rcDefaultPrice": {
+     "type": "Long",
+     "value": 1000000
+    }
+   },
+   "diff": {
+    "find": "      successor.tokens(0) == SELF.tokens(0) &&\n",
+    "replace": ""
+   },
+   "mutatedSource": "// A reserve-backed stablecoin bank (the shape of AgeUSD / SigmaUSD, in one\n// script). The bank box holds:\n//   value      the ERG reserve\n//   tokens(0)  the bank NFT\n//   tokens(1)  stablecoins (SC) not yet in circulation\n//   tokens(2)  reserve coins (RC) not yet in circulation\n//   R4[Long]   SC in circulation      R5[Long]   RC in circulation\n// The oracle box (data input 0, identified by its NFT) reports in R4 the\n// price of one SC unit in nanoERG. A spend rebuilds the bank as OUTPUTS(0)\n// and does exactly one of: mint SC, redeem SC, mint RC, redeem RC, paying\n// or receiving the nominal price plus a fee, subject to the reserve ratio\n// after the action: minting SC and redeeming RC need it at or above the\n// minimum; minting RC needs it at or below the maximum; redeeming SC is\n// always allowed. SC price is the oracle rate, capped by what the reserve\n// can cover; RC price is the equity per RC, or a default when there is no\n// equity or no RC.\n//\n// $oracleNft: Coll[Byte]\n// $minRatioPercent: Int     -- 400 in SigmaUSD\n// $maxRatioPercent: Int     -- 800 in SigmaUSD\n// $feePercent: Int          -- 2 in SigmaUSD\n// $rcDefaultPrice: Long     -- nanoERG per RC when the equity says nothing\n{\n  val wellFormed = OUTPUTS.size > 0 && OUTPUTS(0).tokens.size == 3 && SELF.tokens.size == 3 &&\n    CONTEXT.dataInputs.size > 0 && CONTEXT.dataInputs(0).tokens.size > 0 &&\n    CONTEXT.dataInputs(0).tokens(0)._1 == $oracleNft &&\n    CONTEXT.dataInputs(0).R4[Long].isDefined &&\n    SELF.R4[Long].isDefined && SELF.R5[Long].isDefined &&\n    OUTPUTS(0).R4[Long].isDefined && OUTPUTS(0).R5[Long].isDefined\n  if (!wellFormed) sigmaProp(false) else {\n    val successor = OUTPUTS(0)\n    val rate = CONTEXT.dataInputs(0).R4[Long].get\n    val preserved = successor.propositionBytes == SELF.propositionBytes &&\n      successor.tokens(1)._1 == SELF.tokens(1)._1 &&\n      successor.tokens(2)._1 == SELF.tokens(2)._1\n\n    val reserveIn = SELF.value\n    val reserveOut = successor.value\n    val scCircIn = SELF.R4[Long].get\n    val rcCircIn = SELF.R5[Long].get\n    val scCircOut = successor.R4[Long].get\n    val rcCircOut = successor.R5[Long].get\n    val deltaSc = SELF.tokens(1)._2 - successor.tokens(1)._2\n    val deltaRc = SELF.tokens(2)._2 - successor.tokens(2)._2\n    val tracked = scCircOut == scCircIn + deltaSc && rcCircOut == rcCircIn + deltaRc &&\n      scCircOut >= 0L && rcCircOut >= 0L\n    val oneAction = (deltaSc != 0L && deltaRc == 0L) || (deltaSc == 0L && deltaRc != 0L)\n\n    val scPrice = if (scCircIn == 0L) rate else min(rate, reserveIn / scCircIn)\n    val equity = reserveIn - scCircIn * scPrice\n    val rcPrice = if (rcCircIn > 0L && equity > 0L) equity / rcCircIn else $rcDefaultPrice\n\n    val amount = if (deltaSc != 0L) deltaSc * scPrice else deltaRc * rcPrice\n    val absAmount = if (amount < 0L) -amount else amount\n    val fee = absAmount * $feePercent.toLong / 100L\n    val deltaReserve = reserveOut - reserveIn\n    val minting = amount > 0L\n    val paid = if (minting) deltaReserve >= absAmount + fee else deltaReserve >= -(absAmount - fee)\n\n    // Ratio after, in percent: reserveOut * 100 / (scCircOut * rate); no SC\n    // out means \"at the maximum\" so RC can still be minted.\n    val ratioOk =\n      if (deltaSc > 0L) reserveOut.toBigInt * 100L.toBigInt >= scCircOut.toBigInt * rate.toBigInt * $minRatioPercent.toBigInt\n      else if (deltaSc < 0L) true\n      else if (deltaRc > 0L) scCircOut == 0L || reserveOut.toBigInt * 100L.toBigInt <= scCircOut.toBigInt * rate.toBigInt * $maxRatioPercent.toBigInt\n      else scCircOut == 0L || reserveOut.toBigInt * 100L.toBigInt >= scCircOut.toBigInt * rate.toBigInt * $minRatioPercent.toBigInt\n\n    sigmaProp(preserved && tracked && oneAction && paid && ratioOk)\n  }\n}\n",
+   "roles": {
+    "protected": [
+     {
+      "index": 0,
+      "why": "the bank box (reserves + treasury + NFT)"
+     }
+    ],
+    "attacker": [
+     {
+      "index": 1,
+      "why": "the attacker's funding box, carrying 1 SC to redeem and the junk filler token"
+     }
+    ],
+    "oracle": [
+     {
+      "index": 0,
+      "dataInput": true,
+      "why": "external price feed (pinned; phase 3 varies it)"
+     }
+    ]
+   },
+   "template": {
+    "inputs": [
+     {
+      "roleRef": "protected",
+      "value": 10000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "amount": 1
+       },
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 999999700000
+       },
+       {
+        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "amount": 999995000000
+       }
+      ],
+      "registers": {
+       "R4": {
+        "type": "Long",
+        "value": 300000
+       },
+       "R5": {
+        "type": "Long",
+        "value": 5000000
+       }
+      }
+     },
+     {
+      "roleRef": "attacker",
+      "value": 2000000,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 1
+       },
+       {
+        "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "amount": 1
+       }
+      ]
+     }
+    ],
+    "dataInputs": [
+     {
+      "roleRef": "oracle",
+      "value": 1,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "amount": 1
+       }
+      ],
+      "registers": {
+       "R4": {
+        "type": "Long",
+        "value": 12000000
+       }
+      }
+     }
+    ],
+    "outputs": [
+     {
+      "roleRef": "fixed",
+      "value": 0,
+      "ergoTree": "$mutant",
+      "creationHeight": 5000,
+      "tokens": [
+       {
+        "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "amount": 1
+       },
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 999999700001
+       },
+       {
+        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "amount": 999995000000
+       }
+      ],
+      "registers": {
+       "R4": {
+        "type": "Long",
+        "value": 299999
+       },
+       "R5": {
+        "type": "Long",
+        "value": 5000000
+       }
+      }
+     },
+     {
+      "roleRef": "free",
+      "value": 0,
+      "ergoTree": "10010101d17300",
+      "tokens": []
+     }
+    ],
+    "height": 5000
+   },
+   "extraTrees": {},
+   "proven": true,
+   "witness": {
+    "note": "one honest SC redeem (deltaSc=-1) + the NFT leaves to the attacker's free output; every value guard holds",
+    "extracted": {
+     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "1"
+    }
+   },
+   "missHint": null,
+   "witnessTx": {
+    "height": 5000,
+    "inputs": [
+     {
+      "value": 10000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "amount": 1
+       },
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 999999700000
+       },
+       {
+        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "amount": 999995000000
+       }
+      ],
+      "additionalRegisters": {
+       "R4": "05c0cf24",
+       "R5": "0580ade204"
+      }
+     },
+     {
+      "value": 2000000,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 1
+       },
+       {
+        "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "amount": 1
+       }
+      ]
+     }
+    ],
+    "dataInputs": [
+     {
+      "value": 1,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "amount": 1
+       }
+      ],
+      "additionalRegisters": {
+       "R4": "0580ecb80b"
+      }
+     }
+    ],
+    "outputs": [
+     {
+      "value": 10000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 5000,
+      "tokens": [
+       {
+        "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "amount": 1
+       },
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 999999700001
+       },
+       {
+        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "amount": 999995000000
+       }
+      ],
+      "additionalRegisters": {
+       "R4": "05becf24",
+       "R5": "0580ade204"
+      }
+     },
+     {
+      "value": 2000000,
+      "ergoTree": "10010101d17300",
+      "tokens": [
+       {
+        "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "amount": 1
+       }
+      ]
+     }
+    ]
+   },
+   "witnessNote": "one honest SC redeem (deltaSc=-1: SC conservation via the attacker's 1 SC input); the bank NFT leaves to the attacker; successor.tokens(0) = junk",
+   "originalSource": "// A reserve-backed stablecoin bank (the shape of AgeUSD / SigmaUSD, in one\n// script). The bank box holds:\n//   value      the ERG reserve\n//   tokens(0)  the bank NFT\n//   tokens(1)  stablecoins (SC) not yet in circulation\n//   tokens(2)  reserve coins (RC) not yet in circulation\n//   R4[Long]   SC in circulation      R5[Long]   RC in circulation\n// The oracle box (data input 0, identified by its NFT) reports in R4 the\n// price of one SC unit in nanoERG. A spend rebuilds the bank as OUTPUTS(0)\n// and does exactly one of: mint SC, redeem SC, mint RC, redeem RC, paying\n// or receiving the nominal price plus a fee, subject to the reserve ratio\n// after the action: minting SC and redeeming RC need it at or above the\n// minimum; minting RC needs it at or below the maximum; redeeming SC is\n// always allowed. SC price is the oracle rate, capped by what the reserve\n// can cover; RC price is the equity per RC, or a default when there is no\n// equity or no RC.\n//\n// $oracleNft: Coll[Byte]\n// $minRatioPercent: Int     -- 400 in SigmaUSD\n// $maxRatioPercent: Int     -- 800 in SigmaUSD\n// $feePercent: Int          -- 2 in SigmaUSD\n// $rcDefaultPrice: Long     -- nanoERG per RC when the equity says nothing\n{\n  val wellFormed = OUTPUTS.size > 0 && OUTPUTS(0).tokens.size == 3 && SELF.tokens.size == 3 &&\n    CONTEXT.dataInputs.size > 0 && CONTEXT.dataInputs(0).tokens.size > 0 &&\n    CONTEXT.dataInputs(0).tokens(0)._1 == $oracleNft &&\n    CONTEXT.dataInputs(0).R4[Long].isDefined &&\n    SELF.R4[Long].isDefined && SELF.R5[Long].isDefined &&\n    OUTPUTS(0).R4[Long].isDefined && OUTPUTS(0).R5[Long].isDefined\n  if (!wellFormed) sigmaProp(false) else {\n    val successor = OUTPUTS(0)\n    val rate = CONTEXT.dataInputs(0).R4[Long].get\n    val preserved = successor.propositionBytes == SELF.propositionBytes &&\n      successor.tokens(0) == SELF.tokens(0) &&\n      successor.tokens(1)._1 == SELF.tokens(1)._1 &&\n      successor.tokens(2)._1 == SELF.tokens(2)._1\n\n    val reserveIn = SELF.value\n    val reserveOut = successor.value\n    val scCircIn = SELF.R4[Long].get\n    val rcCircIn = SELF.R5[Long].get\n    val scCircOut = successor.R4[Long].get\n    val rcCircOut = successor.R5[Long].get\n    val deltaSc = SELF.tokens(1)._2 - successor.tokens(1)._2\n    val deltaRc = SELF.tokens(2)._2 - successor.tokens(2)._2\n    val tracked = scCircOut == scCircIn + deltaSc && rcCircOut == rcCircIn + deltaRc &&\n      scCircOut >= 0L && rcCircOut >= 0L\n    val oneAction = (deltaSc != 0L && deltaRc == 0L) || (deltaSc == 0L && deltaRc != 0L)\n\n    val scPrice = if (scCircIn == 0L) rate else min(rate, reserveIn / scCircIn)\n    val equity = reserveIn - scCircIn * scPrice\n    val rcPrice = if (rcCircIn > 0L && equity > 0L) equity / rcCircIn else $rcDefaultPrice\n\n    val amount = if (deltaSc != 0L) deltaSc * scPrice else deltaRc * rcPrice\n    val absAmount = if (amount < 0L) -amount else amount\n    val fee = absAmount * $feePercent.toLong / 100L\n    val deltaReserve = reserveOut - reserveIn\n    val minting = amount > 0L\n    val paid = if (minting) deltaReserve >= absAmount + fee else deltaReserve >= -(absAmount - fee)\n\n    // Ratio after, in percent: reserveOut * 100 / (scCircOut * rate); no SC\n    // out means \"at the maximum\" so RC can still be minted.\n    val ratioOk =\n      if (deltaSc > 0L) reserveOut.toBigInt * 100L.toBigInt >= scCircOut.toBigInt * rate.toBigInt * $minRatioPercent.toBigInt\n      else if (deltaSc < 0L) true\n      else if (deltaRc > 0L) scCircOut == 0L || reserveOut.toBigInt * 100L.toBigInt <= scCircOut.toBigInt * rate.toBigInt * $maxRatioPercent.toBigInt\n      else scCircOut == 0L || reserveOut.toBigInt * 100L.toBigInt >= scCircOut.toBigInt * rate.toBigInt * $minRatioPercent.toBigInt\n\n    sigmaProp(preserved && tracked && oneAction && paid && ratioOk)\n  }\n}\n"
+  },
+  {
+   "id": "M6",
+   "contract": "amm-pool",
+   "operator": "drop-successor-script",
+   "defect": "the pool successor may be rebuilt under the attacker's tree: the full reserves end the transaction attacker-spendable",
+   "params": {
+    "lpSupply": {
+     "type": "Long",
+     "value": 1000000000000
+    },
+    "feeNum": {
+     "type": "Int",
+     "value": 997
+    },
+    "feeDenom": {
+     "type": "Int",
+     "value": 1000
+    }
+   },
+   "diff": {
+    "find": "val preserved = successor.propositionBytes == SELF.propositionBytes &&\n      nftOut == nftIn",
+    "replace": "val preserved = nftOut == nftIn"
+   },
+   "mutatedSource": "// A constant-product liquidity pool between ERG and one token (the shape\n// of Spectrum's N2T pool, in one script). The pool box holds:\n//   value      the ERG reserve (X)\n//   tokens(0)  the pool NFT, which identifies this pool\n//   tokens(1)  LP tokens not yet in circulation\n//   tokens(2)  the token reserve (Y)\n// Every spend must rebuild the box as OUTPUTS(0) with the same script, the\n// same NFT and token ids, and do exactly one of: swap (LP unchanged, the\n// product of the reserves may not fall after the fee), deposit (LP minted\n// is at most the proportional share of what was added), redeem (what is\n// taken out is at most the proportional share of the LP burned). The pool\n// is bootstrapped by creating the box with its first liquidity and the\n// matching LP already in circulation; the script never sees supply zero.\n// Price protection for the trader lives in the order contract, not here.\n//\n// $lpSupply: Long  -- LP tokens minted at bootstrap: circulating = lpSupply - tokens(1)\n// $feeNum: Int     -- 997 with feeDenom 1000 is a 0.3% fee\n// $feeDenom: Int\n{\n  val wellFormed = OUTPUTS.size > 0 && OUTPUTS(0).tokens.size == 3 && SELF.tokens.size == 3\n  if (!wellFormed) sigmaProp(false) else {\n    val successor = OUTPUTS(0)\n    val nftIn = SELF.tokens(0)\n    val lpIn = SELF.tokens(1)\n    val yIn = SELF.tokens(2)\n    val nftOut = successor.tokens(0)\n    val lpOut = successor.tokens(1)\n    val yOut = successor.tokens(2)\n    val preserved = nftOut == nftIn && lpOut._1 == lpIn._1 && yOut._1 == yIn._1\n\n    val supplyIn = $lpSupply - lpIn._2\n    val reservesXIn = SELF.value\n    val reservesYIn = yIn._2\n    val deltaSupply = lpIn._2 - lpOut._2\n    val deltaX = successor.value - reservesXIn\n    val deltaY = yOut._2 - reservesYIn\n\n    val validSwap = deltaSupply == 0L && (\n      if (deltaX > 0L)\n        reservesYIn.toBigInt * deltaX.toBigInt * $feeNum.toBigInt >= -deltaY.toBigInt * (reservesXIn.toBigInt * $feeDenom.toBigInt + deltaX.toBigInt * $feeNum.toBigInt)\n      else\n        reservesXIn.toBigInt * deltaY.toBigInt * $feeNum.toBigInt >= -deltaX.toBigInt * (reservesYIn.toBigInt * $feeDenom.toBigInt + deltaY.toBigInt * $feeNum.toBigInt)\n    )\n    val validDeposit = deltaSupply > 0L && deltaX > 0L && deltaY > 0L &&\n      deltaSupply.toBigInt * reservesXIn.toBigInt <= deltaX.toBigInt * supplyIn.toBigInt &&\n      deltaSupply.toBigInt * reservesYIn.toBigInt <= deltaY.toBigInt * supplyIn.toBigInt\n    val validRedeem = deltaSupply < 0L && deltaX < 0L && deltaY < 0L &&\n      (-deltaX).toBigInt * supplyIn.toBigInt <= (-deltaSupply).toBigInt * reservesXIn.toBigInt &&\n      (-deltaY).toBigInt * supplyIn.toBigInt <= (-deltaSupply).toBigInt * reservesYIn.toBigInt\n\n    sigmaProp(preserved && (validSwap || validDeposit || validRedeem))\n  }\n}\n",
+   "roles": {
+    "protected": [
+     {
+      "index": 0,
+      "why": "the AMM pool (reserves + LP + NFT)"
+     }
+    ],
+    "attacker": [
+     {
+      "index": 1,
+      "why": "the attacker's box"
+     }
+    ]
+   },
+   "template": {
+    "inputs": [
+     {
+      "roleRef": "protected",
+      "value": 1000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "amount": 1
+       },
+       {
+        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "amount": 999000000000
+       },
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 5000000000
+       }
+      ]
+     },
+     {
+      "roleRef": "attacker",
+      "value": 2000000,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 1
+     }
+    ],
+    "outputs": [
+     {
+      "roleRef": "fixed",
+      "value": 1000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 5000,
+      "tokens": [
+       {
+        "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "amount": 1
+       },
+       {
+        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "amount": 999000000000
+       },
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 5000000000
+       }
+      ]
+     },
+     {
+      "roleRef": "free",
+      "value": 0,
+      "ergoTree": "10010101d17300"
+     }
+    ],
+    "height": 5000
+   },
+   "extraTrees": {},
+   "proven": true,
+   "witness": {
+    "note": "no-op swap (deltas 0) passes validSwap; successor re-treed to sigmaProp(true) with the pool's full contents",
+    "extracted": {
+     "nanoErg": "1000000000",
+     "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "999000000000",
+     "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "5000000000"
+    }
+   },
+   "missHint": null,
+   "witnessTx": {
+    "height": 5000,
+    "inputs": [
+     {
+      "value": 1000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "amount": 1
+       },
+       {
+        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "amount": 999000000000
+       },
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 5000000000
+       }
+      ]
+     },
+     {
+      "value": 2000000,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 1
+     }
+    ],
+    "outputs": [
+     {
+      "value": 1000000000,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 5000,
+      "tokens": [
+       {
+        "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "amount": 1
+       },
+       {
+        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "amount": 999000000000
+       },
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 5000000000
+       }
+      ]
+     },
+     {
+      "value": 2000000,
+      "ergoTree": "10010101d17300"
+     }
+    ]
+   },
+   "witnessNote": "no-op swap (deltas 0) passes; pool successor re-treed with the full reserves",
+   "originalSource": "// A constant-product liquidity pool between ERG and one token (the shape\n// of Spectrum's N2T pool, in one script). The pool box holds:\n//   value      the ERG reserve (X)\n//   tokens(0)  the pool NFT, which identifies this pool\n//   tokens(1)  LP tokens not yet in circulation\n//   tokens(2)  the token reserve (Y)\n// Every spend must rebuild the box as OUTPUTS(0) with the same script, the\n// same NFT and token ids, and do exactly one of: swap (LP unchanged, the\n// product of the reserves may not fall after the fee), deposit (LP minted\n// is at most the proportional share of what was added), redeem (what is\n// taken out is at most the proportional share of the LP burned). The pool\n// is bootstrapped by creating the box with its first liquidity and the\n// matching LP already in circulation; the script never sees supply zero.\n// Price protection for the trader lives in the order contract, not here.\n//\n// $lpSupply: Long  -- LP tokens minted at bootstrap: circulating = lpSupply - tokens(1)\n// $feeNum: Int     -- 997 with feeDenom 1000 is a 0.3% fee\n// $feeDenom: Int\n{\n  val wellFormed = OUTPUTS.size > 0 && OUTPUTS(0).tokens.size == 3 && SELF.tokens.size == 3\n  if (!wellFormed) sigmaProp(false) else {\n    val successor = OUTPUTS(0)\n    val nftIn = SELF.tokens(0)\n    val lpIn = SELF.tokens(1)\n    val yIn = SELF.tokens(2)\n    val nftOut = successor.tokens(0)\n    val lpOut = successor.tokens(1)\n    val yOut = successor.tokens(2)\n    val preserved = successor.propositionBytes == SELF.propositionBytes &&\n      nftOut == nftIn && lpOut._1 == lpIn._1 && yOut._1 == yIn._1\n\n    val supplyIn = $lpSupply - lpIn._2\n    val reservesXIn = SELF.value\n    val reservesYIn = yIn._2\n    val deltaSupply = lpIn._2 - lpOut._2\n    val deltaX = successor.value - reservesXIn\n    val deltaY = yOut._2 - reservesYIn\n\n    val validSwap = deltaSupply == 0L && (\n      if (deltaX > 0L)\n        reservesYIn.toBigInt * deltaX.toBigInt * $feeNum.toBigInt >= -deltaY.toBigInt * (reservesXIn.toBigInt * $feeDenom.toBigInt + deltaX.toBigInt * $feeNum.toBigInt)\n      else\n        reservesXIn.toBigInt * deltaY.toBigInt * $feeNum.toBigInt >= -deltaX.toBigInt * (reservesYIn.toBigInt * $feeDenom.toBigInt + deltaY.toBigInt * $feeNum.toBigInt)\n    )\n    val validDeposit = deltaSupply > 0L && deltaX > 0L && deltaY > 0L &&\n      deltaSupply.toBigInt * reservesXIn.toBigInt <= deltaX.toBigInt * supplyIn.toBigInt &&\n      deltaSupply.toBigInt * reservesYIn.toBigInt <= deltaY.toBigInt * supplyIn.toBigInt\n    val validRedeem = deltaSupply < 0L && deltaX < 0L && deltaY < 0L &&\n      (-deltaX).toBigInt * supplyIn.toBigInt <= (-deltaSupply).toBigInt * reservesXIn.toBigInt &&\n      (-deltaY).toBigInt * supplyIn.toBigInt <= (-deltaSupply).toBigInt * reservesYIn.toBigInt\n\n    sigmaProp(preserved && (validSwap || validDeposit || validRedeem))\n  }\n}\n"
+  },
+  {
+   "id": "M7",
+   "contract": "use-lp-swap (the fixed incident contract)",
+   "operator": "drop-successor-script",
+   "defect": "the swap successor can be re-treed: the locked order value (1 ERG + the swap NFT) ends the transaction under the attacker's tree",
+   "params": {
+    "lpNft": {
+     "type": "Coll[Byte]",
+     "value": "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41"
+    }
+   },
+   "diff": {
+    "find": "swapSucc.propositionBytes == SELF.propositionBytes &&\n    ",
+    "replace": ""
+   },
+   "mutatedSource": "// USE LP swap \u2014 FIXED shape (regression fixture for the 2026-09-08 drain).\n//\n// This is the deployed useLpSwap logic, decompiled from mainnet swap-NFT box\n// ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf, with the\n// ONE missing check restored: the box the swap does its constant-product math\n// on must carry the LP singleton NFT. The deployed contract read the pool\n// positionally as INPUTS(0)/OUTPUTS(0) and never asserted which box that was,\n// so an attacker put a decoy at index 0 and drained the real pool spent\n// alongside it. Binding by the singleton NFT closes the substitution: only the\n// genuine pool holds that token.\n//\n// $lpNft: Coll[Byte]  -- the LP pool's singleton NFT (tokens(0) of the pool)\n{\n  val poolIn      = INPUTS(0)\n  val poolInToks  = poolIn.tokens\n  val poolOut     = OUTPUTS(0)\n  val poolOutToks = poolOut.tokens\n\n  // THE FIX: bind the pool the maths runs on by its singleton NFT, at both the\n  // spent box and its successor. A decoy cannot hold the unique LP token.\n  val poolBound =\n    poolInToks(0)._1  == $lpNft &&\n    poolOutToks(0)._1 == $lpNft\n\n  val ergIn      = poolIn.value\n  val ergDelta   = poolOut.value - ergIn\n  val tokenInY   = poolInToks(2)._2\n  val tokenDelta = poolOutToks(2)._2 - tokenInY\n  val swapSucc   = OUTPUTS(1)\n\n  val validSwap =\n    (poolInToks(1)._2 - poolOutToks(1)._2 == 0L) &&\n    (if (ergDelta > 0L)\n        tokenInY.toBigInt * ergDelta.toBigInt * 997.toBigInt >=\n          (-tokenDelta).toBigInt *\n            (ergIn.toBigInt * 1000.toBigInt + ergDelta.toBigInt * 997.toBigInt)\n     else\n        ergIn.toBigInt * tokenDelta.toBigInt * 997.toBigInt >=\n          (-ergDelta).toBigInt *\n            (tokenInY.toBigInt * 1000.toBigInt + tokenDelta.toBigInt * 997.toBigInt)) &&\n    swapSucc.value >= SELF.value &&\n    swapSucc.tokens == SELF.tokens\n\n  sigmaProp(poolBound && validSwap)\n}\n",
+   "roles": {
+    "protected": [
+     {
+      "index": 0,
+      "why": "the AMM pool"
+     },
+     {
+      "index": 1,
+      "why": "the fixed swap order box"
+     }
+    ],
+    "attacker": [
+     {
+      "index": 2,
+      "why": "the attacker's box"
+     }
+    ]
+   },
+   "template": {
+    "inputs": [
+     {
+      "roleRef": "protected",
+      "value": 1000000000,
+      "ergoTree": "amm-pool",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41",
+        "amount": 1
+       },
+       {
+        "id": "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099",
+        "amount": 1000000
+       },
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 5000000000
+       }
+      ]
+     },
+     {
+      "roleRef": "companion",
+      "value": 1000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf",
+        "amount": 1
+       }
+      ]
+     },
+     {
+      "roleRef": "attacker",
+      "value": 2000000,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 1
+     }
+    ],
+    "outputs": [
+     {
+      "roleRef": "fixed",
+      "value": 1000000000,
+      "ergoTree": "amm-pool",
+      "creationHeight": 5000,
+      "tokens": [
+       {
+        "id": "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41",
+        "amount": 1
+       },
+       {
+        "id": "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099",
+        "amount": 1000000
+       },
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 5000000000
+       }
+      ]
+     },
+     {
+      "roleRef": "free",
+      "value": 0,
+      "ergoTree": "10010101d17300"
+     },
+     {
+      "roleRef": "attacker",
+      "value": 2000000,
+      "ergoTree": "10010101d17300"
+     }
+    ],
+    "height": 5000
+   },
+   "extraTrees": {
+    "amm-pool": "// A constant-product liquidity pool between ERG and one token (the shape\n// of Spectrum's N2T pool, in one script). The pool box holds:\n//   value      the ERG reserve (X)\n//   tokens(0)  the pool NFT, which identifies this pool\n//   tokens(1)  LP tokens not yet in circulation\n//   tokens(2)  the token reserve (Y)\n// Every spend must rebuild the box as OUTPUTS(0) with the same script, the\n// same NFT and token ids, and do exactly one of: swap (LP unchanged, the\n// product of the reserves may not fall after the fee), deposit (LP minted\n// is at most the proportional share of what was added), redeem (what is\n// taken out is at most the proportional share of the LP burned). The pool\n// is bootstrapped by creating the box with its first liquidity and the\n// matching LP already in circulation; the script never sees supply zero.\n// Price protection for the trader lives in the order contract, not here.\n//\n// $lpSupply: Long  -- LP tokens minted at bootstrap: circulating = lpSupply - tokens(1)\n// $feeNum: Int     -- 997 with feeDenom 1000 is a 0.3% fee\n// $feeDenom: Int\n{\n  val wellFormed = OUTPUTS.size > 0 && OUTPUTS(0).tokens.size == 3 && SELF.tokens.size == 3\n  if (!wellFormed) sigmaProp(false) else {\n    val successor = OUTPUTS(0)\n    val nftIn = SELF.tokens(0)\n    val lpIn = SELF.tokens(1)\n    val yIn = SELF.tokens(2)\n    val nftOut = successor.tokens(0)\n    val lpOut = successor.tokens(1)\n    val yOut = successor.tokens(2)\n    val preserved = successor.propositionBytes == SELF.propositionBytes &&\n      nftOut == nftIn && lpOut._1 == lpIn._1 && yOut._1 == yIn._1\n\n    val supplyIn = $lpSupply - lpIn._2\n    val reservesXIn = SELF.value\n    val reservesYIn = yIn._2\n    val deltaSupply = lpIn._2 - lpOut._2\n    val deltaX = successor.value - reservesXIn\n    val deltaY = yOut._2 - reservesYIn\n\n    val validSwap = deltaSupply == 0L && (\n      if (deltaX > 0L)\n        reservesYIn.toBigInt * deltaX.toBigInt * $feeNum.toBigInt >= -deltaY.toBigInt * (reservesXIn.toBigInt * $feeDenom.toBigInt + deltaX.toBigInt * $feeNum.toBigInt)\n      else\n        reservesXIn.toBigInt * deltaY.toBigInt * $feeNum.toBigInt >= -deltaX.toBigInt * (reservesYIn.toBigInt * $feeDenom.toBigInt + deltaY.toBigInt * $feeNum.toBigInt)\n    )\n    val validDeposit = deltaSupply > 0L && deltaX > 0L && deltaY > 0L &&\n      deltaSupply.toBigInt * reservesXIn.toBigInt <= deltaX.toBigInt * supplyIn.toBigInt &&\n      deltaSupply.toBigInt * reservesYIn.toBigInt <= deltaY.toBigInt * supplyIn.toBigInt\n    val validRedeem = deltaSupply < 0L && deltaX < 0L && deltaY < 0L &&\n      (-deltaX).toBigInt * supplyIn.toBigInt <= (-deltaSupply).toBigInt * reservesXIn.toBigInt &&\n      (-deltaY).toBigInt * supplyIn.toBigInt <= (-deltaSupply).toBigInt * reservesYIn.toBigInt\n\n    sigmaProp(preserved && (validSwap || validDeposit || validRedeem))\n  }\n}\n",
+    "amm-pool-params": {
+     "lpSupply": {
+      "type": "Long",
+      "value": 1000000000000
+     },
+     "feeNum": {
+      "type": "Int",
+      "value": 997
+     },
+     "feeDenom": {
+      "type": "Int",
+      "value": 1000
+     }
+    }
+   },
+   "proven": true,
+   "witness": {
+    "note": "pool successor verbatim; swap successor re-treed with swap's value + NFT (swapSucc.value >= SELF.value and tokens == SELF.tokens hold); keyless",
+    "extracted": {
+     "nanoErg": "1000000000"
+    }
+   },
+   "missHint": null,
+   "witnessTx": {
+    "height": 5000,
+    "inputs": [
+     {
+      "value": 1000000000,
+      "ergoTree": "$amm-pool",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41",
+        "amount": 1
+       },
+       {
+        "id": "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099",
+        "amount": 1000000
+       },
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 5000000000
+       }
+      ]
+     },
+     {
+      "value": 1000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf",
+        "amount": 1
+       }
+      ]
+     },
+     {
+      "value": 2000000,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 1
+     }
+    ],
+    "outputs": [
+     {
+      "value": 1000000000,
+      "ergoTree": "$amm-pool",
+      "creationHeight": 5000,
+      "tokens": [
+       {
+        "id": "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41",
+        "amount": 1
+       },
+       {
+        "id": "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099",
+        "amount": 1000000
+       },
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 5000000000
+       }
+      ]
+     },
+     {
+      "value": 1000000000,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 5000,
+      "tokens": [
+       {
+        "id": "ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf",
+        "amount": 1
+       }
+      ]
+     },
+     {
+      "value": 2000000,
+      "ergoTree": "10010101d17300"
+     }
+    ]
+   },
+   "witnessNote": "pool successor verbatim (the swap maths see deltas 0); swap successor re-treed with the swap's value + NFT",
+   "originalSource": "// USE LP swap \u2014 FIXED shape (regression fixture for the 2026-09-08 drain).\n//\n// This is the deployed useLpSwap logic, decompiled from mainnet swap-NFT box\n// ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf, with the\n// ONE missing check restored: the box the swap does its constant-product math\n// on must carry the LP singleton NFT. The deployed contract read the pool\n// positionally as INPUTS(0)/OUTPUTS(0) and never asserted which box that was,\n// so an attacker put a decoy at index 0 and drained the real pool spent\n// alongside it. Binding by the singleton NFT closes the substitution: only the\n// genuine pool holds that token.\n//\n// $lpNft: Coll[Byte]  -- the LP pool's singleton NFT (tokens(0) of the pool)\n{\n  val poolIn      = INPUTS(0)\n  val poolInToks  = poolIn.tokens\n  val poolOut     = OUTPUTS(0)\n  val poolOutToks = poolOut.tokens\n\n  // THE FIX: bind the pool the maths runs on by its singleton NFT, at both the\n  // spent box and its successor. A decoy cannot hold the unique LP token.\n  val poolBound =\n    poolInToks(0)._1  == $lpNft &&\n    poolOutToks(0)._1 == $lpNft\n\n  val ergIn      = poolIn.value\n  val ergDelta   = poolOut.value - ergIn\n  val tokenInY   = poolInToks(2)._2\n  val tokenDelta = poolOutToks(2)._2 - tokenInY\n  val swapSucc   = OUTPUTS(1)\n\n  val validSwap =\n    (poolInToks(1)._2 - poolOutToks(1)._2 == 0L) &&\n    (if (ergDelta > 0L)\n        tokenInY.toBigInt * ergDelta.toBigInt * 997.toBigInt >=\n          (-tokenDelta).toBigInt *\n            (ergIn.toBigInt * 1000.toBigInt + ergDelta.toBigInt * 997.toBigInt)\n     else\n        ergIn.toBigInt * tokenDelta.toBigInt * 997.toBigInt >=\n          (-ergDelta).toBigInt *\n            (tokenInY.toBigInt * 1000.toBigInt + tokenDelta.toBigInt * 997.toBigInt)) &&\n    swapSucc.propositionBytes == SELF.propositionBytes &&\n    swapSucc.value >= SELF.value &&\n    swapSucc.tokens == SELF.tokens\n\n  sigmaProp(poolBound && validSwap)\n}\n"
+  }
+ ]
+}
