@@ -50,7 +50,7 @@
     "attacker": [
      {
       "index": 1,
-      "why": "the beneficiary's own funding box (the drain needs no key: the residual is a bool)"
+      "why": "the beneficiary's own funding box. NOTE: the witness is keyed \u2014 the residual is `beneficiary && sigmaProp(...)`, so this mutant is classified keyed-insider (see keyedNote) and sits outside the hunt's keyless model. This labelling records what the hunt was given, not what a keyed attacker model would use."
      }
     ]
    },
@@ -129,7 +129,7 @@
      1
     ]
    },
-   "witnessNote": "the guard-deleted vesting box re-built at dust; 9.998 ERG keyless",
+   "witnessNote": "the guard-deleted vesting box re-built at dust, 9.998 ERG extracted \u2014 but the spend needs the beneficiary's key (needsProof on the protected input), which is why this witness is keyed-insider and not a keyless proof. Left as the record of the misproof.",
    "labellingNote": "the vesting box carries a synthetic singleton (vvvv\u2026) so the hunt can bind the protected box; the contract itself checks no tokens and the honest successor carries none (tokens.size == 0), so the singleton is released in any spend \u2014 including the honest one",
    "attackerModel": "keyed-insider",
    "keyedNote": "exploitable only by the beneficiary: the residual is `beneficiary && sigmaProp(...)` \u2014 needsProof on the protected input. The keyless hunt refuses it by design; this is an insider-drain class the hunt does not model (phase 3+ attacker-model work).",
