@@ -240,3 +240,46 @@ and the flagged expression read in context:
 Documented gaps (from `lints/unchecked_get.rs`): guards expressed with `||` and
 negation, guards held in an enclosing `val`, and cross-branch reasoning are not
 recognised, so those produce false positives.
+
+### `unbound-box-reserves` (High)
+
+A box picked out by **positional index** — `INPUTS(n)`, `OUTPUTS(n)`,
+`CONTEXT.dataInputs(n)` — whose **reserves** (`.value`, or a token amount
+`.tokens(i)._2`) feed arithmetic or a comparison, while nothing in the tree
+binds that box by a singleton NFT.
+
+This is the class behind the **2026-09-08 USE/Dexy LP drain** on mainnet. The
+LP swap contract (box holding swap NFT `ef461517…`) did the constant-product
+maths on `INPUTS(0).value` and `INPUTS(0).tokens(i)._2`, but never said which
+box index 0 had to hold. The index is chosen by whoever builds the transaction,
+so an attacker placed a decoy box there — the maths was correct, applied to the
+wrong box. The fix is a singleton NFT in `tokens(0)`, asserted by the script;
+because the token is unique on chain, only the genuine pool can satisfy it.
+
+Three binding spellings are accepted, all of which pin `tokens(0)`:
+`b.tokens(0)._1 == x`, the whole pair `b.tokens(0) == x`, and the whole
+collection `b.tokens == x.tokens`. Bindings close transitively, so
+`A.tokens(0)._1 == B.tokens(0)._1` carries `B`'s binding to `A` — but only when
+the other side is not itself read off a positional box (two attacker-placed
+boxes agreeing about each other bind nothing). Two shapes are exempt because
+they are how a correct self-validating pool is written: **SELF** (never
+positional) and **SELF's successor** (an output whose `propositionBytes`,
+`ergoTree` or `scriptBytes` are asserted equal to SELF's).
+
+Regression-tested against three deployed trees fetched from the explorer
+(`tests/audit.rs`): the USE LP **swap** contract flags; the USE LP **extract**
+contract (binds the LP by NFT `4ecaa1aa…`) and the USE **bank** contract (binds
+every box it reads) are clean. All three lift completely.
+
+Corpus effect (`ergo-es audit --seed | --mainnet`, which now also tallies
+findings per lint): the lint adds **1 finding on the 279-tree mainnet corpus
+and 0 on the seed corpus**, and flags **no tree that was not already flagged**.
+The single mainnet finding was verified by hand — an `OUTPUTS(0).value`
+conservation equation in a branch that constrains no other property of that
+output.
+
+Documented gaps: an NFT held at a token index other than 0, and a box
+identified by an `exists`/`forall` search over the inputs rather than by a fixed
+index, are not recognised — those are false positives. A computed index
+(`INPUTS(i)` for a derived `i`) is out of scope, and `val` names are collected
+tree-wide rather than per block (lift assigns globally-unique names).

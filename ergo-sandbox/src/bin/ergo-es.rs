@@ -637,6 +637,7 @@ fn cmd_audit(args: &[String]) -> Result<(), String> {
             let mut flagged = 0usize;
             let mut findings_total = 0usize;
             let mut by_severity = std::collections::BTreeMap::<&str, usize>::new();
+            let mut by_lint = std::collections::BTreeMap::<&str, usize>::new();
             let mut partial = 0usize;
             let mut parse_errors = 0usize;
             for h in &trees {
@@ -663,6 +664,7 @@ fn cmd_audit(args: &[String]) -> Result<(), String> {
                 findings_total += n;
                 for f in &report.findings {
                     *by_severity.entry(f.severity.label()).or_default() += 1;
+                    *by_lint.entry(f.lint).or_default() += 1;
                 }
                 if !matches!(
                     report.completeness,
@@ -682,6 +684,9 @@ fn cmd_audit(args: &[String]) -> Result<(), String> {
             println!("  findings: {findings_total}");
             for (sev, n) in &by_severity {
                 println!("    {sev}: {n}");
+            }
+            for (lint, n) in &by_lint {
+                println!("    {lint}: {n}");
             }
             println!("  partial: {partial}");
             if parse_errors > 0 {
