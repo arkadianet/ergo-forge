@@ -524,6 +524,13 @@ fn the_corpus_is_measured_and_does_not_regress() {
         caps["synthesis"].is_object(),
         "corpus caps declare the synthesis-on block"
     );
+    // The synthesis block IS the probe space in the second configuration —
+    // turning one degree off changes what the rate measures — so it is pinned
+    // as a value, not merely checked for shape.
+    assert_eq!(
+        caps["synthesis"], key["caps"]["synthesis"],
+        "the synthesis policy changed: the recorded rate was measured under a different probe space"
+    );
     assert_eq!(
         max_probes,
         key["caps"]["maxProbes"]
@@ -651,6 +658,18 @@ fn the_corpus_is_measured_and_does_not_regress() {
         rate + 1e-9 >= key_rate,
         "the attributable detection rate regressed: {rate} < recorded {key_rate}"
     );
+    // …and pinned exactly, so an IMPROVEMENT is also a deliberate re-record
+    // rather than a silent pass against a stale key. Every per-mutant verdict
+    // is already pinned this way; the headline should not be looser than the
+    // rows it is computed from.
+    assert_eq!(
+        attributable,
+        key["attributableDetections"]
+            .as_u64()
+            .expect("recorded attributable detections") as usize,
+        "attributable detections changed ({attributable}) — if the hunt improved, re-record \
+         the answer key deliberately; the number is the artifact"
+    );
     // The confounded set is part of the meaning of the rate, not a footnote:
     // a mutant becoming confounded (or ceasing to be) changes what the number
     // says, so it is pinned exactly rather than bounded.
@@ -687,7 +706,7 @@ fn the_corpus_is_measured_and_does_not_regress() {
             kr["synthesisOn"]["verdict"].as_str().unwrap(),
             "{id}: synthesis-on verdict regressed"
         );
-        if let Some(recorded) = kr["foundConfounded"].as_bool() {
+        if let Some(recorded) = kr["confounded"].as_bool() {
             assert_eq!(
                 r["confounded"].as_bool().unwrap(),
                 recorded,

@@ -9,7 +9,15 @@
  "caps": {
   "maxProbes": 50000,
   "maxPermutations": 120,
-  "synthesisOn": "fully enabled (maxNewOutputs 2, recreations, successorStates, splits, mints, permuteOutputs, outPerms 24)"
+  "synthesis": {
+   "maxNewOutputs": 2,
+   "companionRecreations": true,
+   "successorStates": true,
+   "splits": true,
+   "mints": true,
+   "permuteOutputs": true,
+   "maxOutputPermutations": 24
+  }
  },
  "perMutant": [
   {
@@ -60,7 +68,7 @@
   {
    "id": "M4",
    "proven": true,
-   "found": true,
+   "found": false,
    "synthesisOff": {
     "verdict": "notunderprobes",
     "probesRun": 28,
@@ -71,8 +79,9 @@
     "probesRun": 4512,
     "capped": false
    },
-   "note": "found only with synthesis on: the drain needs a NEW output (the attacker's payment box at the sale's price position) while the stock returns to the sale box \u2014 out of phase-1's fixed output set CONFOUNDED: the same drainable verdict fires on the unmutated original (see escalatedFindings) \u2014 the hunt's objective has no attacker-cost accounting, so overpayment probes score as drains. The real 1-nanoERG drain IS in family (710 hits), but the verdict alone cannot discriminate.",
-   "foundConfounded": true
+   "note": "found only with synthesis on: the drain needs a NEW output (the attacker's payment box at the sale's price position) while the stock returns to the sale box \u2014 out of phase-1's fixed output set. CONFOUNDED: the same drainable verdict fires on the unmutated original (see escalatedFindings), so it is not attributable to the mutation. The hunt's objective has no conditional sanction, so overpayment probes score as drains; the real 1-nanoERG drain IS in family (710 hits), but the verdict alone cannot discriminate.",
+   "confounded": true,
+   "rawDrainable": true
   },
   {
    "id": "M5",
@@ -215,7 +224,7 @@
    "what": "the winning probe has the attacker OVERPAY the seller (20M of the attacker's own nanoERG into the seller's P2PK box) so `paid` passes legitimately and the stock leaves the sale box with it. The seller is fully paid; the attacker loses money. No exploit.",
    "why": "the leak objective counts protected value that LEFT the protected box, sanctioned only at the free payee's DECLARED amounts, and never subtracts what the attacker SPENT. An overpayment that empties a protected box into a protocol-designated payee scores as a drain.",
    "disposition": "ESCALATED, not fixed: attacker-cost accounting is the roadmap's parked 'pricing / worth-weighted objectives; economic probes \u2014 separate spec' (phase 2 spec, non-goals). This firing is the concrete evidence for that spec. The fixture is untouched.",
-   "consequence": "M4's `found` is confounded: the mutant IS really exploitable (the 1-nanoERG purchase is a genuine keyless theft and is in family \u2014 the hunt scored 710 hits), but its drainable verdict cannot be distinguished from overpayment noise without a cost-aware objective. Recorded as found=true, confounded=true.",
+   "consequence": "M4's `found` is confounded: the mutant IS really exploitable (the 1-nanoERG purchase is a genuine keyless theft and is in family \u2014 the hunt scored 710 hits), but its drainable verdict cannot be distinguished from overpayment noise without a cost-aware objective. Recorded as rawDrainable=true, confounded=true, attributable=false.",
    "mutant": "M4"
   }
  ],
