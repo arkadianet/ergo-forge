@@ -173,6 +173,31 @@ amount 3 — is readable, not discoverable by instrumenting the run). The honest
 a miss says "not under these probes", names which synthesis degrees were
 enabled, and names the caps and the truncation order.
 
+**Two consequences the allocator carries, recorded (review round 3):**
+
+- **A capped synthesis-on run does not subsume phase 1.** Allocation is what
+  makes the synthesis degrees reachable, and it is paid for out of shape
+  `none` — the phase-1 point. On the mapped USE set at a 3,000-probe cap,
+  `none` went from 3,000 probes (depth-first) to 158 (allocated): correct,
+  and a ~1.25% sample of a space phase 1 would have swept whole. A drain
+  phase 1 alone would find can therefore be missed by a capped
+  synthesis-on run. **On a real target, run both**: synthesis off, then
+  synthesis on. One run is not two answers, and the report's per-shape
+  slice is what makes the difference legible.
+- **Breadth the budget cannot pay for is named.** A shape cut off with less
+  room than one input arrangement's decoy sweep (`decoy combinations ×
+  payout modes`) *ran* while covering less than a single arrangement — "it
+  ran" and "it explored something" are different claims, and this document's
+  honesty rule does not let them blur. Thinness is judged on **effective
+  capacity**, not the nominal slice: unused quota flows forward, so a later
+  shape often has more room than its slice, and a shape that merely
+  exhausted its own family was never starved at all — counting either as
+  thin would raise a false alarm. The report records `sliceFloor`,
+  `thinSlices`, and each shape's `budget` (nominal) beside its `capacity`
+  (effective, the gap being what the allocator handed forward); the CLI
+  prints a `THIN SLICES` line. The remedy is a larger `maxProbes` or fewer
+  enabled degrees, and the report says which.
+
 The anti-cheat carries too, sharpened: the vault acceptance below must be
 won by the **generic family** — a hand-fed `OUTPUTS(0)` with the right NFT at
 the right index is not a finding, it is a fixture bug.
