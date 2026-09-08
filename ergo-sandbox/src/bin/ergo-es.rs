@@ -1132,6 +1132,14 @@ fn cmd_drain(args: &[String]) -> Result<(), String> {
                 report.synthesis.companions_qualified
             );
         }
+        if report.synthesis.thin_slices > 0 {
+            println!(
+                "  THIN SLICES: {} shape slice(s) got fewer than {} probes (one \
+                 arrangement's decoy sweep) — they ran without covering a single input \
+                 arrangement",
+                report.synthesis.thin_slices, report.synthesis.slice_floor
+            );
+        }
         if !report.nft_detached.is_empty() {
             println!(
                 "  nftDetached: {} script-matched output(s) lack the protocol NFT",

@@ -339,7 +339,83 @@ mod map_feed {
     /// 3-input fixture), shape `none` alone produces more points than any
     /// sane cap; depth-first spending therefore zeroed every synthesis
     /// shape. With the allocator, under a binding cap, synthesis shapes
-    /// must still run.
+    /// must    /// Breadth the budget cannot pay for is recorded, not hidden. A slice
+    /// thinner than one input arrangement's decoy sweep means the shape ran
+    /// and covered less than a single arrangement — "it ran" and "it
+    /// explored something" are different claims. Asserted both ways: a
+    /// starved run names it, a healthy run reports zero.
+    #[test]
+    fn thin_shape_slices_are_named_and_a_healthy_allocation_is_not() {
+        let fixture = load("use-lp.json");
+        let m: ProtocolMap = map(
+            &fixture,
+            &Seed::TokenId(
+                "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41".to_string(),
+            ),
+            &recorded_opts(),
+        )
+        .expect("map the recorded set");
+        let build = |max_probes: usize| {
+            let (mut request, _skipped) = ergo_sandbox::drain::request_from_map(
+                &m,
+                serde_json::from_value(attacker()).expect("attacker box"),
+            );
+            request.max_probes = Some(max_probes);
+            request.synthesis = serde_json::from_value(json!({
+                "maxNewOutputs": 2, "companionRecreations": true, "successorStates": true,
+                "splits": true, "mints": true, "permuteOutputs": true
+            }))
+            .expect("synthesis block");
+            drain_request(request)
+        };
+
+        // Starved: 200 probes over 19 shapes cannot pay for one arrangement's
+        // decoy sweep per shape.
+        let starved = build(200);
+        let syn = &starved.synthesis;
+        assert!(
+            syn.slice_floor > 0,
+            "the floor is one arrangement's decoy sweep, never zero"
+        );
+        assert!(
+            syn.thin_slices > 0,
+            "200 probes must starve the slices (floor {}): {:?}",
+            syn.slice_floor,
+            syn.shapes
+        );
+        assert!(
+            starved
+                .notes
+                .iter()
+                .any(|n| n.contains("under the") && n.contains("floor")),
+            "the thin allocation is named in the notes: {:?}",
+            starved.notes
+        );
+        assert!(
+            syn.shapes.iter().any(|t| t.budget < syn.slice_floor),
+            "the thin slices are attributable per shape: {:?}",
+            syn.shapes
+        );
+
+        // Healthy: the same set at the cap the sibling test uses reports
+        // zero — the signal is not "synthesis is on", it is "the budget is
+        // too thin for the breadth".
+        let healthy = build(900);
+        assert_eq!(
+            healthy.synthesis.thin_slices, 0,
+            "900 probes pays for every slice (floor {}): {:?}",
+            healthy.synthesis.slice_floor, healthy.synthesis.shapes
+        );
+        assert!(
+            !healthy
+                .notes
+                .iter()
+                .any(|n| n.contains("under the") && n.contains("floor")),
+            "no thin-slice note on a healthy allocation: {:?}",
+            healthy.notes
+        );
+    }
+
     #[test]
     fn the_mapped_use_set_runs_synthesis_shapes_under_a_binding_cap() {
         let fixture = load("use-lp.json");
@@ -366,9 +442,9 @@ mod map_feed {
         .expect("synthesis block");
         let report = drain_request(request);
 
-        assert!(report.capped, "3000 probes must bind on a 12-input set");
+        assert!(report.capped, "900 probes must bind on a 12-input set");
         assert!(
-            report.probes_run <= 3000,
+            report.probes_run <= 900,
             "the cap is respected: {}",
             report.probes_run
         );
@@ -380,7 +456,7 @@ mod map_feed {
             .find(|t| t.shape == "none")
             .expect("the none tally");
         assert!(
-            none.run < 3000,
+            none.run < 900,
             "shape `none` must not consume the whole budget: run={} of {}",
             none.run,
             report.probes_run

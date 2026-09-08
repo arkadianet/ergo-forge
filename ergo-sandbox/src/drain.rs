@@ -401,6 +401,16 @@ pub struct SynthesisRecord {
     /// box-identifying singleton). An axis that will generate nothing is
     /// visible here instead of only in zero tallies.
     pub companions_qualified: usize,
+    /// The probes one shape needs to cover a single input arrangement's
+    /// decoy sweep (`decoy combinations × payout modes`). A shape whose
+    /// slice is under this ran, but cannot have covered even one
+    /// arrangement — "it ran" and "it explored something" are different
+    /// claims, and the report must not blur them.
+    pub slice_floor: usize,
+    /// How many shape slices fell under `slice_floor`. Non-zero means the
+    /// allocation is spread thinner than it can usefully explore: raise
+    /// `maxProbes`, or narrow the enabled degrees.
+    pub thin_slices: usize,
     pub shapes: Vec<ShapeTally>,
 }
 
@@ -549,7 +559,16 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
             hits: 0,
             best: None,
             notes: shape_errors,
-            synthesis: synthesis_record(&req.synthesis, max_probe_cap(req), 1, 0, 0, Vec::new()),
+            synthesis: synthesis_record(
+                &req.synthesis,
+                max_probe_cap(req),
+                1,
+                0,
+                0,
+                0,
+                0,
+                Vec::new(),
+            ),
             rejections: Rejections::default(),
             nft_detached: Vec::new(),
         });
@@ -709,6 +728,29 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
     // One tally bucket per (shape, filler count) — the filler dimension is
     // part of the reported label, which is what makes padded reachability
     // observable in the report.
+    // A slice thinner than one arrangement's decoy sweep buys breadth it
+    // cannot use: the shape runs, and covers less than a single input
+    // arrangement. Recorded, not silently tolerated — "it ran" and "it
+    // explored something" are different claims.
+    let slice_floor = combo_lengths
+        .iter()
+        .try_fold(1usize, |a, &b| a.checked_mul(b))
+        .and_then(|c| c.checked_mul(payout_modes.len()))
+        .unwrap_or(usize::MAX);
+    let thin_slices = (0..shape_count)
+        .filter(|&i| {
+            let budget = shape_ceilings[i] - if i == 0 { 0 } else { shape_ceilings[i - 1] };
+            budget < slice_floor
+        })
+        .count();
+    if thin_slices > 0 && shape_count > 1 {
+        notes.push(format!(
+            "{thin_slices} of {shape_count} shape slices are under the {slice_floor}-probe \
+             floor (one arrangement's decoy sweep): those shapes ran without covering a \
+             single input arrangement — raise maxProbes or narrow the enabled degrees"
+        ));
+    }
+
     let mut shape_tallies: Vec<ShapeTally> = Vec::new();
     let mut tally_of: Vec<Vec<usize>> = Vec::with_capacity(axes.shapes.len());
     for (si, s) in axes.shapes.iter().enumerate() {
@@ -999,6 +1041,8 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
             shape_count,
             companions_considered,
             companions_qualified,
+            slice_floor,
+            thin_slices,
             shape_tallies,
         ),
         rejections,
@@ -1013,12 +1057,15 @@ fn max_probe_cap(req: &DrainRequest) -> usize {
     req.max_probes.unwrap_or(50_000).max(1)
 }
 
+#[allow(clippy::too_many_arguments)]
 fn synthesis_record(
     syn: &Synthesis,
     max_probes: usize,
     shape_count: usize,
     companions_considered: usize,
     companions_qualified: usize,
+    slice_floor: usize,
+    thin_slices: usize,
     shapes: Vec<ShapeTally>,
 ) -> SynthesisRecord {
     SynthesisRecord {
@@ -1042,6 +1089,8 @@ fn synthesis_record(
         ),
         companions_considered,
         companions_qualified,
+        slice_floor,
+        thin_slices,
         shapes,
     }
 }
