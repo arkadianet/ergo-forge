@@ -141,7 +141,7 @@ fn box_json(tpl: &Value, mutant_tree: &str, extra_trees: &serde_json::Map<String
 /// Build the hunt request from a mutant record. The template is the
 /// protocol's HONEST shape; `protocolNfts` is derived from the protected
 /// inputs' tokens(0) — the caller's claim, and nothing more.
-fn build_request(m: &Value, synthesis_on: bool) -> DrainRequest {
+fn build_request(m: &Value, synthesis_on: bool, caps: &Value) -> DrainRequest {
     let extra: serde_json::Map<String, Value> = m
         .get("extraTrees")
         .and_then(|e| e.as_object())
@@ -183,13 +183,13 @@ fn build_request(m: &Value, synthesis_on: bool) -> DrainRequest {
         }
     }
 
-    let caps = &m["caps"];
+    // The cap policy comes from the corpus root — it is part of the
+    // measurement, so it may not be silently defaulted. (It used to read
+    // `m["caps"]`, which is null on every mutant: the declared policy was
+    // decorative, and the run used `DrainRequest`'s defaults, which happen
+    // to match. A future policy change would have been ignored.)
     let synthesis = if synthesis_on {
-        json!({
-            "maxNewOutputs": 2, "companionRecreations": true, "successorStates": true,
-            "splits": true, "mints": true, "permuteOutputs": true,
-            "maxOutputPermutations": 24
-        })
+        caps["synthesis"].clone()
     } else {
         json!({})
     };
@@ -369,8 +369,8 @@ fn verdict_name(v: &DrainVerdict) -> &'static str {
     }
 }
 
-fn run_one(m: &Value, synthesis_on: bool) -> Value {
-    let req = build_request(m, synthesis_on);
+fn run_one(m: &Value, synthesis_on: bool, caps: &Value) -> Value {
+    let req = build_request(m, synthesis_on, caps);
     let t = Instant::now();
     let report =
         ergo_sandbox::decompile::with_large_stack(move || drain_hunt(&req)).expect("hunt runs");
@@ -506,6 +506,39 @@ fn the_corpus_is_measured_and_does_not_regress() {
         })
         .unwrap_or_default();
 
+    // ── the cap policy: validated, and pinned to the recorded run ──
+    // Caps are part of the measurement: a rate produced under different caps
+    // is a different rate, so the policy is checked rather than trusted.
+    let caps = &corpus["caps"];
+    let max_probes = caps["maxProbes"]
+        .as_u64()
+        .expect("corpus caps declare maxProbes");
+    let max_perms = caps["maxPermutations"]
+        .as_u64()
+        .expect("corpus caps declare maxPermutations");
+    assert!(
+        max_probes > 0 && max_perms > 0,
+        "cap policy must be positive: probes={max_probes} perms={max_perms}"
+    );
+    assert!(
+        caps["synthesis"].is_object(),
+        "corpus caps declare the synthesis-on block"
+    );
+    assert_eq!(
+        max_probes,
+        key["caps"]["maxProbes"]
+            .as_u64()
+            .expect("recorded maxProbes"),
+        "the cap policy changed: the recorded rate was measured under different caps"
+    );
+    assert_eq!(
+        max_perms,
+        key["caps"]["maxPermutations"]
+            .as_u64()
+            .expect("recorded maxPermutations"),
+        "the cap policy changed: the recorded rate was measured under different caps"
+    );
+
     // ── one pass over the corpus: mutants and their negative controls ──
     let mut results: BTreeMap<String, Value> = BTreeMap::new();
     let mut controls: BTreeMap<String, Value> = BTreeMap::new();
@@ -522,8 +555,8 @@ fn the_corpus_is_measured_and_does_not_regress() {
     let mut proven = 0usize;
     for m in corpus["mutants"].as_array().unwrap() {
         let id = m["id"].as_str().unwrap().to_string();
-        let off = run_one(m, false);
-        let on = run_one(m, true);
+        let off = run_one(m, false, caps);
+        let on = run_one(m, true, caps);
         // Negative control: the UNMUTATED original, both configurations,
         // asserted and recorded. A drainable original is either a real
         // finding in a contract we ship as an example (escalate — record it
@@ -532,8 +565,8 @@ fn the_corpus_is_measured_and_does_not_regress() {
         // unrecorded drainable original fails the run.
         let mut o = m.clone();
         o["mutatedSource"] = m["originalSource"].clone();
-        let ctrl_off = run_one(&o, false);
-        let ctrl_on = run_one(&o, true);
+        let ctrl_off = run_one(&o, false, caps);
+        let ctrl_on = run_one(&o, true, caps);
         let escalated = key_escalated.contains(&id);
         for (cfg, r) in [("synthesisOff", &ctrl_off), ("synthesisOn", &ctrl_on)] {
             let v = r["verdict"].as_str().unwrap();

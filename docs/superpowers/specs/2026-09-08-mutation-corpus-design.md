@@ -106,8 +106,9 @@ mutant should *require* the phase-4 solver to be provable).
 Methodology, applied: every mutant is compiled from source with
 `compile_with_params`; every witness was hand-built from the honest template
 and validated with `txcheck::check` **before** the hunt ran; every original
-runs as a negative control (all seven originals return `notUnderProbes` in
-both configurations); every mutant runs twice (synthesis off/on); one cap
+runs as a negative control (**six of seven** return `notUnderProbes` in both
+configurations; M4's original fires `drainable` with synthesis on and is
+recorded in `escalatedFindings` — see below); every mutant runs twice (synthesis off/on); one cap
 policy for all (`maxProbes` 50,000, `maxPermutations` 120, synthesis
 fully on in the second configuration).
 
