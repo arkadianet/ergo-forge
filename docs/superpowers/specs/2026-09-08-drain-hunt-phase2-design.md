@@ -75,12 +75,28 @@ freedom, each capped and each recorded in the report:
 1. **Synthesized boxes.** Up to `synthesis.maxNewOutputs` (default 2) new
    outputs beyond the template, of two kinds:
    - **Companion re-creations with padded token layouts** — a companion box
-     rebuilt verbatim (same script, value, tokens) with phase-1's dummy filler
-     tokens inserted so that a carried NFT lands at an attacker-chosen index
+     rebuilt verbatim (same script, value, tokens) with filler tokens
+     inserted so that a carried NFT lands at an attacker-chosen index
      `i ∈ {0..=3}`. This is the vault move: the whitelisted NFT at
-     `OUTPUTS(k).tokens(2)`. Whether the rebuilt companion's *own* script
-     still passes is not our problem to decide — the oracle judges it, and
-     its time-locks and guards are exactly what the probes exercise.
+     `OUTPUTS(k).tokens(2)`.
+     **The padding has a token source, and saying so is load-bearing.**
+     Conservation rejects any output id the inputs do not carry, and a box
+     cannot hold one id twice — so reaching index 2 needs *two distinct
+     filler ids actually held by inputs*. The fillers are therefore sourced,
+     never conjured: the generator pairs a padded re-creation only with the
+     decoy combination that places those exact filler ids on attacker input
+     slots (one filler id per index, deterministically paired), and a
+     caller-declared attacker input that already carries the needed ids
+     sources it too. A padded probe whose fillers are not sourced is not
+     generated at all — generating it would fail conservation and make the
+     flagship verdict vacuous ("conservation blocked us" wearing the costume
+     of "the scripts refused"). The report must keep the two apart: every
+     synthesized probe's rejection is classified (`conservation` /
+     `script` / `missing-key`) and tallied, from `txcheck`'s problems and
+     per-input verdicts.
+     Whether the rebuilt companion's *own* script still passes is not our
+     problem to decide — the oracle judges it, and its time-locks and guards
+     are exactly what the probes exercise.
    - **New attacker sinks** — boxes under the attacker tree, receiving value.
 2. **Per-successor state.** Phase 1 shrank all successors simultaneously in
    drain mode. Phase 2 makes it independent: each script-matched successor is
@@ -92,11 +108,14 @@ freedom, each capped and each recorded in the report:
    sinks). Finite; the split exists because two-box layouts are the common
    laundering shape.
 4. **Mint probes.** Conservation allows one minted token id — the first
-   input's box id. One synthesized output may mint it, in amounts
-   `{1, declared-N}` where N is any amount a synthesized check would want.
-   This forges "successor-looking" boxes for protocols that check a token id
-   the caller did **not** declare as a protocol NFT — and the map's token
-   evidence (`TokenClass::Singleton` vs `Fungible`, from #63's chain source)
+   input's box id. One synthesized output may mint it, in amounts drawn from
+   the **declared request alone**: `{1, the largest amount of any token held
+   by a declared input, the largest amount declared on any template
+   output}` — never from the target script, because a mint sized to
+   "whatever a synthesized check would want" is script-dependent, which is
+   the one property the anti-cheat rests on. Minted placeholders forge
+   "successor-looking" boxes for protocols that check a token id the caller
+   did **not** declare as a protocol NFT — and the map's token evidence (`TokenClass::Singleton` vs `Fungible`, from #63's chain source)
    is what makes the distinction honest: a declared singleton cannot be
    forged by minting, because its id is not the first input's box id and
    conservation blocks the fake.
@@ -106,13 +125,25 @@ freedom, each capped and each recorded in the report:
    `OUTPUTS(0)`. Phase 1 kept output order fixed; phase 2 makes order
    symmetric.
 
-The probe count is the product of the enabled degrees, dominated by the
-output permutation and successor state axes. Caps: `maxNewOutputs` (2),
-successor states (8), output permutations (24 default), total probes
-(50,000 default) — every cap a parameter, every overflow sampled
-deterministically (seeded, ordered), every cap recorded in the report. The
-honesty rule from phase 1 carries: a miss says "not under these probes" and
-now also names which synthesis degrees were enabled.
+The probe count is the product of the enabled degrees, and for any
+realistic set the product exceeds the total-probe cap — **truncation is the
+normal case, not the overflow case**. "Exhaustive over the family" therefore
+means: exhaustive within the sampled prefix, where the prefix is defined by a
+**pinned axis order**, outermost first: (1) synthesized-output shapes (none →
+sinks → companion re-creations, the vault move first — it is the class the
+incident left open); (2) output permutation; (3) per-successor states;
+(4) value splits; (5) mint variants; (6) input permutation and decoy
+combinations, the phase-1 axes, innermost. Synthesis axes iterate outermost
+and input axes innermost: truncation then preserves the new degrees and
+spends its budget varying the phase-1 space inside each synthesis shape,
+instead of the reverse. Caps: `maxNewOutputs` (2), successor states (8),
+output permutations (24 default), total probes (50,000 default) — every cap
+a parameter, every cap recorded in the report alongside the pinned order.
+With the default caps the sampled prefix covers a bounded slice, so the
+flagship vault run **declares larger caps explicitly** (~200,000 probes —
+minutes, not hours) and records them. The honesty rule from phase 1 carries:
+a miss says "not under these probes", names which synthesis degrees were
+enabled, and names the caps and the truncation order.
 
 The anti-cheat carries too, sharpened: the vault acceptance below must be
 won by the **generic family** — a hand-fed `OUTPUTS(0)` with the right NFT at
@@ -127,13 +158,19 @@ phase-1 objective rather than changes to it:
 1. **Synthesized boxes sanction nothing.** Only the caller's declared free
    payees (at their declared amounts) count as sanctioned outflow. A
    synthesized sink holding protected value is leak, all of it.
-2. **A fabricated successor counts by its actual holdings**, exactly like a
-   real one. If a synthesized output carries the pool's script and the pool's
-   full reserves, its holdings are protected — that is a faithful
-   continuation at a new index, and the value is still locked by the pool's
-   script (draining *it* is a second-step attack, out of scope until
-   phase 3+). If it carries the script with dust, it shields dust. Amounts,
-   never identities.
+2. **A fabricated successor counts as protected only when the NFT rides
+   along.** A synthesized output is counted into `protectedOut` only when it
+   carries the protected input's protocol NFT — same id, same token index —
+   in addition to matching the script bytes. Script equality alone is not
+   enough: with synthesis, the generator could otherwise walk into a false
+   negative — park the reserves in a script-clone that does not carry the
+   NFT, score zero leak, and walk away. Reserves detached from their
+   singleton is a real break of exactly the class this project exists to
+   catch, so it is reported as its own signal (`nftDetached`): any
+   script-matched output that lacks the protocol NFT is named in the report
+   whether or not the probe drains. When synthesis is off, the phase-1 rule
+   stands unchanged (caller-declared outputs are trusted) and behavior is
+   byte-identical.
 3. **Minted tokens are neither protected nor sanctioned.** A mint id cannot
    appear in `protectedIn` (no protected input holds it — and if one
    coincidentally does, conservation accounts the movement), and a minted
@@ -169,6 +206,20 @@ without the decode:
    is run once, recorded in the incident corpus, and the test pins the
    recorded verdict — the same pattern the USE replay used: the corpus is
    both fixture and answer key.
+
+   **Sources for the whitelist shape** — this spec's flagship hangs on it,
+   so the provenance is stated: the vault box
+   `e6162e2aff23f7c88968cc958541bacfe3ad80d6541befb7231ac3106e966f8b`
+   (carried by the merged map fixture `use-lp.json`), whose deployed
+   ErgoTree constants were hand-decoded during the incident response — the
+   four NFT constants and the dead `dbf655…` branch at `OUTPUTS(2)` are
+   visible in the tree's constant block, and the drain analysis in the
+   incident report records the decode. **Do not confuse this with**
+   `examples/contracts/dexy/bank/bank.es`, the DexyGold fork's bank, which
+   checks `INPUTS(mintInIndex).tokens(0)._1` — an input-side, index-0
+   check; a different contract. Implementation must land the vault's
+   deployed tree as a corpus fixture so the asserted whitelist shape is
+   checkable, not taken on trust from this document.
 3. **Either outcome is a result.** `drainable` means the vault is a live
    keyless drain of 292,615 ERG + the treasury: **disclosure-first** — the
    operator is the project itself here, but the rule from the phase-1 spec
@@ -180,10 +231,18 @@ without the decode:
 
 ## Compatibility and integration
 
-- The phase-1 request JSON is unchanged and remains the default behavior;
-  `synthesis` is an optional block: `{ "maxNewOutputs": 2,
-  "companionRecreations": true, "successorStates": true, "splits": true,
-  "mints": true, "permuteOutputs": true }`, every field defaulting off.
+- The phase-1 request JSON is unchanged and remains the default behavior.
+  `synthesis` is an optional block whose **defaults are all off** — omitting
+  it, or passing the default block, is byte-identical to phase 1:
+  ```json
+  { "maxNewOutputs": 0, "companionRecreations": false, "successorStates": false,
+    "splits": false, "mints": false, "permuteOutputs": false }
+  ```
+  The fully-enabled block — what the flagship vault run declares — is:
+  ```json
+  { "maxNewOutputs": 2, "companionRecreations": true, "successorStates": true,
+    "splits": true, "mints": true, "permuteOutputs": true }
+  ```
 - `request_from_map` (the map→hunt feed from #63) gains the same block so a
   mapped set is hunted with synthesis in one call — the vault is the first
   target that needs it.
