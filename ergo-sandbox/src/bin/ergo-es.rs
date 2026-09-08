@@ -102,6 +102,14 @@ USAGE:
       (nft / script-hash / self-successor / positional / data-input) and
       set-level findings name the box at risk. --source replays a recorded
       fixture offline; without it the live explorer is used.
+  ergo-es drain <request.json> [--json]
+      Drain hunt, phase 1: can a transaction that holds no key extract value
+      from the protected boxes, over the shapes an attacker can build? The
+      request labels every input (protected / companion / attacker /
+      external), fixes the transaction shape, and names the protocol's
+      singleton NFTs. Probes permute the inputs and substitute a generic
+      decoy family; hits carry a reproducible witness. --json prints the
+      full report with the witness bundle.
 "
     );
 }
