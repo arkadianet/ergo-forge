@@ -52,6 +52,7 @@ cargo run -p ergo-sandbox --bin ergo-es -- decompile 100104c801d191a37300
 cargo run -p ergo-sandbox --bin ergo-es -- roundtrip 100104c801d191a37300
 cargo run -p ergo-sandbox --bin ergo-es -- audit 1001040ad191e4c6a704047300
 cargo run -p ergo-sandbox --bin ergo-es -- hunt 1001040ad191e4c6a704047300
+cargo run -p ergo-sandbox --bin ergo-es -- drain request.json          # {inputs:[{role,box…}], outputs:[{payee,box…}], protocolNfts, height}
 cargo run -p ergo-sandbox --bin ergo-es -- test examples/tests/height-lock.test.json
 cargo run -p ergo-sandbox --bin ergo-es -- validate-tx request.json   # {tx, boxes, height}
 cargo run -p ergo-sandbox --features cost-trace --bin ergo-es -- eval scenario.json --hot-spots
@@ -79,6 +80,7 @@ every endpoint and setting.
 | What does this on-chain contract say? | **Read**: the contract in plain words (who may spend, under what conditions), then the source; `ergo-es decompile`, `POST /api/v1/inspect` |
 | Is the code fragile? (unguarded `Option.get`, tiered by who controls the value) | `ergo-es audit`, inspect findings |
 | Can someone with **no key** spend this box? | `ergo-es hunt`, `POST /api/v1/hunt`, the reader's Spendability section |
+| Can a keyless transaction **drain this contract set** over the shapes an attacker can build? | `ergo-es drain request.json` — labelled roles (`protected`/`companion`/`attacker`/`external`), a fixed shape, bounded enumeration of input permutations and a generic decoy family; the incident replay is the acceptance test (`examples/incidents/`) |
 | Does my contract pass in *this* spending context, and what does it cost? | `ergo-es eval`, `POST /api/v1/eval`, the reader's Scenario panel |
 | Can I work with files? | Open `.es`, `params.json`, `contract.test.json`; save a project zip the CLI runs unchanged; raw `.es` at `/api/v1/examples/{id}.es` |
 | I want to try a contract's whole life: fund it, spend it, spend what came out | **Play**: a sandbox chain in the browser over `POST /api/v1/play` — every input's script runs in the transaction's context, ERG and tokens must balance, outputs get real ids; "Play with it" from Build funds a box under the contract you just made |

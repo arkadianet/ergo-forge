@@ -29,6 +29,7 @@ fn main() -> ExitCode {
         "map" => cmd_map(rest),
         "test" => cmd_test(rest),
         "validate-tx" => cmd_validate_tx(rest),
+        "drain" => cmd_drain(rest),
         "compose" => cmd_compose(rest),
         "point" => cmd_point(rest),
         "help" | "--help" | "-h" => {
@@ -101,6 +102,14 @@ USAGE:
       (nft / script-hash / self-successor / positional / data-input) and
       set-level findings name the box at risk. --source replays a recorded
       fixture offline; without it the live explorer is used.
+  ergo-es drain <request.json> [--json]
+      Drain hunt, phase 1: can a transaction that holds no key extract value
+      from the protected boxes, over the shapes an attacker can build? The
+      request labels every input (protected / companion / attacker /
+      external), fixes the transaction shape, and names the protocol's
+      singleton NFTs. Probes permute the inputs and substitute a generic
+      decoy family; hits carry a reproducible witness. --json prints the
+      full report with the witness bundle.
 "
     );
 }
@@ -1046,6 +1055,64 @@ fn hunt_verdict_str(v: ergo_sandbox::hunt::HuntVerdict) -> &'static str {
         RequiresProof => "requires proof",
         NotUnderProbes => "not under probes",
     }
+}
+
+/// `ergo-es drain <request.json> [--json]` — the phase-1 drain hunt over a
+/// labelled contract set and a fixed transaction shape.
+fn cmd_drain(args: &[String]) -> Result<(), String> {
+    use ergo_sandbox::drain::{drain_hunt, DrainRequest, DrainVerdict};
+
+    let path = args
+        .iter()
+        .find(|a| !a.starts_with("--"))
+        .ok_or("drain needs a request JSON path")?;
+    let as_json = args.iter().any(|a| a == "--json");
+    let text = std::fs::read_to_string(path).map_err(|e| format!("{path}: {e}"))?;
+    let req: DrainRequest = serde_json::from_str(&text).map_err(|e| format!("{path}: {e}"))?;
+    let report = ergo_sandbox::decompile::with_large_stack(move || drain_hunt(&req))
+        .map_err(|e| e.to_string())?;
+
+    if as_json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
+        );
+        return Ok(());
+    }
+    let verdict = match report.verdict {
+        DrainVerdict::Drainable => "DRAINABLE",
+        DrainVerdict::NotUnderProbes => "not under probes",
+        DrainVerdict::InvalidShape => "invalid shape",
+    };
+    println!("drain: {}", verdict.to_lowercase());
+    for n in &report.notes {
+        println!("  note: {n}");
+    }
+    if report.verdict == DrainVerdict::InvalidShape {
+        return Ok(());
+    }
+    println!(
+        "  probes: {}/{} (capped: {}), hits: {}",
+        report.probes_run, report.probes_total, report.capped, report.hits
+    );
+    if let Some(best) = &report.best {
+        println!("  best extraction:");
+        for (asset, amt) in &best.extracted {
+            println!("    {asset}: {amt}");
+        }
+        println!(
+            "  permutation: {:?}, payout: {}, decoys: {}",
+            best.permutation,
+            best.payout,
+            if best.decoys.is_empty() {
+                "none".to_string()
+            } else {
+                best.decoys.join("; ")
+            }
+        );
+        println!("  witness: rerun with --json for the full bundle");
+    }
+    Ok(())
 }
 
 /// `ergo-es test <suite.json>` — the CI entry point for contract tests.

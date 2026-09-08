@@ -22,7 +22,7 @@ use crate::SandboxError;
 /// `ergoTree`, `assets`, `additionalRegisters`, `creationHeight`); a
 /// register value may be the node's `serializedValue` hex or an object
 /// carrying one.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TxRequest {
     pub tx: Tx,
@@ -37,7 +37,7 @@ pub struct TxRequest {
     pub network: Option<String>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Tx {
     pub inputs: Vec<TxInput>,
@@ -47,7 +47,7 @@ pub struct Tx {
     pub outputs: Vec<serde_json::Value>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TxInput {
     pub box_id: String,

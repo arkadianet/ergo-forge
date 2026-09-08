@@ -47,6 +47,7 @@ pub mod box_build;
 pub mod compile;
 pub mod compose;
 pub mod decompile;
+pub mod drain;
 pub mod eval;
 pub mod hot_spots;
 pub mod hunt;
@@ -64,6 +65,9 @@ pub mod txcheck;
 pub use audit::{Finding, Severity};
 pub use compile::{compile_source, compile_source_raw, CompileOutput};
 pub use decompile::{lift_tree, Lifted, Node, NodeKind};
+pub use drain::{
+    drain_hunt, DrainHit, DrainReport, DrainRequest, DrainRole, DrainVerdict, WitnessBundle,
+};
 pub use eval::{eval_scenario, EvalOutcome, Verdict, DEFAULT_COST_LIMIT};
 pub use hunt::{hunt, Hunt, HuntOptions, HuntVerdict};
 pub use inspect::{sigma_boolean_pretty, tree_report, tree_structure};
