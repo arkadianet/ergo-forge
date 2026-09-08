@@ -51,7 +51,11 @@ B", labelled with *how*. The audit then runs on the edges, not only the nodes.
 Any of:
 
 - **A token id** — an NFT the protocol uses. Resolve to the box holding it.
-- **An address** — resolve to its unspent boxes.
+- **An address** — resolve to its unspent boxes, fetched **paginated and
+  bounded** by the frontier cap below. A high-volume address can hold more
+  boxes than any traversal should admit, so the initial frontier is truncated
+  deterministically (canonical order, below) and the truncation is reported
+  like any other.
 - **A transaction id** — take its inputs and outputs as the initial frontier.
 
 A seed is a starting point, never a trust anchor: everything the chain source
@@ -65,16 +69,30 @@ Breadth-first from the seed frontier. For each box:
 1. **Decompile** its ergoTree to the lifted AST (existing decompiler).
 2. **Extract every constant** and classify it (below).
 3. For each constant classified as a **token id**, resolve it against the
-   chain: is there a box holding that token? If so it is a new node, and an
-   **edge** from this contract to that box is recorded.
-4. For each constant classified as a **script hash**, record an edge to
-   whatever tree hashes to it — resolvable once that tree is in the map, so
-   script-hash edges are closed on a second pass.
+   chain. A token may have **many holders**, so selection is defined before
+   the cap applies: fetch holders paginated, order them canonically by
+   `(inclusionHeight, boxId)` ascending, then take the first `max-boxes-per-token`.
+   The order is a property of the map, never of the chain source's response
+   order, so two runs against the same chain state select the same boxes.
+   Each selected box is a node and an **edge** from this contract to it is
+   recorded. Truncation is reported **per token id**, not only in the map's
+   overall result — omitting a holder can omit the box actually at risk.
+4. For each constant classified as a **script hash**, resolve it two ways:
+   - against trees already in the map (closed on a second pass); and
+   - where the chain source supports a script/template-hash query, by a
+     **bounded lookup** subject to the same canonical ordering and per-hash cap.
+
+   A script hash that neither resolves is recorded as an edge to an
+   **`unresolved`** target. Such an edge is kept — the reference is real and
+   worth reporting — but the map is **not** complete, and unresolved edges are
+   excluded from any completeness claim. A collaborator referenced only by
+   script hash must never silently vanish from the set.
 5. Recurse until no new nodes, or until the caps below bite.
 
 Caps, recorded per run and never silent: maximum nodes, maximum depth,
-maximum boxes fetched per token id. A truncated map is reported as truncated,
-in the same spirit as the audit's `Completeness::Partial`.
+maximum boxes per token id, maximum boxes per script hash, and the initial
+frontier size. A truncated map is reported as truncated, in the same spirit as
+the audit's `Completeness::Partial`.
 
 ## Constant classification
 
@@ -93,20 +111,52 @@ Classification is *evidence-based*, never by shape alone: a 32-byte constant
 is only a token id if the chain says a token with that id exists. The chain
 source and the response are archived so the classification is re-derivable.
 
+### What counts as a *protocol NFT*
+
+The role rules below depend on this term, and boxes routinely carry unrelated
+tokens — the drained USE pool's own holders carry RSN, DORT and airdrop dust,
+and the attacker's decoy carried three junk tokens precisely to satisfy
+positional `tokens(i)` reads. So the term is defined by evidence, with an
+explicit precedence:
+
+A token id is a **protocol NFT** iff both hold:
+
+1. it appears as a **constant in at least one mapped tree** (the protocol
+   itself names it); and
+2. its **emission amount is 1** — a singleton, so holding it identifies one box.
+
+A token id that is referenced but not a singleton is recorded as a
+**referenced token**, not a protocol NFT; it may still carry value and appear
+in edges, but it cannot establish identity.
+
+A *box's* protocol NFT is: the token at `tokens(0)` if that is a protocol NFT
+(the singleton convention every deployed set here follows), otherwise the
+lowest-indexed token that is one. Unrelated tokens at any index are ignored
+for identity and reported separately. A box with no protocol NFT has none —
+the map does not guess.
+
 ## Edge typing — the point of the exercise
 
 For each edge "contract A recognises box B", record **how A establishes B's
 identity**, by inspecting A's tree at the site of the reference:
 
-| Binding | Shape in A | Trust |
+| Binding | Shape in A | What it actually pins |
 |---|---|---|
-| `nft` | `B.tokens(0)._1 == <NFT constant>` | B is pinned. Only the real B satisfies it. |
-| `script-hash` | `blake2b256(B.propositionBytes) == <hash constant>` | B's *code* is pinned; any box with that script qualifies. |
-| `self-successor` | `B.propositionBytes == SELF.propositionBytes` | B is A's own recreation. |
-| `positional` | A reads `INPUTS(n)` / `OUTPUTS(n)` with no identity check | **Unpinned.** Whoever builds the transaction chooses what sits there. |
+| `nft` | `B.tokens(0)._1 == <NFT constant>` | A **token id**. It pins a unique *box* only with singleton evidence (emission amount 1, per the definition above); against a non-singleton token any holder qualifies. Recorded as `nft(singleton)` or `nft(fungible)`. |
+| `script-hash` | `blake2b256(B.propositionBytes) == <hash constant>` | B's **code**. Any box with that script qualifies. |
+| `self-successor` | `B.propositionBytes == SELF.propositionBytes` | B's **script bytes only** — *not* its value, tokens or registers. Another box with the same script satisfies it. |
+| `positional` | A reads `INPUTS(n)` / `OUTPUTS(n)` with no identity check | **Nothing.** Whoever builds the transaction chooses what sits there. |
 | `data-input` | B is read via `CONTEXT.dataInputs(n)` | Typed by the same rules; a data input pinned only by position is equally unpinned. |
 
-An edge may carry more than one binding; the strongest one wins for scoring.
+No binding is treated as unique box identity by default. The map records
+**which identity dimensions a binding covers** — script, token id, value,
+registers — and leaves the rest open, because the uncovered dimensions are
+where this bug class lives: the USE pool checked its successor's script and
+token *ids* and never its token *amounts*, which is exactly how the reserves
+walked out of a box that looked correctly pinned.
+
+An edge may carry more than one binding; the strongest one wins for scoring,
+and the covered dimensions are the union.
 
 **The set-level finding** is an edge typed `positional` where A does value
 arithmetic on B — the graph form of the `unbound-box-reserves` lint, and the
@@ -124,13 +174,17 @@ The phase-1 drain hunt requires the caller to label every input
 `protected` / `companion` / `attacker` / `external`, and refuses to guess.
 The map is what stops that being hand work. From the graph:
 
-- **`protected`** — a node carrying a protocol NFT **and** holding value
-  (ERG or non-NFT tokens) that other contracts do arithmetic on.
-- **`companion`** — a node carrying a protocol NFT, holding only dust, whose
+- **`protected`** — a node whose **protocol NFT** (as defined above) is
+  present **and** which holds value — ERG, or referenced tokens other than
+  that NFT — that other contracts do arithmetic on.
+- **`companion`** — a node with a protocol NFT, holding only dust, whose
   script is the authorisation; typically also `movableByAnyone` under the
   spend hunt.
-- **`external`** — a node reached only through `data-input` edges (oracles,
-  trackers).
+- **`external`** — an oracle or tracker: a node read for its *data* rather
+  than spent. Evidence is incoming `data-input` edges, which may coexist with
+  `nft` edges — the USE oracle is both pinned by NFT and read as a data input,
+  so a data-input edge is sufficient evidence, not a requirement that no other
+  binding exists.
 - **`unknown`** — anything the rules do not settle. Emitted as `unknown` and
   never silently defaulted; the caller resolves it.
 
@@ -139,17 +193,30 @@ an `unknown`.
 
 ## Output
 
-One JSON document, deterministic for a given chain state and caps:
+One JSON document, **byte-identical** for a given chain state and caps. Two
+rules make that true rather than aspirational:
 
-```
-{ "seed": …, "chainSource": { "kind": …, "url": …, "height": …, "fetchedAt": … },
+- **No run metadata inside the canonical artifact.** `chainSource` carries only
+  what the map depends on (`kind`, `url`, `height`). The wall-clock
+  `fetchedAt`, durations and any request ids live in a separate `run` block
+  that is explicitly **non-canonical** and excluded from comparison.
+- **Every array has a canonical sort key**: `nodes` by `boxId`; `edges` by
+  `(from.boxId, to.boxId | targetHash, binding, site)`; `findings` by
+  `(severity, lint, from.boxId, to.boxId)`; `tokens` within a node by token id.
+
+```text
+{ "seed": …,
+  "chainSource": { "kind": …, "url": …, "height": … },
+  "run": { "fetchedAt": …, "durationMs": … },          // non-canonical
   "nodes": [ { "boxId", "nft", "treeHash", "value", "tokens",
                "role": "protected|companion|external|unknown", "complete": bool } ],
-  "edges": [ { "from": <node>, "to": <node>, "binding": "nft|script-hash|
-               self-successor|positional|data-input", "valueMath": bool,
-               "site": <snippet> } ],
+  "edges": [ { "from": <node>, "to": <node> | { "unresolved": <hash> },
+               "binding": "nft|script-hash|self-successor|positional|data-input",
+               "covers": ["script","tokenId","value","registers"],
+               "valueMath": bool, "site": <snippet> } ],
   "findings": [ … set-level lints … ],
-  "truncated": { "nodes": n, "depth": d } | null }
+  "truncated": { "nodes": n, "depth": d, "frontier": n,
+                 "perToken": { <tokenId>: n }, "perScriptHash": { <hash>: n } } | null }
 ```
 
 Rendering (CLI table, and later a graph in the Read pane) is a view over this;
@@ -187,8 +254,11 @@ forge *calls*, never a capability it assumes.
 5. **Roles feed the hunt.** The map's proposed roles for the USE set must be
    exactly the labelling the drain-hunt phase-1 fixture uses by hand: pool
    `protected`, swap `companion`, oracle/tracking `external`.
-6. **Determinism and honesty.** Same chain state and caps → same graph.
-   Truncation is reported, never silent.
+6. **Determinism and honesty.** Same chain state and caps → **byte-identical**
+   canonical JSON (the non-canonical `run` block excluded), independent of the
+   chain source's response ordering. Truncation is reported — overall, per
+   token id, and per script hash — and never silent. Unresolved script-hash
+   edges are present in the output and excluded from completeness claims.
 
 ## Integration
 
