@@ -51,6 +51,7 @@ pub mod drain;
 pub mod eval;
 pub mod hot_spots;
 pub mod hunt;
+pub mod identity;
 pub mod ingest;
 pub mod inspect;
 pub mod map;
