@@ -1343,7 +1343,7 @@ fn the_data_input_axis_appends_an_attacker_box_and_is_off_by_default() {
         ],
         "dataInputs": [
             { "value": 1, "ergoTree": "10010101d17300",
-              "registers": { "R4": { "type": "Long", "value": 12000000 } } },
+              "registers": { "R4": { "type": "raw", "value": "0580b48913" } } },
         ],
         "outputs": [
             { "payee": "fixed", "value": 100000000i64, "ergoTree": "10010101d17300",
@@ -1388,13 +1388,28 @@ fn the_data_input_axis_appends_an_attacker_box_and_is_off_by_default() {
         data_shapes.iter().any(|s| s.shape.contains("+data(R4=0)")),
         "the zero boundary must be in the family: {data_shapes:?}"
     );
+    // A generated shape is not a tested shape. Appended-data probes must
+    // actually REACH the oracle: they share (inputs, outputs) with their
+    // verbatim twin, so they are only distinct if the data inputs are in the
+    // dedup key, and they only survive box marshalling if the register is
+    // raw-encoded. Both were broken when this axis first landed, and the
+    // shape-level assertions above passed anyway.
+    assert!(
+        data_shapes.iter().any(|s| s.run > 0),
+        "appended-data probes must run, not just be generated: {data_shapes:?}"
+    );
+    assert_eq!(
+        on.rejections.invalid, 0,
+        "an appended data input must survive box marshalling: {:?}",
+        on.rejections
+    );
     // The declared oracle's own value is carried into the family too — the
     // attacker may restate what an honest box says, but nothing is invented
     // from the target script.
     assert!(
         data_shapes
             .iter()
-            .any(|s| s.shape.contains("+data(R4=12000000)")),
+            .any(|s| s.shape.contains("+data(R4=20000000)")),
         "observed register values must be in the family: {data_shapes:?}"
     );
 }

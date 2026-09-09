@@ -12,7 +12,8 @@
    "splits": true,
    "mints": true,
    "permuteOutputs": true,
-   "maxOutputPermutations": 24
+   "maxOutputPermutations": 24,
+   "dataInputs": true
   },
   "note": "one cap policy for the whole corpus; caps are part of the measurement"
  },

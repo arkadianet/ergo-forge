@@ -1016,13 +1016,22 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                                 }
                             };
 
-                            // Deduplicate: identical (inputs, outputs) shapes are one probe.
-                            let key =
-                                match serde_json::to_string(&(&realized_inputs, &realized_outputs))
-                                {
-                                    Ok(k) => k,
-                                    Err(_) => continue,
-                                };
+                            // Deduplicate: identical realized transactions are one
+                            // probe. The DATA inputs are part of that identity —
+                            // shapes differing only by data variant produce the same
+                            // (inputs, outputs) pair, so leaving them out of the key
+                            // silently collapsed every appended-data probe into its
+                            // verbatim twin and skipped it.
+                            let realized_data_inputs =
+                                realize_data_inputs(req, &point.shape.data, &attacker_tree);
+                            let key = match serde_json::to_string(&(
+                                &realized_inputs,
+                                &realized_outputs,
+                                &realized_data_inputs,
+                            )) {
+                                Ok(k) => k,
+                                Err(_) => continue,
+                            };
                             if !seen.insert(key) {
                                 continue;
                             }
@@ -1033,8 +1042,6 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
 
                             // ── oracle: full transaction validation ──
                             let probe_seq = probes_run;
-                            let realized_data_inputs =
-                                realize_data_inputs(req, &point.shape.data, &attacker_tree);
                             let (tx_request, oracle_outputs) = match build_tx_request(
                                 req,
                                 &realized_inputs,
@@ -1574,7 +1581,12 @@ impl AxisIter {
             let mut r4s: Vec<i64> = vec![0];
             for b in declared.iter().chain(req.data_inputs.iter()) {
                 if let Some(tv) = b.registers.get("R4") {
-                    if let Ok(v) = serde_json::from_value::<i64>(tv.value.clone()) {
+                    let v = if tv.r#type == "raw" {
+                        tv.value.as_str().and_then(raw_long_value)
+                    } else {
+                        serde_json::from_value::<i64>(tv.value.clone()).ok()
+                    };
+                    if let Some(v) = v {
                         if !r4s.contains(&v) {
                             r4s.push(v);
                         }
@@ -2897,6 +2909,50 @@ fn box_json(sb: &ScenarioBox, id_seed: &str) -> Result<serde_json::Value, Sandbo
 /// (`txcheck` allows exactly one minted id — the first input's box id). The
 /// returned boxes are what the witness and the protocol scenarios replay,
 /// so the oracle and every validator see the same transaction.
+/// Serialize a Long as an ErgoTree `raw` constant: type code 0x05 (SLong)
+/// followed by a zigzag varint. The drain hunt's box marshalling accepts
+/// only `raw` registers, so a family that builds `Long`-typed ones produces
+/// boxes that can never reach the oracle.
+fn raw_long(v: i64) -> String {
+    let mut out = vec![0x05u8];
+    let mut z = ((v << 1) ^ (v >> 63)) as u64;
+    loop {
+        let mut b = (z & 0x7f) as u8;
+        z >>= 7;
+        if z != 0 {
+            b |= 0x80;
+        }
+        out.push(b);
+        if z == 0 {
+            break;
+        }
+    }
+    hex::encode(out)
+}
+
+/// Read a Long back out of a `raw` register, so observed register values on
+/// declared boxes join the family. Map-derived boxes carry raw hex, so
+/// without this the family sees none of them.
+fn raw_long_value(hex_str: &str) -> Option<i64> {
+    let bytes = hex::decode(hex_str).ok()?;
+    let (&tag, rest) = bytes.split_first()?;
+    if tag != 0x05 {
+        return None;
+    }
+    let (mut z, mut shift) = (0u64, 0u32);
+    for &b in rest {
+        z |= u64::from(b & 0x7f) << shift;
+        if b & 0x80 == 0 {
+            return Some(((z >> 1) as i64) ^ -((z & 1) as i64));
+        }
+        shift += 7;
+        if shift > 63 {
+            return None;
+        }
+    }
+    None
+}
+
 /// Realize the data inputs for a probe. `Verbatim` is the declared list;
 /// `Append` adds one attacker-owned box carrying the chosen `R4`. The added
 /// box is the attacker's own — it is not an oracle forgery, it is a box the
@@ -2918,8 +2974,8 @@ fn realize_data_inputs(
         b.registers.insert(
             "R4".to_string(),
             crate::TypedValue {
-                r#type: "Long".to_string(),
-                value: serde_json::json!(r4),
+                r#type: "raw".to_string(),
+                value: serde_json::json!(raw_long(*r4)),
             },
         );
         out.push(b);
