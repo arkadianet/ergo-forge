@@ -104,8 +104,15 @@ freedom, each capped and each recorded in the report:
      flagship verdict vacuous ("conservation blocked us" wearing the costume
      of "the scripts refused"). The report must keep the two apart: every
      synthesized probe's rejection is classified (`conservation` /
-     `script` / `missing-key`) and tallied, from `txcheck`'s problems and
-     per-input verdicts.
+     `script` / `missingKey` / `invalid`) and tallied, from `txcheck`'s
+     problems and per-input verdicts. `invalid` means a malformed tree,
+     box or hex value, a missing input, or a marshalling failure prevented
+     evaluation; it is never evidence of a script refusal. Count failures
+     while building the oracle request or invoking it here too. For probes
+     with multiple rejection reasons, `invalid` takes precedence, then
+     `conservation`, then `missingKey`, then `script` (false or a runtime
+     exception). Tallies are reported with synthesis enabled; they are not
+     collected in the synthesis-off configuration.
      Whether the rebuilt companion's *own* script still passes is not our
      problem to decide — the oracle judges it, and its time-locks and guards
      are exactly what the probes exercise.

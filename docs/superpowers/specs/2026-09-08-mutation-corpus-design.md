@@ -130,10 +130,65 @@ set a boolean.
 
 Recorded in `examples/mutants/answer-key.json` and asserted by
 `ergo-sandbox/tests/mutation_corpus.rs` as **no regression** — the recorded
-per-mutant verdicts must not degrade, the confounded set is pinned exactly
+per-mutant verdicts must not degrade, deterministic probe/hit/rejection
+counts must match the deliberately recorded baseline, the confounded set is
+pinned exactly
 (a mutant becoming confounded, or ceasing to be, changes what the number
 means), and never an absolute floor (a hard threshold turns into a fixture
 that gets tuned).
+
+### Baseline repair, 2026-09-09
+
+The repaired run keeps **0/4 attributable**, one raw drainable proven mutant
+(M4, still confounded), all verdicts, and every cap flag unchanged. The answer
+key now records hits and all four rejection buckets for mutants and controls.
+Rejections are collected only with synthesis on; accepted probes with no leak
+are neither rejections nor hits. Timings are diagnostic, not pinned.
+
+M5's adapter had dropped typed registers from the hunt and also supplied them
+in a form the node adapter ignored. The corpus `box_json` now emits serialized
+hex in `additionalRegisters` and equivalent raw typed constants in `registers`:
+the drain marshaller requires raw constants. `ScenarioBox` itself is unchanged.
+The bank input's R4/R5, successor's R4/R5, and oracle's R4 now reach both
+consumers. The declared successor holds 10,000,000,000 nanoERG (previously 0),
+matching the witness. It still preserves the bank NFT at token index 0; the
+witness's different successor token layout remains out of family. The earlier
+fixture correction (removing junk at token index 0 and the predeclared NFT
+payout from the honest template before the original run) is preserved.
+
+M7's template now uses `$amm-pool` for input and output; its witness already
+did. The old 29,448 "script rejections" were malformed probes: with the new
+classifier, the unrepaired mutant and original each report 29,448 `invalid`
+and zero `script`. Repair leaves the out-of-family diagnosis intact while
+correcting its evidence:
+
+| synthesis-on measurement | before fixture repair | after repair |
+|---|---:|---:|
+| M5 and original: probes | 3,416 | 2,216 |
+| M5 and original: conservation | 976 | 208 |
+| M5 and original: script | 2,440 | 1,922 |
+| M5 and original: accepted, no hit | 0 | 86 |
+| M7 and original: invalid | 29,448 | 0 |
+| M7: script (under the new classifier) | 0 | 29,392 |
+| M7 original: script (under the new classifier) | 0 | 29,404 |
+| M7: accepted, no hit | 0 | 56 |
+| M7 original: accepted, no hit | 0 | 44 |
+
+M5 still has zero `invalid`/`missingKey` rejections and zero hits. M7 and its
+original still run 29,448 probes with zero `conservation`/`missingKey`
+rejections and zero hits. Synthesis-off counts stay 28 for M5 and 84 for M7;
+all other probe and hit counts are unchanged. M4 still has 710 mutant hits and
+6 original hits with synthesis on.
+
+The new bucket also exposes a separate existing M1 fixture defect: its
+synthetic token id is 64 non-hex `v` characters, yielding 868 `invalid`
+synthesis-on probes for both mutant and original. That fixture is recorded
+without repair in this work order. Its independently validated witness still
+classifies as keyed-insider, outside the proven denominator; the hunt's miss
+must not be read as a measured key refusal.
+
+M7's role mismatch and M4's output-ownership evidence remain design decisions,
+recorded in `REVIEW-FINDINGS.md`. No role, objective, or proven flag was changed.
 
 ### The operator matrix — read the rate next to it
 
@@ -218,9 +273,10 @@ What the run actually showed, beyond the number:
   Phase 2's synthesis adds sinks and companion re-creations but never
   modifies a template output's tokens or tree; phase 1's output shape is
   fixed by definition. **The missing probe axis is "re-pad / re-tree a
-  fixed output"** — phase-3 backlog entry #1, and the likely conversion of
-  all three misses. The axis, not the budget: M7 spends 29,448 probes in
-  family and misses.
+  fixed output"** — phase-3 backlog entry #1. The repaired M7 run still
+  spends 29,448 probes and misses (29,392 script rejections, zero invalid).
+  Its separate role mismatch must also be settled before claiming the axis
+  alone converts that miss; see `REVIEW-FINDINGS.md`.
 - **The keyed-insider class (M1–M3) is invisible by construction.** The
   hunt refuses `needsProof` on protected inputs — correctly, under its
   keyless attacker model — so a whole defect family (insider drains,
@@ -259,10 +315,11 @@ Stated explicitly, because the rate is only as honest as its boundaries:
 
 | class | mutants | what it implies |
 |-------|---------|-----------------|
-| **out-of-family** | M5, M6, M7 | one missing probe axis: **re-pad / re-tree a fixed (template) output**. Phase 2 pads companion re-creations only; the successors of protected boxes are untouchable. This is the single highest-yield phase-3 entry — it plausibly converts all three misses. |
+| **out-of-family** | M5, M6, M7 | missing probe axis: **re-pad / re-tree a fixed (template) output**. M5 now carries its registers through both adapters and preserves 10,000,000,000 nanoERG in the declared bank successor; its witness still needs a different token layout. M7 now resolves the actual pool tree and still misses. Its separate role mismatch means adding the axis alone does not establish detection; see `REVIEW-FINDINGS.md`. |
 | **keyed-insider (attacker model)** | M1, M2, M3 | the hunt's keyless model cannot see insider drains (beneficiary overdraws, receiver pot drains). Extending the attacker model needs signed-witness machinery — phase-3+ design work, not a coverage knob. |
-| **cap-truncation** | none | no proven mutant was cut off by the budget at 50k probes; M7's 29,448 in-family probes were exhaustive-in-family, which is what makes its miss an *axis* miss and not a cost miss. |
-| **role-labelling** | none | the recorded labellings (incl. the synthetic singletons on M1–M3's token-less boxes and M5's de-attacked template) did not hide any route — with one caveat: the M5 template originally carried the attack shape (junk at `tokens(0)`, NFT pre-declared leaving) and was corrected *before* the run; that iteration is recorded here, in the open. |
+| **cap-truncation** | none | no proven mutant was cut off by the budget at 50k probes; the repaired M7 run exhausts 29,448 probes with 29,392 script rejections and zero invalid probes. The missing axis survives repair; increasing the cap cannot create it. |
+| **role-labelling** | M7 — deferred decision | the role record protects the swap order, but the executable template labels it companion. Roles and `leak()` are unchanged in this repair; evidence and the M4 output-ownership finding are in `REVIEW-FINDINGS.md`. |
+| **invalid fixture** | M1 (outside the proven denominator) | the template singleton id is 64 `v` characters, not hex: all 868 synthesis-on probes are `invalid`. Its independently validated witness is still keyed-insider; the hunt tally is not evidence of a key refusal. Recorded as a separate finding, without repairing another fixture in this work order. |
 | **arithmetic** | none | deliberately: every witness uses amounts the honest template or plain arithmetic produces. The arithmetic mutant is phase 4's exit criterion and must not be pre-seeded. |
 
 ## What the corpus does NOT cover

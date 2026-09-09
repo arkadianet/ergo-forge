@@ -9,7 +9,7 @@
 //! recorded answer key (`answer-key.json`) is asserted as **no regression**
 //! — recorded verdicts must not degrade — never against an absolute floor.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::time::Instant;
 
 use ergo_sandbox::drain::{drain_hunt, DrainRequest, DrainVerdict};
@@ -124,7 +124,30 @@ fn box_json(tpl: &Value, mutant_tree: &str, extra_trees: &serde_json::Map<String
         .get("registers")
         .or_else(|| tpl.get("additionalRegisters"))
     {
-        o["additionalRegisters"] = regs.clone();
+        // Fixtures may use typed scenario constants or node serialized hex.
+        // txcheck reads node hex; drain reads ScenarioBox and its marshaller
+        // requires raw constants. Emit equivalent raw values for BOTH paths.
+        let mut node_regs = serde_json::Map::new();
+        let mut scenario_regs = serde_json::Map::new();
+        for (name, value) in regs.as_object().expect("register map") {
+            let raw = if let Some(raw) =
+                value.as_str().or_else(|| value["serializedValue"].as_str())
+            {
+                raw.to_string()
+            } else {
+                let tv: TypedValue = serde_json::from_value(value.clone()).expect("typed register");
+                let (tpe, value) = ergo_sandbox::parse_typed_value(&tv.r#type, &tv.value)
+                    .expect("register value parses");
+                let mut writer = ergo_primitives::writer::VlqWriter::new();
+                ergo_ser::sigma_value::write_constant(&mut writer, &tpe, &value)
+                    .expect("register serializes");
+                hex::encode(writer.result())
+            };
+            node_regs.insert(name.clone(), json!(raw));
+            scenario_regs.insert(name.clone(), json!({ "type": "raw", "value": raw }));
+        }
+        o["additionalRegisters"] = json!(node_regs);
+        o["registers"] = json!(scenario_regs);
     }
     if let Some(role) = tpl.get("roleRef").and_then(|r| r.as_str()) {
         // Data inputs (oracles) take no role; every hunted input does.
@@ -136,6 +159,48 @@ fn box_json(tpl: &Value, mutant_tree: &str, extra_trees: &serde_json::Map<String
         }
     }
     o
+}
+
+#[test]
+fn bank_template_registers_reach_both_consumers() {
+    let corpus: Value = serde_json::from_str(CORPUS).unwrap();
+    let bank = corpus["mutants"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|m| m["id"] == "M5")
+        .unwrap();
+    let extra = serde_json::Map::new();
+    for (section, index) in [("inputs", 0), ("outputs", 0), ("dataInputs", 0)] {
+        let template = &bank["template"][section][index];
+        let node = box_json(template, PASS_TREE, &extra);
+        let scenario: ergo_sandbox::ScenarioBox = serde_json::from_value(node.clone()).unwrap();
+        let oracle = ergo_sandbox::txcheck::scenario_box(&node);
+        let witness = box_json(&bank["witnessTx"][section][index], PASS_TREE, &extra);
+        assert!(!scenario.registers.is_empty(), "{section}");
+        assert_eq!(
+            serde_json::to_value(&scenario.registers).unwrap(),
+            serde_json::to_value(&oracle.registers).unwrap()
+        );
+        assert_eq!(node["additionalRegisters"], witness["additionalRegisters"]);
+        // Typed fixture values must survive serialization semantically too.
+        for (name, tv) in &scenario.registers {
+            let declared: TypedValue =
+                serde_json::from_value(template["registers"][name].clone()).unwrap();
+            assert_eq!(
+                ergo_sandbox::parse_typed_value(&tv.r#type, &tv.value).unwrap(),
+                ergo_sandbox::parse_typed_value(&declared.r#type, &declared.value).unwrap()
+            );
+        }
+    }
+    assert_eq!(
+        bank["template"]["outputs"][0]["value"],
+        json!(10_000_000_000i64)
+    );
+    assert_eq!(
+        bank["template"]["outputs"][0]["value"],
+        bank["witnessTx"]["outputs"][0]["value"]
+    );
 }
 
 /// Build the hunt request from a mutant record. The template is the
@@ -369,6 +434,54 @@ fn verdict_name(v: &DrainVerdict) -> &'static str {
     }
 }
 
+fn assert_measurement(id: &str, actual: &Value, recorded: &Value) {
+    for config in ["synthesisOff", "synthesisOn"] {
+        let actual = actual[config].as_object().expect("observed configuration");
+        let recorded = recorded[config]
+            .as_object()
+            .expect("recorded configuration");
+        for metric in ["verdict", "probesRun", "capped", "hits", "rejections"] {
+            // Rejections are intentionally absent when synthesis is off.
+            if metric == "rejections" && config == "synthesisOff" {
+                continue;
+            }
+            let observed = actual
+                .get(metric)
+                .unwrap_or_else(|| panic!("{id} {config}: missing observed {metric}"));
+            let baseline = recorded
+                .get(metric)
+                .unwrap_or_else(|| panic!("{id} {config}: missing recorded {metric}"));
+            assert!(
+                !observed.is_null() && !baseline.is_null(),
+                "{id} {config}: {metric} must not be null"
+            );
+            assert_eq!(
+                observed, baseline,
+                "{id} {config}: {metric} changed — review the measurement and re-record deliberately"
+            );
+        }
+    }
+}
+
+fn recorded_rows<'a>(
+    section: &str,
+    key: &'a Value,
+    actual: &BTreeMap<String, Value>,
+) -> &'a [Value] {
+    let rows = key[section].as_array().expect("recorded rows");
+    let ids: BTreeSet<&str> = rows
+        .iter()
+        .map(|row| row["id"].as_str().expect("recorded id"))
+        .collect();
+    assert_eq!(rows.len(), ids.len(), "{section}: duplicate recorded ids");
+    assert_eq!(
+        ids,
+        actual.keys().map(String::as_str).collect(),
+        "{section}: recorded ids must cover every observed result"
+    );
+    rows
+}
+
 fn run_one(m: &Value, synthesis_on: bool, caps: &Value) -> Value {
     let req = build_request(m, synthesis_on, caps);
     let t = Instant::now();
@@ -377,13 +490,23 @@ fn run_one(m: &Value, synthesis_on: bool, caps: &Value) -> Value {
     if matches!(report.verdict, DrainVerdict::InvalidShape) {
         eprintln!("{}: shape errors: {:?}", m["id"], report.notes);
     }
-    json!({
+    let mut result = json!({
         "verdict": verdict_name(&report.verdict),
         "probesRun": report.probes_run,
         "capped": report.capped,
         "hits": report.hits,
         "wallMs": t.elapsed().as_millis() as u64,
-    })
+    });
+    // Rejection tallies are collected only with synthesis enabled.
+    if synthesis_on {
+        result["rejections"] = serde_json::to_value(report.rejections).unwrap();
+    }
+    if let Some(best) = report.best {
+        // Keep the winning transaction reviewable alongside counts, including
+        // who actually owns its outputs. The answer key need not duplicate it.
+        result["best"] = serde_json::to_value(best).unwrap();
+    }
+    result
 }
 
 /// The must-find control (harness validity, NOT a corpus mutant): the
@@ -652,6 +775,13 @@ fn the_corpus_is_measured_and_does_not_regress() {
     // ── the must-find control: a pass/fail on the apparatus ──
     known_detectable_control_is_found(&corpus);
 
+    // Machine-readable observations for deliberate answer-key re-recording.
+    // Emit before snapshot assertions so a changed result remains reviewable.
+    println!(
+        "CORPUS_MEASUREMENT {}",
+        json!({ "mutants": results, "controls": controls })
+    );
+
     // ── the answer key: no regression against the recorded run ──
     let key_rate = key["detectionRate"].as_f64().expect("recorded rate");
     assert!(
@@ -691,21 +821,12 @@ fn the_corpus_is_measured_and_does_not_regress() {
             .expect("recorded raw drainable count") as usize,
         "raw drainable count on proven mutants changed"
     );
-    for kr in key["perMutant"].as_array().expect("per-mutant records") {
+    for kr in recorded_rows("perMutant", &key, &results) {
         let id = kr["id"].as_str().unwrap();
         let r = results
             .get(id)
             .unwrap_or_else(|| panic!("{id} missing from the run"));
-        assert_eq!(
-            r["synthesisOff"]["verdict"].as_str().unwrap(),
-            kr["synthesisOff"]["verdict"].as_str().unwrap(),
-            "{id}: synthesis-off verdict regressed"
-        );
-        assert_eq!(
-            r["synthesisOn"]["verdict"].as_str().unwrap(),
-            kr["synthesisOn"]["verdict"].as_str().unwrap(),
-            "{id}: synthesis-on verdict regressed"
-        );
+        assert_measurement(id, r, kr);
         if let Some(recorded) = kr["confounded"].as_bool() {
             assert_eq!(
                 r["confounded"].as_bool().unwrap(),
@@ -715,11 +836,8 @@ fn the_corpus_is_measured_and_does_not_regress() {
         }
     }
     // The negative controls are recorded too — their section in the key
-    // must exist and every recorded verdict must stay notUnderProbes.
-    for kr in key["negativeControls"]
-        .as_array()
-        .expect("recorded controls")
-    {
+    // must cover every control and agree with that control's own result.
+    for kr in recorded_rows("negativeControls", &key, &controls) {
         let id = kr["id"].as_str().unwrap();
         // The CONTROL's results, not the mutant's — these are different runs,
         // and comparing the mutant against the control's record passed only by
@@ -728,15 +846,6 @@ fn the_corpus_is_measured_and_does_not_regress() {
         let c = controls
             .get(id)
             .unwrap_or_else(|| panic!("{id}: no control result"));
-        assert_eq!(
-            c["synthesisOff"]["verdict"].as_str().unwrap(),
-            kr["synthesisOff"]["verdict"].as_str().unwrap(),
-            "{id}: negative-control verdict changed (synthesis off)"
-        );
-        assert_eq!(
-            c["synthesisOn"]["verdict"].as_str().unwrap(),
-            kr["synthesisOn"]["verdict"].as_str().unwrap(),
-            "{id}: negative-control verdict changed (synthesis on)"
-        );
+        assert_measurement(&format!("{id} negative control"), c, kr);
     }
 }
