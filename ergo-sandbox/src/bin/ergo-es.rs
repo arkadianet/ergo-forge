@@ -1083,6 +1083,7 @@ fn cmd_drain(args: &[String]) -> Result<(), String> {
         DrainVerdict::Drainable => "DRAINABLE",
         DrainVerdict::NotUnderProbes => "not under probes",
         DrainVerdict::InvalidShape => "invalid shape",
+        DrainVerdict::IncompleteObjective => "incomplete objective",
     };
     println!("drain: {}", verdict.to_lowercase());
     for n in &report.notes {
@@ -1153,6 +1154,42 @@ fn cmd_drain(args: &[String]) -> Result<(), String> {
                 report.nft_detached.len()
             );
         }
+    }
+    println!("  objective: {}", report.objective_version);
+    println!(
+        "  declared attacker public keys: {:?}",
+        report.attacker_public_keys
+    );
+    if let Some(accounting) = report
+        .best
+        .as_ref()
+        .map(|b| &b.accounting)
+        .or(report.first_accounting.as_ref())
+    {
+        println!(
+            "  recognized output indices: {:?}",
+            accounting.recognized_output_indices
+        );
+        println!(
+            "  unknown output indices: {:?}",
+            accounting.unknown_output_indices
+        );
+        if report.best.is_none() {
+            println!(
+                "  extracted: {}",
+                serde_json::to_string(&accounting.extracted).map_err(|e| e.to_string())?
+            );
+        }
+        for (asset, v) in &accounting.v {
+            println!(
+                "    {asset}: V={v} A={} N={} S={}",
+                accounting.a[asset], accounting.n[asset], accounting.s[asset]
+            );
+        }
+        println!(
+            "  terms used: {}",
+            serde_json::to_string(&accounting.terms_used).map_err(|e| e.to_string())?
+        );
     }
     if let Some(best) = &report.best {
         println!("  best extraction:");

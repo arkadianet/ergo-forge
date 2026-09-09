@@ -47,15 +47,10 @@
 //!   amount is 1, which is the caller's claim when it declares
 //!   `protocolNfts`. `propositionBytes ==` pins script bytes only — never
 //!   value, tokens or registers.
-//! - **Measure leaks by identity and by amount.** A script-matched successor
-//!   contributes its *actual* holdings to `protectedOut`, per asset — never
-//!   "the right script, so the value stayed". The USE drain's successor had
-//!   the right script and the right token ids and 1/1/1 amounts; identity-
-//!   only accounting is exactly the hole it walked through. With synthesis
-//!   on, script bytes alone shield nothing: a script-matched output counts as
-//!   protected only when the protected input's protocol NFT rides along
-//!   (same id, same token index); every script-matched NFT-less output is
-//!   reported as its own `nftDetached` signal.
+//! - **Measure recognized receipts per asset.** Phase 3 scores victim-funded
+//!   receipts in canonical unconditional or declared-key P2PK outputs, after
+//!   outside funding and explicit release allowances. Script custody and
+//!   detached NFTs are diagnostics only.
 //!
 //! A miss says "not under these probes" — never "safe". With synthesis on,
 //! every synthesized probe's rejection is classified (`conservation` /
@@ -281,6 +276,14 @@ pub struct DrainRequest {
     /// compiled by the oracle-pinned compiler.
     #[serde(default)]
     pub attacker_tree: Option<String>,
+    /// Compressed SEC1 public keys the attacker declares held. This does not
+    /// relax the keyless gate on protected or companion spending inputs.
+    #[serde(default)]
+    pub attacker_public_keys: Vec<String>,
+    /// Explicit authorization policy. An empty terms list declares custody
+    /// with no authorized releases. Missing policy means incomplete scoring.
+    #[serde(default)]
+    pub objective: Option<ObjectivePolicy>,
     #[serde(default)]
     pub max_permutations: Option<usize>,
     #[serde(default)]
@@ -288,6 +291,76 @@ pub struct DrainRequest {
     /// Output-synthesis degrees. Absent = phase 1, byte-identical.
     #[serde(default)]
     pub synthesis: Synthesis,
+}
+
+/// Versioned caller claims; free output labels never imply authorization.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct ObjectivePolicy {
+    pub terms: Vec<ReleaseTerm>,
+}
+
+/// A bounded allowance for one source/asset/exact recipient script. Source
+/// indices always refer to DECLARED spending inputs, before permutation.
+/// Duplicate/overlapping allowances for the same binding combine by maximum,
+/// not addition. Distinct recipients share the source's available holdings.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct ReleaseTerm {
+    pub source_input: usize,
+    pub asset: String,
+    pub destination_tree: String,
+    pub max_amount: u64,
+    /// None = explicit static allowance (including box value/refunds/fees).
+    /// Other assets are never implicitly released by a conditional term.
+    #[serde(default)]
+    pub payment: Option<PaymentTerm>,
+}
+
+/// Fixed-rate exchange. The release is source holdings minus holdings at
+/// declared continuation/owner scripts (including the seller). Payment is
+/// net increase at the seller script, preventing refunds/recycled holdings
+/// from counting as new consideration. The whole release must be paid for.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct PaymentTerm {
+    pub asset: String,
+    pub seller_tree: String,
+    pub amount_per_unit: u64,
+    pub retained_trees: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TermUsed {
+    pub term_index: usize,
+    pub term: ReleaseTerm,
+    pub released: String,
+    pub payment_received: Option<String>,
+    pub satisfied: bool,
+    /// Eligible allowance before shared source/destination capacity caps.
+    pub eligible: String,
+}
+
+/// All quantities are decimal strings; zeroes are explicit on the union of
+/// assets. `extracted` alone omits zeroes. Output indices are realized indices.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DrainAccounting {
+    #[serde(rename = "V")]
+    pub v: BTreeMap<String, String>,
+    #[serde(rename = "A")]
+    pub a: BTreeMap<String, String>,
+    #[serde(rename = "N")]
+    pub n: BTreeMap<String, String>,
+    #[serde(rename = "S")]
+    pub s: BTreeMap<String, String>,
+    pub recognized_output_indices: Vec<usize>,
+    pub unknown_output_indices: Vec<usize>,
+    /// Raw loss from victim script custody; diagnostic, never an extraction gate.
+    pub custody_deficit: BTreeMap<String, String>,
+    pub terms_used: Vec<TermUsed>,
+    pub extracted: BTreeMap<String, String>,
 }
 
 // ── Report ───────────────────────────────────────────────────────────────────
@@ -301,6 +374,8 @@ pub enum DrainVerdict {
     NotUnderProbes,
     /// The request cannot be hunted: shape errors are in `notes`.
     InvalidShape,
+    /// Missing or unsupported authorization policy; no extraction verdict.
+    IncompleteObjective,
 }
 
 /// The scenario each protocol input runs in, for `ergo-es eval` replay.
@@ -328,7 +403,8 @@ pub struct WitnessBundle {
 #[serde(rename_all = "camelCase")]
 pub struct DrainHit {
     /// Per-asset leak, decimal strings: `nanoErg` and token ids.
-    pub extracted: BTreeMap<String, String>,
+    #[serde(flatten)]
+    pub accounting: DrainAccounting,
     /// Input positions in realized order, as declared slot indices.
     pub permutation: Vec<usize>,
     /// Decoy labels for attacker slots (`declared` when untouched).
@@ -339,6 +415,13 @@ pub struct DrainHit {
     /// template shapes).
     pub shape: String,
     pub witness: WitnessBundle,
+}
+
+impl std::ops::Deref for DrainHit {
+    type Target = DrainAccounting;
+    fn deref(&self) -> &Self::Target {
+        &self.accounting
+    }
 }
 
 /// One shape family's traversal tally (phase-2 report).
@@ -451,6 +534,11 @@ pub struct SynthesisCaps {
 #[serde(rename_all = "camelCase")]
 pub struct DrainReport {
     pub verdict: DrainVerdict,
+    pub objective_version: &'static str,
+    pub objective_policy: Option<ObjectivePolicy>,
+    pub attacker_public_keys: Vec<String>,
+    /// First accepted transaction, including zero-score results for review.
+    pub first_accounting: Option<DrainAccounting>,
     /// Probes evaluated (post-deduplication).
     pub probes_run: usize,
     /// Probes generated. `probes_run < probes_total` only under the cap.
@@ -567,6 +655,10 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
     if !shape_errors.is_empty() {
         return Ok(DrainReport {
             verdict: DrainVerdict::InvalidShape,
+            objective_version: "recognized-attacker-receipts-v1",
+            objective_policy: req.objective.clone(),
+            attacker_public_keys: req.attacker_public_keys.clone(),
+            first_accounting: None,
             probes_run: 0,
             probes_total: 0,
             capped: false,
@@ -635,20 +727,21 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
         vec!["verbatim"]
     };
 
-    // Sanctioned outflow: only what the caller declares through FREE payees.
-    // Fixed outputs are the protocol's own and are accounted as protected
-    // continuations, never as sanctioned leakage.
-    let declared_free: Vec<BTreeMap<String, u128>> = req
-        .outputs
-        .iter()
-        .filter(|o| o.payee == Payee::Free)
-        .map(|o| holdings(&o.box_.value, &o.box_.tokens))
-        .collect();
+    // Pin victim scope before probing; decoys and permutations cannot change it.
+    let victim_holdings = sum_boxes(
+        req.inputs
+            .iter()
+            .filter(|i| is_victim(i.role))
+            .map(|i| &i.box_),
+    );
+    let recognized_trees = recognized_trees(req)?;
+    let objective_errors = objective_errors(req);
+    let objective_complete = objective_errors.is_empty();
+    notes.extend(objective_errors);
+    let mut first_accounting = None;
 
-    // NFT riders (phase-2 spec, Decision 2 rule 2): with synthesis on, a
-    // script-matched output shields holdings only when the protected input's
-    // protocol NFT rides along — same id, same token index. Off = the
-    // phase-1 rule, byte-identical.
+    // Retain the phase-2 NFT rider diagnostic independently of extraction:
+    // script-matched outputs missing their NFT at the same index are named.
     let riders: BTreeMap<String, (String, usize)> = protected
         .iter()
         .filter_map(|&i| {
@@ -978,14 +1071,22 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                             }
 
                             // ── objective: leak by identity and amount ──
-                            let (extracted, detached) = leak(
+                            let accounting = leak(
+                                req,
+                                &victim_holdings,
                                 &position_roles,
                                 &realized_inputs,
                                 &oracle_outputs,
+                                &recognized_trees,
+                            );
+                            let detached = custody_diagnostics(
+                                &oracle_outputs,
                                 &protected_trees,
-                                &declared_free,
                                 if syn_enabled { Some(&riders) } else { None },
                             );
+                            if first_accounting.is_none() {
+                                first_accounting = Some(accounting.clone());
+                            }
                             if syn_enabled {
                                 for d in detached {
                                     if detached_seen.insert(d.detail.clone())
@@ -995,11 +1096,15 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                                     }
                                 }
                             }
-                            if extracted.is_empty() {
+                            if !objective_complete || accounting.extracted.is_empty() {
                                 continue;
                             }
                             hits += 1;
-                            let total: u128 = extracted.values().sum();
+                            let total: u128 = accounting
+                                .extracted
+                                .values()
+                                .map(|v| v.parse::<u128>().unwrap())
+                                .sum();
                             if best.as_ref().map(|(t, _)| total > *t).unwrap_or(true) {
                                 let decoy_labels: Vec<String> = attacker_slots
                                     .iter()
@@ -1008,10 +1113,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                                 best = Some((
                                     total,
                                     DrainHit {
-                                        extracted: extracted
-                                            .into_iter()
-                                            .map(|(k, v)| (k, v.to_string()))
-                                            .collect(),
+                                        accounting,
                                         permutation: permutable
                                             .iter()
                                             .map(|&pos| slot_at_position[pos])
@@ -1078,13 +1180,19 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
         }
     }
     notes.dedup();
-    let verdict = if hits > 0 {
+    let verdict = if !objective_complete {
+        DrainVerdict::IncompleteObjective
+    } else if hits > 0 {
         DrainVerdict::Drainable
     } else {
         DrainVerdict::NotUnderProbes
     };
     Ok(DrainReport {
         verdict,
+        objective_version: "recognized-attacker-receipts-v1",
+        objective_policy: req.objective.clone(),
+        attacker_public_keys: req.attacker_public_keys.clone(),
+        first_accounting,
         probes_run,
         probes_total,
         capped,
@@ -1877,33 +1985,369 @@ fn holdings(value: &i64, tokens: &[TokenAmount]) -> BTreeMap<String, u128> {
     m
 }
 
-/// The leak: protected inputs' holdings minus what script-matched successor
-/// outputs actually hold, minus what the template sanctions through free
-/// payees (their declared amounts). Assets with no leak are omitted.
-///
-/// Successors are outputs whose script bytes match a protected input's —
-/// `propositionBytes ==` pins the script only, so their *actual* holdings are
-/// counted, per asset. The drained USE successor (right script, right token
-/// ids, 1/1/1 amounts) therefore shields 0.002 ERG and one of each token, and
-/// nothing more.
-fn leak(
-    roles: &[DrainRole],
-    realized_inputs: &[ScenarioBox],
-    realized_outputs: &[ScenarioBox],
-    protected_trees: &HashSet<String>,
-    free_declared: &[BTreeMap<String, u128>],
-    riders: Option<&BTreeMap<String, (String, usize)>>,
-) -> (BTreeMap<String, u128>, Vec<NftDetached>) {
-    let mut protected_in: BTreeMap<String, u128> = BTreeMap::new();
-    for (i, b) in realized_inputs.iter().enumerate() {
-        if roles[i] != DrainRole::Protected {
-            continue;
-        }
-        for (k, v) in holdings(&b.value, &b.tokens) {
-            *protected_in.entry(k).or_default() += v;
+fn is_victim(role: DrainRole) -> bool {
+    matches!(role, DrainRole::Protected | DrainRole::Companion)
+}
+
+type Amounts = BTreeMap<String, u128>;
+
+fn sum_boxes<'a>(boxes: impl Iterator<Item = &'a ScenarioBox>) -> Amounts {
+    let mut sum = Amounts::new();
+    for b in boxes {
+        for (asset, amount) in holdings(&b.value, &b.tokens) {
+            *sum.entry(asset).or_default() += amount;
         }
     }
-    let mut protected_out: BTreeMap<String, u128> = BTreeMap::new();
+    sum
+}
+
+fn tree(b: &ScenarioBox) -> String {
+    b.ergo_tree
+        .as_deref()
+        .unwrap_or_default()
+        .trim()
+        .to_lowercase()
+}
+
+fn recognized_trees(req: &DrainRequest) -> Result<HashSet<String>, SandboxError> {
+    let mut trees = HashSet::from(["10010101d17300".to_string()]);
+    for key in &req.attacker_public_keys {
+        let bytes = hex::decode(key.trim())
+            .map_err(|e| SandboxError::Scenario(format!("attackerPublicKeys: {e}")))?;
+        if bytes.len() != 33
+            || !matches!(bytes[0], 2 | 3)
+            || k256::PublicKey::from_sec1_bytes(&bytes).is_err()
+        {
+            return Err(SandboxError::Scenario(
+                "attackerPublicKeys requires compressed SEC1 public keys".into(),
+            ));
+        }
+        trees.insert(format!("0008cd{}", hex::encode(bytes)));
+    }
+    Ok(trees)
+}
+
+fn objective_errors(req: &DrainRequest) -> Vec<String> {
+    let Some(policy) = &req.objective else {
+        return vec![
+            "incomplete objective: declare objective.terms (empty means no authorized releases)"
+                .into(),
+        ];
+    };
+    let mut errors = Vec::new();
+    for (i, term) in policy.terms.iter().enumerate() {
+        if !req
+            .inputs
+            .get(term.source_input)
+            .is_some_and(|i| is_victim(i.role))
+        {
+            errors.push(format!("incomplete objective: term {i} sourceInput must name a declared victim spending input"));
+        }
+        let valid_asset = |asset: &str| {
+            asset == "nanoErg" || hex::decode(asset).is_ok_and(|bytes| bytes.len() == 32)
+        };
+        if !valid_asset(&term.asset)
+            || term
+                .payment
+                .as_ref()
+                .is_some_and(|p| !valid_asset(&p.asset))
+        {
+            errors.push(format!(
+                "incomplete objective: term {i} asset must be nanoErg or a 32-byte token id"
+            ));
+        }
+        if term.destination_tree.trim().is_empty()
+            || hex::decode(term.destination_tree.trim()).is_err()
+        {
+            errors.push(format!(
+                "incomplete objective: term {i} invalid destinationTree"
+            ));
+        }
+        if let Some(payment) = &term.payment {
+            if payment.amount_per_unit == 0
+                || payment.seller_tree.trim().is_empty()
+                || hex::decode(payment.seller_tree.trim()).is_err()
+                || payment
+                    .retained_trees
+                    .iter()
+                    .any(|t| t.trim().is_empty() || hex::decode(t.trim()).is_err())
+            {
+                errors.push(format!(
+                    "incomplete objective: term {i} invalid payment binding/rate"
+                ));
+            }
+            // A bounded fixed-rate policy supports one claim per payment pool.
+            // Exact duplicates are harmless. More complex joint exchanges
+            // need an explicit allocation model; never silently double spend
+            // consideration or issue a verdict with an underspecified policy.
+            for prev in &policy.terms[..i] {
+                if let Some(p) = &prev.payment {
+                    if p.asset.eq_ignore_ascii_case(&payment.asset)
+                        && p.seller_tree
+                            .trim()
+                            .eq_ignore_ascii_case(payment.seller_tree.trim())
+                        && prev != term
+                    {
+                        errors.push(format!("incomplete objective: term {i} shares payment with a different term; joint payment allocation is unsupported"));
+                    }
+                }
+            }
+        }
+    }
+    errors
+}
+
+/// Measurement only; called after transaction validity and missing-key gates.
+fn leak(
+    req: &DrainRequest,
+    victim: &Amounts,
+    roles: &[DrainRole],
+    inputs: &[ScenarioBox],
+    outputs: &[ScenarioBox],
+    recognized: &HashSet<String>,
+) -> DrainAccounting {
+    let indices: Vec<usize> = outputs
+        .iter()
+        .enumerate()
+        .filter(|(_, b)| recognized.contains(&tree(b)))
+        .map(|(i, _)| i)
+        .collect();
+    let attacker = sum_boxes(indices.iter().map(|&i| &outputs[i]));
+    let input_total = sum_boxes(inputs.iter());
+    let output_total = sum_boxes(outputs.iter());
+    let mut outside = sum_boxes(
+        inputs
+            .iter()
+            .zip(roles)
+            .filter(|(_, r)| !is_victim(**r))
+            .map(|(b, _)| b),
+    );
+    // On a valid realized transaction only the permitted mint id can have
+    // positive token supply growth. ERG cannot be minted; burns add nothing.
+    for (asset, amount) in &output_total {
+        if asset != "nanoErg" {
+            *outside.entry(asset.clone()).or_default() +=
+                amount.saturating_sub(*input_total.get(asset).unwrap_or(&0));
+        }
+    }
+    let mut terms_used = Vec::new();
+    // Capacities: (asset, declared source, exact destination). Max deduplicates
+    // overlapping claims; a max-flow below shares source and receipt holdings.
+    let mut allowances: BTreeMap<(String, usize, String), u128> = BTreeMap::new();
+    if let Some(policy) = &req.objective {
+        for (i, term) in policy.terms.iter().enumerate() {
+            let Some(source) = req
+                .inputs
+                .get(term.source_input)
+                .filter(|s| is_victim(s.role))
+            else {
+                continue;
+            };
+            let asset = if term.asset == "nanoErg" {
+                term.asset.clone()
+            } else {
+                term.asset.to_lowercase()
+            };
+            let source_amount = *holdings(&source.box_.value, &source.box_.tokens)
+                .get(&asset)
+                .unwrap_or(&0);
+            let destination = term.destination_tree.trim().to_lowercase();
+            let receipts = sum_boxes(
+                indices
+                    .iter()
+                    .map(|&i| &outputs[i])
+                    .filter(|b| tree(b) == destination),
+            );
+            let mut released = source_amount;
+            let mut paid = None;
+            let mut satisfied = true;
+            if let Some(payment) = &term.payment {
+                let seller = payment.seller_tree.trim().to_lowercase();
+                let retained = sum_boxes(outputs.iter().filter(|b| {
+                    tree(b) == seller
+                        || payment
+                            .retained_trees
+                            .iter()
+                            .any(|t| t.trim().eq_ignore_ascii_case(&tree(b)))
+                }));
+                released = source_amount.saturating_sub(*retained.get(&asset).unwrap_or(&0));
+                let payment_asset = if payment.asset == "nanoErg" {
+                    payment.asset.clone()
+                } else {
+                    payment.asset.to_lowercase()
+                };
+                let before = sum_boxes(inputs.iter().filter(|b| tree(b) == seller));
+                let after = sum_boxes(outputs.iter().filter(|b| tree(b) == seller));
+                let received = after
+                    .get(&payment_asset)
+                    .unwrap_or(&0)
+                    .saturating_sub(*before.get(&payment_asset).unwrap_or(&0));
+                satisfied = payment.amount_per_unit > 0
+                    && released
+                        .checked_mul(u128::from(payment.amount_per_unit))
+                        .is_some_and(|required| received >= required);
+                paid = Some(received.to_string());
+            }
+            let eligible = if satisfied {
+                u128::from(term.max_amount)
+                    .min(released)
+                    .min(*receipts.get(&asset).unwrap_or(&0))
+            } else {
+                0
+            };
+            let cap = allowances
+                .entry((asset, term.source_input, destination))
+                .or_default();
+            *cap = (*cap).max(eligible);
+            terms_used.push(TermUsed {
+                term_index: i,
+                term: term.clone(),
+                released: released.to_string(),
+                payment_received: paid,
+                satisfied,
+                eligible: eligible.to_string(),
+            });
+        }
+    }
+    let mut sanctioned = Amounts::new();
+    for asset in victim.keys() {
+        // Source -> victim input -> recipient script -> sink. Grouping exact
+        // scripts counts each realized output once even under duplicate terms.
+        let destinations: Vec<String> = allowances
+            .keys()
+            .filter(|(a, _, _)| a == asset)
+            .map(|(_, _, d)| d.clone())
+            .collect::<std::collections::BTreeSet<_>>()
+            .into_iter()
+            .collect();
+        let sink = 1 + req.inputs.len() + destinations.len();
+        let mut capacities = vec![vec![0u128; sink + 1]; sink + 1];
+        for (i, input) in req
+            .inputs
+            .iter()
+            .enumerate()
+            .filter(|(_, i)| is_victim(i.role))
+        {
+            capacities[0][1 + i] = *holdings(&input.box_.value, &input.box_.tokens)
+                .get(asset)
+                .unwrap_or(&0);
+        }
+        for (j, destination) in destinations.iter().enumerate() {
+            let node = 1 + req.inputs.len() + j;
+            capacities[node][sink] = *sum_boxes(
+                indices
+                    .iter()
+                    .map(|&i| &outputs[i])
+                    .filter(|b| tree(b) == *destination),
+            )
+            .get(asset)
+            .unwrap_or(&0);
+            for ((a, source, d), amount) in &allowances {
+                if a == asset && d == destination {
+                    capacities[1 + source][node] = *amount;
+                }
+            }
+        }
+        sanctioned.insert(asset.clone(), max_flow(capacities, sink));
+    }
+    let assets: std::collections::BTreeSet<_> = victim
+        .keys()
+        .chain(attacker.keys())
+        .chain(outside.keys())
+        .chain(sanctioned.keys())
+        .cloned()
+        .collect();
+    let strings = |amounts: &Amounts| {
+        assets
+            .iter()
+            .map(|a| (a.clone(), amounts.get(a).unwrap_or(&0).to_string()))
+            .collect()
+    };
+    let extracted = victim
+        .iter()
+        .filter_map(|(asset, v)| {
+            let amount = attacker
+                .get(asset)
+                .unwrap_or(&0)
+                .saturating_sub(*outside.get(asset).unwrap_or(&0))
+                .saturating_sub(*sanctioned.get(asset).unwrap_or(&0))
+                .min(*v);
+            (amount > 0).then(|| (asset.clone(), amount.to_string()))
+        })
+        .collect();
+    let victim_trees: HashSet<_> = req
+        .inputs
+        .iter()
+        .filter(|i| is_victim(i.role))
+        .map(|i| tree(&i.box_))
+        .collect();
+    let retained = sum_boxes(outputs.iter().filter(|b| victim_trees.contains(&tree(b))));
+    let custody_deficit = victim
+        .iter()
+        .filter_map(|(a, v)| {
+            let deficit = v.saturating_sub(*retained.get(a).unwrap_or(&0));
+            (deficit > 0).then(|| (a.clone(), deficit.to_string()))
+        })
+        .collect();
+    let unknown_output_indices = (0..outputs.len())
+        .filter(|i| !indices.contains(i))
+        .collect();
+    DrainAccounting {
+        v: strings(victim),
+        a: strings(&attacker),
+        n: strings(&outside),
+        s: strings(&sanctioned),
+        recognized_output_indices: indices,
+        unknown_output_indices,
+        custody_deficit,
+        terms_used,
+        extracted,
+    }
+}
+
+/// Edmonds-Karp on the small allowance graph. Unlike greedy allocation this
+/// obtains an upper bound independent of term/source ordering.
+fn max_flow(mut residual: Vec<Vec<u128>>, sink: usize) -> u128 {
+    let mut total = 0;
+    loop {
+        let mut parents = vec![usize::MAX; residual.len()];
+        parents[0] = 0;
+        let mut queue = std::collections::VecDeque::from([0]);
+        while let Some(u) = queue.pop_front() {
+            for (v, parent) in parents.iter_mut().enumerate() {
+                if *parent == usize::MAX && residual[u][v] > 0 {
+                    *parent = u;
+                    queue.push_back(v);
+                }
+            }
+        }
+        if parents[sink] == usize::MAX {
+            return total;
+        }
+        let mut amount = u128::MAX;
+        let mut v = sink;
+        while v != 0 {
+            let u = parents[v];
+            amount = amount.min(residual[u][v]);
+            v = u;
+        }
+        v = sink;
+        while v != 0 {
+            let u = parents[v];
+            residual[u][v] -= amount;
+            residual[v][u] += amount;
+            v = u;
+        }
+        total += amount;
+    }
+}
+
+/// Identity diagnostics are deliberately independent of extraction scoring.
+fn custody_diagnostics(
+    realized_outputs: &[ScenarioBox],
+    protected_trees: &HashSet<String>,
+    riders: Option<&BTreeMap<String, (String, usize)>>,
+) -> Vec<NftDetached> {
     let mut detached: Vec<NftDetached> = Vec::new();
     for (pos, b) in realized_outputs.iter().enumerate() {
         let pinned = b
@@ -1914,12 +2358,8 @@ fn leak(
         if !pinned {
             continue;
         }
-        // Phase-2 rule (Decision 2, rule 2): with synthesis on, a
-        // script-matched output shields only when the protected input's
-        // protocol NFT rides along — same id, same token index. Script
-        // equality alone would let a synthesized script-clone park the
-        // reserves, score zero leak, and walk away — a false negative, so
-        // every such output is also named in the report.
+        // Phase-2 identity diagnostic: a matching script does not establish
+        // that the protocol NFT rode along. This never changes A or extracted.
         if let Some(riders) = riders {
             let tree = b
                 .ergo_tree
@@ -1927,8 +2367,7 @@ fn leak(
                 .unwrap_or_default()
                 .trim()
                 .to_lowercase();
-            // No rider requirement recorded (defensive): script bytes
-            // count, as in phase 1.
+            // Without a declared rider there is no detachment to report.
             if let Some((nft, idx)) = riders.get(&tree) {
                 let rides = b
                     .tokens
@@ -1946,26 +2385,8 @@ fn leak(
                 }
             }
         }
-        for (k, v) in holdings(&b.value, &b.tokens) {
-            *protected_out.entry(k).or_default() += v;
-        }
     }
-    let mut free: BTreeMap<String, u128> = BTreeMap::new();
-    for m in free_declared {
-        for (k, v) in m {
-            *free.entry(k.clone()).or_default() += *v;
-        }
-    }
-    let mut out = BTreeMap::new();
-    for (asset, in_amt) in &protected_in {
-        let held = protected_out.get(asset).copied().unwrap_or(0);
-        let sanctioned = free.get(asset).copied().unwrap_or(0);
-        let leak = in_amt.saturating_sub(held).saturating_sub(sanctioned);
-        if leak > 0 {
-            out.insert(asset.clone(), leak);
-        }
-    }
-    (out, detached)
+    detached
 }
 
 // ── Payout construction ──────────────────────────────────────────────────────
@@ -2393,7 +2814,7 @@ pub fn scenario_box_from_chain(b: &crate::map::source::ChainBox) -> ScenarioBox 
 /// the generic honest one: each protected box rebuilt verbatim as its
 /// successor, one free payee as the drain sink carrying the attacker's tree.
 /// Verbatim probes of this template are generally unbalanced (the attacker's
-/// own input has no sanctioned output); the drain-mode construction balances
+/// own input has no funded output); the drain-mode construction balances
 /// by taking the remainder, which is the workhorse here.
 ///
 /// Nodes the map left `unknown` are returned so the caller resolves them and
@@ -2461,6 +2882,8 @@ pub fn request_from_map(
             height: m.height,
             network: None,
             attacker_tree: None,
+            attacker_public_keys: Vec::new(),
+            objective: None,
             max_permutations: None,
             max_probes: None,
             // Synthesis stays off by default: the caller opts in by setting
@@ -2473,6 +2896,259 @@ pub fn request_from_map(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    const SINK: &str = "10010101d17300";
+    const KEY: &str = "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197";
+    const STOCK: &str = "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc";
+
+    fn measured(
+        req: &DrainRequest,
+        inputs: &[ScenarioBox],
+        roles: &[DrainRole],
+        outputs: &[ScenarioBox],
+    ) -> DrainAccounting {
+        leak(
+            req,
+            &sum_boxes(
+                req.inputs
+                    .iter()
+                    .filter(|i| is_victim(i.role))
+                    .map(|i| &i.box_),
+            ),
+            roles,
+            inputs,
+            outputs,
+            &recognized_trees(req).unwrap(),
+        )
+    }
+
+    fn accounting_request() -> DrainRequest {
+        serde_json::from_value(json!({
+            "inputs": [
+                { "role": "protected", "value": 100, "ergoTree": "unknown", "tokens": [{ "id": STOCK, "amount": 10 }] },
+                { "role": "companion", "value": 50, "ergoTree": "unknown" },
+                { "role": "attacker", "value": 20, "ergoTree": SINK }
+            ],
+            "outputs": [], "protocolNfts": [STOCK], "height": 1,
+            "objective": { "terms": [] },
+            "dataInputs": [{ "value": 9999, "ergoTree": SINK, "tokens": [{ "id": STOCK, "amount": 9999 }] }]
+        })).unwrap()
+    }
+
+    fn receipt(value: i64, stock: u64, script: &str) -> ScenarioBox {
+        ScenarioBox {
+            value,
+            tokens: vec![TokenAmount {
+                id: STOCK.into(),
+                amount: stock,
+            }],
+            ergo_tree: Some(script.into()),
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn accounting_pins_companions_and_uses_realized_funding_not_data_or_template() {
+        let req = accounting_request();
+        let inputs = vec![
+            receipt(40, 0, SINK),
+            req.inputs[1].box_.clone(),
+            req.inputs[0].box_.clone(),
+        ];
+        let roles = [
+            DrainRole::Attacker,
+            DrainRole::Companion,
+            DrainRole::Protected,
+        ];
+        let outputs = vec![receipt(190, 10, SINK)];
+        let a = measured(&req, &inputs, &roles, &outputs);
+        assert_eq!(a.v["nanoErg"], "150");
+        assert_eq!(a.n["nanoErg"], "40");
+        assert_eq!(a.extracted["nanoErg"], "150");
+        assert_eq!(a.extracted[STOCK], "10");
+        let b = measured(
+            &req,
+            &inputs.iter().rev().cloned().collect::<Vec<_>>(),
+            &roles.into_iter().rev().collect::<Vec<_>>(),
+            &outputs,
+        );
+        assert_eq!(a.extracted, b.extracted);
+        let preserved = measured(
+            &req,
+            &inputs,
+            &roles,
+            &[receipt(40, 0, SINK), receipt(150, 10, "unknown")],
+        );
+        assert!(preserved.extracted.is_empty());
+        let companion_only = measured(
+            &req,
+            &inputs,
+            &roles,
+            &[receipt(90, 0, SINK), receipt(100, 10, "unknown")],
+        );
+        assert_eq!(companion_only.extracted["nanoErg"], "50");
+    }
+
+    #[test]
+    fn recognition_is_exact_declared_keys_only_and_ignores_payee_labels() {
+        let mut req = accounting_request();
+        let p2pk = format!("0008cd{KEY}");
+        req.attacker_tree = Some(p2pk.clone());
+        let inputs: Vec<_> = req.inputs.iter().map(|i| i.box_.clone()).collect();
+        let roles: Vec<_> = req.inputs.iter().map(|i| i.role).collect();
+        let outputs = vec![
+            receipt(100, 10, &p2pk),
+            receipt(50, 0, "10010101d1730000"),
+            receipt(20, 0, SINK),
+        ];
+        let a = measured(&req, &inputs, &roles, &outputs);
+        assert_eq!(a.recognized_output_indices, vec![2]);
+        assert!(a.extracted.is_empty());
+        req.attacker_public_keys.push(KEY.into());
+        let a = measured(&req, &inputs, &roles, &outputs);
+        assert_eq!(a.recognized_output_indices, vec![0, 2]);
+        assert_eq!(a.extracted[STOCK], "10");
+        assert_eq!(a.extracted["nanoErg"], "100");
+        req.attacker_public_keys.push("02ff".into());
+        assert!(recognized_trees(&req).is_err());
+    }
+
+    #[test]
+    fn minted_supply_and_self_funded_change_cannot_score_and_assets_never_net() {
+        let mut req = accounting_request();
+        // Existing victim stock shares the mint id: only supply growth is N.
+        req.inputs[2].box_.tokens = vec![TokenAmount {
+            id: STOCK.into(),
+            amount: 4,
+        }];
+        let inputs: Vec<_> = req.inputs.iter().map(|i| i.box_.clone()).collect();
+        let roles: Vec<_> = req.inputs.iter().map(|i| i.role).collect();
+        let a = measured(
+            &req,
+            &inputs,
+            &roles,
+            &[receipt(20, 34, SINK), receipt(150, 0, "unknown")],
+        );
+        assert_eq!(a.n[STOCK], "24");
+        assert_eq!(a.extracted[STOCK], "10");
+        assert!(!a.extracted.contains_key("nanoErg"));
+        let a = measured(
+            &req,
+            &inputs,
+            &roles,
+            &[receipt(20, 24, SINK), receipt(150, 10, "unknown")],
+        );
+        assert!(a.extracted.is_empty());
+    }
+
+    #[test]
+    fn static_allowances_deduplicate_and_share_source_and_receipt_caps() {
+        let mut req = accounting_request();
+        let term = ReleaseTerm {
+            source_input: 0,
+            asset: STOCK.into(),
+            destination_tree: SINK.into(),
+            max_amount: 6,
+            payment: None,
+        };
+        req.objective.as_mut().unwrap().terms = vec![term.clone(), term];
+        let inputs: Vec<_> = req.inputs.iter().map(|i| i.box_.clone()).collect();
+        let roles: Vec<_> = req.inputs.iter().map(|i| i.role).collect();
+        let a = measured(&req, &inputs, &roles, &[receipt(170, 10, SINK)]);
+        assert_eq!(a.s[STOCK], "6");
+        assert_eq!(a.extracted[STOCK], "4");
+        req.objective.as_mut().unwrap().terms[0].max_amount = 100;
+        let a = measured(&req, &inputs, &roles, &[receipt(170, 10, SINK)]);
+        assert_eq!(a.s[STOCK], "10");
+        // Greedy would allocate source 1 to destination 1 and strand source 2.
+        let mut capacity = vec![vec![0; 6]; 6];
+        for (u, v, n) in [
+            (0, 1, 5),
+            (0, 2, 5),
+            (1, 3, 5),
+            (1, 4, 5),
+            (2, 3, 5),
+            (3, 5, 5),
+            (4, 5, 5),
+        ] {
+            capacity[u][v] = n;
+        }
+        assert_eq!(max_flow(capacity, 5), 10);
+    }
+
+    #[test]
+    fn conditional_terms_bind_payment_and_stock_without_cross_asset_netting() {
+        let mut req = accounting_request();
+        let seller = format!("0008cd{KEY}");
+        req.objective.as_mut().unwrap().terms = vec![ReleaseTerm {
+            source_input: 0,
+            asset: STOCK.into(),
+            destination_tree: SINK.into(),
+            max_amount: 10,
+            payment: Some(PaymentTerm {
+                asset: "nanoErg".into(),
+                seller_tree: seller.clone(),
+                amount_per_unit: 1,
+                retained_trees: vec!["unknown".into()],
+            }),
+        }];
+        let inputs: Vec<_> = req.inputs.iter().map(|i| i.box_.clone()).collect();
+        let roles: Vec<_> = req.inputs.iter().map(|i| i.role).collect();
+        let a = measured(
+            &req,
+            &inputs,
+            &roles,
+            &[receipt(10, 0, &seller), receipt(160, 10, SINK)],
+        );
+        assert_eq!(a.s[STOCK], "10");
+        assert!(!a.extracted.contains_key(STOCK));
+        let a = measured(
+            &req,
+            &inputs,
+            &roles,
+            &[receipt(167, 10, SINK), receipt(3, 0, &seller)],
+        );
+        assert_eq!(a.s[STOCK], "0");
+        assert_eq!(a.extracted[STOCK], "10");
+        let a = measured(
+            &req,
+            &inputs,
+            &roles,
+            &[receipt(170, 10, &seller), receipt(0, 0, SINK)],
+        );
+        assert_eq!(a.a[STOCK], "0");
+        assert!(a.extracted.is_empty());
+        let a = measured(
+            &req,
+            &inputs,
+            &roles,
+            &[receipt(10, 0, SINK), receipt(160, 10, SINK)],
+        );
+        assert_eq!(
+            a.s[STOCK], "0",
+            "retreeing seller payment cannot satisfy a term"
+        );
+    }
+
+    #[test]
+    fn missing_policy_and_non_victim_allowances_are_explicitly_incomplete() {
+        let mut req = accounting_request();
+        req.objective = None;
+        assert!(!objective_errors(&req).is_empty());
+        req.objective = Some(ObjectivePolicy {
+            terms: vec![ReleaseTerm {
+                source_input: 2,
+                asset: STOCK.into(),
+                destination_tree: SINK.into(),
+                max_amount: 10,
+                payment: None,
+            }],
+        });
+        assert!(
+            !objective_errors(&req).is_empty(),
+            "non-victim sources are refused"
+        );
+    }
 
     #[test]
     fn permutations_are_lexicographic_and_capped() {

@@ -74,7 +74,8 @@ fn drain(request: Value) -> ergo_sandbox::drain::DrainReport {
     drain_request(req)
 }
 
-fn drain_request(req: DrainRequest) -> ergo_sandbox::drain::DrainReport {
+fn drain_request(mut req: DrainRequest) -> ergo_sandbox::drain::DrainReport {
+    req.objective.get_or_insert_with(Default::default);
     ergo_sandbox::decompile::with_large_stack(move || drain_hunt(&req)).expect("hunt runs")
 }
 
@@ -89,11 +90,11 @@ fn the_use_lp_drain_is_rediscovered_from_the_honest_template() {
     assert_eq!(report.verdict, DrainVerdict::Drainable);
     let best = report.best.as_ref().expect("a best hit");
 
-    // The extraction is the incident's: the whole reserve minus the drained
-    // successor's keep-value, per asset.
+    // Recognized receipts less realized attacker funding. The fixed fee
+    // output is not a recognized sink; its 2M nanoERG is excluded.
     assert_eq!(
         best.extracted.get("nanoErg").map(String::as_str),
-        Some("284695583089453")
+        Some("284695581089453")
     );
     let use_id = "a55b8735ed1a99e46c2c89f8994aacdf4b1109bdcf682f1e5b34479c6e392669";
     let lp_token_id = "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099";
@@ -599,6 +600,33 @@ fn minimal_request() -> Value {
     })
 }
 
+#[test]
+fn declared_attacker_keys_do_not_relax_the_protected_input_gate() {
+    let key = "028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197";
+    let mut request = minimal_request();
+    request["inputs"][0]["ergoTree"] = json!(format!("0008cd{key}"));
+    request["attackerPublicKeys"] = json!([key]);
+    request["synthesis"] = json!({ "successorStates": true });
+    let report = drain(request);
+    assert_eq!(report.verdict, DrainVerdict::NotUnderProbes);
+    assert_eq!(report.hits, 0);
+    assert!(report.rejections.missing_key > 0);
+    assert!(report.first_accounting.is_none());
+}
+
+#[test]
+fn undeclared_objective_reports_incomplete_instead_of_an_extraction_verdict() {
+    let req: DrainRequest = serde_json::from_value(minimal_request()).unwrap();
+    let report = ergo_sandbox::decompile::with_large_stack(move || drain_hunt(&req)).unwrap();
+    assert_eq!(report.verdict, DrainVerdict::IncompleteObjective);
+    assert_eq!(report.hits, 0);
+    assert!(report.best.is_none());
+    assert!(report
+        .notes
+        .iter()
+        .any(|n| n.contains("incomplete objective")));
+}
+
 mod synthesis {
     use super::*;
 
@@ -622,7 +650,7 @@ mod synthesis {
         let a = serde_json::to_value(&omitted).unwrap();
         let b = serde_json::to_value(&all_off).unwrap();
         assert_eq!(a, b, "omitted vs all-off synthesis must be byte-identical");
-        assert_eq!(omitted.verdict, DrainVerdict::NotUnderProbes);
+        assert_eq!(omitted.verdict, DrainVerdict::Drainable); // canonical successor is spendable
         assert_eq!(omitted.probes_run, all_off.probes_run);
 
         // An explicit `maxNewOutputs: 0` is the spec's all-off block too:
@@ -901,11 +929,8 @@ mod synthesis {
         );
     }
 
-    /// Decision 2, rule 2: with synthesis on, a script-matched output shields
-    /// only when the protected input's protocol NFT rides along (same id,
-    /// same index). The false negative this plugs: an attacker-tree free
-    /// payee declared with the pool's script parks the reserves in a
-    /// script-clone and scores zero leak in phase 1.
+    /// Canonical sinks are recognized even when script-matched to a victim.
+    /// NFT detachment remains a separate synthesis diagnostic.
     #[test]
     fn an_nft_detached_successor_shields_nothing_and_is_reported() {
         let pool_tree = "10010101d17300";
@@ -929,13 +954,12 @@ mod synthesis {
             "height": 100,
             "network": "mainnet",
         });
-        // Phase 1 (synthesis off): the phase-1 rule stands — script bytes
-        // shield — so the reserves look safe. The false negative, recorded.
+        // Recognition is independent of synthesis and script custody.
         let phase1 = drain(request.clone());
-        assert_eq!(phase1.verdict, DrainVerdict::NotUnderProbes);
+        assert_eq!(phase1.verdict, DrainVerdict::Drainable);
         assert!(phase1.nft_detached.is_empty());
 
-        // Synthesis on: the NFT must ride along; the clone shields nothing.
+        // Synthesis on also records the NFT-less clone diagnostic.
         let mut phase2 = request;
         phase2["synthesis"] = json!({ "successorStates": true });
         let phase2 = drain(phase2);
@@ -1151,16 +1175,18 @@ mod synthesis {
             with.rejections
         );
         let best = with.best.as_ref().expect("a hit");
-        // 10M protected − 2M kept by the minimized successor − 2M the
-        // caller's free payee sanctions at its declared amount.
+        // 10M recognized receipts minus 2M realized attacker funding.
+        // The declared free amount is not an additional allowance.
         assert_eq!(
             best.extracted.get("nanoErg").map(String::as_str),
-            Some("6000000")
+            Some("8000000")
         );
         // The witness validates: the minted id is the first input's box id.
         let check = tx_check(&best.witness.tx_request).expect("txrequest checks");
         assert!(check.valid, "witness problems: {:?}", check.problems);
         let first_input = &best.witness.tx_request.tx.inputs[0].box_id;
+        assert_eq!(best.accounting.n[first_input], "1");
+        assert!(!best.extracted.contains_key(first_input));
         let sink = &best.witness.tx_request.tx.outputs[2];
         let sink_tokens = sink["assets"].as_array().unwrap();
         assert_eq!(
@@ -1172,11 +1198,10 @@ mod synthesis {
         assert_eq!(sink_tokens[0]["amount"].as_u64(), Some(1));
     }
 
-    /// Per-successor states: each script-matched successor is independently
-    /// `{verbatim, minimized}` — protocols with multiple protected boxes
-    /// where only one is exploitable become expressible.
+    /// Minimizing a canonical successor changes its position/quantity but
+    /// not the total recognized receipts: its retained value already counts.
     #[test]
-    fn per_successor_states_express_partial_drains() {
+    fn per_successor_states_preserve_recognized_receipt_accounting() {
         let p1_src = "sigmaProp(OUTPUTS(0).value == SELF.value)";
         let p1_tree = hex::encode(
             ergo_sandbox::compile::compile_source(p1_src, 3, NetworkPrefix::Mainnet)
@@ -1204,9 +1229,13 @@ mod synthesis {
             "height": 100,
             "network": "mainnet",
         });
-        // Phase 1: drain mode shrinks BOTH successors — P1's script refuses.
+        // P2's canonical successor already contributes 50M to A.
         let phase1 = drain(request.clone());
-        assert_eq!(phase1.verdict, DrainVerdict::NotUnderProbes);
+        assert_eq!(phase1.verdict, DrainVerdict::Drainable);
+        assert_eq!(
+            phase1.best.as_ref().unwrap().extracted["nanoErg"],
+            "50000000"
+        );
 
         // Phase 2: [P1 verbatim, P2 minimized] drains P2 through the shape
         // P1's script permits.
@@ -1215,11 +1244,11 @@ mod synthesis {
         let phase2 = drain(phase2);
         assert_eq!(phase2.verdict, DrainVerdict::Drainable);
         let best = phase2.best.as_ref().expect("a hit");
-        // 50M P2 − 2M kept by the minimized successor − 2M the caller's free
-        // payee sanctions at its declared amount.
+        // All P2 holdings remain recognized wherever the axis moves them;
+        // P1's 10M stays outside A, and the attacker's 2M is subtracted once.
         assert_eq!(
             best.extracted.get("nanoErg").map(String::as_str),
-            Some("46000000")
+            Some("50000000")
         );
     }
 }

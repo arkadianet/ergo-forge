@@ -203,6 +203,32 @@ fn bank_template_registers_reach_both_consumers() {
     );
 }
 
+/// Explicit measurement policy for the fixed corpus shapes. These are caller
+/// claims, shared unchanged by mutant and original, never inferred by the hunt.
+fn objective_policy(m: &Value, tree: &str) -> Value {
+    match m["id"].as_str().unwrap() {
+        "M4" => json!({ "terms": [{
+            "sourceInput": 0, "asset": m["params"]["tokenId"]["value"],
+            "destinationTree": PASS_TREE, "maxAmount": 10,
+            "payment": { "asset": "nanoErg", "sellerTree": P2PK,
+                "amountPerUnit": 1_000_000, "retainedTrees": [tree] }
+        }] }),
+        // The declared one-SC redemption: price floor(10^10 / 300000)
+        // minus floor(2% fee) = 32667 nanoERG. No NFT release allowance.
+        "M5" => json!({ "terms": [{ "sourceInput": 0, "asset": "nanoErg",
+            "destinationTree": PASS_TREE, "maxAmount": 32667 }] }),
+        // Fixed trusted oracle/circulation state: SC purchase costs 33333
+        // plus 666 fee. Payment is the bank's realized reserve increase.
+        "M8" => json!({ "terms": [{ "sourceInput": 0,
+            "asset": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "destinationTree": PASS_TREE, "maxAmount": 999999700000u64,
+            "payment": { "asset": "nanoErg", "sellerTree": tree,
+                "amountPerUnit": 33999, "retainedTrees": [tree] }
+        }] }),
+        _ => json!({ "terms": [] }),
+    }
+}
+
 /// Build the hunt request from a mutant record. The template is the
 /// protocol's HONEST shape; `protocolNfts` is derived from the protected
 /// inputs' tokens(0) — the caller's claim, and nothing more.
@@ -259,6 +285,7 @@ fn build_request(m: &Value, synthesis_on: bool, caps: &Value) -> DrainRequest {
         json!({})
     };
     let text = json!({
+        "objective": objective_policy(m, &mutant_tree),
         "inputs": inputs,
         "dataInputs": data_inputs,
         "outputs": outputs,
@@ -431,6 +458,7 @@ fn verdict_name(v: &DrainVerdict) -> &'static str {
         DrainVerdict::Drainable => "drainable",
         DrainVerdict::NotUnderProbes => "notunderprobes",
         DrainVerdict::InvalidShape => "invalidshape",
+        DrainVerdict::IncompleteObjective => "incompleteobjective",
     }
 }
 
@@ -501,6 +529,8 @@ fn run_one(m: &Value, synthesis_on: bool, caps: &Value) -> Value {
     if synthesis_on {
         result["rejections"] = serde_json::to_value(report.rejections).unwrap();
     }
+    result["firstAccounting"] = serde_json::to_value(&report.first_accounting).unwrap();
+    result["objectivePolicy"] = serde_json::to_value(&report.objective_policy).unwrap();
     if let Some(best) = report.best {
         // Keep the winning transaction reviewable alongside counts, including
         // who actually owns its outputs. The answer key need not duplicate it.
@@ -551,11 +581,8 @@ fn known_detectable_control_is_found(corpus: &Value) {
         .expect("the deployed-vulnerable contract compiles")
         .tree_bytes,
     );
-    // The pool box needs a trivially-passing tree that is NOT the attacker's
-    // default `sigmaProp(true)` hex: drain mode re-trees the free payee to
-    // the attacker tree, and if that equals a protected tree the free payee
-    // counts as a script-matched successor and shields the whole drain (leak
-    // = 0). Distinct script, same semantics.
+    // Keep the historical control's distinct passing pool tree. Recognition
+    // is bounded: this tree is outside A even though it currently reduces to pass.
     let pool_tree = hex::encode(
         ergo_sandbox::compile::compile_source(
             "sigmaProp(HEIGHT >= 0)",
@@ -569,6 +596,7 @@ fn known_detectable_control_is_found(corpus: &Value) {
     // The honest fill shape (the phase-1 test's template): the pool
     // protected, the (vulnerable) swap companion, the attacker's own box.
     let request: DrainRequest = serde_json::from_value(json!({
+        "objective": { "terms": [] },
         "inputs": [
             { "role": "protected", "value": 1000000000i64, "ergoTree": &pool_tree,
               "tokens": [
@@ -613,6 +641,56 @@ fn known_detectable_control_is_found(corpus: &Value) {
             .map(|t| (t.shape.clone(), t.run))
             .collect::<Vec<_>>()
     );
+}
+
+#[test]
+fn m4_recorded_seller_only_receipts_score_zero_on_mutant_and_original() {
+    let corpus: Value = serde_json::from_str(CORPUS).unwrap();
+    let m = corpus["mutants"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|m| m["id"] == "M4")
+        .unwrap();
+    for original in [false, true] {
+        let mut record = m.clone();
+        if original {
+            record["mutatedSource"] = m["originalSource"].clone();
+        }
+        let compiled = compile_tree(record["mutatedSource"].as_str().unwrap(), &record["params"]);
+        let mut req = build_request(&record, false, &corpus["caps"]);
+        let extra = serde_json::Map::new();
+        for (i, input) in m["witnessTx"]["inputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .enumerate()
+        {
+            req.inputs[i].box_ =
+                serde_json::from_value(box_json(input, &compiled, &extra)).unwrap();
+        }
+        req.outputs = m["witnessTx"]["outputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|o| serde_json::from_value(box_json(o, &compiled, &extra)).unwrap())
+            .collect();
+        // Replay the previously recorded original's 21M seller-only payment.
+        if original {
+            req.inputs[1].box_.value = 20_000_000;
+            req.outputs[0].box_.value = 21_000_000;
+        }
+        req.max_probes = Some(1);
+        req.max_permutations = Some(1);
+        let report = ergo_sandbox::decompile::with_large_stack(move || drain_hunt(&req)).unwrap();
+        assert_eq!(report.verdict, DrainVerdict::NotUnderProbes);
+        let accounting = report
+            .first_accounting
+            .expect("recorded transaction passes both gates");
+        assert!(accounting.a.values().all(|amount| amount == "0"));
+        assert!(accounting.extracted.is_empty());
+        assert_eq!(accounting.recognized_output_indices, vec![2]);
+    }
 }
 
 #[test]

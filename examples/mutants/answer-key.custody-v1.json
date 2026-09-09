@@ -2,10 +2,10 @@
  "recorded": "2026-09-09",
  "runner": "ergo-sandbox/tests/mutation_corpus.rs (release build)",
  "methodology": "docs/superpowers/specs/2026-09-08-mutation-corpus-design.md",
- "detectionRate": 0.4,
+ "detectionRate": 0.0,
  "provenMutants": 5,
- "found": 2,
- "denominatorNote": "proven = a hand-built KEYLESS drain witness validated by txcheck before the hunt ran. M1-M3 were initially misproven (their witnesses validated under txcheck but carry needsProof on the protected input \u2014 the residual requires the beneficiary's/receiver's key): reclassified as keyed-insider, outside the hunt's attacker model, never in the denominator. The five proven flags remain historical keyless-validity classifications. This accounting-only change does not reconstruct or widen witnesses; M4 seller-only witness is explicitly checked to score zero, while the actual corpus run supplies a different recognized-receipt best result.",
+ "found": 0,
+ "denominatorNote": "proven = a hand-built KEYLESS drain witness validated by txcheck before the hunt ran. M1-M3 were initially misproven (their witnesses validated under txcheck but carry needsProof on the protected input \u2014 the residual requires the beneficiary's/receiver's key): reclassified as keyed-insider, outside the hunt's attacker model, never in the denominator.",
  "caps": {
   "maxProbes": 50000,
   "maxPermutations": 120,
@@ -43,9 +43,7 @@
    },
    "attributable": false,
    "confounded": false,
-   "attackerModel": "keyed-insider",
-   "found": false,
-   "rawDrainable": false
+   "attackerModel": "keyed-insider"
   },
   {
    "id": "M2",
@@ -70,9 +68,7 @@
    },
    "attributable": false,
    "confounded": false,
-   "attackerModel": "keyed-insider",
-   "found": false,
-   "rawDrainable": false
+   "attackerModel": "keyed-insider"
   },
   {
    "id": "M3",
@@ -97,14 +93,12 @@
    },
    "attributable": false,
    "confounded": false,
-   "attackerModel": "keyed-insider",
-   "found": false,
-   "rawDrainable": false
+   "attackerModel": "keyed-insider"
   },
   {
    "id": "M4",
    "proven": true,
-   "found": true,
+   "found": false,
    "synthesisOff": {
     "capped": false,
     "hits": 0,
@@ -113,7 +107,7 @@
    },
    "synthesisOn": {
     "capped": false,
-    "hits": 668,
+    "hits": 710,
     "probesRun": 4512,
     "rejections": {
      "conservation": 0,
@@ -124,8 +118,8 @@
     "verdict": "drainable"
    },
    "attributable": false,
-   "confounded": false,
-   "note": "Recognized-receipts objective v1: seller-only receipts score A=0. The mutant retains 668 synthesis-on hits with actual recognized receipts; the original now has zero hits. This is an objective change, not a generator change. Historical custody-deficit claims are retained only in answer-key.custody-v1.json.",
+   "confounded": true,
+   "note": "found only with synthesis on: the drain needs a NEW output (the attacker's payment box at the sale's price position) while the stock returns to the sale box \u2014 out of phase-1's fixed output set. CONFOUNDED: the same drainable verdict fires on the unmutated original (see escalatedFindings), so it is not attributable to the mutation. The hunt's objective has no conditional sanction, so overpayment probes score as drains; the real 1-nanoERG drain IS in family (710 hits), but the verdict alone cannot discriminate.",
    "rawDrainable": true
   },
   {
@@ -151,8 +145,7 @@
     "verdict": "notunderprobes"
    },
    "attributable": false,
-   "confounded": false,
-   "rawDrainable": false
+   "confounded": false
   },
   {
    "id": "M6",
@@ -177,13 +170,12 @@
     "verdict": "notunderprobes"
    },
    "attributable": false,
-   "confounded": false,
-   "rawDrainable": false
+   "confounded": false
   },
   {
    "id": "M7",
    "proven": true,
-   "found": true,
+   "found": false,
    "synthesisOff": {
     "capped": false,
     "hits": 0,
@@ -192,7 +184,7 @@
    },
    "synthesisOn": {
     "capped": false,
-    "hits": 12,
+    "hits": 0,
     "probesRun": 29448,
     "rejections": {
      "conservation": 0,
@@ -200,12 +192,10 @@
      "missingKey": 0,
      "script": 29392
     },
-    "verdict": "drainable"
+    "verdict": "notunderprobes"
    },
    "attributable": false,
-   "confounded": false,
-   "rawDrainable": true,
-   "note": "Recognized-receipts objective v1 includes the declared companion: existing synthesis-on probes yield 12 hits, extracting 1000000000 nanoErg and one swap NFT. The pool contributes no attacker receipt; the original remains clean. No roles or output axes changed."
+   "confounded": false
   },
   {
    "id": "M8",
@@ -231,14 +221,14 @@
    },
    "attributable": false,
    "confounded": false,
-   "note": "flip-index: oracle NFT validated on dataInputs(0), rate read from dataInputs(1). Proven keyless drain (hand-built witness: attacker supplies a second, unvalidated data input with R4=0, so scPrice collapses to 0 and the uncirculated SC reserve leaves for free). MISS is out-of-family: the drain needs a data-input substitution and data inputs are passed through verbatim \u2014 all 2216 probes were legitimate SCRIPT rejections, zero invalid, so the honest template is sound. This is the 3c data-input axis's first measurable target.",
-   "rawDrainable": false
+   "note": "flip-index: oracle NFT validated on dataInputs(0), rate read from dataInputs(1). Proven keyless drain (hand-built witness: attacker supplies a second, unvalidated data input with R4=0, so scPrice collapses to 0 and the uncirculated SC reserve leaves for free). MISS is out-of-family: the drain needs a data-input substitution and data inputs are passed through verbatim \u2014 all 2216 probes were legitimate SCRIPT rejections, zero invalid, so the honest template is sound. This is the 3c data-input axis's first measurable target."
   }
  ],
  "missTable": {
   "out-of-family": [
    "M5",
-   "M6"
+   "M6",
+   "M7 \u2014 missing fixed-output re-pad / re-tree axis; M7 also has a deferred role mismatch (REVIEW-FINDINGS.md), so axis coverage alone does not establish detection."
   ],
   "keyed-insider (out of attacker model)": [
    "M1",
@@ -247,7 +237,7 @@
   ],
   "cap-truncation": [],
   "role-labelling": [
-   "M7 metadata still differs from the executable template; no role changed. All declared protected and companion inputs now count in V, resolving the scoring omission."
+   "M7 \u2014 swap is companion in the executable template but protected in the role record; deferred decision, no role changes."
   ],
   "arithmetic": [],
   "invalid fixture (outside proven denominator)": [
@@ -328,7 +318,7 @@
    },
    "synthesisOn": {
     "capped": false,
-    "hits": 0,
+    "hits": 6,
     "probesRun": 4512,
     "rejections": {
      "conservation": 0,
@@ -336,9 +326,9 @@
      "missingKey": 4506,
      "script": 0
     },
-    "verdict": "notunderprobes"
+    "verdict": "drainable"
    },
-   "note": "Recognized-receipts objective v1: seller-only receipts score A=0. The mutant retains 668 synthesis-on hits with actual recognized receipts; the original now has zero hits. This is an objective change, not a generator change. Historical custody-deficit claims are retained only in answer-key.custody-v1.json."
+   "escalated": "see escalatedFindings - the firing is recorded, the fixture untouched"
   },
   {
    "id": "M5",
@@ -426,8 +416,19 @@
    "note": "unmutated bank rejects the same shape: the control is clean, so an M8 detection would be attributable"
   }
  ],
- "escalatedFindings": [],
- "negativeControlsNote": "All eight originals are notUnderProbes in both configurations. M1 still has invalid fixture probes; M4 seller-only confound is resolved by bounded output recognition.",
+ "escalatedFindings": [
+  {
+   "raisedBy": "the negative control itself",
+   "original": "token-sale (M4's unmutated original)",
+   "verdict": "drainable (synthesis on, 4512 probes)",
+   "what": "the winning probe has the attacker OVERPAY the seller (20M of the attacker's own nanoERG into the seller's P2PK box) so `paid` passes legitimately and the stock leaves the sale box with it. The seller is fully paid; the attacker loses money. No exploit.",
+   "why": "the leak objective counts protected value that LEFT the protected box, sanctioned only at the free payee's DECLARED amounts, and never subtracts what the attacker SPENT. An overpayment that empties a protected box into a protocol-designated payee scores as a drain.",
+   "disposition": "ESCALATED, not fixed: attacker-cost accounting is the roadmap's parked 'pricing / worth-weighted objectives; economic probes \u2014 separate spec' (phase 2 spec, non-goals). This firing is the concrete evidence for that spec. The fixture is untouched.",
+   "consequence": "M4's `found` is confounded: the mutant IS really exploitable (the 1-nanoERG purchase is a genuine keyless theft and is in family \u2014 the hunt scored 710 hits), but its drainable verdict cannot be distinguished from overpayment noise without a cost-aware objective. Recorded as rawDrainable=true, confounded=true, attributable=false.",
+   "mutant": "M4"
+  }
+ ],
+ "negativeControlsNote": "Every original runs in both configurations, asserted in the harness; a drainable original must be pre-recorded in escalatedFindings (M4) or the run fails. Six original verdicts are notUnderProbes, but M1 has 868 invalid synthesis-on probes and supplies no evaluated-script evidence. M4 remains the escalated, confounded firing.",
  "harnessValidity": {
   "knownDetectableControl": {
    "id": "C-incident",
@@ -438,10 +439,12 @@
   }
  },
  "detectionRateNote": "attributable detections / proven mutants. A drainable verdict counts only when the mutant's own unmutated control is CLEAN in the same configuration \u2014 a hit that also fires on the original says nothing about the mutation. Derived by the harness, not flagged by hand.",
- "attributableDetections": 2,
- "rawDrainableOnProven": 2,
- "confounded": [],
- "foundNote": "2/5 attributable under recognized-receipts v1 (M4, M7), from unchanged probe families. This is not generator progress; the old objective baseline is retained separately.",
+ "attributableDetections": 0,
+ "rawDrainableOnProven": 1,
+ "confounded": [
+  "M4"
+ ],
+ "foundNote": "raw drainable verdicts on proven mutants: see rawDrainableOnProven (1, all confounded)",
  "rejectionAccounting": "Rejections are recorded only for synthesisOn. Invalid takes precedence over conservation, then missingKey, then script. Accepted probes with no measured leak are neither hits nor rejections. Deterministic counts are asserted; wall-clock timings are diagnostic only.",
  "baselineRepairs": {
   "M5": {
@@ -475,32 +478,5 @@
    },
    "note": "Before the fixture repair, all 29448 probes were invalid on both mutant and control, previously misreported as script rejections. Template input/output references now use $amm-pool. The witness already used $amm-pool in both places. Probe counts, hits, verdicts, and caps are unchanged; corrected rejection counts are recorded in the rows above. Roles and objective are unchanged."
   }
- },
- "objectiveVersion": "recognized-attacker-receipts-v1",
- "previousBaseline": "answer-key.custody-v1.json",
- "objectivePolicyNote": "Policies are explicit in mutation_corpus.rs::objective_policy and recorded in runtime reports: M4 fixed-rate stock sale; M5 bounded 32667 nanoErg redemption allowance, no identity NFT allowance; M8 fixed trusted-state SC purchase rate 33999 nanoErg; other sets declare no release. No implicit free-payee sanctions.",
- "resolvedFindings": [
-  {
-   "mutant": "M4",
-   "what": "Original synthesis-on verdict changes drainable -> notunderprobes; 6 historical custody hits become zero. Seller P2PK is not a declared attacker key, so seller-only A=0. Mutant remains drainable via other existing probes (668 hits)."
-  }
- ],
- "verdictChanges": [
-  {
-   "id": "M4",
-   "kind": "negativeControl",
-   "configuration": "synthesisOn",
-   "before": "drainable",
-   "after": "notunderprobes",
-   "cause": "Seller-only outputs are not recognized attacker receipts."
-  },
-  {
-   "id": "M7",
-   "kind": "mutant",
-   "configuration": "synthesisOn",
-   "before": "notunderprobes",
-   "after": "drainable",
-   "cause": "Companion holdings enter V and existing recognized outputs receive its ERG and NFT."
-  }
- ]
+ }
 }
