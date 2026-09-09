@@ -107,12 +107,12 @@
    },
    "synthesisOn": {
     "capped": false,
-    "hits": 710,
-    "probesRun": 4512,
+    "hits": 320,
+    "probesRun": 1704,
     "rejections": {
      "conservation": 0,
      "invalid": 0,
-     "missingKey": 3802,
+     "missingKey": 1384,
      "script": 0
     },
     "verdict": "drainable"
@@ -318,12 +318,12 @@
    },
    "synthesisOn": {
     "capped": false,
-    "hits": 6,
-    "probesRun": 4512,
+    "hits": 4,
+    "probesRun": 1704,
     "rejections": {
      "conservation": 0,
      "invalid": 0,
-     "missingKey": 4506,
+     "missingKey": 1700,
      "script": 0
     },
     "verdict": "drainable"
