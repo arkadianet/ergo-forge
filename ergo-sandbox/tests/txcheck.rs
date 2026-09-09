@@ -12,6 +12,82 @@ fn run(json: &str) -> TxCheck {
 const TRUE_TREE: &str = "10010101d17300"; // sigmaProp(true)
 
 #[test]
+fn zero_token_outputs_are_rejected_even_without_resolved_inputs() {
+    let id = "aa".repeat(32);
+    let token_id = "cc".repeat(32);
+    let mut req: ergo_sandbox::txcheck::TxRequest = serde_json::from_value(serde_json::json!({
+        "height": 1000,
+        "tx": {
+            "inputs": [{"boxId": id}],
+            "outputs": [
+                {"value": 1_000_000, "ergoTree": TRUE_TREE},
+                {"value": 1_000_000, "ergoTree": TRUE_TREE,
+                 "assets": [{"tokenId": token_id, "amount": 0}]}
+            ]
+        },
+        "boxes": [{"boxId": id, "value": 2_000_000, "ergoTree": TRUE_TREE}]
+    }))
+    .unwrap();
+    for state in 0..3 {
+        if state == 1 {
+            req.boxes.clear();
+        } else if state == 2 {
+            req.tx.inputs.clear();
+        }
+        let r = check(&req).unwrap();
+        assert!(!r.valid, "{r:?}");
+        assert!(
+            r.problems.iter().any(|p| p.contains("outputs[1]")
+                && p.contains(&token_id)
+                && p.contains("amount 0")
+                && p.contains("omit")),
+            "{r:?}"
+        );
+        if state == 0 {
+            let mut omitted = req.clone();
+            omitted.tx.outputs[1]
+                .as_object_mut()
+                .unwrap()
+                .remove("assets");
+            let r = check(&omitted).unwrap();
+            assert!(r.valid, "{r:?}");
+        }
+    }
+}
+
+#[test]
+fn zero_token_input_and_data_input_boxes_are_rejected() {
+    let input_id = "aa".repeat(32);
+    let data_id = "bb".repeat(32);
+    let token_id = "cc".repeat(32);
+    for (index, field) in [(0, "inputs"), (1, "dataInputs")] {
+        let mut json = serde_json::json!({
+            "height": 1000,
+            "tx": {
+                "inputs": [{"boxId": input_id}],
+                "dataInputs": [{"boxId": data_id}],
+                "outputs": [{"value": 1_000_000, "ergoTree": TRUE_TREE}]
+            },
+            "boxes": [
+                {"boxId": input_id, "value": 1_000_000, "ergoTree": TRUE_TREE},
+                {"boxId": data_id, "value": 1_000_000, "ergoTree": TRUE_TREE}
+            ]
+        });
+        json["boxes"][index]["assets"] = serde_json::json!([{"tokenId": token_id, "amount": 0}]);
+        let r = run(&json.to_string());
+        assert!(!r.valid, "{r:?}");
+        let box_id = if index == 0 { &input_id } else { &data_id };
+        assert!(
+            r.problems.iter().any(|p| p.contains(field)
+                && p.contains(box_id)
+                && p.contains(&token_id)
+                && p.contains("amount 0")),
+            "{r:?}"
+        );
+    }
+}
+
+#[test]
 fn a_transaction_whose_scripts_pass_and_balances_is_valid() {
     let r = run(&format!(
         r#"{{

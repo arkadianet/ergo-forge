@@ -46,7 +46,7 @@ A JSON object. Keys are camelCase. Unknown keys are ignored.
 |---|---|---|
 | `value` | integer | nanoERG. |
 | `ergoTree` | hex string | Wire bytes. May be omitted on the SELF box. |
-| `tokens` | array of `{id, amount}` | 32-byte hex id, integer amount. |
+| `tokens` | array of `{id, amount}` | 32-byte hex id, strictly positive integer amount (rule 108). Omit the entry when the amount is zero. |
 | `creationHeight` | integer | |
 | `registers` | object `"R4"`…`"R9"` → typed value | Dense from R4 upward. |
 | `boxId` | 32-byte hex | Default: computed from the box's bytes, as the chain would (transaction id all-zero, index 0). |

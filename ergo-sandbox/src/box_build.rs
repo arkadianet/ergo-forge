@@ -19,6 +19,26 @@ use ergo_sigma::evaluator::EvalBox;
 use crate::scenario::ScenarioBox;
 use crate::SandboxError;
 
+/// Rule 108 (`txPositiveAssets`): output candidates may only carry positive
+/// token amounts. The node checks this before resolving inputs or running
+/// scripts; scenario inputs/data inputs must also describe possible boxes.
+pub(crate) fn validate_token_amounts(field: &str, sb: &ScenarioBox) -> Result<(), SandboxError> {
+    for t in &sb.tokens {
+        if t.amount == 0 {
+            let box_id = sb
+                .box_id
+                .as_deref()
+                .map(|id| format!(" `{id}`"))
+                .unwrap_or_default();
+            return Err(SandboxError::Scenario(format!(
+                "`{field}` box{box_id}: token `{}` has amount 0; token amounts must be strictly positive (rule 108); omit the entry when no tokens remain",
+                t.id
+            )));
+        }
+    }
+    Ok(())
+}
+
 /// Build an owned `EvalBox` from scenario JSON.
 ///
 /// `default_tree_bytes` is the box's own locking script (canonical ErgoTree
@@ -44,6 +64,7 @@ pub fn build_eval_box_in(
     tx_id: [u8; 32],
     index: u16,
 ) -> Result<EvalBox, SandboxError> {
+    validate_token_amounts(field, sb)?;
     let script_bytes: Vec<u8> = match default_tree_bytes {
         Some(bytes) => bytes.to_vec(),
         None => match sb

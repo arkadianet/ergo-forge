@@ -1855,7 +1855,8 @@ fn mint_amounts(req: &DrainRequest) -> Vec<u64> {
         .flat_map(|o| o.box_.tokens.iter().map(|t| t.amount))
         .max();
     for m in [max_in, max_out].into_iter().flatten() {
-        if !amounts.contains(&m) {
+        // No mint is represented by None on the probe axis, never amount 0.
+        if m > 0 && !amounts.contains(&m) {
             amounts.push(m);
         }
     }
@@ -2484,6 +2485,75 @@ pub fn request_from_map(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn mint_probes_omit_zero_amounts_derived_from_templates() {
+        let mut req = dummy_request();
+        let token = TokenAmount {
+            id: "cc".repeat(32),
+            amount: 0,
+        };
+        req.inputs[0].box_.tokens.push(token.clone());
+        req.outputs[0].box_.tokens.push(token);
+        assert_eq!(mint_amounts(&req), vec![1]);
+        req.inputs[0].box_.tokens[0].amount = 7;
+        assert_eq!(mint_amounts(&req), vec![1, 7]);
+    }
+
+    #[test]
+    fn drain_payouts_omit_zero_token_remainders() {
+        let tree = "10010101d17300";
+        let token_id = "cc".repeat(32);
+        let req: DrainRequest = serde_json::from_value(json!({
+            "inputs": [{"role": "protected", "value": 10_000_000, "ergoTree": tree,
+                "tokens": [{"id": token_id, "amount": 1}]}],
+            "outputs": [
+                {"payee": "fixed", "value": 1_000_000, "ergoTree": tree,
+                 "tokens": [{"id": token_id, "amount": 1}]},
+                {"payee": "free", "value": 1_000_000, "ergoTree": tree}
+            ],
+            "protocolNfts": [token_id], "height": 100
+        }))
+        .unwrap();
+        let inputs = vec![req.inputs[0].box_.clone()];
+        let phase1 = realize_outputs(&req, &inputs, "drain", tree).unwrap();
+        assert!(phase1[1].tokens.is_empty());
+
+        let shape = ShapeDesc {
+            recreate: None,
+            sinks: 0,
+            static_label: "none".into(),
+        };
+        let point = ProbePoint {
+            shape_index: 0,
+            shape: &shape,
+            out_perm: &[0, 1],
+            succ: &SuccState::Bits(vec![false, false]),
+            split: false,
+            mint: None,
+            filler_domain: vec![0],
+        };
+        let (synthesized, _) = materialize_synthesized(
+            &req,
+            "drain",
+            &point,
+            0,
+            &inputs,
+            &[],
+            &[],
+            &HashSet::from([tree.to_string()]),
+            Some(1),
+            tree,
+        )
+        .unwrap();
+        assert!(synthesized[1].tokens.is_empty());
+        for outputs in [phase1, synthesized] {
+            assert_eq!(outputs[0].tokens[0].amount, 1);
+            for b in &outputs {
+                crate::box_build::build_eval_box("outputs", b, None).unwrap();
+            }
+        }
+    }
 
     #[test]
     fn permutations_are_lexicographic_and_capped() {

@@ -239,7 +239,7 @@ pub struct ScenarioBox {
 pub struct TokenAmount {
     /// 32-byte token id, hex.
     pub id: String,
-    /// Token amount.
+    /// Strictly positive token amount (rule 108). Omit the entry for zero.
     pub amount: u64,
 }
 

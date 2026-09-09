@@ -149,6 +149,15 @@ pub fn check(req: &TxRequest) -> Result<TxCheck, SandboxError> {
     let mut inputs = Vec::new();
     let mut signatures_needed = 0;
 
+    // Rule 108 is output-only and precedes input resolution/scripts on the
+    // node. Do not rely on eval_scenario to reach it: inputs may be missing
+    // (or empty). Share the same box invariant with scenario marshalling.
+    for (i, output) in outputs.iter().enumerate() {
+        if let Err(e) = crate::box_build::validate_token_amounts(&format!("outputs[{i}]"), output) {
+            problems.push(e.to_string());
+        }
+    }
+
     // Script checks need every input and data input present.
     let all_present =
         input_boxes.iter().all(Option::is_some) && data_boxes.iter().all(Option::is_some);

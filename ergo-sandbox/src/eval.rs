@@ -202,12 +202,14 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
     let outputs: Vec<EvalBox> = sc
         .outputs
         .iter()
-        .map(|b| build_eval_box("outputs", b, None))
+        .enumerate()
+        .map(|(i, b)| build_eval_box("outputs", b, None).map_err(index_err(i)))
         .collect::<Result<_, _>>()?;
     let data_inputs: Vec<EvalBox> = sc
         .data_inputs
         .iter()
-        .map(|b| build_eval_box("dataInputs", b, None))
+        .enumerate()
+        .map(|(i, b)| build_eval_box("dataInputs", b, None).map_err(index_err(i)))
         .collect::<Result<_, _>>()?;
 
     // 3. Context variables (BTreeMap iteration is sorted by var id, so the
