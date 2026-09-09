@@ -1,0 +1,133 @@
+{
+  "blockContext": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": {
+      "activatedScriptVersion": 0,
+      "height": 100,
+      "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+      "preHeaderNBits": 117586360,
+      "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+      "preHeaderTimestamp": 1700000000000,
+      "preHeaderVersion": 1,
+      "preHeaderVotes": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "case": {
+    "deploymentIdentity": "unknown",
+    "formatVersion": 1,
+    "nodeValidated": false,
+    "premises": {
+      "assumptions": {
+        "wireTransaction": {
+          "origin": "caller-supplied",
+          "status": "present",
+          "value": {
+            "bytes": "0287ca67e4822b4c8777457f779eb98fb3a348fc40d9a3de8940a124ab29c4ad6a00009597c9d1a6fc8e8be132628f2c7e89d234ad1d4f2ea19767db6de759bce49c34000101040e00000180897a10010101d17300640000",
+            "bytesToSign": "0287ca67e4822b4c8777457f779eb98fb3a348fc40d9a3de8940a124ab29c4ad6a00009597c9d1a6fc8e8be132628f2c7e89d234ad1d4f2ea19767db6de759bce49c34000101040e00000180897a10010101d17300640000",
+            "dataInputCount": 0,
+            "formatVersion": 1,
+            "inputCount": 2,
+            "method": "canonical-wire-construction",
+            "nodeValidated": false,
+            "previousStatePremise": {
+              "reason": "state not supplied; no unspent-state assertion",
+              "status": "missing"
+            },
+            "transactionId": "b2d512f6ea214b0d540046c47b283a21b21c6510b88498491e2dd0e7376925da"
+          }
+        }
+      },
+      "boxes": {
+        "origin": "caller-supplied",
+        "status": "present",
+        "value": [
+          {
+            "document": {
+              "boxId": "87ca67e4822b4c8777457f779eb98fb3a348fc40d9a3de8940a124ab29c4ad6a",
+              "bytes": "c0843d10010101d17300640000111111111111111111111111111111111111111111111111111111111111111100",
+              "ergoTree": "10010101d17300"
+            },
+            "origin": "hypothetical",
+            "record": null
+          },
+          {
+            "document": {
+              "boxId": "9597c9d1a6fc8e8be132628f2c7e89d234ad1d4f2ea19767db6de759bce49c34",
+              "bytes": "c0843d0008cd0324653eac434488002cc06bbfb7f10fe18991e35f9fe4302dbea6d2353dc0ab1c640000222222222222222222222222222222222222222222222222222222222222222201",
+              "ergoTree": "0008cd0324653eac434488002cc06bbfb7f10fe18991e35f9fe4302dbea6d2353dc0ab1c"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        ]
+      },
+      "constants": {
+        "reason": "binding origins not supplied",
+        "status": "missing"
+      },
+      "context": {
+        "reason": "execution context not supplied",
+        "status": "missing"
+      },
+      "engineRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "source": {
+        "reason": "source identity not supplied",
+        "status": "missing"
+      },
+      "targetBytes": {
+        "reason": "target bytes not supplied",
+        "status": "missing"
+      }
+    }
+  },
+  "formatVersion": 1,
+  "headers": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": []
+  },
+  "localPolicy": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": {
+      "maxTransactionSize": 524288
+    }
+  },
+  "networkRules": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": {
+      "description": "authored keyless/rent vector",
+      "mode": "disabled",
+      "reason": "explicit hypothetical network without EIP-27"
+    }
+  },
+  "parameters": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": {
+      "dataInputCost": 100,
+      "inputCost": 2000,
+      "maxBlockCost": 8001091,
+      "maxBlockSize": 524288,
+      "maxBoxSize": 4096,
+      "maxTokensPerBox": 122,
+      "minValuePerByte": 360,
+      "outputCost": 100,
+      "storageFeeFactor": 1250000,
+      "storagePeriod": 1051200,
+      "tokenAccessCost": 100
+    }
+  },
+  "priorBlockCost": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": 0
+  },
+  "transactionBytes": "0287ca67e4822b4c8777457f779eb98fb3a348fc40d9a3de8940a124ab29c4ad6a00009597c9d1a6fc8e8be132628f2c7e89d234ad1d4f2ea19767db6de759bce49c34000101040e00000180897a10010101d17300640000"
+}

@@ -95,7 +95,9 @@ The separate [P03 library validator](docs/node-validation.md) runs the pinned
 node’s full transaction pipeline with explicit state and rules. Its `node-accepted`
 result applies only to those supplied premises; it establishes neither historical
 state nor a property violation or future inclusion. Legacy endpoints keep their
-preflight/simulation meaning.
+preflight/simulation meaning. The [P04 signing API](docs/transaction-proofs.md)
+adds one explicitly owned P2PK funding proof over canonical transaction bytes
+and requires that same full validation; keys stay outside replay requests.
 
 The [governing roadmap](docs/ROADMAP.md) and [record-only scoreboard](docs/roadmap-metrics.json)
 separate recovery coverage, sampled preflight detection, and node-validated claims.

@@ -1,0 +1,34 @@
+{
+  "cases": [
+    {
+      "claimStatus": "no-property-claim",
+      "expected": {
+        "stage": "complete",
+        "status": "node-accepted",
+        "transactionId": "b2d512f6ea214b0d540046c47b283a21b21c6510b88498491e2dd0e7376925da"
+      },
+      "family": "owned-funding-proof",
+      "files": [
+        {
+          "path": "proof-vectors/unsigned.fixture",
+          "role": "unsigned",
+          "sha256": "7fbbb6060e4c09335d67add3dece3d8948e60cb708afda31aaa89d49d0df1a06"
+        },
+        {
+          "path": "proof-vectors/signed.fixture",
+          "role": "signed",
+          "sha256": "207c6cb9af2c0fc8b5334075b088f9aa1c422563f3f8cef5b7cb947096d44c0a"
+        }
+      ],
+      "fundingInput": 1,
+      "id": "owned-p2pk-with-keyless-companion",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": "none-P04",
+      "publicKey": "0324653eac434488002cc06bbfb7f10fe18991e35f9fe4302dbea6d2353dc0ab1c",
+      "publicationEligibility": "public-authored",
+      "sourceKind": "authored-hypothetical"
+    }
+  ],
+  "formatVersion": 1,
+  "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0"
+}

@@ -1,6 +1,7 @@
 //! Versioned, unvalidated experiment inputs and provenance-bound static results.
 //! Wire construction and explicit supplied-state validation delegate to the pinned node.
 pub mod case;
+pub mod sign;
 pub mod validate;
 pub mod wire;
 pub use case::{

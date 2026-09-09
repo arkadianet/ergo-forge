@@ -69,7 +69,8 @@ prior accumulated cost, and explicitly disable the re-emission rule. Required
 IDs and the minimum count are read from ROADMAP's policy block.
 
 P03 adds a library capability only. Legacy HTTP/CLI verdicts, preflight, Play,
-search, signing and browser storage remain unchanged. No P04 signing operation
-or P05 property-claim producer is implemented. Frozen scoreboard zeros remain
+search, legacy scenario signing and browser storage remain unchanged. The separate [P04 signing boundary](transaction-proofs.md) now produces one
+owned standard P2PK funding proof and then calls this validator. No P05
+property-claim producer is implemented. Frozen scoreboard zeros remain
 measurements at their recorded baseline revision; these new hypothetical codec/
 validation vectors do not rewrite those numbers.

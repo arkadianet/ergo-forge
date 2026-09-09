@@ -43,3 +43,20 @@ operation via a temporary Cargo example, never as a gate or automatic repair.
 The captured settings and empty header lists are hypothetical inputs, not
 historical state evidence. `none-P03` and `no-property-claim` prevent these vectors
 from being presented as P05 property claims.
+
+# P04 transaction proof vectors
+
+`proof-manifest.json` registers the P04 experiment separately from P03's frozen
+node-vector inventory. The policy block names this manifest and required case ID.
+`proof-vectors/{unsigned,signed}.fixture` are complete supplied-state requests;
+the signed one contains a real transaction-bound DLog proof and no scalar.
+Both inputs and all context are hypothetical. The test key is intentionally
+public in the test/producer code; it must never receive real funds.
+
+`generate_transaction_proofs.rs` is the retained one-time producer. It calls the
+new signing boundary and records the successful full node validation result.
+For an explicitly authorized new fixture, copy it to a temporary Cargo example
+and run that example from the repository root. It writes the P04 files, so never
+run it as a gate or as a repair for a failed test. Proof randomness means rerunning
+it will change the signed bytes/hash. Gates only read and verify committed values.
+The `.fixture` suffix keeps these vectors outside frozen JSON decompiler enrollment.

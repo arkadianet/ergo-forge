@@ -190,7 +190,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
 {
   "schemaVersion": 1,
   "baselineRev": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
-  "completedThrough": "P03",
+  "completedThrough": "P04",
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,
   "units": [
@@ -279,7 +279,9 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "declared_public_key_without_proof_is_not_acceptance",
         "replay_bundle_contains_no_secret"
       ],
-      "implemented": false
+      "fixtureManifest": "ergo-sandbox/tests/fixtures/evidence/proof-manifest.json",
+      "caseIds": ["owned-p2pk-with-keyless-companion"],
+      "implemented": true
     },
     {
       "id": "P05",
@@ -394,7 +396,7 @@ The runner's gate command is `python3 scripts/roadmap_gate.py --require P05` (su
 
 To keep every release shippable, repository CI runs `--through-completed` plus the next PR's `--require` gate. `completedThrough` advances only in the PR whose gates pass, with all predecessors rerun. The status report remains separate from the green CI prefix: unimplemented goals cannot disappear behind a green release. A stopped unit blocks downstream dependent units until a governing-plan amendment removes them or changes the dependency with a new acceptance gate.
 
-P00 also adds a record-only scoreboard check that reads committed JSON, verifies corpus membership/thresholds and links, and exits nonzero if this document's baseline claims disagree. P01 adds origin validation of the 28 ingestion rows. P03–P08 register `tests/fixtures/evidence/manifest.json` with case ID, family, source kind, exact file hashes, node revision, property version, expected acceptance/claim status, and publication eligibility. P07's `precision.json` supplies the eight frozen labels and references those case IDs. No harness may accept a hand-set `confirmed: true` as evidence: replay derives that result.
+P00 also adds a record-only scoreboard check that reads committed JSON, verifies corpus membership/thresholds and links, and exits nonzero if this document's baseline claims disagree. P01 adds origin validation of the 28 ingestion rows. P03–P08 register `tests/fixtures/evidence/manifest.json` (P04 uses the separately policy-registered `proof-manifest.json`, as amended below) with case ID, family, source kind, exact file hashes, node revision, property version, expected acceptance/claim status, and publication eligibility. P07's `precision.json` supplies the eight frozen labels and references those case IDs. No harness may accept a hand-set `confirmed: true` as evidence: replay derives that result.
 
 Existing release checks remain required: `cargo fmt --all -- --check`, workspace clippy with warnings denied, workspace tests, and the existing cost-trace CI variants ([ci.yml:51](../.github/workflows/ci.yml#L51)). P06 additionally runs `cargo test --release -p ergo-sandbox --test mutation_corpus -- --nocapture`. The per-entry decompiler test remains `bundled_contracts_and_compiled_fixtures_round_trip` ([decompile_corpus.rs:160](../ergo-sandbox/tests/decompile_corpus.rs#L160)); do not loosen its existing exact entries to make an evidence fixture fit.
 
@@ -513,7 +515,7 @@ P03 execution record: see [P03-REPORT.md](P03-REPORT.md) and the
 the eight acceptance cases explicitly in `caseIds`, plus an enabled re-emission
 rejection to test rule forwarding. This makes the existing prose requirements
 machine-readable and adds a control; the minimum of eight and all other numeric
-thresholds remain unchanged. P04–P08 remain unimplemented. These authored
+thresholds remain unchanged. At P03 completion, P04–P08 were unimplemented. These authored
 hypothetical vectors do not change any frozen measurement or prove a property.
 
 P03 gate-command amendment: the runner uses `--show-output` instead of
@@ -523,3 +525,17 @@ with one test thread. Capturing and then showing diagnostics preserves complete
 status lines and all output. Discovery, required names, whole-target execution,
 ignored/zero-test rejection and every threshold are unchanged. The separately
 requested P03 `--nocapture` command is also run directly.
+
+P04 manifest amendment: P04 registers `proof-manifest.json` beside P03's
+`manifest.json`, with its location and required experiment ID in the policy block.
+The P03 harness binds its exact node-vector inventory; appending P04 rows there
+would force a change to that completed gate and its corpus membership. P04's
+separate manifest preserves those rows and adds the same required revision,
+file-hash, family, source, property-status and publication metadata. No threshold,
+acceptance name, old fixture or numeric baseline is changed.
+
+P04 execution record: see [P04-REPORT.md](P04-REPORT.md) and the
+[transaction proof API boundary](transaction-proofs.md). P04 is registered as
+implemented. Its completed prefix advances only after P00–P04 rerun green.
+The signed execution is hypothetical supplied-state evidence, not a property
+claim. P05–P08 remain unimplemented; legacy endpoints and frozen search stay unchanged.

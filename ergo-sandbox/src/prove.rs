@@ -267,3 +267,59 @@ pub fn prove(
     .map(|(proof, _cost)| proof)
     .map_err(|e| err(e.to_string()))
 }
+
+/// An explicitly owned DLog scalar for the strict transaction signing path.
+/// Unlike legacy scenario `SecretSpec`, this value cannot enter replay JSON.
+/// Owned storage is zeroized on drop; callers must also protect their originals.
+///
+/// ```compile_fail
+/// use ergo_sandbox::prove::OwnedDlogSecret;
+/// let key = OwnedDlogSecret::from_bytes(zeroize::Zeroizing::new([1; 32])).unwrap();
+/// let exported = serde_json::to_string(&key).unwrap();
+/// ```
+/// ```compile_fail
+/// use ergo_sandbox::prove::OwnedDlogSecret;
+/// let imported: OwnedDlogSecret = serde_json::from_str("{}").unwrap();
+/// ```
+pub struct OwnedDlogSecret {
+    scalar: Zeroizing<Scalar>,
+}
+impl std::fmt::Debug for OwnedDlogSecret {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("OwnedDlogSecret([REDACTED])")
+    }
+}
+impl OwnedDlogSecret {
+    pub fn from_bytes(bytes: Zeroizing<[u8; 32]>) -> Result<Self, SandboxError> {
+        let scalar: Option<Scalar> = Scalar::from_repr(FieldBytes::from(*bytes)).into();
+        match scalar {
+            Some(s) if s != Scalar::ZERO => Ok(Self {
+                scalar: Zeroizing::new(s),
+            }),
+            _ => Err(err(
+                "owned DLog key must be a nonzero scalar below the group order",
+            )),
+        }
+    }
+    pub fn public_key(&self) -> [u8; 33] {
+        compressed(&(ProjectivePoint::GENERATOR * *self.scalar))
+    }
+    pub(crate) fn prove_message(&self, message: &[u8]) -> Result<Vec<u8>, SandboxError> {
+        let pk = self.public_key();
+        let registry = SecretRegistry::empty()
+            .merge_external_secrets(&[ProverExternalSecret::Dlog {
+                pk,
+                scalar: Zeroizing::new(*self.scalar),
+            }])
+            .map_err(|_| err("could not register owned DLog key"))?;
+        prove_sigma(
+            &SigmaBoolean::ProveDlog(GroupElement::from_bytes(pk)),
+            &registry,
+            message,
+            &HintsBag::empty(),
+            &mut OsRngBackend,
+        )
+        .map(|(proof, _)| proof)
+        .map_err(|_| err("owned DLog proof generation failed"))
+    }
+}
