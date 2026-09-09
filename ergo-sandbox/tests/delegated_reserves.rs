@@ -249,3 +249,18 @@ fn dexy_bank_deliberately_delegates_reserves() {
 fn branch_specific_delegation_is_not_decided() {
     assert!(preserved("out.value >= SELF.value || HEIGHT > 100").is_empty());
 }
+
+#[test]
+fn id_only_slots_explicitly_state_the_unobservable_singleton_assumption() {
+    for slot in [0, 1, 3] {
+        let f = preserved(&format!(
+            "out.value >= SELF.value && out.tokens({slot})._1 == SELF.tokens({slot})._1"
+        ));
+        assert_eq!(f.len(), 1);
+        assert_eq!(f[0].severity, Severity::Medium);
+        assert!(f[0].message.contains(&format!(
+            "unbounded unless token slot {slot} is a supply-1 singleton, which this analysis cannot observe"
+        )));
+        assert!(!f[0].message.contains("ERG value"));
+    }
+}
