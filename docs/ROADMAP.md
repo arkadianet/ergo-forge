@@ -190,7 +190,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
 {
   "schemaVersion": 1,
   "baselineRev": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
-  "completedThrough": "P04",
+  "completedThrough": "P05",
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,
   "units": [
@@ -280,7 +280,9 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "replay_bundle_contains_no_secret"
       ],
       "fixtureManifest": "ergo-sandbox/tests/fixtures/evidence/proof-manifest.json",
-      "caseIds": ["owned-p2pk-with-keyless-companion"],
+      "caseIds": [
+        "owned-p2pk-with-keyless-companion"
+      ],
       "implemented": true
     },
     {
@@ -297,7 +299,22 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "offline_replay_reproduces_claim",
         "wrong_companion_or_policy_invalidates_claim"
       ],
-      "implemented": false
+      "implemented": true,
+      "fixtureManifest": "ergo-sandbox/tests/fixtures/evidence/claim-manifest.json",
+      "caseIds": [
+        "use-incident",
+        "sale-mutant-unpaid",
+        "sale-fixed-paid",
+        "sale-fixed-unpaid"
+      ],
+      "positiveCaseIds": [
+        "use-incident",
+        "sale-mutant-unpaid"
+      ],
+      "negativeCaseIds": [
+        "sale-fixed-paid",
+        "sale-fixed-unpaid"
+      ]
     },
     {
       "id": "P06",
@@ -383,7 +400,15 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
     "ingestion": "docs/ingestion-lithos-results.json",
     "decompiler": "ergo-sandbox/tests/fixtures/decompile_corpus_expectations.json",
     "history": "examples/mutants/answer-key.custody-v1.json"
-  }
+  },
+  "resolvedStopRecords": [
+    {
+      "unit": "P05",
+      "recordSha256": "0639e75daaab01d5a67ebb25a797b0cdbbba197474c0b0fec29815706ed67986",
+      "decision": "docs/P05-DECISION.md",
+      "decisionSha256": "cbc1096d4d208a900c2be4c7091ba49feb2bf1722e8dca77f2d3567ad4d02aa2"
+    }
+  ]
 }
 ```
 <!-- /roadmap-policy:v1 -->
@@ -394,7 +419,7 @@ The runner's gate command is `python3 scripts/roadmap_gate.py --require P05` (su
 
 `python3 scripts/roadmap_gate.py --all-goals` runs the full goal set and returns nonzero while anything is missing or failing. **It is expected to fail today**, first because the runner/new tests do not exist, then because the product obligations are not met. An infrastructure failure is reported as `missing-gate`, never as experimental evidence that a contract is unsafe. The runner writes a machine report distinguishing `missing-gate` (required infrastructure/evidence absent), `failed` (executed product gate failed), `passed`, `stopped`, and `unimplemented` (a registered unit explicitly marked `implemented: false`); none of missing-gate/failed/stopped/unimplemented counts as completion. P00 registers P01–P08 as unimplemented, so the full-goal check fails for unfinished product work rather than misclassifying planned files as broken infrastructure.
 
-To keep every release shippable, repository CI runs `--through-completed` plus the next PR's `--require` gate. `completedThrough` advances only in the PR whose gates pass, with all predecessors rerun. The status report remains separate from the green CI prefix: unimplemented goals cannot disappear behind a green release. A stopped unit blocks downstream dependent units until a governing-plan amendment removes them or changes the dependency with a new acceptance gate.
+To keep every release shippable, repository CI runs `--through-completed` plus the next PR's `--require` gate. `completedThrough` advances only in the PR whose gates pass, with all predecessors rerun. The status report remains separate from the green CI prefix: unimplemented goals cannot disappear behind a green release. A stopped unit blocks downstream dependent units until a governing-plan amendment removes them or changes the dependency with a new acceptance gate, or a policy-pinned governing decision resolves that exact stop with recovered evidence and reopens the original gate. Reopening does not award a pass: the original unit and predecessor tests must execute successfully. The stop record and its original evidence remain history.
 
 P00 also adds a record-only scoreboard check that reads committed JSON, verifies corpus membership/thresholds and links, and exits nonzero if this document's baseline claims disagree. P01 adds origin validation of the 28 ingestion rows. P03–P08 register `tests/fixtures/evidence/manifest.json` (P04 uses the separately policy-registered `proof-manifest.json`, as amended below) with case ID, family, source kind, exact file hashes, node revision, property version, expected acceptance/claim status, and publication eligibility. P07's `precision.json` supplies the eight frozen labels and references those case IDs. No harness may accept a hand-set `confirmed: true` as evidence: replay derives that result.
 
@@ -544,5 +569,20 @@ P05 attempt stopped on 2026-09-10 (local date), under the existing section 6
 `missing-provenance` rule. See [P05-REPORT.md](P05-REPORT.md) and the
 machine-readable [stop record](roadmap-stops.json). The required public USE
 case lacked a fully backed validation context; a prototype's hypothetical-context
-green results are not accepted. P05 remains unimplemented and `completedThrough`
-remains P04. No acceptance requirement or policy threshold is amended.
+green results are not accepted. At that stop, P05 remained unimplemented and `completedThrough`
+remained P04. No acceptance requirement or policy threshold was amended.
+
+P05 governing decision after `e251f22`: **B, recover the historical source
+material; preserve every original threshold.** See [P05-DECISION.md](P05-DECISION.md).
+The original stop is retained with a policy-pinned resolution. This only reopens
+the gate; it cannot grant completion. P05 uses a separate `claim-manifest.json`
+so the completed P03/P04 fixture inventories remain unchanged. The recovery
+harness re-derives the USE request from raw recorded artifacts, including actual
+prior transaction costs, before counting it as the public-incident case.
+P06–P08 remain unimplemented. No lowered-bar alternative is authorized.
+
+P05 completion: P00–P05 and `--through-completed` through P04 reran green before
+advancement. `completedThrough` is now P05. The final through-P05 and full-suite gates
+passed; actual output is recorded in [P05-RECOVERY-REPORT.md](P05-RECOVERY-REPORT.md).
+The boundary is source-recorded context plus declared-property validation, not
+authenticated historical UTXO membership or canonical-chain certification.

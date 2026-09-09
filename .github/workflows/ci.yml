@@ -85,4 +85,4 @@ jobs:
         run: |
           python3 scripts/roadmap_gate.py --through-completed
           # The implementation PR's unit; update with the next governing unit.
-          python3 scripts/roadmap_gate.py --require P04
+          python3 scripts/roadmap_gate.py --require P05

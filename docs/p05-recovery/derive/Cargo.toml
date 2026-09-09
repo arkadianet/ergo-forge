@@ -1,0 +1,18 @@
+[package]
+name = "p05-recovery"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+ergo-sandbox = { path = "../../../ergo-sandbox" }
+serde_json = "1"
+hex = "0.4"
+ergo-chain-spec = { git = "https://github.com/arkadianet/ergo", rev = "9468043396e5daa2828211bcff4234bc70fae4f0" }
+ergo-ser = { git = "https://github.com/arkadianet/ergo", rev = "9468043396e5daa2828211bcff4234bc70fae4f0" }
+ergo-validation = { git = "https://github.com/arkadianet/ergo", rev = "9468043396e5daa2828211bcff4234bc70fae4f0" }
+ergo-primitives = { git = "https://github.com/arkadianet/ergo", rev = "9468043396e5daa2828211bcff4234bc70fae4f0" }
+ergo-crypto = { git = "https://github.com/arkadianet/ergo", rev = "9468043396e5daa2828211bcff4234bc70fae4f0" }
+sha2 = "0.10"

@@ -1,0 +1,122 @@
+[
+  {
+    "name": "epoch-ids",
+    "url": "https://node.ergo.watch/blocks/at/1867776",
+    "retrievedAt": "2026-09-09T21:23:13.716179+00:00",
+    "status": 200,
+    "finalUrl": "https://node.ergo.watch/blocks/at/1867776",
+    "file": "epoch-ids.fixture",
+    "sha256": "36fa8090b880279d5206fe04f4d1195289a7363e10a9337ef8f47cca95f8eb63",
+    "bytes": 72
+  },
+  {
+    "name": "headers",
+    "url": "https://node.ergo.watch/blocks/chainSlice?fromHeight=1868194&toHeight=1868204",
+    "retrievedAt": "2026-09-09T21:23:13.716435+00:00",
+    "status": 200,
+    "finalUrl": "https://node.ergo.watch/blocks/chainSlice?fromHeight=1868194&toHeight=1868204",
+    "file": "headers.fixture",
+    "sha256": "f7b372a8f1152e190e83dd6aab6c5aca06e276ac89f1980acf984b5ed9318464",
+    "bytes": 12192
+  },
+  {
+    "name": "node-block",
+    "url": "https://node.ergo.watch/blocks/83a985afb17f0352206916e168609f7fc9f1da83daffc659db9cff2e2bb954c1",
+    "retrievedAt": "2026-09-09T21:23:13.716684+00:00",
+    "status": 200,
+    "finalUrl": "https://node.ergo.watch/blocks/83a985afb17f0352206916e168609f7fc9f1da83daffc659db9cff2e2bb954c1",
+    "file": "node-block.fixture",
+    "sha256": "5b144ecc8b1b75740a5cd1f54bb437be9dcee0461b3470a585383c16c5b0bf02",
+    "bytes": 383683
+  },
+  {
+    "name": "node-info",
+    "url": "https://node.ergo.watch/info",
+    "retrievedAt": "2026-09-09T21:23:13.716950+00:00",
+    "status": 200,
+    "finalUrl": "https://node.ergo.watch/info",
+    "file": "node-info.fixture",
+    "sha256": "eee404a1e81e62fc74391533cf92f73a954af92ec4286d84bd860515f0002f86",
+    "bytes": 1474
+  },
+  {
+    "name": "epoch-block",
+    "url": "https://node.ergo.watch/blocks/393111467f6875e5561f0cdd1c6ba6ea910785654db2323553a378a8c0b9b4ff",
+    "retrievedAt": "2026-09-09T21:24:31.700334+00:00",
+    "status": 200,
+    "finalUrl": "https://node.ergo.watch/blocks/393111467f6875e5561f0cdd1c6ba6ea910785654db2323553a378a8c0b9b4ff",
+    "file": "epoch-block.fixture",
+    "sha256": "e8133fd4678a72c9b811f7d90f36d479a95be9ab9c3f333b3edf9bfe6479d27a",
+    "bytes": 18687
+  },
+  {
+    "name": "previous-headers",
+    "url": "https://node.ergo.watch/blocks/chainSlice?fromHeight=1868193&toHeight=1868203",
+    "retrievedAt": "2026-09-09T21:24:31.700591+00:00",
+    "status": 200,
+    "finalUrl": "https://node.ergo.watch/blocks/chainSlice?fromHeight=1868193&toHeight=1868203",
+    "file": "previous-headers.fixture",
+    "sha256": "dcd763f54688cc8d56de7ac97f4679d65e27ef945da81481a1ae1f14a9c73b6e",
+    "bytes": 12192
+  },
+  {
+    "name": "epoch-chain",
+    "url": "https://node.ergo.watch/blocks/chainSlice?fromHeight=1867775&toHeight=1868204",
+    "retrievedAt": "2026-09-09T21:24:31.700796+00:00",
+    "status": 200,
+    "finalUrl": "https://node.ergo.watch/blocks/chainSlice?fromHeight=1867775&toHeight=1868204",
+    "file": "epoch-chain.fixture",
+    "sha256": "4fed5acca0fe1013542d4d28e5d3c0620ac02ed9f556bf0aecece3f0c14a7b39",
+    "bytes": 522953
+  },
+  {
+    "name": "prior-0",
+    "url": "https://api.ergoplatform.com/api/v1/transactions/10ff5c82991eb44853b7aaf6da95372d9c006e8a18c18809ca9a9a5405356b68",
+    "retrievedAt": "2026-09-09T21:24:31.700990+00:00",
+    "status": 200,
+    "finalUrl": "https://api.ergoplatform.com/api/v1/transactions/10ff5c82991eb44853b7aaf6da95372d9c006e8a18c18809ca9a9a5405356b68",
+    "file": "prior-0.fixture",
+    "sha256": "fa0c9553ec93b09dcb48ab63e7706060c24f98172cf5d0adb31bb6b06132a812",
+    "bytes": 8613
+  },
+  {
+    "name": "prior-1",
+    "url": "https://api.ergoplatform.com/api/v1/transactions/ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+    "retrievedAt": "2026-09-09T21:24:32.730065+00:00",
+    "status": 200,
+    "finalUrl": "https://api.ergoplatform.com/api/v1/transactions/ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+    "file": "prior-1.fixture",
+    "sha256": "a88a9e9ebbd3171fd936bfbe06937bce1dbf206e7da90f3bd6e70c49ebd108b5",
+    "bytes": 53633
+  },
+  {
+    "name": "prior-2",
+    "url": "https://api.ergoplatform.com/api/v1/transactions/2b5a56dc2714ebcd1eceaef086edfcc12d4d63eb30ca8a42257ad7df04b57b60",
+    "retrievedAt": "2026-09-09T21:24:33.072324+00:00",
+    "status": 200,
+    "finalUrl": "https://api.ergoplatform.com/api/v1/transactions/2b5a56dc2714ebcd1eceaef086edfcc12d4d63eb30ca8a42257ad7df04b57b60",
+    "file": "prior-2.fixture",
+    "sha256": "1b3b4e9d234f61470ffc8e5efe564ecebcaa4d95bad6b5db479cc306e3f3272f",
+    "bytes": 11963
+  },
+  {
+    "name": "prior-3",
+    "url": "https://api.ergoplatform.com/api/v1/transactions/6a4d184c397f1b4159d1ca0065d987e41efc23a563c5f0800003dcc50eedb641",
+    "retrievedAt": "2026-09-09T21:24:33.099480+00:00",
+    "status": 200,
+    "finalUrl": "https://api.ergoplatform.com/api/v1/transactions/6a4d184c397f1b4159d1ca0065d987e41efc23a563c5f0800003dcc50eedb641",
+    "file": "prior-3.fixture",
+    "sha256": "597ebbcfd76491ba333e2346029489e49d0c29a533448fc3b1063a1eba24761a",
+    "bytes": 3012
+  },
+  {
+    "name": "prior-4",
+    "url": "https://api.ergoplatform.com/api/v1/transactions/30c1cacc7f4e30f1b52f1f1da35ae93750bf9187461eb374ecf9d9f9ade3d719",
+    "retrievedAt": "2026-09-09T21:24:33.503510+00:00",
+    "status": 200,
+    "finalUrl": "https://api.ergoplatform.com/api/v1/transactions/30c1cacc7f4e30f1b52f1f1da35ae93750bf9187461eb374ecf9d9f9ade3d719",
+    "file": "prior-4.fixture",
+    "sha256": "3c30e9e7ab7231ffcf4a88e38f92654b12703fdf32cfd3c475ad91128f48000d",
+    "bytes": 41453
+  }
+]

@@ -118,6 +118,32 @@ class RoadmapGateTests(unittest.TestCase):
             path.write_text('[{"reasonCode":"timebox"}]')
             self.assert_status('missing-gate', lambda: gate.stop_records(self.policy, Path(tmp)))
 
+    def test_resolution_requires_exact_policy_record_and_decision(self):
+        self.assertEqual(gate.stop_records(self.policy), [])
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assert_status('missing-gate', lambda: gate.stop_records(self.policy, Path(tmp)))
+        without = copy.deepcopy(self.policy)
+        without.pop('resolvedStopRecords', None)
+        self.assertTrue(gate.stop_records(without))
+        altered = copy.deepcopy(self.policy)
+        altered['resolvedStopRecords'][0]['recordSha256'] = '0' * 64
+        self.assert_status('missing-gate', lambda: gate.stop_records(altered))
+        altered = copy.deepcopy(self.policy)
+        altered['resolvedStopRecords'][0]['decisionSha256'] = '0' * 64
+        self.assert_status('missing-gate', lambda: gate.stop_records(altered))
+        # A later stop remains blocking even when the historical stop is resolved.
+        original = gate.load_json(gate.ROOT / self.policy['stopRecords'])
+        new_stop = copy.deepcopy(original[0])
+        new_stop.pop('resolution')
+        new_stop['reasonCode'] = 'new-evidence-failure'
+        real_load = gate.load_json
+        def appended(path):
+            if path == gate.ROOT / self.policy['stopRecords']:
+                return original + [new_stop]
+            return real_load(path)
+        with patch.object(gate, 'load_json', side_effect=appended):
+            self.assertEqual(gate.stop_records(self.policy), [new_stop])
+
 
 if __name__ == '__main__':
     unittest.main()

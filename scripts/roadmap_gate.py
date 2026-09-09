@@ -179,6 +179,7 @@ def scoreboard(policy, root=ROOT):
 def stop_records(policy, root=ROOT):
     path = root / policy['stopRecords']
     if not path.exists():
+        require(not policy.get('resolvedStopRecords'), 'resolved stop record is missing', 'missing-gate')
         return []
     records = load_json(path)
     require(isinstance(records, list), 'stop records must be an array', 'missing-gate')
@@ -192,7 +193,28 @@ def stop_records(policy, root=ROOT):
             require(isinstance(result.get('command'), list) and bool(result['command']) and type(result.get('exitCode')) is int and bool(result.get('evidenceHashes')), 'incomplete stop gate result', 'missing-gate')
             for file, digest in result['evidenceHashes'].items():
                 require(sha(read(root / file)) == digest, 'stop evidence hash mismatch', 'missing-gate')
-    return records
+    resolutions = policy.get('resolvedStopRecords', [])
+    require(isinstance(resolutions, list), 'invalid stop resolutions', 'missing-gate')
+    by_hash = {}
+    for resolution in resolutions:
+        require(isinstance(resolution, dict) and {'unit', 'recordSha256', 'decision', 'decisionSha256'} <= resolution.keys(), 'incomplete stop resolution', 'missing-gate')
+        digest = resolution['recordSha256']
+        require(digest not in by_hash, 'duplicate stop resolution', 'missing-gate')
+        by_hash[digest] = resolution
+    open_records = []
+    used = set()
+    for record in records:
+        digest = sha(json.dumps(record, sort_keys=True, separators=(',', ':')).encode())
+        resolution = by_hash.get(digest)
+        if resolution is None:
+            open_records.append(record)
+            continue
+        require(resolution['unit'] == record['unitOrProposal'], 'stop resolution unit mismatch', 'missing-gate')
+        require(record.get('resolution', {}).get('governingDecision') == resolution['decision'], 'stop resolution lacks governing decision', 'missing-gate')
+        require(sha(read(root / resolution['decision'])) == resolution['decisionSha256'], 'governing decision hash mismatch', 'missing-gate')
+        used.add(digest)
+    require(used == set(by_hash), 'stop resolution does not match the recorded stop', 'missing-gate')
+    return open_records
 
 
 def check_discovery(output, names):

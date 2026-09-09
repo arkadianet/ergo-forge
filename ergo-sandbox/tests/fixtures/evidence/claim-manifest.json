@@ -1,0 +1,120 @@
+{
+  "cases": [
+    {
+      "claimStatus": "confirmed-violation",
+      "expectedFingerprint": "dc7c07268879d14fc16a92ab4ed30a81d5fba4cec8dc0ffbd2111f133317ab5d",
+      "expectedNodeAccepted": true,
+      "expectedStatus": "confirmed-violation",
+      "expectedTransactionId": "5371373d346aade57f684ead23f386e3441ffb2cb7a860babe96e3c5048b2725",
+      "family": "public-use-incident",
+      "files": [
+        {
+          "path": "claim-vectors/use-incident.fixture",
+          "role": "bundle",
+          "sha256": "838815a0165e9816e3da0461bfcd3d17898ac2f891886a1f3f0729bca2d51c5c"
+        },
+        {
+          "path": "claim-vectors/use-archive.fixture",
+          "role": "source",
+          "sha256": "388678856086920d98d7679c74da198a66be207abe4201526c46b82665102da8"
+        }
+      ],
+      "id": "use-incident",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": "recognized-attacker-receipts-v1",
+      "publicationEligibility": "public-authored-or-public-incident",
+      "sourceKind": "source-recorded-inputs"
+    },
+    {
+      "claimStatus": "confirmed-violation",
+      "expectedFingerprint": "1a0671cfbca5580f752f0ad532e82d892d76b0aac0f800ce4e85a7f943ea51fa",
+      "expectedNodeAccepted": true,
+      "expectedStatus": "confirmed-violation",
+      "expectedTransactionId": "a594fa476517bf20bc9dff50cf2b6ff7a5f30b74307b604f697f0088e8cbe5c4",
+      "family": "authored-fixed-rate-sale",
+      "files": [
+        {
+          "path": "claim-vectors/sale-mutant-unpaid.fixture",
+          "role": "bundle",
+          "sha256": "2bd640988148dfadc3b59810d56b937f49be8a491ce47d1f945dd85f835e21dc"
+        },
+        {
+          "path": "claim-vectors/sale-fixed.es",
+          "role": "source",
+          "sha256": "b2fac2858cece937cf417117e2df1edbcd02d970036aa2d481f256456f6be413"
+        },
+        {
+          "path": "claim-vectors/sale-mutant.es",
+          "role": "source",
+          "sha256": "a942ddb62b2cc361e54f4fed9a8bc6fb60108a34f28e31eef3e24949390fe8ec"
+        }
+      ],
+      "id": "sale-mutant-unpaid",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": "recognized-attacker-receipts-v1",
+      "publicationEligibility": "public-authored-or-public-incident",
+      "sourceKind": "hypothetical-or-mixed-inputs"
+    },
+    {
+      "claimStatus": "accepted-nonviolating",
+      "expectedFingerprint": "1fb606018ede6059b53c11f44afa06313e2bd00f4ab9c4d075fef7deb758f742",
+      "expectedNodeAccepted": true,
+      "expectedStatus": "accepted-nonviolating",
+      "expectedTransactionId": "e4a5ce048a3d7ac5ee8cc3b258a72fa5bdd0e0905df5aa87bb1b6ebe0eaae3c6",
+      "family": "authored-fixed-rate-sale",
+      "files": [
+        {
+          "path": "claim-vectors/sale-fixed-paid.fixture",
+          "role": "bundle",
+          "sha256": "268ed7c3d1e80caea9c60672fb3c6ea441fd6d6567de1b25cd99722e6f37d0d8"
+        },
+        {
+          "path": "claim-vectors/sale-fixed.es",
+          "role": "source",
+          "sha256": "b2fac2858cece937cf417117e2df1edbcd02d970036aa2d481f256456f6be413"
+        },
+        {
+          "path": "claim-vectors/sale-mutant.es",
+          "role": "source",
+          "sha256": "a942ddb62b2cc361e54f4fed9a8bc6fb60108a34f28e31eef3e24949390fe8ec"
+        }
+      ],
+      "id": "sale-fixed-paid",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": "recognized-attacker-receipts-v1",
+      "publicationEligibility": "public-authored-or-public-incident",
+      "sourceKind": "hypothetical-or-mixed-inputs"
+    },
+    {
+      "claimStatus": "node-rejected",
+      "expectedFingerprint": "111d09d4f5182b8f37eef2a79522bb3c06dc4f3a03afa5e25ac61a5522d315f8",
+      "expectedNodeAccepted": false,
+      "expectedStatus": "node-rejected",
+      "expectedTransactionId": null,
+      "family": "authored-fixed-rate-sale",
+      "files": [
+        {
+          "path": "claim-vectors/sale-fixed-unpaid.fixture",
+          "role": "bundle",
+          "sha256": "329791005bc5fd0b25b11d9e02282ea910b8cff6c4dd573e932892e3cd9de33f"
+        },
+        {
+          "path": "claim-vectors/sale-fixed.es",
+          "role": "source",
+          "sha256": "b2fac2858cece937cf417117e2df1edbcd02d970036aa2d481f256456f6be413"
+        },
+        {
+          "path": "claim-vectors/sale-mutant.es",
+          "role": "source",
+          "sha256": "a942ddb62b2cc361e54f4fed9a8bc6fb60108a34f28e31eef3e24949390fe8ec"
+        }
+      ],
+      "id": "sale-fixed-unpaid",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": "recognized-attacker-receipts-v1",
+      "publicationEligibility": "public-authored-or-public-incident",
+      "sourceKind": "hypothetical-or-mixed-inputs"
+    }
+  ],
+  "formatVersion": 1
+}

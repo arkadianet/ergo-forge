@@ -20,6 +20,7 @@ fn main() -> ExitCode {
     let rest = &args[1..];
     let result = match cmd.as_str() {
         "compile" => cmd_compile(rest),
+        "replay" => cmd_replay(rest),
         "tree" => cmd_tree(rest),
         "triage" => cmd_triage(rest),
         "match" => cmd_match(rest),
@@ -60,6 +61,8 @@ fn usage() {
         "ergo-es — ErgoScript workbench CLI
 
 USAGE:
+  ergo-es replay <case.json> [--json]
+      Offline full-node validation and declared-property replay; broadcasts nothing.
   ergo-es tree <address|boxId|treeHex> [--json] [--network mainnet|testnet]
                [--source fixture.json | --explorer URL]
       Decode offline, or explicitly resolve a box, then decompile and audit.
@@ -1664,4 +1667,26 @@ fn cmd_triage(args: &[String]) -> Result<(), String> {
         serde_json::to_string_pretty(&finding).map_err(|e| e.to_string())?
     );
     Ok(())
+}
+
+fn cmd_replay(args: &[String]) -> Result<(), String> {
+    if args.is_empty() || args.len() > 2 || (args.len() == 2 && args[1] != "--json") {
+        return Err("usage: ergo-es replay <case.json> [--json]".into());
+    }
+    let bytes = std::fs::read(&args[0]).map_err(|e| e.to_string())?;
+    let bundle: ergo_sandbox::evidence::replay::ReplayBundle =
+        serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+    let report = ergo_sandbox::evidence::replay::replay(&bundle);
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
+    );
+    if matches!(
+        report["status"].as_str(),
+        Some("confirmed-violation" | "accepted-nonviolating")
+    ) {
+        Ok(())
+    } else {
+        Err("replay did not establish a supported accepted property result".into())
+    }
 }

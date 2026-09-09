@@ -98,6 +98,9 @@ state nor a property violation or future inclusion. Legacy endpoints keep their
 preflight/simulation meaning. The [P04 signing API](docs/transaction-proofs.md)
 adds one explicitly owned P2PK funding proof over canonical transaction bytes
 and requires that same full validation; keys stay outside replay requests.
+The [P05 offline replay command](docs/claim-replay.md) then evaluates the declared
+extraction property and binds any confirmed violation to the complete bundle.
+It does not establish historical state or infer protocol intent.
 
 The [governing roadmap](docs/ROADMAP.md) and [record-only scoreboard](docs/roadmap-metrics.json)
 separate recovery coverage, sampled preflight detection, and node-validated claims.

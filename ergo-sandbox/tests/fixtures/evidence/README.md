@@ -60,3 +60,9 @@ and run that example from the repository root. It writes the P04 files, so never
 run it as a gate or as a repair for a failed test. Proof randomness means rerunning
 it will change the signed bytes/hash. Gates only read and verify committed values.
 The `.fixture` suffix keeps these vectors outside frozen JSON decompiler enrollment.
+
+P05's separate `claim-manifest.json` pins USE plus three authored sale controls.
+The [recovery directory](../../../../docs/p05-recovery/README.md) records raw public
+material and the pinned-node derivation, repeated by the P05 target. The rejected
+prior USE candidate remains stop evidence outside this accepted manifest. No
+P03/P04 manifest row or preflight corpus measurement was changed.

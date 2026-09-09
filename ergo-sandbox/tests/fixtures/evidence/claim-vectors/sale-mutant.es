@@ -1,0 +1,1 @@
+{ sigmaProp(OUTPUTS(0).value >= SELF.tokens(0)._2 * 1000000L) }
