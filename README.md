@@ -52,7 +52,7 @@ cargo run -p ergo-sandbox --bin ergo-es -- decompile 100104c801d191a37300
 cargo run -p ergo-sandbox --bin ergo-es -- roundtrip 100104c801d191a37300
 cargo run -p ergo-sandbox --bin ergo-es -- audit 1001040ad191e4c6a704047300
 cargo run -p ergo-sandbox --bin ergo-es -- hunt 1001040ad191e4c6a704047300
-cargo run -p ergo-sandbox --bin ergo-es -- drain request.json          # {inputs:[{role,box…}], outputs:[{payee,box…}], protocolNfts, height}
+cargo run -p ergo-sandbox --bin ergo-es -- drain request.json          # {inputs:[{role,box…}], outputs:[{payee,box…}], protocolNfts, height, objective:{terms:[]}}
 cargo run -p ergo-sandbox --bin ergo-es -- test examples/tests/height-lock.test.json
 cargo run -p ergo-sandbox --bin ergo-es -- validate-tx request.json   # {tx, boxes, height}
 cargo run -p ergo-sandbox --features cost-trace --bin ergo-es -- eval scenario.json --hot-spots
@@ -159,3 +159,5 @@ lint, ranges instead of carets, a wallet step in Build.
 
 Engine crates are consumed from `arkadianet/ergo` via pinned git
 revisions (`Cargo.toml`) — bump deliberately, the node is the oracle.
+
+Drain requests require an explicit authorization policy; see [drain accounting](docs/drain-accounting.md) for the formula, key declarations and release terms.
