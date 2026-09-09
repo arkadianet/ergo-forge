@@ -151,10 +151,32 @@ fn the_recorded_lint_verdict_matches_a_live_run() {
     let tree = ergo_sandbox::inspect::parse_tree(&compiled.tree_bytes).expect("tree parses");
     let lifted = ergo_sandbox::decompile::lift_tree(&tree, false);
     let a = ergo_sandbox::audit::audit(&lifted);
+    // `unbound-box-reserves` stays clean on this tree — the vault HAS the
+    // NFT-binding shape that lint keys on. What the corpus note called the
+    // gap ("CLEAN IS NOT SAFE": the successor's ERG value and the treasury
+    // AMOUNT are unpinned) is now covered by `delegated-reserves`, so the
+    // live audit is no longer empty. Pin both halves: the old verdict is
+    // unchanged, and the gap it named is now caught by name.
     assert!(
-        a.findings.is_empty(),
-        "the recorded verdict is clean; live findings: {:?}",
+        !a.findings.iter().any(|f| f.lint == "unbound-box-reserves"),
+        "unbound-box-reserves must stay clean on the vault: {:?}",
         a.findings
+    );
+    let delegated: Vec<_> = a
+        .findings
+        .iter()
+        .filter(|f| f.lint == "delegated-reserves")
+        .collect();
+    assert_eq!(
+        delegated.len(),
+        1,
+        "delegated-reserves must name the vault's unpinned reserves: {:?}",
+        a.findings
+    );
+    assert!(
+        delegated[0].message.contains("ERG value") && delegated[0].message.contains("tokens(1)._2"),
+        "the finding must cite BOTH unpinned assets the corpus note predicted: {:?}",
+        delegated[0]
     );
 
     // Clean is not safe: the lint keys on reserve math and NFT-binding

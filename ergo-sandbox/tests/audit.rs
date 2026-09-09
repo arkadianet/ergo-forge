@@ -332,7 +332,10 @@ fn positional_reserves_without_an_nft_are_flagged() {
     assert_eq!(keys.len(), 2, "{f:?}");
     assert!(keys.iter().any(|m| m.contains("INPUTS(0)")), "{keys:?}");
     assert!(keys.iter().any(|m| m.contains("OUTPUTS(0)")), "{keys:?}");
-    assert!(f.iter().all(|x| x.severity == ergo_sandbox::Severity::High));
+    assert!(f
+        .iter()
+        .filter(|x| x.lint == "unbound-box-reserves")
+        .all(|x| x.severity == ergo_sandbox::Severity::High));
 }
 
 /// The same tree with the LP pinned by its NFT is clean.
