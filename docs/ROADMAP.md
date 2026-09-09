@@ -190,7 +190,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
 {
   "schemaVersion": 1,
   "baselineRev": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
-  "completedThrough": "P05",
+  "completedThrough": "P06",
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,
   "units": [
@@ -330,7 +330,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "missing_funding_proof_blocks_promotion",
         "associated_lint_is_not_the_confirmed_claim"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "P07",

@@ -556,11 +556,31 @@ pub struct SynthesisCaps {
     pub max_probes: usize,
 }
 
+/// Candidate verdict only; promotion never changes this result.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DrainPreflight {
+    pub method: &'static str,
+    pub node_validated: bool,
+    pub verdict: DrainVerdict,
+}
+impl DrainPreflight {
+    fn new(verdict: DrainVerdict) -> Self {
+        Self {
+            method: "unsigned-preflight",
+            node_validated: false,
+            verdict,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DrainReport {
     #[serde(flatten)]
     pub claim: crate::claim::ClaimMetadata,
+    pub preflight: DrainPreflight,
+    pub promotion: Option<crate::evidence::promotion::Promotion>,
     pub verdict: DrainVerdict,
     pub objective_version: &'static str,
     pub objective_policy: Option<ObjectivePolicy>,
@@ -684,6 +704,8 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
     }
     if !shape_errors.is_empty() {
         return Ok(DrainReport {
+            preflight: DrainPreflight::new(DrainVerdict::InvalidShape),
+            promotion: None,
             claim: crate::claim::ClaimMetadata::legacy("unsigned-preflight", "caller-declared contract set, roles, protocolNfts and objective; generated scenario material; signatures not checked"),
             verdict: DrainVerdict::InvalidShape,
             objective_version: "recognized-attacker-receipts-v1",
@@ -1237,6 +1259,8 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
         DrainVerdict::NotUnderProbes
     };
     Ok(DrainReport {
+        preflight: DrainPreflight::new(verdict),
+        promotion: None,
         claim: crate::claim::ClaimMetadata::legacy("unsigned-preflight", "caller-declared contract set, roles, protocolNfts and objective; generated scenario material; signatures not checked"),
         verdict,
         objective_version: "recognized-attacker-receipts-v1",
