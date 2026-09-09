@@ -18,7 +18,7 @@ path = "src/main.rs"
 [dependencies]
 # Reuse the public read-only chain source for protocol mapping. Outbound
 # requests still require the instance's EXPLORER_URL configuration.
-ergo-sandbox = { path = "../ergo-sandbox", default-features = false, features = ["explorer"] }
+ergo-sandbox = { path = "../ergo-sandbox", default-features = false, features = ["explorer", "cost-trace"] }
 ergo-ser     = { workspace = true }
 ergo-primitives = { workspace = true }
 ergo-compiler = { workspace = true }

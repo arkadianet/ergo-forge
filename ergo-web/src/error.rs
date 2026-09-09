@@ -16,6 +16,8 @@ pub enum ApiError {
     CompileError {
         message: String,
         offset: Option<u32>,
+        phase: &'static str,
+        offset_source: &'static str,
     },
     NotFound(String),
     /// The feature needs an outbound dependency that is not configured.
@@ -39,12 +41,18 @@ struct Inner {
     offset: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     missing_params: Option<Vec<ergo_sandbox::compile::ParamNeed>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    phase: Option<&'static str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    offset_source: Option<&'static str>,
 }
 
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
         let mut offset = None;
         let mut missing_params = None;
+        let mut phase = None;
+        let mut offset_source = None;
         let (status, code, message) = match self {
             ApiError::InvalidInput(m) => (StatusCode::BAD_REQUEST, "invalid_input", m),
             ApiError::MissingParams(needs) => {
@@ -53,8 +61,15 @@ impl IntoResponse for ApiError {
                 missing_params = Some(needs);
                 (StatusCode::BAD_REQUEST, "missing_params", m)
             }
-            ApiError::CompileError { message, offset: o } => {
+            ApiError::CompileError {
+                message,
+                offset: o,
+                phase: p,
+                offset_source: s,
+            } => {
                 offset = o;
+                phase = Some(p);
+                offset_source = Some(s);
                 (StatusCode::BAD_REQUEST, "compile_error", message)
             }
             ApiError::NotFound(m) => (StatusCode::NOT_FOUND, "not_found", m),
@@ -79,6 +94,8 @@ impl IntoResponse for ApiError {
                     message,
                     offset,
                     missing_params,
+                    phase,
+                    offset_source,
                 },
             }),
         )

@@ -38,6 +38,7 @@ pub async fn compile_route(
     let needs_for_error = scan_params(&source);
     let params = req.params;
     let template = is_template(&source);
+    let substituted = may_substitute(&source, &params);
     let result = state
         .engine
         .run(move || {
@@ -112,12 +113,7 @@ pub async fn compile_route(
                 "parameter `{name}`: {reason}"
             )))
         }
-        Err(ParamError::Compile(e)) => {
-            return Err(ApiError::CompileError {
-                message: format!("compile failed: {e}"),
-                offset: Some(e.pos()),
-            })
-        }
+        Err(ParamError::Compile(e)) => return Err(compiler_error(e, substituted)),
     };
     let (completeness, raw_placeholders, truncated) = dto::completeness_parts(&report);
     Ok(Json(dto::CompileResponse {
@@ -136,4 +132,68 @@ pub async fn compile_route(
         template,
         positioned,
     }))
+}
+
+/// Preserve the engine offset, distinguishing real source starts (including
+/// zero) from the post-typecheck sentinel. Never infer a phase from a message.
+pub(super) fn compiler_error(e: ergo_compiler::CompileError, substituted: bool) -> ApiError {
+    use ergo_compiler::CompileError;
+    let (phase, positioned) = match &e {
+        CompileError::Parse(_) => ("parse", true),
+        CompileError::Bind(_) => ("bind", true),
+        CompileError::Type(_) => ("type", true),
+        CompileError::Root { .. } => ("root", false),
+        CompileError::Emit(_) => ("emit", false),
+        CompileError::Serializer { .. } => ("serializer", false),
+        CompileError::Write(_) => ("write", false),
+    };
+    ApiError::CompileError {
+        message: format!("compile failed: {e}"),
+        offset: Some(e.pos()),
+        phase,
+        offset_source: if !positioned {
+            "unavailable"
+        } else if substituted {
+            "substitutedSource"
+        } else {
+            "source"
+        },
+    }
+}
+
+// The public sandbox API has no substitution origin map. Conservatively
+// withhold authored positions when quoted parameters may be replaced.
+pub(super) fn may_substitute(
+    source: &str,
+    params: &std::collections::BTreeMap<String, ergo_sandbox::scenario::TypedValue>,
+) -> bool {
+    !is_template(source)
+        && source.split('"').skip(1).step_by(2).any(|literal| {
+            params.iter().any(|(name, value)| {
+                matches!(value.r#type.as_str(), "String" | "Coll[Byte]" | "raw")
+                    && (literal.contains(&format!("${name}")) || literal == name)
+            })
+        })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::response::IntoResponse;
+
+    #[tokio::test]
+    async fn write_failure_keeps_zero_without_claiming_a_source_position() {
+        let error = ergo_compiler::CompileError::Write(ergo_ser::error::WriteError::InvalidData(
+            "test serialization failure".into(),
+        ));
+        let response = compiler_error(error, false).into_response();
+        assert_eq!(response.status(), 400);
+        let bytes = axum::body::to_bytes(response.into_body(), 4096)
+            .await
+            .unwrap();
+        let body: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(body["error"]["phase"], "write");
+        assert_eq!(body["error"]["offset"], 0);
+        assert_eq!(body["error"]["offsetSource"], "unavailable");
+    }
 }

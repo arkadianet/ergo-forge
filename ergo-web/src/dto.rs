@@ -184,6 +184,9 @@ pub struct EvalResponse {
     pub cost_limit: u64,
     pub reduced_to: Option<String>,
     pub trace: Vec<TraceDto>,
+    /// Ranked costs of the diagnostic reduction, in JIT units. This trace
+    /// excludes the later proof-verification pass and has no source spans.
+    pub hot_spots: Vec<HotSpotDto>,
     pub tree_hex: String,
     pub address: String,
 }
@@ -199,6 +202,14 @@ pub struct ValueDto {
     pub line: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub col: Option<u32>,
+}
+
+#[derive(Serialize)]
+pub struct HotSpotDto {
+    pub label: String,
+    pub jit: u64,
+    pub count: usize,
+    pub share: f64,
 }
 
 #[derive(Serialize)]
@@ -220,7 +231,17 @@ pub fn verdict_str(v: ergo_sandbox::Verdict) -> &'static str {
 
 impl EvalResponse {
     pub fn from_engine(o: ergo_sandbox::EvalOutcome) -> Self {
+        let hot_spots = ergo_sandbox::hot_spots::hot_spots(&o.cost_breakdown)
+            .into_iter()
+            .map(|row| HotSpotDto {
+                label: row.label,
+                jit: row.jit,
+                count: row.count,
+                share: row.share,
+            })
+            .collect();
         Self {
+            hot_spots,
             verdict: verdict_str(o.verdict),
             values: o
                 .values

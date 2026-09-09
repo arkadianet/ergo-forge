@@ -217,7 +217,7 @@ details label { display: block; margin-top: 0.5rem; font-size: 0.9rem; color: va
 }
 .caret {
   margin: 0.25rem 0; padding: 0.4rem 0.7rem; background: #2b0605; border: 1px solid var(--high);
-  border-radius: 6px; color: var(--text); font-size: 0.85rem; white-space: pre;
+  border-radius: 6px; color: var(--text); font-size: 0.85rem; white-space: pre-wrap;
 }
 .params { border-collapse: collapse; margin: 0.5rem 0; width: 100%; }
 .params td { padding: 0.25rem 0.5rem; border-bottom: 1px solid var(--line); }
@@ -285,7 +285,14 @@ button.secondary {
 .cm-s-default .cm-meta { color: #ffcb6b; }
 .cm-s-default .cm-variable { color: var(--text); }
 .cm-s-default .cm-matchingbracket { color: var(--accent) !important; text-decoration: underline; }
-.cm-error-mark { text-decoration: underline wavy var(--high); text-underline-offset: 3px; }
+.cm-error-point { display: inline-block; width: 0; height: 1.2em; border-left: 2px solid var(--high); margin-left: -1px; margin-right: -1px; vertical-align: text-bottom; position: relative; }
+.cm-error-point::after { content: ""; position: absolute; bottom: -4px; left: -5px; border-left: 4px solid transparent; border-right: 4px solid transparent; border-bottom: 5px solid var(--high); }
+.cost-hot-spots { margin: 1rem 0; }
+.cost-table-scroll { overflow-x: auto; }
+#cost-hot-spots-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+#cost-hot-spots-table th, #cost-hot-spots-table td { padding: 0.45rem; border-bottom: 1px solid var(--line); text-align: right; font-variant-numeric: tabular-nums; }
+#cost-hot-spots-table th:first-child, #cost-hot-spots-table td:first-child { text-align: left; overflow-wrap: anywhere; }
+#cost-hot-spots-table th { white-space: nowrap; }
 .cm-finding-high { text-decoration: underline wavy var(--high); text-underline-offset: 3px; }
 .cm-finding-medium { text-decoration: underline wavy var(--medium); text-underline-offset: 3px; }
 .cm-finding-low { text-decoration: underline dotted var(--low); text-underline-offset: 3px; }
