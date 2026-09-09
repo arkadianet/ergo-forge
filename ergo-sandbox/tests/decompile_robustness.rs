@@ -182,13 +182,6 @@ fn unavailable_information_is_always_a_visible_structural_placeholder() {
             },
         ),
         op(
-            0xD4,
-            Payload::DeserializeContext {
-                id: 1,
-                tpe: SigmaType::SBoolean,
-            },
-        ),
-        op(
             0xD5,
             Payload::DeserializeRegister {
                 reg_id: 4,

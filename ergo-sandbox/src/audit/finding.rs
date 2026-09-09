@@ -1,6 +1,7 @@
 //! What a lint reports.
 
 use crate::Node;
+use serde::Serialize;
 
 /// Longest rendered snippet carried on a finding; longer ones are cut with a
 /// trailing `…`. Keeps a finding printable on one terminal line.
@@ -10,7 +11,7 @@ pub const SNIPPET_MAX: usize = 120;
 ///
 /// Ordering matters: variants are declared most-severe first so `as u8`
 /// sorts findings correctly.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize)]
 pub enum Severity {
     /// Can cause the script to fail at validation, locking the box.
     High,
@@ -33,7 +34,7 @@ impl Severity {
 }
 
 /// One lint result, anchored to a node in the lifted tree.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Finding {
     /// Stable machine-readable lint id, e.g. `"unchecked-get"`.
     pub lint: &'static str,

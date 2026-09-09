@@ -1,0 +1,46 @@
+{
+  "dexy/lp/pool/main.es": {
+    "extractionNFT": {
+      "type": "String",
+      "value": "VyH1LIZtdgtj70qHwcHBOI7MLdbGe9lqarMxaFZ6qcw="
+    },
+    "interventionNFT": {
+      "type": "String",
+      "value": "CbAav6jDyH6h0IWsbNovtvsowhzNWx7A2p4u7Y3mvX4="
+    },
+    "lpMintNFT": {
+      "type": "String",
+      "value": "8jsQlFOWbP7qkftkPbt4dTTlXgiJaaZOxQZStYWUOFw="
+    },
+    "lpRedeemNFT": {
+      "type": "String",
+      "value": "rwWASPbe9AhUPTPir51A9FvrsGtM5RI1AKrJXbFPrIc="
+    },
+    "lpSwapNFT": {
+      "type": "String",
+      "value": "ID3TFzo2pMrLiHriLXk2wO8qvjUtx+gaXXbbkuW5Iu4="
+    }
+  },
+  "dexy/lp/pool/swap.es": {
+    "feeDenomLp": {
+      "type": "Int",
+      "value": 1000
+    },
+    "feeNumLp": {
+      "type": "Int",
+      "value": 3
+    }
+  },
+  "hodlcoin/phoenix/phoenix_v1_hodltoken_bank.es": {
+    "phoenixFeeContractBytes": {
+      "type": "Coll[Byte]",
+      "value": "e9fe08e184764121e324e0dd02217945068cb5e6294edc4619b3b59ec89a4283"
+    }
+  },
+  "hodlcoin/phoenix/phoenix_v1_hodltoken_proxy.es": {
+    "minTxOperatorFee": {
+      "type": "Long",
+      "value": 1000000
+    }
+  }
+}
