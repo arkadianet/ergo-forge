@@ -12,6 +12,10 @@ pub async fn test_route(
     State(state): State<std::sync::Arc<AppState>>,
     ApiJson(suite): ApiJson<Suite>,
 ) -> Result<Json<SuiteResult>, ApiError> {
+    let substituted = suite
+        .source
+        .as_deref()
+        .is_some_and(|s| super::compile::may_substitute(s, &suite.params));
     let result = state
         .engine
         .run(move || run(&suite))
@@ -20,10 +24,7 @@ pub async fn test_route(
     match result {
         Ok(r) => Ok(Json(r)),
         Err(SuiteError::Compile(ergo_sandbox::compile::ParamError::Compile(e))) => {
-            Err(ApiError::CompileError {
-                message: format!("compile failed: {e}"),
-                offset: Some(e.pos()),
-            })
+            Err(super::compile::compiler_error(e, substituted))
         }
         Err(e) => Err(ApiError::InvalidInput(e.to_string())),
     }

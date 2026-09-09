@@ -172,7 +172,26 @@ textually (`String` params as given, `Coll[Byte]` as hex). The response
 lists every parameter the source uses with `supplied: true/false`.
 
 Errors: `missing_params` (400, with `missingParams: [{name, typeHint}]` so
-a form can be built), `compile_error` (400, with `offset` into the source).
+a form can be built), `compile_error` (400):
+
+```json
+{"error":{"code":"compile_error","message":"compile failed: …","phase":"type","offset":10,"offsetSource":"source"}}
+```
+
+`phase` is `parse`, `bind`, `type`, `root`, `emit`, `serializer`, or `write`.
+`offset` preserves the compiler's 0-based UTF-8 byte offset; it is a start,
+not a range. `offsetSource` tells clients whether it can locate that start:
+
+- `source`: an offset in the submitted source, including a genuine zero or EOF.
+- `unavailable`: a post-typecheck phase; its zero is a sentinel, not a location.
+- `substitutedSource`: quoted parameters may have been replaced. The public
+  sandbox API has no origin map, so the editor conservatively withholds a
+  marker even when a particular replacement might not shift the position.
+
+The Write editor places a point marker and collapsed caret for `source`,
+with the phase and line/column shown. Editing source, parameters or network
+clears the diagnostic; stale compile responses cannot mark changed source.
+`POST /api/v1/test` compile errors use the same metadata.
 
 ### `GET /api/v1/examples`, `GET /api/v1/examples/{id}`
 
@@ -345,6 +364,19 @@ curl -s -X POST http://127.0.0.1:8080/api/v1/eval \
 `proofRejected`. A script that ran and failed is a 200 with that verdict;
 only marshalling and compile errors are 400s, with the compiler's message.
 
+The response also includes `hotSpots: [{label, jit, count, share}]`, ranked
+by descending JIT units (ties by label), using the public
+`ergo_sandbox::hot_spots::hot_spots` fold. `count` is the number of cost
+charging steps and `share` is a fraction of the recorded trace (0–1).
+The web dependency enables the sandbox's existing `cost-trace` feature.
+
+These rows describe the diagnostic **reduction** only. They exclude the
+later proof-verification pass, whose cost can replace the top-level `cost`
+(in block units). They are operation labels, without source positions.
+Errors can have partial traces; an empty array means no ranking is available.
+The Scenario result displays the ranking in both Write and Read, retaining
+the existing semantic Trace below it.
+
 ### Storage rent in every answer
 
 `inspect`, `compile` and `hunt` responses carry `rent`: `{boxBytes,
@@ -508,3 +540,14 @@ navigation, typed edges and caps, offline/live lookup, box selection,
 network mismatch, keyboard tabs, mobile layout, and the existing Build,
 Write, Play, eval, tests, examples, point and validation surfaces. Live
 explorer paths use synthetic data served on loopback.
+
+Compiler-position and cost-view browser checks (system Chromium, no npm
+packages) and before/after captures are documented in
+[`ui/positions-review/README.md`](../ui/positions-review/README.md):
+
+```bash
+CARGO_TARGET_DIR=./target-sh cargo build --release -p ergo-web
+BIND_ADDR=127.0.0.1:8099 EXPLORER_URL= UI_DIR=ui ./target-sh/release/ergo-web
+# In another terminal:
+node ergo-web/tests/positions-browser.mjs http://127.0.0.1:8099
+```

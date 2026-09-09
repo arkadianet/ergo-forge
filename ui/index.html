@@ -144,7 +144,7 @@
 // $unlockHeight: Int
 sigmaProp(HEIGHT > $unlockHeight)</textarea>
       <pre id="caret" class="caret" hidden></pre>
-      <p id="compile-status" class="status" hidden></p>
+      <p id="compile-status" class="status" role="status" hidden></p>
 
       <div id="params-panel" hidden>
         <h2>Parameters</h2>
@@ -447,6 +447,17 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
         <dt>error</dt><dd><code id="eval-error"></code></dd>
         <dt>address</dt><dd><code id="eval-address"></code></dd>
       </dl>
+      <section class="cost-hot-spots" aria-labelledby="cost-hot-spots-title">
+        <h3 id="cost-hot-spots-title">Cost hot spots</h3>
+        <p class="hint">Operations ranked by cost in this scenario’s reduction. Shares use the recorded trace, in JIT units; proof verification is excluded. Operations have no source locations.</p>
+        <p id="cost-hot-spots-summary" class="hint"></p>
+        <div class="cost-table-scroll">
+          <table id="cost-hot-spots-table">
+            <thead><tr><th scope="col">Operation</th><th scope="col">Steps</th><th scope="col">JIT units</th><th scope="col">Share</th></tr></thead>
+            <tbody id="cost-hot-spots"></tbody>
+          </table>
+        </div>
+      </section>
       <details>
         <summary>Trace</summary>
         <ul id="eval-trace" class="residuals"></ul>

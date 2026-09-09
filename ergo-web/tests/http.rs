@@ -1084,3 +1084,95 @@ async fn play_applies_a_transaction_and_returns_new_boxes() {
         "{res}"
     );
 }
+
+#[tokio::test]
+async fn compile_phases_distinguish_source_zero_from_unpositioned_zero() {
+    let base = spawn().await;
+    for (source, phase, offset, origin) in [
+        ("@", "parse", 0, "source"),
+        ("sigmaProp(HEIGHT >", "parse", 18, "source"),
+        ("PK(\"not-an-address\")", "bind", 0, "source"),
+        ("sigmaProp(HEIGHT > true)", "type", 10, "source"),
+        ("// café 🦀\nsigmaProp(HEIGHT > true)", "type", 24, "source"),
+        ("HEIGHT", "root", 0, "unavailable"),
+        ("sigmaProp((HEIGHT & 1) == 0)", "emit", 0, "unavailable"),
+        (
+            "unsignedBigInt(\"5\") > unsignedBigInt(\"3\")",
+            "serializer",
+            0,
+            "unavailable",
+        ),
+    ] {
+        let response = post_compile(&base, serde_json::json!({ "source": source })).await;
+        assert_eq!(response.status(), 400, "{source}");
+        let body: serde_json::Value = response.json().await.unwrap();
+        assert_eq!(body["error"]["phase"], phase, "{body}");
+        assert_eq!(body["error"]["offset"], offset, "{body}");
+        assert_eq!(body["error"]["offsetSource"], origin, "{body}");
+    }
+}
+
+#[tokio::test]
+async fn compile_does_not_claim_substituted_offsets_are_authored_positions() {
+    let base = spawn().await;
+    for (source, params, origin) in [
+        (
+            "{ val bytes = fromBase16(\"$data\"); sigmaProp(HEIGHT > true) }",
+            serde_json::json!({"data":{"type":"Coll[Byte]","value":"abcdef0123456789"}}),
+            "substitutedSource",
+        ),
+        (
+            "{ val bytes = fromBase16(\"DATA\"); sigmaProp(HEIGHT > true) }",
+            serde_json::json!({"DATA":{"type":"String","value":"abcdef0123456789"}}),
+            "substitutedSource",
+        ),
+        (
+            "{ val bytes = fromBase16(\"$data\"); sigmaProp(HEIGHT > true) }",
+            serde_json::json!({"data":{"type":"raw","value":"0e08abcdef0123456789"}}),
+            "substitutedSource",
+        ),
+        (
+            "sigmaProp(HEIGHT > $limit && HEIGHT > true)",
+            serde_json::json!({"limit":{"type":"Int","value":1000}}),
+            "source",
+        ),
+    ] {
+        let response =
+            post_compile(&base, serde_json::json!({"source":source, "params":params})).await;
+        let body: serde_json::Value = response.json().await.unwrap();
+        assert_eq!(body["error"]["phase"], "type", "{body}");
+        assert_eq!(body["error"]["offsetSource"], origin, "{body}");
+        assert!(body["error"]["offset"].as_u64().unwrap() > 0);
+    }
+}
+
+#[tokio::test]
+async fn eval_exposes_ranked_reduction_costs_for_success_failure_and_errors() {
+    let base = spawn().await;
+    for (source, height, verdict) in [
+        ("sigmaProp(HEIGHT > 1000)", 1001, "pass"),
+        ("sigmaProp(HEIGHT > 1000)", 1000, "fail"),
+        ("sigmaProp(SELF.R4[Int].get > HEIGHT)", 1001, "error"),
+    ] {
+        let response =
+            post_eval(&base, serde_json::json!({"source":source, "height":height})).await;
+        assert_eq!(response.status(), 200);
+        let body: serde_json::Value = response.json().await.unwrap();
+        assert_eq!(body["verdict"], verdict, "{body}");
+        let rows = body["hotSpots"].as_array().unwrap();
+        assert!(!rows.is_empty(), "{body}");
+        let total: u64 = rows.iter().map(|r| r["jit"].as_u64().unwrap()).sum();
+        assert!(total > 0);
+        for row in rows {
+            assert!(row["count"].as_u64().unwrap() > 0);
+            assert!(!row["label"].as_str().unwrap().starts_with("OP:"));
+            let share = row["jit"].as_u64().unwrap() as f64 / total as f64;
+            assert!((row["share"].as_f64().unwrap() - share).abs() < 1e-10);
+        }
+        for pair in rows.windows(2) {
+            let a = pair[0]["jit"].as_u64().unwrap();
+            let b = pair[1]["jit"].as_u64().unwrap();
+            assert!(a > b || (a == b && pair[0]["label"].as_str() <= pair[1]["label"].as_str()));
+        }
+    }
+}

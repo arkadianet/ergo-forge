@@ -443,26 +443,62 @@ function placeholderFor(type) {
            "Coll[Long]": "1, 2, 3" }[type] || "number";
 }
 
-/// Mark a compile error at a byte offset: a squiggle on the token there and
-/// the caret line under the editor (kept for copy/paste of the position).
-function showCaret(byteOffset) {
+// Compiler positions are starts, never ranges. A bookmark keeps the point
+// visible without pretending to know the token's end (including at EOF).
+let compileErrorMark = null;
+let compileGeneration = 0;
+function clearCompileError() {
+  compileErrorMark?.clear();
+  compileErrorMark = null;
+  $("caret").hidden = true;
+}
+function invalidateCompileError() {
+  ++compileGeneration;
+  clearCompileError();
+  $("compile-status").hidden = true;
+}
+editor.on("change", invalidateCompileError);
+$("params-rows").addEventListener("input", invalidateCompileError);
+$("params-rows").addEventListener("change", invalidateCompileError);
+$("write-network").addEventListener("change", invalidateCompileError);
+
+function showCaret(byteOffset, phase) {
   const src = editorValue();
+  if (!Number.isInteger(byteOffset) || byteOffset < 0 || byteOffset > new TextEncoder().encode(src).length) return false;
   const offset = byteOffsetToIndex(src, byteOffset);
-  const tok = (src.slice(offset).match(/^[A-Za-z0-9_$.]+/) || [""])[0];
-  // At end of input (unexpected EOF) mark the last character instead.
-  const start = offset >= src.length ? Math.max(0, src.length - 1) : offset;
-  const from = editor.posFromIndex(start);
-  const to = editor.posFromIndex(Math.min(src.length, start + Math.max(1, tok.length)));
-  marks.push(editor.markText(from, to, { className: "cm-error-mark", title: "compile error here" }));
+  // Reject offsets inside a UTF-8 code point instead of rounding forward.
+  if (new TextEncoder().encode(src.slice(0, offset)).length !== byteOffset) return false;
+  const from = editor.posFromIndex(offset);
+  const location = `${phase} error · line ${from.line + 1}, column ${from.ch + 1} · byte ${byteOffset}`;
+  const point = document.createElement("span");
+  point.className = "cm-error-point";
+  point.title = location;
+  point.setAttribute("aria-hidden", "true");
+  compileErrorMark = editor.setBookmark(from, { widget: point, insertLeft: true });
+  editor.focus();
+  editor.setCursor(from);
   editor.scrollIntoView(from, 60);
-  const caret = $("caret");
-  if (offset == null || offset > src.length) { caret.hidden = true; return; }
-  const before = src.slice(0, offset);
-  const line = before.split("\n").length;
-  const col = offset - before.lastIndexOf("\n") - 1;
-  const text = src.split("\n")[line - 1] || "";
-  caret.textContent = `line ${line}, col ${col + 1}\n${text}\n${" ".repeat(col)}^`;
-  caret.hidden = false;
+  $("caret").textContent = location + " (start position)";
+  $("caret").hidden = false;
+  return true;
+}
+
+function showCompileError(error, fallback) {
+  const phase = error.phase;
+  const label = phase ? phase[0].toUpperCase() + phase.slice(1) : "Compile";
+  const detail = String(error.message || fallback).replace(/^compile failed: /, "");
+  const prefix = `${phase} error: `;
+  let message = `${label} error: ${detail.startsWith(prefix) ? detail.slice(prefix.length) : detail}`;
+  if (["root", "emit", "serializer", "write"].includes(phase)) {
+    message += ". No source position is available for this phase; offset 0 is a placeholder.";
+  } else if (error.offsetSource === "substitutedSource") {
+    message += `. Compiler byte offset ${error.offset} refers to source after string parameter substitution; the original editor position is unavailable.`;
+  } else if (["parse", "bind", "type"].includes(phase) && error.offsetSource === "source") {
+    if (!showCaret(error.offset, label)) message += ". Source position is unavailable.";
+  } else if (error.code === "compile_error") {
+    message += ". Source position is unavailable.";
+  }
+  $("compile-status").textContent = message;
 }
 
 let compileInFlight = false;
@@ -470,7 +506,10 @@ async function compile() {
   if (compileInFlight) return;
   const status = $("compile-status");
   const source = editorValue();
+  const generation = compileGeneration;
+  const contextAtStart = contextGeneration;
   compileInFlight = true;
+  clearCompileError();
   clearMarks();
   $("compile").disabled = true;
   status.textContent = "Compiling…";
@@ -483,6 +522,7 @@ async function compile() {
       body: JSON.stringify({ source, network: $("write-network").value, params: collectParams() }),
     });
     const body = await res.json();
+    if (generation !== compileGeneration || contextAtStart !== contextGeneration) return;
     if (!res.ok) {
       const e = body.error || {};
       if (e.code === "missing_params") {
@@ -490,8 +530,7 @@ async function compile() {
         status.textContent = "Fill in the parameters below, then compile again.";
         $("params-rows").querySelector("input")?.focus();
       } else {
-        status.textContent = `Error: ${e.message || res.status}`;
-        if (e.offset != null) showCaret(e.offset);
+        showCompileError(e, res.status);
       }
       $("compiled").hidden = true;
       return;
@@ -504,8 +543,9 @@ async function compile() {
     showTab("result");
     huntTree(body.treeHex, $("write-network").value);
   } catch (e) {
-    status.textContent = `Request failed: ${e}`;
+    if (generation === compileGeneration && contextAtStart === contextGeneration) status.textContent = `Request failed: ${e}`;
   } finally {
+    if (generation !== compileGeneration || contextAtStart !== contextGeneration) status.hidden = true;
     compileInFlight = false;
     $("compile").disabled = false;
   }
@@ -1831,6 +1871,25 @@ const EVAL_VERDICTS = {
   proofRejected: ["PROOF REJECTED", "bad"],
 };
 
+function renderHotSpots(rows, verdict) {
+  const list = $("cost-hot-spots");
+  list.textContent = "";
+  $("cost-hot-spots-table").hidden = rows.length === 0;
+  const total = rows.reduce((sum, row) => sum + row.jit, 0);
+  $("cost-hot-spots-summary").textContent = rows.length
+    ? `${total.toLocaleString()} JIT units recorded${verdict === "error" ? " before reduction stopped (trace may be partial)" : ""}.`
+    : "No cost steps were recorded for this reduction; no ranking is available.";
+  for (const row of rows) {
+    const tr = document.createElement("tr");
+    for (const value of [row.label, row.count.toLocaleString(), row.jit.toLocaleString(), `${(row.share * 100).toFixed(1)}%`]) {
+      const td = document.createElement("td");
+      td.textContent = value;
+      tr.appendChild(td);
+    }
+    list.appendChild(tr);
+  }
+}
+
 let evalInFlight = false;
 
 async function runScenario() {
@@ -1887,6 +1946,7 @@ async function runScenario() {
     v.textContent = label;
     v.className = `hunt-verdict ${cls}`;
     $("eval-cost").textContent = `${body.cost} / ${body.costLimit} block units`;
+    renderHotSpots(body.hotSpots || [], body.verdict);
     $("eval-reduced").textContent = body.reducedTo || "—";
     $("eval-error").textContent = body.error || "—";
     $("eval-address").textContent = body.address;
