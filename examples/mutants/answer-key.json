@@ -2,9 +2,9 @@
  "recorded": "2026-09-09",
  "runner": "ergo-sandbox/tests/mutation_corpus.rs (release build)",
  "methodology": "docs/superpowers/specs/2026-09-08-mutation-corpus-design.md",
- "detectionRate": 0.0,
+ "detectionRate": 0.4,
  "provenMutants": 5,
- "found": 0,
+ "found": 2,
  "denominatorNote": "proven = a hand-built KEYLESS drain witness validated by txcheck before the hunt ran. M1-M3 were initially misproven (their witnesses validated under txcheck but carry needsProof on the protected input \u2014 the residual requires the beneficiary's/receiver's key): reclassified as keyed-insider, outside the hunt's attacker model, never in the denominator.",
  "caps": {
   "maxProbes": 50000,
@@ -25,13 +25,21 @@
    "proven": false,
    "synthesisOff": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 28,
     "verdict": "notunderprobes"
    },
    "synthesisOn": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 868,
     "rejections": {
      "conservation": 0,
@@ -50,13 +58,21 @@
    "proven": false,
    "synthesisOff": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 28,
     "verdict": "notunderprobes"
    },
    "synthesisOn": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 2856,
     "rejections": {
      "conservation": 0,
@@ -75,13 +91,21 @@
    "proven": false,
    "synthesisOff": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 28,
     "verdict": "notunderprobes"
    },
    "synthesisOn": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 2856,
     "rejections": {
      "conservation": 0,
@@ -98,16 +122,106 @@
   {
    "id": "M4",
    "proven": true,
-   "found": false,
+   "found": true,
    "synthesisOff": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": [
+      {
+       "asset": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "destinationTree": "10010101d17300",
+       "maxAmount": 10,
+       "payment": {
+        "amountPerUnit": 1000000,
+        "asset": "nanoErg",
+        "retainedTrees": [
+         "1bfc010308cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d91970e20cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc0580897ad808d6017300d602b2db6308a7040000d6037301d60495938c72020172038c7202020500d60591b1a50402d60699720495eded720591b1db6308b2a50402000400938cb2db6308b2a50402000400000172038cb2db6308b2a5040200040000020500d607b2a5040000d608ed93c27207d0720192c172070500eb027201d1ecededed91720605008f720672047208eded720593c2b2a5040200c2a792c1b2a5040200c1a7eded937206720491720405007208"
+        ],
+        "sellerTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+       },
+       "sourceInput": 0
+      }
+     ]
+    },
     "probesRun": 28,
     "verdict": "notunderprobes"
    },
    "synthesisOn": {
     "capped": false,
-    "hits": 320,
+    "firstAccounting": {
+     "A": {
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "0"
+     },
+     "N": {
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "2000000"
+     },
+     "S": {
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "0"
+     },
+     "V": {
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "10",
+      "nanoErg": "1000000"
+     },
+     "custodyDeficit": {
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "10",
+      "nanoErg": "1000000"
+     },
+     "extracted": {},
+     "recognizedOutputIndices": [
+      2
+     ],
+     "termsUsed": [
+      {
+       "eligible": "0",
+       "paymentReceived": "3000000",
+       "released": "0",
+       "satisfied": true,
+       "term": {
+        "asset": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "destinationTree": "10010101d17300",
+        "maxAmount": 10,
+        "payment": {
+         "amountPerUnit": 1000000,
+         "asset": "nanoErg",
+         "retainedTrees": [
+          "1bfc010308cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d91970e20cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc0580897ad808d6017300d602b2db6308a7040000d6037301d60495938c72020172038c7202020500d60591b1a50402d60699720495eded720591b1db6308b2a50402000400938cb2db6308b2a50402000400000172038cb2db6308b2a5040200040000020500d607b2a5040000d608ed93c27207d0720192c172070500eb027201d1ecededed91720605008f720672047208eded720593c2b2a5040200c2a792c1b2a5040200c1a7eded937206720491720405007208"
+         ],
+         "sellerTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        },
+        "sourceInput": 0
+       },
+       "termIndex": 0
+      }
+     ],
+     "unknownOutputIndices": [
+      0,
+      1
+     ]
+    },
+    "hits": 292,
+    "objectivePolicy": {
+     "terms": [
+      {
+       "asset": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "destinationTree": "10010101d17300",
+       "maxAmount": 10,
+       "payment": {
+        "amountPerUnit": 1000000,
+        "asset": "nanoErg",
+        "retainedTrees": [
+         "1bfc010308cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d91970e20cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc0580897ad808d6017300d602b2db6308a7040000d6037301d60495938c72020172038c7202020500d60591b1a50402d60699720495eded720591b1db6308b2a50402000400938cb2db6308b2a50402000400000172038cb2db6308b2a5040200040000020500d607b2a5040000d608ed93c27207d0720192c172070500eb027201d1ecededed91720605008f720672047208eded720593c2b2a5040200c2a792c1b2a5040200c1a7eded937206720491720405007208"
+        ],
+        "sellerTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+       },
+       "sourceInput": 0
+      }
+     ]
+    },
     "probesRun": 1704,
     "rejections": {
      "conservation": 0,
@@ -117,8 +231,8 @@
     },
     "verdict": "drainable"
    },
-   "attributable": false,
-   "confounded": true,
+   "attributable": true,
+   "confounded": false,
    "note": "found only with synthesis on: the drain needs a NEW output (the attacker's payment box at the sale's price position) while the stock returns to the sale box \u2014 out of phase-1's fixed output set. CONFOUNDED: the same drainable verdict fires on the unmutated original (see escalatedFindings), so it is not attributable to the mutation. The hunt's objective has no conditional sanction, so overpayment probes score as drains; the real 1-nanoERG drain IS in family (710 hits), but the verdict alone cannot discriminate.",
    "rawDrainable": true
   },
@@ -128,13 +242,143 @@
    "found": false,
    "synthesisOff": {
     "capped": false,
+    "firstAccounting": {
+     "A": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "0",
+      "nanoErg": "0"
+     },
+     "N": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "1",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "1",
+      "nanoErg": "0"
+     },
+     "S": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "0",
+      "nanoErg": "0"
+     },
+     "V": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "1",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "999999700000",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "999995000000",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "0",
+      "nanoErg": "10000000000"
+     },
+     "custodyDeficit": {},
+     "extracted": {},
+     "recognizedOutputIndices": [
+      1
+     ],
+     "termsUsed": [
+      {
+       "eligible": "0",
+       "paymentReceived": null,
+       "released": "10000000000",
+       "satisfied": true,
+       "term": {
+        "asset": "nanoErg",
+        "destinationTree": "10010101d17300",
+        "maxAmount": 32667,
+        "payment": null,
+        "sourceInput": 0
+       },
+       "termIndex": 0
+      }
+     ],
+     "unknownOutputIndices": [
+      0
+     ]
+    },
     "hits": 0,
+    "objectivePolicy": {
+     "terms": [
+      {
+       "asset": "nanoErg",
+       "destinationTree": "10010101d17300",
+       "maxAmount": 32667,
+       "payment": null,
+       "sourceInput": 0
+      }
+     ]
+    },
     "probesRun": 28,
     "verdict": "notunderprobes"
    },
    "synthesisOn": {
     "capped": false,
+    "firstAccounting": {
+     "A": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "1",
+      "nanoErg": "2000000"
+     },
+     "N": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "1",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "1",
+      "nanoErg": "2000000"
+     },
+     "S": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "0",
+      "nanoErg": "32667"
+     },
+     "V": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "1",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "999999700000",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "999995000000",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "0",
+      "nanoErg": "10000000000"
+     },
+     "custodyDeficit": {},
+     "extracted": {},
+     "recognizedOutputIndices": [
+      1
+     ],
+     "termsUsed": [
+      {
+       "eligible": "32667",
+       "paymentReceived": null,
+       "released": "10000000000",
+       "satisfied": true,
+       "term": {
+        "asset": "nanoErg",
+        "destinationTree": "10010101d17300",
+        "maxAmount": 32667,
+        "payment": null,
+        "sourceInput": 0
+       },
+       "termIndex": 0
+      }
+     ],
+     "unknownOutputIndices": [
+      0
+     ]
+    },
     "hits": 0,
+    "objectivePolicy": {
+     "terms": [
+      {
+       "asset": "nanoErg",
+       "destinationTree": "10010101d17300",
+       "maxAmount": 32667,
+       "payment": null,
+       "sourceInput": 0
+      }
+     ]
+    },
     "probesRun": 2216,
     "rejections": {
      "conservation": 208,
@@ -153,13 +397,89 @@
    "found": false,
    "synthesisOff": {
     "capped": false,
+    "firstAccounting": {
+     "A": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "0"
+     },
+     "N": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "0"
+     },
+     "S": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "0"
+     },
+     "V": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "1",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "5000000000",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "999000000000",
+      "nanoErg": "1000000000"
+     },
+     "custodyDeficit": {},
+     "extracted": {},
+     "recognizedOutputIndices": [
+      1
+     ],
+     "termsUsed": [],
+     "unknownOutputIndices": [
+      0
+     ]
+    },
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 28,
     "verdict": "notunderprobes"
    },
    "synthesisOn": {
     "capped": false,
+    "firstAccounting": {
+     "A": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "2000000"
+     },
+     "N": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "2000000"
+     },
+     "S": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "0"
+     },
+     "V": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "1",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "5000000000",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "999000000000",
+      "nanoErg": "1000000000"
+     },
+     "custodyDeficit": {},
+     "extracted": {},
+     "recognizedOutputIndices": [
+      1
+     ],
+     "termsUsed": [],
+     "unknownOutputIndices": [
+      0
+     ]
+    },
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 1652,
     "rejections": {
      "conservation": 0,
@@ -175,16 +495,69 @@
   {
    "id": "M7",
    "proven": true,
-   "found": false,
+   "found": true,
    "synthesisOff": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 84,
     "verdict": "notunderprobes"
    },
    "synthesisOn": {
     "capped": false,
-    "hits": 0,
+    "firstAccounting": {
+     "A": {
+      "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41": "0",
+      "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf": "1",
+      "nanoErg": "1002000000"
+     },
+     "N": {
+      "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41": "0",
+      "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf": "0",
+      "nanoErg": "2000000"
+     },
+     "S": {
+      "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41": "0",
+      "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf": "0",
+      "nanoErg": "0"
+     },
+     "V": {
+      "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41": "1",
+      "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099": "1000000",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "5000000000",
+      "ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf": "1",
+      "nanoErg": "2000000000"
+     },
+     "custodyDeficit": {
+      "ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf": "1",
+      "nanoErg": "1000000000"
+     },
+     "extracted": {
+      "ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf": "1",
+      "nanoErg": "1000000000"
+     },
+     "recognizedOutputIndices": [
+      1,
+      2
+     ],
+     "termsUsed": [],
+     "unknownOutputIndices": [
+      0
+     ]
+    },
+    "hits": 12,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 29448,
     "rejections": {
      "conservation": 0,
@@ -192,9 +565,9 @@
      "missingKey": 0,
      "script": 29392
     },
-    "verdict": "notunderprobes"
+    "verdict": "drainable"
    },
-   "attributable": false,
+   "attributable": true,
    "confounded": false
   },
   {
@@ -203,13 +576,51 @@
    "found": false,
    "synthesisOff": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": [
+      {
+       "asset": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+       "destinationTree": "10010101d17300",
+       "maxAmount": 999999700000,
+       "payment": {
+        "amountPerUnit": 33999,
+        "asset": "nanoErg",
+        "retainedTrees": [
+         "10340400040004060406040004000400040004000e20dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd040004000400010004000402040204040404050004020500050005000580897a0500050405c80104000400040204020404040405000500050005000500050005000601640602019005000101050005000601640602032005000601640602019095efedededededededededed91b1a5730093b1db6308b2a5730100730293b1db6308a7730391b1db6501fe730491b1db6308b2db6501fe7305007306938cb2db6308b2db6501fe730700730800017309e6c6b2db6501fe730a000405e6c6a70405e6c6a70505e6c6b2a5730b000405e6c6b2a5730c000505d1730dd813d601b2a5730e00d602e4c672010405d603e4c6a70405d604db6308a7d605db63087201d606998cb27204730f00028cb2720573100002d607e4c6a70505d608998cb27204731100028cb2720573120002d609e4c672010505d60a9472067313d60be4c6b2db6501fe7314000405d60cc1a7d60d959372037315720ba1720b9d720c7203d60e99720c9c7203720dd60f95720a9c7206720d9c720895ed917207731691720e73179d720e72077318d610958f720f7319f0720f720fd6119d9c7210731a731bd612c17201d613997212720cd1ededededededed93c27201c2a793b2db63087201731c00b2db6308a7731d00938cb2db63087201731e00018cb2db6308a7731f0001938cb2db63087201732000018cb2db6308a773210001ededed9372029a720372069372099a7207720892720273229272097323eced720a9372087324ed937206732594720873269591720f73279272139a72107211927213f09972107211959172067328929c7e72120673299c9c7e7202067e720b06732a958f7206732b732c95917208732dec937202732e909c7e721206732f9c9c7e7202067e720b067330ec9372027331929c7e72120673329c9c7e7202067e720b067333"
+        ],
+        "sellerTree": "10340400040004060406040004000400040004000e20dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd040004000400010004000402040204040404050004020500050005000580897a0500050405c80104000400040204020404040405000500050005000500050005000601640602019005000101050005000601640602032005000601640602019095efedededededededededed91b1a5730093b1db6308b2a5730100730293b1db6308a7730391b1db6501fe730491b1db6308b2db6501fe7305007306938cb2db6308b2db6501fe730700730800017309e6c6b2db6501fe730a000405e6c6a70405e6c6a70505e6c6b2a5730b000405e6c6b2a5730c000505d1730dd813d601b2a5730e00d602e4c672010405d603e4c6a70405d604db6308a7d605db63087201d606998cb27204730f00028cb2720573100002d607e4c6a70505d608998cb27204731100028cb2720573120002d609e4c672010505d60a9472067313d60be4c6b2db6501fe7314000405d60cc1a7d60d959372037315720ba1720b9d720c7203d60e99720c9c7203720dd60f95720a9c7206720d9c720895ed917207731691720e73179d720e72077318d610958f720f7319f0720f720fd6119d9c7210731a731bd612c17201d613997212720cd1ededededededed93c27201c2a793b2db63087201731c00b2db6308a7731d00938cb2db63087201731e00018cb2db6308a7731f0001938cb2db63087201732000018cb2db6308a773210001ededed9372029a720372069372099a7207720892720273229272097323eced720a9372087324ed937206732594720873269591720f73279272139a72107211927213f09972107211959172067328929c7e72120673299c9c7e7202067e720b06732a958f7206732b732c95917208732dec937202732e909c7e721206732f9c9c7e7202067e720b067330ec9372027331929c7e72120673329c9c7e7202067e720b067333"
+       },
+       "sourceInput": 0
+      }
+     ]
+    },
     "probesRun": 28,
     "verdict": "notunderprobes"
    },
    "synthesisOn": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": [
+      {
+       "asset": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+       "destinationTree": "10010101d17300",
+       "maxAmount": 999999700000,
+       "payment": {
+        "amountPerUnit": 33999,
+        "asset": "nanoErg",
+        "retainedTrees": [
+         "10340400040004060406040004000400040004000e20dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd040004000400010004000402040204040404050004020500050005000580897a0500050405c80104000400040204020404040405000500050005000500050005000601640602019005000101050005000601640602032005000601640602019095efedededededededededed91b1a5730093b1db6308b2a5730100730293b1db6308a7730391b1db6501fe730491b1db6308b2db6501fe7305007306938cb2db6308b2db6501fe730700730800017309e6c6b2db6501fe730a000405e6c6a70405e6c6a70505e6c6b2a5730b000405e6c6b2a5730c000505d1730dd813d601b2a5730e00d602e4c672010405d603e4c6a70405d604db6308a7d605db63087201d606998cb27204730f00028cb2720573100002d607e4c6a70505d608998cb27204731100028cb2720573120002d609e4c672010505d60a9472067313d60be4c6b2db6501fe7314000405d60cc1a7d60d959372037315720ba1720b9d720c7203d60e99720c9c7203720dd60f95720a9c7206720d9c720895ed917207731691720e73179d720e72077318d610958f720f7319f0720f720fd6119d9c7210731a731bd612c17201d613997212720cd1ededededededed93c27201c2a793b2db63087201731c00b2db6308a7731d00938cb2db63087201731e00018cb2db6308a7731f0001938cb2db63087201732000018cb2db6308a773210001ededed9372029a720372069372099a7207720892720273229272097323eced720a9372087324ed937206732594720873269591720f73279272139a72107211927213f09972107211959172067328929c7e72120673299c9c7e7202067e720b06732a958f7206732b732c95917208732dec937202732e909c7e721206732f9c9c7e7202067e720b067330ec9372027331929c7e72120673329c9c7e7202067e720b067333"
+        ],
+        "sellerTree": "10340400040004060406040004000400040004000e20dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd040004000400010004000402040204040404050004020500050005000580897a0500050405c80104000400040204020404040405000500050005000500050005000601640602019005000101050005000601640602032005000601640602019095efedededededededededed91b1a5730093b1db6308b2a5730100730293b1db6308a7730391b1db6501fe730491b1db6308b2db6501fe7305007306938cb2db6308b2db6501fe730700730800017309e6c6b2db6501fe730a000405e6c6a70405e6c6a70505e6c6b2a5730b000405e6c6b2a5730c000505d1730dd813d601b2a5730e00d602e4c672010405d603e4c6a70405d604db6308a7d605db63087201d606998cb27204730f00028cb2720573100002d607e4c6a70505d608998cb27204731100028cb2720573120002d609e4c672010505d60a9472067313d60be4c6b2db6501fe7314000405d60cc1a7d60d959372037315720ba1720b9d720c7203d60e99720c9c7203720dd60f95720a9c7206720d9c720895ed917207731691720e73179d720e72077318d610958f720f7319f0720f720fd6119d9c7210731a731bd612c17201d613997212720cd1ededededededed93c27201c2a793b2db63087201731c00b2db6308a7731d00938cb2db63087201731e00018cb2db6308a7731f0001938cb2db63087201732000018cb2db6308a773210001ededed9372029a720372069372099a7207720892720273229272097323eced720a9372087324ed937206732594720873269591720f73279272139a72107211927213f09972107211959172067328929c7e72120673299c9c7e7202067e720b06732a958f7206732b732c95917208732dec937202732e909c7e721206732f9c9c7e7202067e720b067330ec9372027331929c7e72120673329c9c7e7202067e720b067333"
+       },
+       "sourceInput": 0
+      }
+     ]
+    },
     "probesRun": 2216,
     "rejections": {
      "conservation": 0,
@@ -249,13 +660,21 @@
    "id": "M1",
    "synthesisOff": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 28,
     "verdict": "notunderprobes"
    },
    "synthesisOn": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 868,
     "rejections": {
      "conservation": 0,
@@ -270,13 +689,21 @@
    "id": "M2",
    "synthesisOff": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 28,
     "verdict": "notunderprobes"
    },
    "synthesisOn": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 2856,
     "rejections": {
      "conservation": 0,
@@ -291,13 +718,21 @@
    "id": "M3",
    "synthesisOff": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 28,
     "verdict": "notunderprobes"
    },
    "synthesisOn": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 2856,
     "rejections": {
      "conservation": 0,
@@ -312,13 +747,103 @@
    "id": "M4",
    "synthesisOff": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": [
+      {
+       "asset": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "destinationTree": "10010101d17300",
+       "maxAmount": 10,
+       "payment": {
+        "amountPerUnit": 1000000,
+        "asset": "nanoErg",
+        "retainedTrees": [
+         "1bff010308cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d91970e20cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc0580897ad808d6017300d602b2db6308a7040000d6037301d60495938c72020172038c7202020500d60591b1a50402d60699720495eded720591b1db6308b2a50402000400938cb2db6308b2a50402000400000172038cb2db6308b2a5040200040000020500d607b2a5040000d608ed93c27207d0720192c172079c72067302eb027201d1ecededed91720605008f720672047208eded720593c2b2a5040200c2a792c1b2a5040200c1a7eded937206720491720405007208"
+        ],
+        "sellerTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+       },
+       "sourceInput": 0
+      }
+     ]
+    },
     "probesRun": 28,
     "verdict": "notunderprobes"
    },
    "synthesisOn": {
     "capped": false,
-    "hits": 4,
+    "firstAccounting": {
+     "A": {
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "0"
+     },
+     "N": {
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "20000000"
+     },
+     "S": {
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "0"
+     },
+     "V": {
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "10",
+      "nanoErg": "1000000"
+     },
+     "custodyDeficit": {
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "10",
+      "nanoErg": "1000000"
+     },
+     "extracted": {},
+     "recognizedOutputIndices": [
+      2
+     ],
+     "termsUsed": [
+      {
+       "eligible": "0",
+       "paymentReceived": "21000000",
+       "released": "0",
+       "satisfied": true,
+       "term": {
+        "asset": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "destinationTree": "10010101d17300",
+        "maxAmount": 10,
+        "payment": {
+         "amountPerUnit": 1000000,
+         "asset": "nanoErg",
+         "retainedTrees": [
+          "1bff010308cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d91970e20cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc0580897ad808d6017300d602b2db6308a7040000d6037301d60495938c72020172038c7202020500d60591b1a50402d60699720495eded720591b1db6308b2a50402000400938cb2db6308b2a50402000400000172038cb2db6308b2a5040200040000020500d607b2a5040000d608ed93c27207d0720192c172079c72067302eb027201d1ecededed91720605008f720672047208eded720593c2b2a5040200c2a792c1b2a5040200c1a7eded937206720491720405007208"
+         ],
+         "sellerTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+        },
+        "sourceInput": 0
+       },
+       "termIndex": 0
+      }
+     ],
+     "unknownOutputIndices": [
+      0,
+      1
+     ]
+    },
+    "hits": 0,
+    "objectivePolicy": {
+     "terms": [
+      {
+       "asset": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "destinationTree": "10010101d17300",
+       "maxAmount": 10,
+       "payment": {
+        "amountPerUnit": 1000000,
+        "asset": "nanoErg",
+        "retainedTrees": [
+         "1bff010308cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d91970e20cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc0580897ad808d6017300d602b2db6308a7040000d6037301d60495938c72020172038c7202020500d60591b1a50402d60699720495eded720591b1db6308b2a50402000400938cb2db6308b2a50402000400000172038cb2db6308b2a5040200040000020500d607b2a5040000d608ed93c27207d0720192c172079c72067302eb027201d1ecededed91720605008f720672047208eded720593c2b2a5040200c2a792c1b2a5040200c1a7eded937206720491720405007208"
+        ],
+        "sellerTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
+       },
+       "sourceInput": 0
+      }
+     ]
+    },
     "probesRun": 1704,
     "rejections": {
      "conservation": 0,
@@ -326,7 +851,7 @@
      "missingKey": 1700,
      "script": 0
     },
-    "verdict": "drainable"
+    "verdict": "notunderprobes"
    },
    "escalated": "see escalatedFindings - the firing is recorded, the fixture untouched"
   },
@@ -334,13 +859,143 @@
    "id": "M5",
    "synthesisOff": {
     "capped": false,
+    "firstAccounting": {
+     "A": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "0",
+      "nanoErg": "0"
+     },
+     "N": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "1",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "1",
+      "nanoErg": "0"
+     },
+     "S": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "0",
+      "nanoErg": "0"
+     },
+     "V": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "1",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "999999700000",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "999995000000",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "0",
+      "nanoErg": "10000000000"
+     },
+     "custodyDeficit": {},
+     "extracted": {},
+     "recognizedOutputIndices": [
+      1
+     ],
+     "termsUsed": [
+      {
+       "eligible": "0",
+       "paymentReceived": null,
+       "released": "10000000000",
+       "satisfied": true,
+       "term": {
+        "asset": "nanoErg",
+        "destinationTree": "10010101d17300",
+        "maxAmount": 32667,
+        "payment": null,
+        "sourceInput": 0
+       },
+       "termIndex": 0
+      }
+     ],
+     "unknownOutputIndices": [
+      0
+     ]
+    },
     "hits": 0,
+    "objectivePolicy": {
+     "terms": [
+      {
+       "asset": "nanoErg",
+       "destinationTree": "10010101d17300",
+       "maxAmount": 32667,
+       "payment": null,
+       "sourceInput": 0
+      }
+     ]
+    },
     "probesRun": 28,
     "verdict": "notunderprobes"
    },
    "synthesisOn": {
     "capped": false,
+    "firstAccounting": {
+     "A": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "1",
+      "nanoErg": "2000000"
+     },
+     "N": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "1",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "1",
+      "nanoErg": "2000000"
+     },
+     "S": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "0",
+      "nanoErg": "32667"
+     },
+     "V": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "1",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "999999700000",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "999995000000",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "0",
+      "nanoErg": "10000000000"
+     },
+     "custodyDeficit": {},
+     "extracted": {},
+     "recognizedOutputIndices": [
+      1
+     ],
+     "termsUsed": [
+      {
+       "eligible": "32667",
+       "paymentReceived": null,
+       "released": "10000000000",
+       "satisfied": true,
+       "term": {
+        "asset": "nanoErg",
+        "destinationTree": "10010101d17300",
+        "maxAmount": 32667,
+        "payment": null,
+        "sourceInput": 0
+       },
+       "termIndex": 0
+      }
+     ],
+     "unknownOutputIndices": [
+      0
+     ]
+    },
     "hits": 0,
+    "objectivePolicy": {
+     "terms": [
+      {
+       "asset": "nanoErg",
+       "destinationTree": "10010101d17300",
+       "maxAmount": 32667,
+       "payment": null,
+       "sourceInput": 0
+      }
+     ]
+    },
     "probesRun": 2216,
     "rejections": {
      "conservation": 208,
@@ -355,13 +1010,89 @@
    "id": "M6",
    "synthesisOff": {
     "capped": false,
+    "firstAccounting": {
+     "A": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "0"
+     },
+     "N": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "0"
+     },
+     "S": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "0"
+     },
+     "V": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "1",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "5000000000",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "999000000000",
+      "nanoErg": "1000000000"
+     },
+     "custodyDeficit": {},
+     "extracted": {},
+     "recognizedOutputIndices": [
+      1
+     ],
+     "termsUsed": [],
+     "unknownOutputIndices": [
+      0
+     ]
+    },
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 28,
     "verdict": "notunderprobes"
    },
    "synthesisOn": {
     "capped": false,
+    "firstAccounting": {
+     "A": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "2000000"
+     },
+     "N": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "2000000"
+     },
+     "S": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "0",
+      "nanoErg": "0"
+     },
+     "V": {
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": "1",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "5000000000",
+      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": "999000000000",
+      "nanoErg": "1000000000"
+     },
+     "custodyDeficit": {},
+     "extracted": {},
+     "recognizedOutputIndices": [
+      1
+     ],
+     "termsUsed": [],
+     "unknownOutputIndices": [
+      0
+     ]
+    },
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 1652,
     "rejections": {
      "conservation": 0,
@@ -376,13 +1107,61 @@
    "id": "M7",
    "synthesisOff": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 84,
     "verdict": "notunderprobes"
    },
    "synthesisOn": {
     "capped": false,
+    "firstAccounting": {
+     "A": {
+      "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41": "0",
+      "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf": "0",
+      "nanoErg": "2000000"
+     },
+     "N": {
+      "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41": "0",
+      "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf": "0",
+      "nanoErg": "2000000"
+     },
+     "S": {
+      "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41": "0",
+      "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099": "0",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "0",
+      "ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf": "0",
+      "nanoErg": "0"
+     },
+     "V": {
+      "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41": "1",
+      "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099": "1000000",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": "5000000000",
+      "ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf": "1",
+      "nanoErg": "2000000000"
+     },
+     "custodyDeficit": {},
+     "extracted": {},
+     "recognizedOutputIndices": [
+      2,
+      3
+     ],
+     "termsUsed": [],
+     "unknownOutputIndices": [
+      0,
+      1
+     ]
+    },
     "hits": 0,
+    "objectivePolicy": {
+     "terms": []
+    },
     "probesRun": 29448,
     "rejections": {
      "conservation": 0,
@@ -397,13 +1176,51 @@
    "id": "M8",
    "synthesisOff": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": [
+      {
+       "asset": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+       "destinationTree": "10010101d17300",
+       "maxAmount": 999999700000,
+       "payment": {
+        "amountPerUnit": 33999,
+        "asset": "nanoErg",
+        "retainedTrees": [
+         "10340400040004060406040004000400040004000e20dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd040004000400010004000402040204040404050004000500050005000580897a0500050405c80104000400040204020404040405000500050005000500050005000601640602019005000101050005000601640602032005000601640602019095efedededededededededed91b1a5730093b1db6308b2a5730100730293b1db6308a7730391b1db6501fe730491b1db6308b2db6501fe7305007306938cb2db6308b2db6501fe730700730800017309e6c6b2db6501fe730a000405e6c6a70405e6c6a70505e6c6b2a5730b000405e6c6b2a5730c000505d1730dd813d601b2a5730e00d602e4c672010405d603e4c6a70405d604db6308a7d605db63087201d606998cb27204730f00028cb2720573100002d607e4c6a70505d608998cb27204731100028cb2720573120002d609e4c672010505d60a9472067313d60be4c6b2db6501fe7314000405d60cc1a7d60d959372037315720ba1720b9d720c7203d60e99720c9c7203720dd60f95720a9c7206720d9c720895ed917207731691720e73179d720e72077318d610958f720f7319f0720f720fd6119d9c7210731a731bd612c17201d613997212720cd1ededededededed93c27201c2a793b2db63087201731c00b2db6308a7731d00938cb2db63087201731e00018cb2db6308a7731f0001938cb2db63087201732000018cb2db6308a773210001ededed9372029a720372069372099a7207720892720273229272097323eced720a9372087324ed937206732594720873269591720f73279272139a72107211927213f09972107211959172067328929c7e72120673299c9c7e7202067e720b06732a958f7206732b732c95917208732dec937202732e909c7e721206732f9c9c7e7202067e720b067330ec9372027331929c7e72120673329c9c7e7202067e720b067333"
+        ],
+        "sellerTree": "10340400040004060406040004000400040004000e20dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd040004000400010004000402040204040404050004000500050005000580897a0500050405c80104000400040204020404040405000500050005000500050005000601640602019005000101050005000601640602032005000601640602019095efedededededededededed91b1a5730093b1db6308b2a5730100730293b1db6308a7730391b1db6501fe730491b1db6308b2db6501fe7305007306938cb2db6308b2db6501fe730700730800017309e6c6b2db6501fe730a000405e6c6a70405e6c6a70505e6c6b2a5730b000405e6c6b2a5730c000505d1730dd813d601b2a5730e00d602e4c672010405d603e4c6a70405d604db6308a7d605db63087201d606998cb27204730f00028cb2720573100002d607e4c6a70505d608998cb27204731100028cb2720573120002d609e4c672010505d60a9472067313d60be4c6b2db6501fe7314000405d60cc1a7d60d959372037315720ba1720b9d720c7203d60e99720c9c7203720dd60f95720a9c7206720d9c720895ed917207731691720e73179d720e72077318d610958f720f7319f0720f720fd6119d9c7210731a731bd612c17201d613997212720cd1ededededededed93c27201c2a793b2db63087201731c00b2db6308a7731d00938cb2db63087201731e00018cb2db6308a7731f0001938cb2db63087201732000018cb2db6308a773210001ededed9372029a720372069372099a7207720892720273229272097323eced720a9372087324ed937206732594720873269591720f73279272139a72107211927213f09972107211959172067328929c7e72120673299c9c7e7202067e720b06732a958f7206732b732c95917208732dec937202732e909c7e721206732f9c9c7e7202067e720b067330ec9372027331929c7e72120673329c9c7e7202067e720b067333"
+       },
+       "sourceInput": 0
+      }
+     ]
+    },
     "probesRun": 28,
     "verdict": "notunderprobes"
    },
    "synthesisOn": {
     "capped": false,
+    "firstAccounting": null,
     "hits": 0,
+    "objectivePolicy": {
+     "terms": [
+      {
+       "asset": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+       "destinationTree": "10010101d17300",
+       "maxAmount": 999999700000,
+       "payment": {
+        "amountPerUnit": 33999,
+        "asset": "nanoErg",
+        "retainedTrees": [
+         "10340400040004060406040004000400040004000e20dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd040004000400010004000402040204040404050004000500050005000580897a0500050405c80104000400040204020404040405000500050005000500050005000601640602019005000101050005000601640602032005000601640602019095efedededededededededed91b1a5730093b1db6308b2a5730100730293b1db6308a7730391b1db6501fe730491b1db6308b2db6501fe7305007306938cb2db6308b2db6501fe730700730800017309e6c6b2db6501fe730a000405e6c6a70405e6c6a70505e6c6b2a5730b000405e6c6b2a5730c000505d1730dd813d601b2a5730e00d602e4c672010405d603e4c6a70405d604db6308a7d605db63087201d606998cb27204730f00028cb2720573100002d607e4c6a70505d608998cb27204731100028cb2720573120002d609e4c672010505d60a9472067313d60be4c6b2db6501fe7314000405d60cc1a7d60d959372037315720ba1720b9d720c7203d60e99720c9c7203720dd60f95720a9c7206720d9c720895ed917207731691720e73179d720e72077318d610958f720f7319f0720f720fd6119d9c7210731a731bd612c17201d613997212720cd1ededededededed93c27201c2a793b2db63087201731c00b2db6308a7731d00938cb2db63087201731e00018cb2db6308a7731f0001938cb2db63087201732000018cb2db6308a773210001ededed9372029a720372069372099a7207720892720273229272097323eced720a9372087324ed937206732594720873269591720f73279272139a72107211927213f09972107211959172067328929c7e72120673299c9c7e7202067e720b06732a958f7206732b732c95917208732dec937202732e909c7e721206732f9c9c7e7202067e720b067330ec9372027331929c7e72120673329c9c7e7202067e720b067333"
+        ],
+        "sellerTree": "10340400040004060406040004000400040004000e20dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd040004000400010004000402040204040404050004000500050005000580897a0500050405c80104000400040204020404040405000500050005000500050005000601640602019005000101050005000601640602032005000601640602019095efedededededededededed91b1a5730093b1db6308b2a5730100730293b1db6308a7730391b1db6501fe730491b1db6308b2db6501fe7305007306938cb2db6308b2db6501fe730700730800017309e6c6b2db6501fe730a000405e6c6a70405e6c6a70505e6c6b2a5730b000405e6c6b2a5730c000505d1730dd813d601b2a5730e00d602e4c672010405d603e4c6a70405d604db6308a7d605db63087201d606998cb27204730f00028cb2720573100002d607e4c6a70505d608998cb27204731100028cb2720573120002d609e4c672010505d60a9472067313d60be4c6b2db6501fe7314000405d60cc1a7d60d959372037315720ba1720b9d720c7203d60e99720c9c7203720dd60f95720a9c7206720d9c720895ed917207731691720e73179d720e72077318d610958f720f7319f0720f720fd6119d9c7210731a731bd612c17201d613997212720cd1ededededededed93c27201c2a793b2db63087201731c00b2db6308a7731d00938cb2db63087201731e00018cb2db6308a7731f0001938cb2db63087201732000018cb2db6308a773210001ededed9372029a720372069372099a7207720892720273229272097323eced720a9372087324ed937206732594720873269591720f73279272139a72107211927213f09972107211959172067328929c7e72120673299c9c7e7202067e720b06732a958f7206732b732c95917208732dec937202732e909c7e721206732f9c9c7e7202067e720b067330ec9372027331929c7e72120673329c9c7e7202067e720b067333"
+       },
+       "sourceInput": 0
+      }
+     ]
+    },
     "probesRun": 2216,
     "rejections": {
      "conservation": 0,
@@ -439,11 +1256,9 @@
   }
  },
  "detectionRateNote": "attributable detections / proven mutants. A drainable verdict counts only when the mutant's own unmutated control is CLEAN in the same configuration \u2014 a hit that also fires on the original says nothing about the mutation. Derived by the harness, not flagged by hand.",
- "attributableDetections": 0,
- "rawDrainableOnProven": 1,
- "confounded": [
-  "M4"
- ],
+ "attributableDetections": 2,
+ "rawDrainableOnProven": 2,
+ "confounded": [],
  "foundNote": "raw drainable verdicts on proven mutants: see rawDrainableOnProven (1, all confounded)",
  "rejectionAccounting": "Rejections are recorded only for synthesisOn. Invalid takes precedence over conservation, then missingKey, then script. Accepted probes with no measured leak are neither hits nor rejections. Deterministic counts are asserted; wall-clock timings are diagnostic only.",
  "baselineRepairs": {
