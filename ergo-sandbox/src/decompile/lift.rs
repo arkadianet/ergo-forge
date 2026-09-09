@@ -17,9 +17,6 @@ use crate::method_names::METHOD_NAMES;
 
 // ── operator tables ──────────────────────────────────────────────────────────
 
-/// Infix binary operators: opcode → (symbol, precedence).
-/// Higher precedence binds tighter. Mirrors ErgoScript/Scala precedence:
-/// unary > multiplicative > additive > comparison > logical.
 /// Infix binary operators: opcode → symbol. Precedence lives in
 /// `print::prec_of`, keyed by symbol.
 fn infix_op(op: u8) -> Option<&'static str> {
@@ -32,13 +29,12 @@ fn infix_op(op: u8) -> Option<&'static str> {
         0x92 => ">=", // Ge
         0x93 => "==", // Eq
         0x94 => "!=", // Neq
-        0xF4 => "^",  // BinXor (strict) — Scala assigns ^ lower than && but
-        // ErgoScript parity keeps it above comparisons in practice; pinned by round-trip.
-        0x99 => "-", // Minus
-        0x9A => "+", // Plus
-        0x9C => "*", // Multiply
-        0x9D => "/", // Divide
-        0x9E => "%", // Modulo
+        0xF4 => "^",  // BinXor (strict); source precedence is below &&.
+        0x99 => "-",  // Minus
+        0x9A => "+",  // Plus
+        0x9C => "*",  // Multiply
+        0x9D => "/",  // Divide
+        0x9E => "%",  // Modulo
         _ => return None,
     })
 }
@@ -67,11 +63,6 @@ pub(crate) struct LiftCtx {
     pub(crate) testnet: bool,
     /// wire id → source name, per lexical scope stack.
     pub(crate) scopes: Vec<BTreeMap<u32, String>>,
-    /// Global (scope-agnostic) id→name registry — fallback for ValUse ids
-    /// whose lexical scope lookup missed (the wire's per-block id spaces
-    /// make this unambiguous in practice: the most recent binding of an id
-    /// is the in-scope one).
-    pub(crate) global: BTreeMap<u32, String>,
     /// next counter per prefix.
     pub(crate) counters: BTreeMap<&'static str, usize>,
     /// Current lift recursion depth, bounded by [`MAX_LIFT_DEPTH`].
@@ -80,6 +71,10 @@ pub(crate) struct LiftCtx {
     pub(crate) truncated: bool,
     /// Next lift-local node id. See `ast::Node::id`.
     pub(crate) next_id: u64,
+    /// Source names of functions whose uses are exclusively folds.
+    pub(crate) unwrapped_functions: std::collections::HashSet<String>,
+    /// IR function addresses selected by lexical use analysis.
+    pub(crate) fold_lambdas: std::collections::HashSet<usize>,
     /// IR node address → its id in `ergo_ser::opcode::preorder` — the walk
     /// the compiler's source map is keyed by (P5-B consumer contract).
     pub(crate) ir_ptr_ids: std::collections::HashMap<usize, u64>,
@@ -92,11 +87,12 @@ impl LiftCtx {
         Self {
             testnet: true,
             scopes: vec![BTreeMap::new()],
-            global: BTreeMap::new(),
             counters: BTreeMap::new(),
             depth: 0,
             truncated: false,
             next_id: 0,
+            unwrapped_functions: std::collections::HashSet::new(),
+            fold_lambdas: std::collections::HashSet::new(),
             ir_ptr_ids: std::collections::HashMap::new(),
             ir_ids: std::collections::HashMap::new(),
         }
@@ -136,12 +132,23 @@ impl LiftCtx {
 
     fn bind(&mut self, id: u32, prefix: &'static str) -> String {
         let name = self.fresh(prefix);
+        self.bind_named(id, name.clone());
+        name
+    }
+
+    fn bind_named(&mut self, id: u32, name: String) {
         self.scopes
             .last_mut()
             .expect("scope stack never empty")
-            .insert(id, name.clone());
-        self.global.insert(id, name.clone());
-        name
+            .insert(id, name);
+    }
+
+    fn register_function(&mut self, name: &str, rhs: &Expr) {
+        if let Expr::Op(n) = rhs {
+            if self.fold_lambdas.contains(&(n as *const _ as usize)) {
+                self.unwrapped_functions.insert(name.into());
+            }
+        }
     }
 
     fn lookup(&self, id: u32) -> Option<String> {
@@ -150,7 +157,7 @@ impl LiftCtx {
                 return Some(n.clone());
             }
         }
-        self.global.get(&id).cloned()
+        None
     }
 }
 
@@ -199,8 +206,8 @@ fn lift_const(tpe: &SigmaType, val: &SigmaValue, cx: &mut LiftCtx) -> NodeKind {
         // express values outside the Long range.
         (SigmaType::SBigInt, SigmaValue::BigInt(n)) => NodeKind::Const(format!("bigInt(\"{n}\")")),
         (SigmaType::SGroupElement, SigmaValue::GroupElement(ge)) => NodeKind::Const(format!(
-            "PK(\"{}\")",
-            crate::inspect::group_element_base58_net(ge.as_bytes(), cx.testnet)
+            "decodePoint(fromBase16(\"{}\"))",
+            hex::encode(ge.as_bytes())
         )),
         (SigmaType::SSigmaProp, SigmaValue::SigmaProp(sb)) => match sb {
             SigmaBoolean::ProveDlog(ge) => NodeKind::Const(format!(
@@ -208,7 +215,7 @@ fn lift_const(tpe: &SigmaType, val: &SigmaValue, cx: &mut LiftCtx) -> NodeKind {
                 crate::inspect::group_element_base58_net(ge.as_bytes(), cx.testnet)
             )),
             SigmaBoolean::TrivialProp(b) => NodeKind::Const(format!("sigmaProp({b})")),
-            other => NodeKind::Raw(format!("{other:?}")),
+            other => NodeKind::Raw(format!("<sigma constant {other:?}>")),
         },
         // `fromBase16("<hex>")` is the compiler's byte-coll predef: any
         // length, and byte signedness is handled by the compiler (its Bytes
@@ -228,24 +235,24 @@ fn lift_const(tpe: &SigmaType, val: &SigmaValue, cx: &mut LiftCtx) -> NodeKind {
                 })
                 .collect(),
         ),
-        (tpe, SigmaValue::Coll(CollValue::Values(vs))) => NodeKind::Coll(
-            match tpe {
-                SigmaType::SColl(inner) => crate::inspect::type_str(inner),
-                _ => "Byte".into(),
-            },
-            vs.iter()
-                .map(|v| lift_const_child(&sigma_type_of(v), v, cx))
-                .collect(),
+        (SigmaType::SColl(inner), SigmaValue::Coll(CollValue::Values(vs))) => NodeKind::Coll(
+            crate::inspect::type_str(inner),
+            vs.iter().map(|v| lift_const_child(inner, v, cx)).collect(),
         ),
-        (_, SigmaValue::Tuple(vs)) => NodeKind::Tuple(
-            vs.iter()
-                .map(|v| lift_const_child(&SigmaType::SAny, v, cx))
-                .collect(),
-        ),
-        (tpe, val) => {
-            let _ = (tpe, val);
-            NodeKind::Raw(crate::inspect::value_debug(tpe, val))
+        (SigmaType::STuple(types), SigmaValue::Tuple(vs)) if types.len() == vs.len() => {
+            NodeKind::Tuple(
+                types
+                    .iter()
+                    .zip(vs)
+                    .map(|(t, v)| lift_const_child(t, v, cx))
+                    .collect(),
+            )
         }
+        (tpe, val) => NodeKind::Raw(format!(
+            "<constant {}: {}>",
+            crate::inspect::type_str(tpe),
+            crate::inspect::value_debug(tpe, val)
+        )),
     }
 }
 
@@ -270,25 +277,6 @@ fn lift_const_child(tpe: &SigmaType, val: &SigmaValue, cx: &mut LiftCtx) -> Node
     let kind = lift_const(tpe, val, cx);
     cx.depth -= 1;
     Node { id, kind }
-}
-
-/// Best-effort static type of a value (for nested constant lifting).
-fn sigma_type_of(v: &SigmaValue) -> SigmaType {
-    match v {
-        SigmaValue::Unit => SigmaType::SUnit,
-        SigmaValue::Boolean(_) => SigmaType::SBoolean,
-        SigmaValue::Byte(_) => SigmaType::SByte,
-        SigmaValue::Short(_) => SigmaType::SShort,
-        SigmaValue::Int(_) => SigmaType::SInt,
-        SigmaValue::Long(_) => SigmaType::SLong,
-        SigmaValue::BigInt(_) => SigmaType::SBigInt,
-        SigmaValue::GroupElement(_) => SigmaType::SGroupElement,
-        SigmaValue::SigmaProp(_) => SigmaType::SSigmaProp,
-        SigmaValue::Coll(CollValue::BoolBits(_)) => SigmaType::SColl(Box::new(SigmaType::SBoolean)),
-        SigmaValue::Coll(CollValue::Bytes(_)) => SigmaType::SColl(Box::new(SigmaType::SByte)),
-        SigmaValue::Str(_) => SigmaType::SString,
-        _ => SigmaType::SAny,
-    }
 }
 
 fn method_lookup(type_id: u8, method_id: u8) -> Option<(&'static str, &'static str)> {
@@ -332,12 +320,9 @@ fn lift_method_like(
                     args_l,
                 );
             }
-            // Box.getReg-v5 (99,7): the wire has no type byte; the source
-            // form is the bracket-typed `getReg[T](idx)`. The type is not
-            // recoverable from the wire — default to `Int`, which the
-            // `getReg[..](…).isDefined` vectors use.
-            if type_id == 99 && method_id == 7 && args_l.len() == 1 {
-                return NodeKind::GetRegDyn(obj_l, "Int".into(), args_l);
+            // v5's dynamic getReg has no recoverable element type.
+            if type_id == 99 && method_id == 7 {
+                return NodeKind::Raw("<Box.getReg v5: element type absent from wire>".into());
             }
             NodeKind::Method(obj_l, name.to_string(), args_l)
         }
@@ -375,16 +360,15 @@ pub(crate) fn lift_op_inner(
 ) -> NodeKind {
     let op = node.opcode;
     let payload = &node.payload;
-    let debug = || debug_expr(&Expr::Op(node.clone()));
+    let fold_lambda = cx.fold_lambdas.contains(&(node as *const _ as usize));
+    let debug = || format!("<{}>", debug_expr(&Expr::Op(node.clone())));
     // Infix operators — the wire parses comparisons/booleans as `Payload::Two`
     // (the packed-bool 0x85 form only appears for `Coll[Boolean]` constants).
     if let Some(sym) = infix_op(op) {
         if let Payload::Two(a, b) = payload {
-            return NodeKind::Infix(
-                sym,
-                Box::new(lift(a, cx, constants)),
-                Box::new(lift(b, cx, constants)),
-            );
+            let left = lift(a, cx, constants);
+            let right = lift(b, cx, constants);
+            return NodeKind::Infix(sym, Box::new(left), Box::new(right));
         }
     }
     match payload {
@@ -395,7 +379,7 @@ pub(crate) fn lift_op_inner(
             0xA4 => "INPUTS",
             0xA5 => "OUTPUTS",
             0xA7 => "SELF",
-            0xAC => "MinerPubKey",
+            0xAC => "MinerPubkey",
             0xA6 => "LastBlockUtxoRootHash",
             0xDD => "Global",
             0xFE => "CONTEXT",
@@ -457,28 +441,33 @@ pub(crate) fn lift_op_inner(
                 0xC5 => NodeKind::Prop(Box::new(inner_l), "id".into()),
                 0xC7 => NodeKind::Method(Box::new(inner_l), "creationInfo".into(), vec![]),
                 0xCD => {
-                    let Node {
-                        id: inner_id,
-                        kind: inner_kind,
-                    } = inner_l;
-                    match inner_kind {
-                        // ProveDlog(x): source predef `proveDlog(x)`. A bare GE
-                        // constant already prints as PK(…) (sigma-typed by
-                        // construction); any COMPUTED argument (val, var,
-                        // method result, global call such as decodePoint(…))
-                        // needs the explicit proveDlog(…) or the result types as
-                        // GroupElement and cannot satisfy Coll[SigmaProp].
-                        NodeKind::Val(_)
-                        | NodeKind::GetVar(..)
-                        | NodeKind::Method(..)
-                        | NodeKind::Global(..) => NodeKind::Global(
-                            "proveDlog".into(),
-                            vec![Node {
-                                id: inner_id,
-                                kind: inner_kind,
-                            }],
-                        ),
-                        other => other, // a bare ProveDlog leaf prints as PK(…)
+                    // Only a literal GE can use PK sugar. Every computed GE
+                    // must keep the ProveDlog operation, regardless of AST shape.
+                    let literal = match &**inner {
+                        Expr::Const {
+                            tpe: SigmaType::SGroupElement,
+                            val: SigmaValue::GroupElement(ge),
+                        } => Some(ge),
+                        Expr::Op(n) => match &n.payload {
+                            Payload::ConstPlaceholder { index } => match constants
+                                .get(*index as usize)
+                            {
+                                Some((SigmaType::SGroupElement, SigmaValue::GroupElement(ge))) => {
+                                    Some(ge)
+                                }
+                                _ => None,
+                            },
+                            _ => None,
+                        },
+                        _ => None,
+                    };
+                    if let Some(ge) = literal {
+                        NodeKind::Const(format!(
+                            "PK(\"{}\")",
+                            crate::inspect::group_element_base58_net(ge.as_bytes(), cx.testnet)
+                        ))
+                    } else {
+                        NodeKind::Global("proveDlog".into(), vec![inner_l])
                     }
                 }
                 0xCB => NodeKind::Global("blake2b256".into(), vec![inner_l]),
@@ -486,7 +475,7 @@ pub(crate) fn lift_op_inner(
                 0x7A => NodeKind::Global("longToByteArray".into(), vec![inner_l]),
                 0x7B => NodeKind::Global("byteArrayToBigInt".into(), vec![inner_l]),
                 0x7C => NodeKind::Global("byteArrayToLong".into(), vec![inner_l]),
-                0xCF => NodeKind::Const("isProven".into()),
+                0xCF => NodeKind::Prop(Box::new(inner_l), "isProven".into()),
                 0xD0 => NodeKind::Method(Box::new(inner_l), "propBytes".into(), vec![]),
                 0xEE => NodeKind::Global("decodePoint".into(), vec![inner_l]),
                 0xFF => {
@@ -564,30 +553,10 @@ pub(crate) fn lift_op_inner(
             let al = lift(a, cx, constants);
             let bl = lift(b, cx, constants);
             match op {
-                0x98 => {
-                    // AtLeast(k, Coll(props)): the children must be
-                    // SigmaProp-typed — bool comparisons need explicit
-                    // `sigmaProp(…)` wrapping to recompile.
-                    let Node {
-                        id: bl_id,
-                        kind: bl_kind,
-                    } = bl;
-                    let wrapped = match bl_kind {
-                        NodeKind::Coll(t, items) => Node {
-                            id: bl_id,
-                            kind: NodeKind::Coll(
-                                t,
-                                items.into_iter().map(|it| wrap_sigma(it, cx)).collect(),
-                            ),
-                        },
-                        other => Node {
-                            id: bl_id,
-                            kind: other,
-                        },
-                    };
-                    NodeKind::AtLeast(Box::new(al), Box::new(wrapped))
-                }
-                0x9B => NodeKind::Infix("xorBytes", Box::new(al), Box::new(bl)),
+                // The IR children already have SigmaProp type. Guessing it
+                // from printed syntax adds BoolToSigmaProp around ValUse nodes.
+                0x98 => NodeKind::AtLeast(Box::new(al), Box::new(bl)),
+                0x9B => NodeKind::Global("Global.xor".into(), vec![al, bl]),
                 0x9F => NodeKind::Method(Box::new(al), "exp".into(), vec![bl]),
                 0xA0 => NodeKind::Method(Box::new(al), "multiply".into(), vec![bl]),
                 0xA1 => NodeKind::Global("min".into(), vec![al, bl]),
@@ -602,6 +571,14 @@ pub(crate) fn lift_op_inner(
             }
         }
         Payload::Three(a, b, c) => match op {
+            0x74 => NodeKind::Global(
+                "substConstants".into(),
+                vec![
+                    lift(a, cx, constants),
+                    lift(b, cx, constants),
+                    lift(c, cx, constants),
+                ],
+            ),
             0x95 => NodeKind::If(
                 Box::new(lift(a, cx, constants)),
                 Box::new(lift(b, cx, constants)),
@@ -618,30 +595,52 @@ pub(crate) fn lift_op_inner(
                 // Fold(input, zero, foldOp): source `input.fold(zero, lambda)`
                 let coll = lift(a, cx, constants);
                 let zero = lift(b, cx, constants);
-                let lam = lift(c, cx, constants);
+                if let Expr::Op(n) = &**c {
+                    cx.fold_lambdas.insert(n as *const _ as usize);
+                }
+                let mut lam = lift(c, cx, constants);
+                if let NodeKind::Val(name) = &lam.kind {
+                    if !cx.unwrapped_functions.contains(name) {
+                        lam.kind = NodeKind::Raw(
+                            "<fold function: shared source arity cannot be recovered exactly>"
+                                .into(),
+                        );
+                    }
+                }
                 NodeKind::Method(Box::new(coll), "fold".into(), vec![zero, lam])
             }
             _ => NodeKind::Raw(debug()),
         },
+        Payload::Four(g, h, u, v) if op == 0xCE => NodeKind::Global(
+            "proveDHTuple".into(),
+            [g, h, u, v]
+                .iter()
+                .map(|e| lift(e, cx, constants))
+                .collect(),
+        ),
         Payload::Four(..) => NodeKind::Raw(debug()),
-        Payload::ValUse { id } => NodeKind::Val(cx.lookup(*id).unwrap_or_else(|| format!("%{id}"))),
+        Payload::ValUse { id } => match cx.lookup(*id) {
+            Some(name) => NodeKind::Val(name),
+            None => NodeKind::Raw(format!("<unbound val {id}>")),
+        },
         Payload::ConstPlaceholder { index } => match constants.get(*index as usize) {
             Some((tpe, val)) => lift_const(tpe, val, cx),
-            None => NodeKind::Raw(format!("$<bad {}>", index)),
+            None => NodeKind::Raw(format!("<bad constant index {index}>")),
         },
-        Payload::TaggedVar { id, .. } => NodeKind::GetVar(*id as i64, String::new()),
+        Payload::TaggedVar { .. } => NodeKind::Raw(debug()),
         Payload::ValDef { id, rhs, .. } => {
-            let name = cx.bind(*id, "val");
-            let _ = name;
+            let name = cx.fresh("val");
             let rhs_l = lift(rhs, cx, constants);
+            cx.bind_named(*id, name.clone());
             NodeKind::Block(
-                vec![Stmt::Val(cx.lookup(*id).unwrap_or_default(), rhs_l)],
+                vec![Stmt::Val(name.clone(), rhs_l)],
                 Box::new(Node {
                     id: cx.alloc_id(),
-                    kind: NodeKind::Val(cx.lookup(*id).unwrap_or_default()),
+                    kind: NodeKind::Val(name),
                 }),
             )
         }
+        Payload::FunDef { tpe_args, .. } if !tpe_args.is_empty() => NodeKind::Raw(debug()),
         Payload::FunDef { id, rhs, .. } => {
             let name = cx.bind(*id, "fn");
             NodeKind::Block(
@@ -655,40 +654,47 @@ pub(crate) fn lift_op_inner(
         Payload::BlockValue { items, result } => {
             cx.push_scope();
             let mut stmts = Vec::with_capacity(items.len());
-            let mut bindings: BTreeMap<String, Node> = BTreeMap::new();
             for item in items {
-                if let Expr::Op(n) = item {
-                    match &n.payload {
+                match item {
+                    Expr::Op(n) => match &n.payload {
                         Payload::ValDef { id, rhs, .. } => {
-                            let name = cx.bind(*id, "v");
-                            bindings.insert(name.clone(), lift(rhs, cx, constants));
+                            // RHS sees the previous binding, if an id is reused.
+                            let name = cx.fresh("v");
+                            cx.register_function(&name, rhs);
+                            let rhs = lift(rhs, cx, constants);
+                            cx.bind_named(*id, name.clone());
+                            stmts.push(Stmt::Val(name, rhs));
                         }
-                        Payload::FunDef { id, rhs, .. } => {
-                            let name = cx.bind(*id, "f");
-                            bindings.insert(name.clone(), lift(rhs, cx, constants));
+                        Payload::FunDef {
+                            id, rhs, tpe_args, ..
+                        } if tpe_args.is_empty() => {
+                            let name = cx.fresh("f");
+                            cx.register_function(&name, rhs);
+                            let rhs = lift(rhs, cx, constants);
+                            cx.bind_named(*id, name.clone());
+                            stmts.push(Stmt::Def(name, rhs));
                         }
-                        _ => {}
-                    }
-                }
-            }
-            // Render statements in binding order, resolving later bindings.
-            for item in items {
-                if let Expr::Op(n) = item {
-                    match &n.payload {
-                        Payload::ValDef { id, .. } => {
-                            let name = cx.lookup(*id).unwrap_or_default();
-                            if let Some(rhs) = bindings.get(&name) {
-                                stmts.push(Stmt::Val(name.clone(), rhs.clone()));
-                            }
-                        }
-                        Payload::FunDef { id, .. } => {
-                            let name = cx.lookup(*id).unwrap_or_default();
-                            if let Some(rhs) = bindings.get(&name) {
-                                stmts.push(Stmt::Def(name.clone(), rhs.clone()));
-                            }
-                        }
-                        _ => {}
-                    }
+                        _ => stmts.push(Stmt::Val(
+                            cx.fresh("unlifted"),
+                            Node {
+                                id: cx.alloc_id(),
+                                kind: NodeKind::Raw(format!(
+                                    "<unsupported block item: {}>",
+                                    debug_expr(item)
+                                )),
+                            },
+                        )),
+                    },
+                    _ => stmts.push(Stmt::Val(
+                        cx.fresh("unlifted"),
+                        Node {
+                            id: cx.alloc_id(),
+                            kind: NodeKind::Raw(format!(
+                                "<unsupported block item: {}>",
+                                debug_expr(item)
+                            )),
+                        },
+                    )),
                 }
             }
             let result_l = lift(result, cx, constants);
@@ -705,7 +711,7 @@ pub(crate) fn lift_op_inner(
             // arg (`(t: (Long, Box)) => t._1 + t._2.value`) — the compiler
             // re-wraps a 2-arg source lambda on emit. Unwrap: render the
             // 2-arg source form so recompilation reproduces the wire.
-            if args.len() == 1 {
+            if fold_lambda && args.len() == 1 {
                 // Only a 2-field tuple is the fold wrap shape; other arities
                 // fall through to the generic lambda rendering (never index
                 // past the field list).
@@ -751,13 +757,19 @@ pub(crate) fn lift_op_inner(
             // Box.getReg[T] v6 form (99,19): the wire carries the element
             // type as an explicit type arg — render `obj.getReg[T](idx)`.
             if *type_id == 99 && *method_id == 19 {
-                if let Some(t0) = type_args.first() {
+                if let [t0] = type_args.as_slice() {
                     return NodeKind::GetRegDyn(
                         Box::new(lift(obj, cx, constants)),
                         crate::inspect::type_str(t0),
                         args.iter().map(|a| lift(a, cx, constants)).collect(),
                     );
                 }
+                return NodeKind::Raw("<Box.getReg v6: expected one explicit element type>".into());
+            }
+            if !type_args.is_empty() {
+                return NodeKind::Raw(format!(
+                    "<method {type_id}.{method_id}: unsupported explicit type arguments>"
+                ));
             }
             lift_method_like(*type_id, *method_id, obj, args, cx, constants)
         }
@@ -783,55 +795,18 @@ pub(crate) fn lift_op_inner(
         }
         Payload::ExtractRegisterAs { input, reg_id, tpe } => {
             let obj = Box::new(lift(input, cx, constants));
-            // R0 sources as `.value`; other registers as `R4[T]`-style
-            // typed accessors — EXCEPT when the register read's Option-ness
-            // is observed (`.isDefined`/`.get` on the raw read), which only
-            // the explicit `getReg[T](n)` form preserves. We can't see the
-            // parent here, so always use `R4[T]` accessor + `.get` — but for
-            // the seed corpus's `getReg[T](n).isDefined` vectors the wire
-            // shape is identical (0xE6 0xC6 …), so prefer the accessor form
-            // that round-trips: `R5[T]` recompiles to ExtractRegisterAs and
-            // `R5[T].get` to OptionGet(ExtractRegisterAs) — the exact wire.
-            // The `getReg[T](n).isDefined` vector is byte-equal to
-            // `R5[T].isDefined` ONLY if R5[T] stays an Option — it doesn't.
-            // So: render the accessor form; the isDefined cases will
-            // recompile from `getReg[T](n)` — keep those distinct by
-            // checking whether this node's parent expects an Option.
-            // Practically: `getReg` form is UNAMBIGUOUS for both shapes —
-            // `OUTPUTS(0).getReg[Long](5).get` compiles to the same bytes
-            // as `R5[Long].get`? Verified below by the round-trip test;
-            // until then prefer the explicit getReg form (it's what the
-            // wire stores) and let `.get` produce OptionGet(ExtractRegAs).
-            if *reg_id == 0 {
-                NodeKind::Prop(obj, "value".into())
-            } else {
-                NodeKind::Prop(
-                    obj,
-                    format!("R{}[{}]", reg_id, crate::inspect::type_str(tpe)),
-                )
-            }
+            // ExtractRegisterAs is Option[T], including R0. ExtractAmount
+            // (0xC1) is the separate operation that renders as `.value`.
+            NodeKind::Prop(
+                obj,
+                format!("R{}[{}]", reg_id, crate::inspect::type_str(tpe)),
+            )
         }
         Payload::GetVar { var_id, tpe } => {
             NodeKind::GetVar(*var_id as i64, crate::inspect::type_str(tpe))
         }
-        Payload::DeserializeContext { id, .. } => NodeKind::Global(
-            "deserializeContext".into(),
-            vec![Node {
-                id: cx.alloc_id(),
-                kind: NodeKind::Int(*id as i64),
-            }],
-        ),
-        Payload::DeserializeRegister {
-            reg_id, default, ..
-        } => {
-            let mut args = vec![Node {
-                id: cx.alloc_id(),
-                kind: NodeKind::Int(*reg_id as i64),
-            }];
-            if let Some(d) = default {
-                args.push(lift(d, cx, constants));
-            }
-            NodeKind::Global("deserializeRegister".into(), args)
+        Payload::DeserializeContext { .. } | Payload::DeserializeRegister { .. } => {
+            NodeKind::Raw(debug())
         }
         Payload::SigmaCollection { items } => {
             // SigmaAnd/SigmaOr recompile from `&&`/`||` chains over sigma
@@ -839,8 +814,7 @@ pub(crate) fn lift_op_inner(
             let items_l: Vec<Node> = items.iter().map(|i| lift(i, cx, constants)).collect();
             let sym = if op == 0xEA { "&&" } else { "||" };
             match items_l.len() {
-                0 => NodeKind::Const(if op == 0xEA { "true" } else { "false" }.into()),
-                1 => items_l.into_iter().next().expect("len 1").kind,
+                0 | 1 => NodeKind::Raw(debug()),
                 _ => {
                     let mut it = items_l.into_iter();
                     let first = it.next().expect("non-empty");
@@ -852,7 +826,7 @@ pub(crate) fn lift_op_inner(
                 }
             }
         }
-        Payload::NoneValue { .. } => NodeKind::Const("None".into()),
+        Payload::NoneValue { .. } => NodeKind::Raw(debug()),
         Payload::ByIndex {
             input,
             index,
@@ -867,40 +841,12 @@ pub(crate) fn lift_op_inner(
             // collection-typed receivers as ByIndex).
             if let Some(d) = default {
                 return NodeKind::Method(
-                    Box::new(Node {
-                        id: cx.alloc_id(),
-                        kind: NodeKind::Index(Box::new(input_l), Box::new(index_l), None),
-                    }),
+                    Box::new(input_l),
                     "getOrElse".into(),
-                    vec![lift(d, cx, constants)],
+                    vec![index_l, lift(d, cx, constants)],
                 );
             }
-            let Node {
-                id: input_id,
-                kind: input_kind,
-            } = input_l;
-            match input_kind {
-                // Box-collection indexing: `OUTPUTS(i)`, `tokens(i)`. A bound
-                // `val` over them (v2[0]) hits the same parser constraint.
-                NodeKind::Method(..)
-                | NodeKind::Leaf("OUTPUTS")
-                | NodeKind::Leaf("INPUTS")
-                | NodeKind::Val(_) => NodeKind::ApplyFn(
-                    Box::new(Node {
-                        id: input_id,
-                        kind: input_kind,
-                    }),
-                    vec![index_l],
-                ),
-                _ => NodeKind::Index(
-                    Box::new(Node {
-                        id: input_id,
-                        kind: input_kind,
-                    }),
-                    Box::new(index_l),
-                    None,
-                ),
-            }
+            NodeKind::ApplyFn(Box::new(input_l), vec![index_l])
         }
         Payload::NumericCast { input, tpe } => match cast_name(tpe) {
             Some(name) => {
@@ -922,15 +868,12 @@ pub(crate) fn lift_op_inner(
 fn rewrite_fold_fields(e: Node, bound: &str, n1: &str, n2: &str) -> Node {
     let Node { id, kind } = e;
     let kind = match kind {
-        NodeKind::Prop(obj, f) if f == "_1" || f == "_2" => {
-            let rewritten = rewrite_fold_fields(*obj, bound, n1, n2);
-            match &rewritten.kind {
-                NodeKind::Val(name) if name == bound => {
-                    NodeKind::Val((if f == "_1" { n1 } else { n2 }).to_string())
-                }
-                _ => NodeKind::Prop(Box::new(rewritten), f),
+        NodeKind::Prop(obj, f) if f == "_1" || f == "_2" => match &obj.kind {
+            NodeKind::Val(name) if name == bound => {
+                NodeKind::Val((if f == "_1" { n1 } else { n2 }).to_string())
             }
-        }
+            _ => NodeKind::Prop(Box::new(rewrite_fold_fields(*obj, bound, n1, n2)), f),
+        },
         NodeKind::Prop(obj, f) => {
             NodeKind::Prop(Box::new(rewrite_fold_fields(*obj, bound, n1, n2)), f)
         }
@@ -1008,30 +951,95 @@ fn rewrite_fold_fields(e: Node, bound: &str, n1: &str, n2: &str) -> Node {
                 .map(|a| rewrite_fold_fields(a, bound, n1, n2))
                 .collect(),
         ),
+        NodeKind::Val(name) if name == bound => {
+            NodeKind::Raw("<fold tuple used as a whole: cannot unwrap to two arguments>".into())
+        }
         other => other,
     };
     Node { id, kind }
 }
 
-/// Wrap a lifted expression in `sigmaProp(…)` when it isn't already
-/// sigma-typed (AtLeast/allOf children must be SigmaProps).
-fn wrap_sigma(e: Node, cx: &mut LiftCtx) -> Node {
-    let Node { id, kind } = e;
-    match kind {
-        // Already sigma-ish: sigmaProp calls, PK constants, proveDlog,
-        // AtLeast, sigma and/or.
-        NodeKind::Global(ref name, _) if name == "sigmaProp" || name == "proveDlog" => {
-            Node { id, kind }
+/// Resolve lexical uses before choosing a source arity for shared functions.
+/// A tuple function used exclusively as a fold operator can itself be
+/// unwrapped. Mixed uses retain the tuple signature and mark fold calls raw.
+pub(crate) fn find_fold_lambdas(root: &Expr) -> std::collections::HashSet<usize> {
+    type Scope = BTreeMap<u32, Option<usize>>;
+    fn visit(
+        e: &Expr,
+        in_fold: bool,
+        scopes: &mut Vec<Scope>,
+        uses: &mut BTreeMap<usize, (bool, bool)>,
+        depth: usize,
+    ) -> bool {
+        if depth >= MAX_LIFT_DEPTH {
+            return false;
         }
-        NodeKind::AtLeast(..) => Node { id, kind },
-        // PK("…") and sigmaProp(…) constants are already SigmaProp-typed.
-        NodeKind::Const(ref s) if s.starts_with("PK(") || s.starts_with("sigmaProp(") => {
-            Node { id, kind }
+        if let Expr::Op(n) = e {
+            match &n.payload {
+                Payload::ValUse { id } => {
+                    if let Some(Some(ptr)) = scopes.iter().rev().find_map(|s| s.get(id)) {
+                        let entry = uses.entry(*ptr).or_default();
+                        if in_fold {
+                            entry.0 = true;
+                        } else {
+                            entry.1 = true;
+                        }
+                    }
+                    return true;
+                }
+                Payload::FuncValue { args, body } => {
+                    if in_fold {
+                        uses.entry(n as *const _ as usize).or_default().0 = true;
+                    }
+                    scopes.push(args.iter().map(|(id, _)| (*id, None)).collect());
+                    let complete = visit(body, false, scopes, uses, depth + 1);
+                    scopes.pop();
+                    return complete;
+                }
+                Payload::BlockValue { items, result } => {
+                    scopes.push(Scope::new());
+                    let mut complete = true;
+                    for item in items {
+                        complete &= visit(item, false, scopes, uses, depth + 1);
+                        if let Expr::Op(def) = item {
+                            if let Payload::ValDef { id, rhs, .. }
+                            | Payload::FunDef { id, rhs, .. } = &def.payload
+                            {
+                                let ptr = match &**rhs {
+                                    Expr::Op(f)
+                                        if matches!(f.payload, Payload::FuncValue { .. }) =>
+                                    {
+                                        Some(f as *const _ as usize)
+                                    }
+                                    _ => None,
+                                };
+                                scopes.last_mut().unwrap().insert(*id, ptr);
+                            }
+                        }
+                    }
+                    complete &= visit(result, false, scopes, uses, depth + 1);
+                    scopes.pop();
+                    return complete;
+                }
+                Payload::Three(a, b, c) if n.opcode == 0xB0 => {
+                    return visit(a, false, scopes, uses, depth + 1)
+                        & visit(b, false, scopes, uses, depth + 1)
+                        & visit(c, true, scopes, uses, depth + 1);
+                }
+                _ => {}
+            }
         }
-        // Everything else (bool comparisons, and-chains of bools) wraps.
-        _ => Node {
-            id: cx.alloc_id(),
-            kind: NodeKind::Global("sigmaProp".into(), vec![Node { id, kind }]),
-        },
+        let mut complete = true;
+        for child in ergo_ser::opcode::children(e) {
+            complete &= visit(child, false, scopes, uses, depth + 1);
+        }
+        complete
     }
+    let mut uses = BTreeMap::new();
+    if !visit(root, false, &mut vec![Scope::new()], &mut uses, 0) {
+        return std::collections::HashSet::new();
+    }
+    uses.into_iter()
+        .filter_map(|(ptr, (fold, other))| (fold && !other).then_some(ptr))
+        .collect()
 }

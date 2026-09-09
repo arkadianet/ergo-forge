@@ -10,20 +10,19 @@ use super::ast::{Node, NodeKind, Stmt};
 // ── printer ──────────────────────────────────────────────────────────────────
 
 /// Precedence for an infix operator symbol. Higher binds tighter. Mirrors
-/// ErgoScript/Scala: unary > multiplicative > additive > comparison > logical.
-/// Inverse of `lift::infix_op`'s table; every symbol there is distinct.
+/// the pinned compiler's `parse::operators::precedence_of`, including the
+/// distinct precedence of `>` versus `<`, and XOR below AND.
 pub(crate) fn prec_of(sym: &str) -> u8 {
     match sym {
+        "xorBytes" => 0,
         "||" => 1,
-        "&&" => 2,
-        "<" | "<=" | ">" | ">=" | "==" | "!=" => 4,
-        "^" => 5,
-        "-" | "+" => 6,
-        "*" | "/" | "%" => 7,
-        // Constructed directly in `lift` (not via `infix_op`), with the same
-        // precedences they carried on the node before prec_of existed.
-        "xorBytes" => 6,
-        "++" => 7,
+        "^" => 2,
+        "&&" => 3,
+        "==" | "!=" => 4,
+        "<" | "<=" => 5,
+        ">" | ">=" => 6,
+        "-" | "+" | "++" => 7,
+        "*" | "/" | "%" => 8,
         other => unreachable!("unknown infix operator {other:?}"),
     }
 }
@@ -54,7 +53,7 @@ pub(crate) fn print_node(n: &Node, parent: Option<u8>, out: &mut String) {
         }
         NodeKind::Leaf(s) => out.push_str(s),
         NodeKind::Unary(op, inner) => {
-            let this = 8u8;
+            let this = 9u8;
             let needs = parent.is_some_and(|p| p > this);
             // Binder quirk (upstream): `!v.R5[T].isDefined` types the `!`
             // operand as the UNAPPLIED generic accessor (SFunc → Option[T]).
@@ -104,6 +103,19 @@ pub(crate) fn print_node(n: &Node, parent: Option<u8>, out: &mut String) {
             }
         }
         NodeKind::Infix(sym, lhs, rhs) => {
+            if matches!(*sym, "+" | "*") && (needs_binding(lhs) || needs_binding(rhs)) {
+                // The compiler re-types +/* operands; some already lowered
+                // forms cannot be re-typed. Source temporaries avoid that
+                // without changing the lifted AST consumed by other tools.
+                let left = temporary_name(n, lhs.id, "dcLeft");
+                let right = temporary_name(n, rhs.id, "dcRight");
+                let _ = write!(out, "{{ val {left} = ");
+                print_node(lhs, None, out);
+                let _ = write!(out, "; val {right} = ");
+                print_node(rhs, None, out);
+                let _ = write!(out, "; {left} {sym} {right} }}");
+                return;
+            }
             let this = prec_of(sym);
             let needs = parent.is_some_and(|p| p > this);
             let emit = |o: &mut String| {
@@ -125,7 +137,7 @@ pub(crate) fn print_node(n: &Node, parent: Option<u8>, out: &mut String) {
         }
         NodeKind::Method(obj, name, args) => {
             // Receiver binds like a postfix expression (tightest).
-            print_node(obj, Some(9), out);
+            print_node(obj, Some(10), out);
             out.push('.');
             out.push_str(name);
             if !args.is_empty() {
@@ -140,7 +152,7 @@ pub(crate) fn print_node(n: &Node, parent: Option<u8>, out: &mut String) {
             }
         }
         NodeKind::ApplyFn(f, args) => {
-            print_node(f, Some(9), out);
+            print_node(f, Some(10), out);
             out.push('(');
             for (i, a) in args.iter().enumerate() {
                 if i > 0 {
@@ -151,12 +163,12 @@ pub(crate) fn print_node(n: &Node, parent: Option<u8>, out: &mut String) {
             out.push(')');
         }
         NodeKind::Prop(obj, name) => {
-            print_node(obj, Some(9), out);
+            print_node(obj, Some(10), out);
             out.push('.');
             out.push_str(name);
         }
         NodeKind::GetRegDyn(obj, tpe, args) => {
-            print_node(obj, Some(9), out);
+            print_node(obj, Some(10), out);
             out.push_str(&format!(".getReg[{tpe}]("));
             for (i, a) in args.iter().enumerate() {
                 if i > 0 {
@@ -193,7 +205,7 @@ pub(crate) fn print_node(n: &Node, parent: Option<u8>, out: &mut String) {
             out.push(')');
         }
         NodeKind::Index(input, index, default) => {
-            print_node(input, Some(9), out);
+            print_node(input, Some(10), out);
             out.push('[');
             print_node(index, None, out);
             out.push(']');
@@ -281,5 +293,48 @@ fn print_stmt(s: &Stmt, out: &mut String) {
             let _ = write!(out, "def {name} = ");
             print_node(e, None, out);
         }
+    }
+}
+
+fn needs_binding(n: &Node) -> bool {
+    match &n.kind {
+        NodeKind::If(..) | NodeKind::ApplyFn(..) | NodeKind::Block(..) => true,
+        NodeKind::Method(_, name, _) if name == "getOrElse" || name == "fold" => true,
+        NodeKind::Infix(_, a, b) => needs_binding(a) || needs_binding(b),
+        _ => false,
+    }
+}
+
+fn temporary_name(expression: &Node, id: u64, prefix: &str) -> String {
+    let mut name = format!("{prefix}{id}");
+    // Lift-generated names never use these prefixes; still avoid capture when print()
+    // is called with a caller-built AST containing such a reference.
+    while references_name(expression, &name) {
+        name.push('_');
+    }
+    name
+}
+
+fn references_name(n: &Node, name: &str) -> bool {
+    let has = |n: &Node| references_name(n, name);
+    match &n.kind {
+        NodeKind::Val(v) => v == name,
+        NodeKind::Unary(_, a) | NodeKind::Prop(a, _) | NodeKind::Lambda(_, a) => has(a),
+        NodeKind::Infix(_, a, b) | NodeKind::AtLeast(a, b) => has(a) || has(b),
+        NodeKind::Method(o, _, args)
+        | NodeKind::ApplyFn(o, args)
+        | NodeKind::GetRegDyn(o, _, args) => has(o) || args.iter().any(has),
+        NodeKind::Coll(_, items) | NodeKind::Tuple(items) | NodeKind::Global(_, items) => {
+            items.iter().any(has)
+        }
+        NodeKind::Index(a, b, d) => has(a) || has(b) || d.as_deref().is_some_and(has),
+        NodeKind::If(c, t, e) => has(c) || has(t) || has(e),
+        NodeKind::Block(stmts, result) => {
+            has(result)
+                || stmts.iter().any(|s| match s {
+                    Stmt::Val(_, n) | Stmt::Def(_, n) => has(n),
+                })
+        }
+        _ => false,
     }
 }

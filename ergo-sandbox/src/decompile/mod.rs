@@ -9,7 +9,10 @@
 //! ## The verification bar (workbench-PLAN.md)
 //!
 //! `decompile → recompile → byte-identical` on known provenance. This is
-//! checked by `tests/decompile_roundtrip.rs` over the compile corpus. The
+//! checked by `tests/decompile_roundtrip.rs` over the compile vectors and
+//! measured per entry by `tests/decompile_corpus.rs` over the bundled contracts
+//! and compiled fixtures. See `docs/decompile-robustness-2026-09-09.md` for the
+//! remaining divergences; successful lifting alone does not certify parity. The
 //! bar is achievable only where the tree's shape is exactly what the
 //! compiler emits; hand-built trees may normalize differently — the
 //! round-trip test measures, and any miss is either a printer bug (fix) or
@@ -153,6 +156,7 @@ pub struct Lifted {
 pub fn lift_tree(tree: &ergo_ser::ergo_tree::ErgoTree, testnet: bool) -> Lifted {
     let mut cx = LiftCtx {
         testnet,
+        fold_lambdas: lift::find_fold_lambdas(&tree.body),
         ..LiftCtx::new()
     };
     cx.ir_ptr_ids = ergo_ser::opcode::preorder(&tree.body)
@@ -207,7 +211,8 @@ pub struct Decompiled {
     /// The rendered source-like ErgoScript.
     pub source: String,
     /// Number of `<…>` raw placeholders — constructs with no source-like lift
-    /// yet. Zero means the whole tree was lifted.
+    /// yet. Zero means the whole tree was lifted, not that its printed source
+    /// has been verified to recompile byte-identically.
     pub raw_placeholders: usize,
     /// Set when the lift hit the recursion ceiling ([`MAX_LIFT_DEPTH`]).
     pub truncated: bool,
