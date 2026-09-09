@@ -207,3 +207,85 @@ Feed the exact tree into a scenario or the existing audit command:
 ergo-es tree 4MQyML64GnzMxZgm --json | jq '{tree: .treeHex, height: 100}' | ergo-es eval - --json
 ergo-es audit "$(ergo-es tree 4MQyML64GnzMxZgm --json | jq -r .treeHex)"
 ```
+### Contract identity under constant substitution
+
+`ergo-es match` compares compiled source with a deployed tree, or two tree hex
+strings, using the library's `ergo_sandbox::identity::match_trees` API:
+
+```sh
+# params.json uses the existing name -> {type, value} compile parameter format.
+CARGO_TARGET_DIR=./target-match cargo run --release -p ergo-sandbox --bin ergo-es -- \
+  match examples/contracts/dexy/lp/pool/swap.es "$DEPLOYED_TREE_HEX" \
+  --params params.json --json
+# Or, with the binary installed:
+ergo-es match "$SOURCE_TREE_HEX" "$DEPLOYED_TREE_HEX"
+```
+
+For the bundled `examples/incidents/use-lp-drain.deployed-swap.test.json` tree,
+compile the swap source with:
+
+```json
+{
+  "feeNumLp": {"type": "Long", "value": 3},
+  "feeDenomLp": {"type": "Int", "value": 1000}
+}
+```
+
+The verdict is **same program with differing constants**. Parameter types matter:
+using `Int` for the numerator causes the compiler to insert two extra casts and
+produces **different program** under this conservative structural comparison.
+Casts are retained, even when their operand is a constant. Source inputs (`.es`
+or `.ergo`) compile with the existing parameter compiler, mainnet address parsing,
+and requested tree version 3 (ordinary contracts retain version 0). Missing
+parameters are errors; values are never guessed. Both tree inputs are hexadecimal
+ErgoTree bytes, not addresses. The command does not fetch chain data.
+
+The three verdicts (JSON: `same_program`,
+`same_program_with_differing_constants`, `different_program`) describe parsed
+program structure and resolved constant occurrences. `byte_identical` separately
+reports exact serialization equality. A successful comparison exits 0 even for
+`different_program`; malformed input, unparsed/unsupported trees, unresolved
+constant references, and compilation errors exit nonzero without a verdict.
+
+The matcher compares the full parsed opcode IR before decompiler lifting. It
+preserves operation tags, ordered children and arities, binding IDs, register and
+context-variable selectors, method IDs and type arguments, numeric casts, optional
+children, and other non-constant metadata. Inline constants and constant-table
+references become untyped holes; references resolve independently in each tree,
+so table reordering and sharing do not affect identity. Boolean literal opcodes
+and packed Boolean collections are also constant leaves. A collection stored as
+one constant is one hole, regardless of its length. Other compiler rewrites and
+binding renumbering are deliberately not normalized. Tree versions must match;
+size/segregation flags and unused constant-table entries are ignored.
+
+`constant_differences` lists every differing occurrence by ordered child `path`
+(`[]` is the root, `[0]` its first child), with each side's `table_index` when
+present, type, and full IR value representation. Reused table entries can appear
+at multiple paths. A null side denotes an absent node or an operation at that
+path. For different programs, these are positional observations, not a proposed
+substitution map. Values and types are compared as parsed data, never as strings.
+
+Similarity is the number of equal node labels at identical child paths divided
+by the union of paths, including one additional label for tree version. Hole
+labels ignore values and types; operation labels retain their metadata and child
+layout. The report includes the numerator, denominator, and definition. Only a
+score of 1 establishes structural identity under this definition. Partial scores
+are structural overlap, not confidence percentages or evidence of equivalent
+behaviour.
+
+**Matching structure while constants differ does not prove behavioural
+equivalence.** A constant can change which branch is reachable, which key is
+authorized, or which asset is accepted. Even `sigmaProp(true)` and
+`sigmaProp(false)` match under constant substitution. This tool neither certifies
+safety nor establishes source provenance or that a supplied tree is deployed at
+an address. Review all constant differences and independently obtain the deployed
+tree. Existing audit detectors and mutation-corpus expectations are unchanged.
+
+Offline regression fixtures cover the Dexy swap, the HodlCOMET10 bank and burn
+proxy, and near-miss Phoenix hodlcoin siblings. The Phoenix trees and explorer
+transaction/box provenance are pinned in
+[`identity_phoenix.json`](ergo-sandbox/tests/fixtures/identity_phoenix.json).
+Library callers compile sources through `compile::compile_with_params`, then pass
+`CompileOutput::tree_bytes` and deployed bytes to `identity::match_trees`. As with
+other deep-tree parser consumers, use `decompile::with_large_stack` on hosts with
+small thread stacks.

@@ -1966,5 +1966,17 @@
     "raw_placeholders": 0,
     "truncated": false,
     "tree_sha256": "4778791e6f12f6b8203a46f24c722debaa3a3ad87ca4be78efa4668440824a55"
+  },
+  "ergo-sandbox/tests/fixtures/identity_phoenix.json#/bank/tree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "795d4a83a23864969b6f1b99c4db1e121c6c6f485b206a8bab31e47393be8405"
+  },
+  "ergo-sandbox/tests/fixtures/identity_phoenix.json#/proxy/tree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "bf0c4e3ec04360d0e642f0c8f177b1485d33821daabb3be403a5a6e3cbf4ee67"
   }
 }

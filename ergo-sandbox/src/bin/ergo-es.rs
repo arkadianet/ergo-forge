@@ -21,6 +21,7 @@ fn main() -> ExitCode {
     let result = match cmd.as_str() {
         "compile" => cmd_compile(rest),
         "tree" => cmd_tree(rest),
+        "match" => cmd_match(rest),
         "ingest" => cmd_ingest(rest),
         "params" => cmd_params(rest),
         "eval" => cmd_eval(rest),
@@ -61,6 +62,9 @@ USAGE:
   ergo-es tree <address|boxId|treeHex> [--json] [--network mainnet|testnet]
                [--source fixture.json | --explorer URL]
       Decode offline, or explicitly resolve a box, then decompile and audit.
+  ergo-es match <source.es|treeHex> <treeHex> [--params p.json] [--json]
+      Compare program structure with constant leaves treated as holes.
+      A match does not prove behavioural equivalence or safety.
   ergo-es ingest <directory> [--params params.json] [--tree-version N]
                  [--network mainnet|testnet] [--json] [--no-infer]
       Compile and lift .ergo/.es sources for static tooling, with reported
@@ -1551,4 +1555,71 @@ fn tree_explorer(url: &str) -> Result<Box<dyn ergo_sandbox::map::source::ChainSo
         let _ = url;
         Err("live box lookup requires the explorer feature; --source works offline".into())
     }
+}
+
+fn cmd_match(args: &[String]) -> Result<(), String> {
+    if args.len() < 2 {
+        return Err("match needs <source.es|treeHex> <treeHex> [--params p.json] [--json]".into());
+    }
+    let mut params_path = None;
+    let mut json = false;
+    let mut flags = args[2..].iter();
+    while let Some(flag) = flags.next() {
+        match flag.as_str() {
+            "--json" if !json => json = true,
+            "--params" if params_path.is_none() => {
+                params_path = Some(flags.next().ok_or("--params needs a file")?);
+            }
+            _ => return Err(format!("unknown or repeated match option: {flag}")),
+        }
+    }
+    let right = hex::decode(&args[1]).map_err(|e| format!("right tree hex: {e}"))?;
+    let left = if args[0].ends_with(".es") || args[0].ends_with(".ergo") {
+        let source = read_input(&args[0])?;
+        let params = match params_path {
+            Some(p) => {
+                serde_json::from_str(&std::fs::read_to_string(p).map_err(|e| e.to_string())?)
+                    .map_err(|e| format!("params: {e}"))?
+            }
+            None => std::collections::BTreeMap::new(),
+        };
+        ergo_sandbox::decompile::with_large_stack(move || {
+            ergo_sandbox::compile::compile_with_params(&source, &params, 3, NetworkPrefix::Mainnet)
+                .map(|out| out.tree_bytes)
+                .map_err(|e| e.to_string())
+        })?
+    } else {
+        if params_path.is_some() {
+            return Err("--params requires a source file".into());
+        }
+        hex::decode(&args[0]).map_err(|e| format!("left tree hex: {e}"))?
+    };
+    let report = ergo_sandbox::decompile::with_large_stack(move || {
+        ergo_sandbox::identity::match_trees(&left, &right)
+    })
+    .map_err(|e| e.to_string())?;
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
+        );
+    } else {
+        println!("{}", report.verdict);
+        println!(
+            "Structural similarity: {:.6} ({}/{})",
+            report.similarity, report.matching_labels, report.total_positions
+        );
+        println!(
+            "Byte identical: {}; tree versions: {} / {}",
+            report.byte_identical, report.left_version, report.right_version
+        );
+        for diff in &report.constant_differences {
+            println!(
+                "Constant at {:?}: left={:?}; right={:?}",
+                diff.path, diff.left, diff.right
+            );
+        }
+        println!("{}\n{}", report.similarity_definition, report.limitation);
+    }
+    Ok(())
 }
