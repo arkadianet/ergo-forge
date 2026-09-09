@@ -499,12 +499,7 @@
       "roleRef": "fixedRest",
       "value": 0,
       "ergoTree": "$mutant",
-      "tokens": [
-       {
-        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-        "amount": 0
-       }
-      ]
+      "tokens": []
      },
      {
       "roleRef": "free",
@@ -558,12 +553,7 @@
      {
       "value": 0,
       "ergoTree": "$mutant",
-      "tokens": [
-       {
-        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-        "amount": 0
-       }
-      ]
+      "tokens": []
      },
      {
       "value": 0,

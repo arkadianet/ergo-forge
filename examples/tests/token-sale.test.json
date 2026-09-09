@@ -146,17 +146,12 @@
       ]
     },
     {
-      "name": "an empty box (no stock) cannot be bought",
-      "expect": "needsProof",
+      "name": "an empty box (no stock) errors at SELF.tokens(0)",
+      "expect": "error",
       "height": 1,
       "selfBox": {
         "value": 1000000,
-        "tokens": [
-          {
-            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-            "amount": 0
-          }
-        ]
+        "tokens": []
       },
       "outputs": [
         {

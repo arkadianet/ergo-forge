@@ -93,6 +93,44 @@ fn outputs_registers_and_tokens_are_visible_to_the_script() {
 // ----- error paths -----
 
 #[test]
+fn zero_token_amounts_are_rejected_in_every_scenario_box_position() {
+    let token_id = "cc".repeat(32);
+    for field in ["selfBox", "inputs", "outputs", "dataInputs"] {
+        // Include the synthetic/placeholder-tree path as well as real boxes.
+        for tree in ["10010101d17300", "deadbeef"] {
+            let empty_box = serde_json::json!({"value": 1_000_000, "ergoTree": tree});
+            let mut b = empty_box.clone();
+            b["tokens"] = serde_json::json!([{"id": token_id, "amount": 0}]);
+            let mut json = serde_json::json!({"source": "sigmaProp(true)", "height": 100});
+            json[field] = if field == "selfBox" {
+                b
+            } else {
+                serde_json::json!([empty_box, b])
+            };
+            let mut sc: Scenario = serde_json::from_value(json).unwrap();
+            let err = eval_scenario(&sc).unwrap_err();
+            assert!(matches!(err, ergo_sandbox::SandboxError::Scenario(_)));
+            let msg = err.to_string();
+            for expected in [field, &token_id, "amount 0", "strictly positive", "omit"] {
+                assert!(msg.contains(expected), "{msg}");
+            }
+            if field != "selfBox" {
+                assert!(msg.contains("[1]"), "{msg}");
+            }
+            let b = match field {
+                "selfBox" => sc.self_box.as_mut().unwrap(),
+                "inputs" => &mut sc.inputs[1],
+                "outputs" => &mut sc.outputs[1],
+                "dataInputs" => &mut sc.data_inputs[1],
+                _ => unreachable!(),
+            };
+            b.tokens.clear();
+            assert_eq!(eval_scenario(&sc).unwrap().verdict, Verdict::Pass);
+        }
+    }
+}
+
+#[test]
 fn runtime_exception_is_an_error_verdict_not_a_panic() {
     // OUTPUTS(0) with no outputs → box-index runtime exception.
     let out = eval_json(r#"{"source":"sigmaProp(OUTPUTS(0).value == 1L)","height":2000}"#);
