@@ -76,6 +76,11 @@ pub const DRAIN_KEEP_VALUE: i64 = 2_000_000;
 /// but `maxNewOutputs` is omitted (Decision 1 of the phase-2 spec).
 pub const DEFAULT_MAX_NEW_OUTPUTS: usize = 2;
 
+/// How many distinct `R4` values the data-input family tries (the zero
+/// boundary first, then values observed on the declared boxes). A cap, so
+/// the axis cannot blow the shape count open on a register-rich request.
+const DATA_R4_VARIANTS: usize = 3;
+
 /// Default cap on the per-successor `{verbatim, minimized}` combinations
 /// (`2^s` capped).
 pub const DEFAULT_MAX_SUCCESSOR_STATES: usize = 8;
@@ -126,6 +131,12 @@ pub struct Synthesis {
     /// Blind edits of at most one fixed-payee declared output: re-tree, or
     /// prepend 1..=3 sourced filler tokens. Independent of maxNewOutputs.
     pub declared_output_modifications: bool,
+    /// Data-input substitution: the attacker chooses WHICH box a script
+    /// reads as a data input, and may reference a box of their own. The
+    /// family is drawn from the declared request — observed register values
+    /// plus the zero boundary — never fabricated from the target script.
+    #[serde(default)]
+    pub data_inputs: bool,
     /// Each script-matched successor independently `{verbatim, minimized}`
     /// (`2^s` combinations, capped at `max_successor_states`).
     #[serde(default)]
@@ -164,6 +175,7 @@ impl Default for Synthesis {
             max_new_outputs: None,
             companion_recreations: false,
             declared_output_modifications: false,
+            data_inputs: false,
             successor_states: false,
             max_successor_states: DEFAULT_MAX_SUCCESSOR_STATES,
             splits: false,
@@ -179,6 +191,7 @@ impl Synthesis {
     /// to phase 1.
     pub fn active(&self) -> bool {
         self.declared_output_modifications
+            || self.data_inputs
             || self.companion_recreations
             || self.successor_states
             || self.splits
@@ -874,7 +887,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
         for &f in &axes.filler_domains[si] {
             per_f.push(shape_tallies.len());
             shape_tallies.push(ShapeTally {
-                shape: s.tally_label(f),
+                shape: s.tally_label_with_data(f),
                 generated: 0,
                 construction_skipped: 0,
                 run: 0,
@@ -1003,13 +1016,22 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                                 }
                             };
 
-                            // Deduplicate: identical (inputs, outputs) shapes are one probe.
-                            let key =
-                                match serde_json::to_string(&(&realized_inputs, &realized_outputs))
-                                {
-                                    Ok(k) => k,
-                                    Err(_) => continue,
-                                };
+                            // Deduplicate: identical realized transactions are one
+                            // probe. The DATA inputs are part of that identity —
+                            // shapes differing only by data variant produce the same
+                            // (inputs, outputs) pair, so leaving them out of the key
+                            // silently collapsed every appended-data probe into its
+                            // verbatim twin and skipped it.
+                            let realized_data_inputs =
+                                realize_data_inputs(req, &point.shape.data, &attacker_tree);
+                            let key = match serde_json::to_string(&(
+                                &realized_inputs,
+                                &realized_outputs,
+                                &realized_data_inputs,
+                            )) {
+                                Ok(k) => k,
+                                Err(_) => continue,
+                            };
                             if !seen.insert(key) {
                                 continue;
                             }
@@ -1024,6 +1046,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                                 req,
                                 &realized_inputs,
                                 &realized_outputs,
+                                &realized_data_inputs,
                                 probe_seq,
                             ) {
                                 Ok(r) => r,
@@ -1143,6 +1166,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                                             &position_roles,
                                             &realized_inputs,
                                             &oracle_outputs,
+                                            &realized_data_inputs,
                                             &tx_request,
                                         ),
                                     },
@@ -1297,11 +1321,37 @@ enum DeclaredOutputEdit {
     Repad { output: usize, fillers: usize },
 }
 
-/// A synthesized-output shape: one declared edit OR at most one companion re-creation plus
-/// attacker sinks (`new_count() ≤ maxNewOutputs`).
+/// How a probe realizes the declared data inputs. An attacker chooses WHICH
+/// box a script reads — including a box of their own — but never what an
+/// honest oracle says. `Append`'s register values come from the declared
+/// request (values already present on its boxes, plus the zero boundary),
+/// so the family stays script-independent: the generator never reads the
+/// tree under hunt to decide what a script would want.
+#[derive(Debug, Clone, PartialEq, Eq)]
+enum DataVariant {
+    /// The declared data inputs, untouched (phase-1/2 behaviour).
+    Verbatim,
+    /// One extra attacker-owned data input carrying `R4` = the given Long.
+    Append { r4: i64 },
+}
+
+impl DataVariant {
+    fn label(&self) -> String {
+        match self {
+            DataVariant::Verbatim => String::new(),
+            DataVariant::Append { r4 } => format!("+data(R4={r4})"),
+        }
+    }
+}
+
+/// A synthesized-output shape: one declared edit OR at most one companion
+/// re-creation plus attacker sinks (`new_count() ≤ maxNewOutputs`), paired
+/// with how the probe realizes its data inputs.
 #[derive(Debug, Clone)]
 struct ShapeDesc {
     edit: Option<DeclaredOutputEdit>,
+    /// How this shape realizes the data inputs.
+    data: DataVariant,
     /// The re-creation, if any: the companion slot and the token index to
     /// move. A companion qualifies through any token it carries at amount 1
     /// — the syntactic shape of a box-identifying singleton. (The map's
@@ -1341,6 +1391,13 @@ impl ShapeDesc {
             }
             None => self.static_label.clone(),
         }
+    }
+
+    /// The tally label with the data-input variant appended, so a data
+    /// substitution is visible in the report rather than hidden inside a
+    /// shape that otherwise looks identical.
+    fn tally_label_with_data(&self, fillers: usize) -> String {
+        format!("{}{}", self.tally_label(fillers), self.data.label())
     }
 }
 
@@ -1424,6 +1481,7 @@ impl AxisIter {
         // qualifies through any token it carries at amount 1 (see
         // `ShapeDesc.recreate` — deliberately not `protocolNfts`).
         let mut shapes: Vec<ShapeDesc> = vec![ShapeDesc {
+            data: DataVariant::Verbatim,
             edit: None,
             recreate: None,
             sinks: 0,
@@ -1435,6 +1493,7 @@ impl AxisIter {
                     continue;
                 }
                 shapes.push(ShapeDesc {
+                    data: DataVariant::Verbatim,
                     edit: Some(DeclaredOutputEdit::Retree { output }),
                     recreate: None,
                     sinks: 0,
@@ -1442,6 +1501,7 @@ impl AxisIter {
                 });
                 for fillers in 1..=3 {
                     shapes.push(ShapeDesc {
+                        data: DataVariant::Verbatim,
                         edit: Some(DeclaredOutputEdit::Repad { output, fillers }),
                         recreate: None,
                         sinks: 0,
@@ -1470,6 +1530,7 @@ impl AxisIter {
         }
         for rc in &recreations {
             shapes.push(ShapeDesc {
+                data: DataVariant::Verbatim,
                 edit: None,
                 recreate: Some(rc.clone()),
                 sinks: 0,
@@ -1479,6 +1540,7 @@ impl AxisIter {
         if syn.companion_recreations && max_new >= 2 {
             for rc in &recreations {
                 shapes.push(ShapeDesc {
+                    data: DataVariant::Verbatim,
                     edit: None,
                     recreate: Some(rc.clone()),
                     sinks: 1,
@@ -1491,6 +1553,7 @@ impl AxisIter {
         }
         if max_new >= 1 {
             shapes.push(ShapeDesc {
+                data: DataVariant::Verbatim,
                 edit: None,
                 recreate: None,
                 sinks: 1,
@@ -1499,11 +1562,46 @@ impl AxisIter {
         }
         if syn.splits && max_new >= 2 {
             shapes.push(ShapeDesc {
+                data: DataVariant::Verbatim,
                 edit: None,
                 recreate: None,
                 sinks: 2,
                 static_label: "sinks(2)".to_string(),
             });
+        }
+
+        // Axis 1b: data-input variants. An attacker chooses WHICH box a
+        // script reads — including one of their own — so each shape is
+        // paired with each data realization. Register values come from the
+        // declared request (values already on its boxes, plus the zero
+        // boundary), never from reading the tree under hunt. Every pair is
+        // its own shape, so it gets its own slice from the allocator and
+        // its own line in the report.
+        if syn.data_inputs {
+            let mut r4s: Vec<i64> = vec![0];
+            for b in declared.iter().chain(req.data_inputs.iter()) {
+                if let Some(tv) = b.registers.get("R4") {
+                    let v = if tv.r#type == "raw" {
+                        tv.value.as_str().and_then(raw_long_value)
+                    } else {
+                        serde_json::from_value::<i64>(tv.value.clone()).ok()
+                    };
+                    if let Some(v) = v {
+                        if !r4s.contains(&v) {
+                            r4s.push(v);
+                        }
+                    }
+                }
+            }
+            r4s.truncate(DATA_R4_VARIANTS);
+            let base = shapes.clone();
+            for r4 in r4s {
+                for sh in &base {
+                    let mut d = sh.clone();
+                    d.data = DataVariant::Append { r4 };
+                    shapes.push(d);
+                }
+            }
         }
 
         // Axis 2: output permutation (identity when off).
@@ -2811,13 +2909,88 @@ fn box_json(sb: &ScenarioBox, id_seed: &str) -> Result<serde_json::Value, Sandbo
 /// (`txcheck` allows exactly one minted id — the first input's box id). The
 /// returned boxes are what the witness and the protocol scenarios replay,
 /// so the oracle and every validator see the same transaction.
+/// Serialize a Long as an ErgoTree `raw` constant: type code 0x05 (SLong)
+/// followed by a zigzag varint. The drain hunt's box marshalling accepts
+/// only `raw` registers, so a family that builds `Long`-typed ones produces
+/// boxes that can never reach the oracle.
+fn raw_long(v: i64) -> String {
+    let mut out = vec![0x05u8];
+    let mut z = ((v << 1) ^ (v >> 63)) as u64;
+    loop {
+        let mut b = (z & 0x7f) as u8;
+        z >>= 7;
+        if z != 0 {
+            b |= 0x80;
+        }
+        out.push(b);
+        if z == 0 {
+            break;
+        }
+    }
+    hex::encode(out)
+}
+
+/// Read a Long back out of a `raw` register, so observed register values on
+/// declared boxes join the family. Map-derived boxes carry raw hex, so
+/// without this the family sees none of them.
+fn raw_long_value(hex_str: &str) -> Option<i64> {
+    let bytes = hex::decode(hex_str).ok()?;
+    let (&tag, rest) = bytes.split_first()?;
+    if tag != 0x05 {
+        return None;
+    }
+    let (mut z, mut shift) = (0u64, 0u32);
+    for &b in rest {
+        z |= u64::from(b & 0x7f) << shift;
+        if b & 0x80 == 0 {
+            return Some(((z >> 1) as i64) ^ -((z & 1) as i64));
+        }
+        shift += 7;
+        if shift > 63 {
+            return None;
+        }
+    }
+    None
+}
+
+/// Realize the data inputs for a probe. `Verbatim` is the declared list;
+/// `Append` adds one attacker-owned box carrying the chosen `R4`. The added
+/// box is the attacker's own — it is not an oracle forgery, it is a box the
+/// attacker can create and point a script at when the script never binds
+/// which box it reads.
+fn realize_data_inputs(
+    req: &DrainRequest,
+    data: &DataVariant,
+    attacker_tree: &str,
+) -> Vec<ScenarioBox> {
+    let mut out = req.data_inputs.clone();
+    if let DataVariant::Append { r4 } = data {
+        let mut b = ScenarioBox {
+            value: 1,
+            ergo_tree: Some(attacker_tree.to_string()),
+            creation_height: 1,
+            ..Default::default()
+        };
+        b.registers.insert(
+            "R4".to_string(),
+            crate::TypedValue {
+                r#type: "raw".to_string(),
+                value: serde_json::json!(raw_long(*r4)),
+            },
+        );
+        out.push(b);
+    }
+    out
+}
+
 fn build_tx_request(
     req: &DrainRequest,
     realized_inputs: &[ScenarioBox],
     realized_outputs: &[ScenarioBox],
+    realized_data_inputs: &[ScenarioBox],
     probe_seq: usize,
 ) -> Result<(TxRequest, Vec<ScenarioBox>), SandboxError> {
-    let mut boxes = Vec::with_capacity(realized_inputs.len() + req.data_inputs.len());
+    let mut boxes = Vec::with_capacity(realized_inputs.len() + realized_data_inputs.len());
     let mut tx_inputs = Vec::with_capacity(realized_inputs.len());
     let mut first_input_id: Option<String> = None;
     for (i, b) in realized_inputs.iter().enumerate() {
@@ -2832,8 +3005,8 @@ fn build_tx_request(
         });
         boxes.push(bj);
     }
-    let mut data_inputs = Vec::with_capacity(req.data_inputs.len());
-    for (i, b) in req.data_inputs.iter().enumerate() {
+    let mut data_inputs = Vec::with_capacity(realized_data_inputs.len());
+    for (i, b) in realized_data_inputs.iter().enumerate() {
         let bj = box_json(b, &format!("drain|{probe_seq}|data|{i}"))?;
         let id = bj["boxId"].as_str().unwrap_or_default().to_string();
         data_inputs.push(TxInput {
@@ -2879,6 +3052,7 @@ fn witness_bundle(
     roles: &[DrainRole],
     realized_inputs: &[ScenarioBox],
     realized_outputs: &[ScenarioBox],
+    realized_data_inputs: &[ScenarioBox],
     tx_request: &TxRequest,
 ) -> WitnessBundle {
     let mut protocol_scenarios = Vec::new();
@@ -2901,7 +3075,7 @@ fn witness_bundle(
             self_index: Some(i),
             inputs: realized_inputs.to_vec(),
             outputs: realized_outputs.to_vec(),
-            data_inputs: req.data_inputs.clone(),
+            data_inputs: realized_data_inputs.to_vec(),
             context_vars: Default::default(),
             miner_pubkey: None,
             pre_header: None,
@@ -3405,6 +3579,7 @@ mod tests {
                         continue;
                     }
                     let shape = ShapeDesc {
+                        data: DataVariant::Verbatim,
                         edit: Some(if count == 0 {
                             DeclaredOutputEdit::Retree { output }
                         } else {
@@ -3467,7 +3642,9 @@ mod tests {
                         serde_json::to_value(&outs[2 - (1 - output)]).unwrap(),
                         serde_json::to_value(&req.outputs[1 - output].box_).unwrap()
                     );
-                    let (tx, _) = build_tx_request(&req, &inputs, &outs, 1).unwrap();
+                    let (tx, _) =
+                        build_tx_request(&req, &inputs, &outs, &req.data_inputs.clone(), 1)
+                            .unwrap();
                     assert!(
                         tx_check(&tx).unwrap().valid,
                         "sourced padding must conserve, including mint ids"
@@ -3561,6 +3738,7 @@ mod tests {
         assert!(phase1[1].tokens.is_empty());
 
         let shape = ShapeDesc {
+            data: DataVariant::Verbatim,
             edit: None,
             recreate: None,
             sinks: 0,
