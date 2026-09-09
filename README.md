@@ -1,9 +1,6 @@
 # ergo-forge
 
-The ErgoScript playground — build, write, read, audit, and test Ergo
-contracts on the same compiler and interpreter that run the Rust Ergo node
-([arkadianet/ergo](https://github.com/arkadianet/ergo)). No second
-interpreter, no second compiler: a verdict here is the consensus verdict.
+ergo-forge is an ErgoScript workbench for building contracts and inspecting deployed code through reproducible experiments on the Rust Ergo node's pinned compiler and execution engine. Its authoring and audit views share contracts, scenarios, and evidence; every result states whether it is a static observation, a synthetic experiment, or a transaction checked against an explicitly supplied state. It helps people check specific contract claims and investigate counterexamples. It is not a general security certification service, an autonomous vulnerability scanner, a wallet, or a protocol-design generator. New work must improve the fidelity, reproducibility, or interpretation of those experiments; more recipes, detectors, graph features, and search breadth do not qualify by themselves.
 
 Four ways in, one engine:
 
@@ -15,18 +12,18 @@ Four ways in, one engine:
   run, findings underlined in your source, spendability, scenarios, and test
   suites you can run in CI.
 - **Read** — for anyone: paste an address, see the contract in plain words
-  and as ErgoScript, what's fragile, who can spend it, and whether a
-  transaction you are about to sign would validate.
+  and as ErgoScript, static observations, sampled spending scenarios, and unsigned preflight
+  checks of selected transaction conditions; full node validation has not run.
 - **Play** — a sandbox chain in the browser: fund boxes under any
   contract, build transactions that spend them (secrets, data inputs,
-  tokens, registers), watch the real rules accept or refuse, advance the
+  tokens, registers), watch scenario reduction and balance checks accept or refuse, advance the
   height, and keep going with the boxes that came out.
 
 Layout:
 
 - [`ergo-sandbox/`](ergo-sandbox/) — the engine crate + `ergo-es` CLI:
   compile (with parameters and EIP-5 templates), decompile, round-trip,
-  audit, spend hunt, scenario eval, test suites, transaction validation,
+  audit, spend hunt, scenario eval, test suites, unsigned transaction preflight,
   cost hot-spots.
 - [`ergo-web/`](ergo-web/) — the HTTP service and the playground UI
   (`ui/`, vanilla JS, nothing loaded from a CDN). Optional explorer lookups
@@ -34,7 +31,7 @@ Layout:
 - [`examples/`](examples/) — 101 contracts (16 recipes, 6 protocol contracts and 7 basics written
   here, 79 real deployed contracts vendored from the node's corpus) and test
   suites.
-- [`docs/workbench-PLAN.md`](docs/workbench-PLAN.md) — the plan and the
+- [`docs/workbench-PLAN.md`](docs/workbench-PLAN.md) — the historical plan and the
   measured record of every phase; design records under
   `docs/superpowers/specs/`.
 
@@ -65,7 +62,7 @@ docker run --rm -p 127.0.0.1:8080:8080 ghcr.io/arkadianet/ergo-web:0.3.0
 
 Without `EXPLORER_URL` the service makes no outbound calls at all. With it,
 Read can fetch the real box behind an address (so the spend hunt answers for
-that box), Build can turn dates into heights, and transaction validation can
+that box), Build can turn dates into heights, and unsigned preflight can
 fetch the boxes it needs. See [`ergo-web/README.md`](ergo-web/README.md) for
 every endpoint and setting.
 
@@ -83,14 +80,19 @@ every endpoint and setting.
 | Can a keyless transaction **drain this contract set** over the shapes an attacker can build? | `ergo-es drain request.json` — labelled roles (`protected`/`companion`/`attacker`/`external`), a fixed shape, bounded enumeration of input permutations and a generic decoy family; the incident replay is the acceptance test (`examples/incidents/`) |
 | Does my contract pass in *this* spending context, and what does it cost? | `ergo-es eval`, `POST /api/v1/eval`, the reader's Scenario panel |
 | Can I work with files? | Open `.es`, `params.json`, `contract.test.json`; save a project zip the CLI runs unchanged; raw `.es` at `/api/v1/examples/{id}.es` |
-| I want to try a contract's whole life: fund it, spend it, spend what came out | **Play**: a sandbox chain in the browser over `POST /api/v1/play` — every input's script runs in the transaction's context, ERG and tokens must balance, outputs get real ids; "Play with it" from Build funds a box under the contract you just made |
-| Will this transaction validate, before I sign it? | `ergo-es validate-tx`, `POST /api/v1/validate-tx`, the Validate section in Read |
+| I want to try a contract's whole life: fund it, spend it, spend what came out | **Play**: a sandbox chain in the browser over `POST /api/v1/play` — every input's script runs in the transaction's context, ERG and tokens must balance, outputs get deterministic simulation IDs; scenario proofs use a supplied/default message; "Play with it" from Build funds a box under the contract you just made |
+| Does this unsigned transaction pass selected preflight checks? | `ergo-es validate-tx`, `POST /api/v1/validate-tx`, the Validate section in Read |
 | Do all my contract's paths still behave after a change? | `ergo-es test contract.test.json` (CI), `POST /api/v1/test`, the Tests panel |
 | Where does the cost go? | `ergo-es eval --hot-spots` (cost-trace build) |
 
-Every answer comes from the node's own compiler and reducer. Verification
-bars are measured on real corpora and pinned in CI (byte-exact round-trip
-floors, lint flag rates, the hunt tally, the stack budget).
+Compilation and scenario reduction use the pinned node engine. Static lints,
+recognition and structural matching do not consult the reducer. Preflight adds
+selected balance checks; it does not establish full node acceptance or future
+inclusion. Current result envelopes disclose their method, provenance limits,
+and `nodeValidated: false`. Static severity is review priority.
+
+The [governing roadmap](docs/ROADMAP.md) and [record-only scoreboard](docs/roadmap-metrics.json)
+separate recovery coverage, sampled preflight detection, and node-validated claims.
 
 Example scenario (`sigmaProp(HEIGHT > 100)` failing at height 99):
 
@@ -126,14 +128,17 @@ to every release alongside the container image.
 ## How much to trust it
 
 - **Compiler and reducer are the node's own.** The decompiler is graded by
-  byte-exact recompilation: 270 of 279 mainnet trees in the node's corpus,
-  332 of 344 trees from a live sample of recent blocks. Misses degrade to
+  byte-exact recompilation. Historical node-corpus measurements were 270 of
+  279 mainnet trees and 332 of 344 trees from a sampled set of blocks. The
+  current committed fixture inventory records 238/329 exact obtained trees
+  (339 rows including 10 initial compile failures); see the
+  [versioned scoreboard](docs/roadmap-metrics.json). Misses degrade to
   honest `<…>` placeholders and an audit over a partial tree says so.
 - **Real contracts, not toys.** 61 of the 79 deployed contracts in the
   gallery compile with auto-filled parameters; the rest are EIP-5 templates
   with non-literal defaults or files the reference parser also rejects.
-- **The spend hunt is a sample, not a proof.** A hit is a transaction anyone
-  can build; a miss says "not under these probes" and names the reason
+- **The spend hunt is a sample, not a proof.** A hit is a passing sampled scenario; canonical transaction
+  validation has not run; a miss says "not under these probes" and names the reason
   (synthetic SELF, missing data inputs).
 - **Positions are carets, not ranges.** Findings point at the start of the
   cited expression; the reader selects the whole expression by matching the
@@ -143,9 +148,10 @@ to every release alongside the container image.
   a box holding less than the fee is swept, tokens included. The inspect,
   compile and hunt answers say so with the estimated fee; a "burn" address
   is not an exception.
-- **Transaction validation checks scripts and balances, not signatures.** An
-  input that reduces to a sigma proposition is reported as a signature
-  needed.
+- **Unsigned preflight checks selected script and balance conditions.** An
+  input that reduces to a sigma proposition is reported as a signature needed.
+  Signatures and the full transaction pipeline are not validated. `preflightPassed`
+  is the result; `valid` remains its deprecated alias and never means node acceptance.
 
 CI enforces the verification bars on every PR, including the whole-corpus
 round-trip floors against the pinned node checkout. A `v*` tag publishes the
@@ -154,13 +160,8 @@ release.
 
 ## Status
 
-Phases P0–P4f are done (recon, engine, decompiler, public AST, audit lints,
-spend hunt, cost hot-spots, HTTP service and UI, playground with parameters
-and templates, test suites, chain lookups, Build mode, transaction
-validation); the node-side P5-A/P5-B (source positions and the source map)
-landed and are consumed. See the plan for the measured record of each.
-Remaining: register fuzzing for the hunt, cross-branch reasoning in the
-lint, ranges instead of carets, a wallet step in Build.
+The only active build queue is [docs/ROADMAP.md](docs/ROADMAP.md). Earlier phase
+records are historical; their remaining-work lists authorize no new work.
 
 Engine crates are consumed from `arkadianet/ergo` via pinned git
 revisions (`Cargo.toml`) — bump deliberately, the node is the oracle.
@@ -289,3 +290,23 @@ Library callers compile sources through `compile::compile_with_params`, then pas
 `CompileOutput::tree_bytes` and deployed bytes to `identity::match_trees`. As with
 other deep-tree parser consumers, use `decompile::with_large_stack` on hosts with
 small thread stacks.
+
+### Authority rules
+
+Use the exact pinned compiler/reducer; no second acceptance engine. A property
+claim requires full pinned node validation **and** a versioned violated property;
+today there are zero such producers. Premises must survive export before any
+promotion; unsupported semantics fail closed for promotion. A miss never means
+safe, truncation stays visible, and third-party audit material stays private.
+
+Source inference uses synthetic constants ([ingestion](docs/ingestion.md)).
+A complete lift measures recovery coverage, not audit completeness. Conditional
+[contract-set discharge](docs/audit-context.md) depends on the supplied co-execution.
+`same_program_with_differing_constants` is [structural matching](ergo-sandbox/src/identity.rs#L18),
+not behavioral equivalence or deployment identity.
+
+Triage records use `formatVersion: 2`: `reproduced-in-scenario` means the sampled
+objective passed unsigned preflight replay, not that its associated lint caused
+a flaw. `consensusReducerConsulted` records a method call, not node validation.
+Saved v1 `confirmed` records must be replayed via their embedded request; no
+verified-record import exists. See [scenario reproduction](examples/incidents/README.md).

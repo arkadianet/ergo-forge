@@ -57,6 +57,8 @@ pub struct ConstantDifference {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct MatchReport {
+    #[serde(flatten)]
+    pub claim: crate::claim::ClaimMetadata,
     pub verdict: MatchVerdict,
     pub byte_identical: bool,
     pub left_version: u8,
@@ -111,6 +113,7 @@ pub fn match_trees(left: &[u8], right: &[u8]) -> Result<MatchReport, SandboxErro
         }
     }
     Ok(MatchReport {
+        claim: crate::claim::ClaimMetadata::STATIC,
         verdict: if matching_labels != total_positions {
             MatchVerdict::DifferentProgram
         } else if constant_differences.is_empty() {

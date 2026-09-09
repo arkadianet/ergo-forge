@@ -22,6 +22,8 @@ pub struct PointRequest {
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PointResponse {
+    #[serde(flatten)]
+    claim: ergo_sandbox::claim::ClaimMetadata,
     /// Compressed 33-byte hex.
     pub point: String,
     /// The generator, for scripts that spell it out.
@@ -60,6 +62,10 @@ pub async fn point(ApiJson(req): ApiJson<PointRequest>) -> Result<Json<PointResp
         (None, None)
     };
     Ok(Json(PointResponse {
+        claim: ergo_sandbox::claim::ClaimMetadata::legacy(
+            "key-derivation",
+            "caller-supplied key material; no transaction checked",
+        ),
         point,
         generator,
         address,

@@ -5,7 +5,7 @@
  "detectionRate": 0.8,
  "provenMutants": 5,
  "found": 4,
- "denominatorNote": "proven = a hand-built KEYLESS drain witness validated by txcheck before the hunt ran. M1-M3 were initially misproven (their witnesses validated under txcheck but carry needsProof on the protected input \u2014 the residual requires the beneficiary's/receiver's key): reclassified as keyed-insider, outside the hunt's attacker model, never in the denominator.",
+ "denominatorNote": "proven = an independently supplied KEYLESS witness passing unsigned txcheck preflight before the hunt. M1-M3 are excluded as keyed-insider, not disproven defects. No full-node-validated execution is counted here.",
  "caps": {
   "maxProbes": 50000,
   "maxPermutations": 120,
@@ -701,22 +701,22 @@
  ],
  "missTable": {
   "out-of-family": [
-   "M5",
-   "M6",
-   "M7 \u2014 missing fixed-output re-pad / re-tree axis; M7 also has a deferred role mismatch (REVIEW-FINDINGS.md), so axis coverage alone does not establish detection."
+   "M5 \u2014 the current proven miss; existing output edits cannot express the required token replacement. M6 and M7 are now attributable detections."
   ],
   "keyed-insider (out of attacker model)": [
    "M1",
    "M2",
-   "M3 \u2014 residuals require the beneficiary's/receiver's key; the hunt refuses needsProof on protected inputs by contract. A keyed-insider hunt is a phase-3+ attacker-model extension, not a coverage fix."
+   "M3 \u2014 independently classified keyed-insider witnesses; M1 search probes are invalid, not evidence of key refusal."
   ],
-  "cap-truncation": [],
+  "cap-truncation": [
+   "M7 \u2014 capped at 50000, but detected; not a cap-caused miss."
+  ],
   "role-labelling": [
-   "M7 \u2014 swap is companion in the executable template but protected in the role record; deferred decision, no role changes."
+   "M7 \u2014 historical role discrepancy remains a premise limitation; current executable rows detect it. No role change in P00."
   ],
   "arithmetic": [],
   "invalid fixture (outside proven denominator)": [
-   "M1 \u2014 868 invalid synthesis-on probes on both mutant and control; non-hex synthetic token id. Witness independently classifies as keyed-insider."
+   "M1 \u2014 1976 invalid synthesis-on probes on both mutant and control; independently classified keyed-insider."
   ]
  },
  "negativeControls": [
@@ -1304,12 +1304,12 @@
    "verdict": "drainable (synthesis on, 4512 probes)",
    "what": "the winning probe has the attacker OVERPAY the seller (20M of the attacker's own nanoERG into the seller's P2PK box) so `paid` passes legitimately and the stock leaves the sale box with it. The seller is fully paid; the attacker loses money. No exploit.",
    "why": "the leak objective counts protected value that LEFT the protected box, sanctioned only at the free payee's DECLARED amounts, and never subtracts what the attacker SPENT. An overpayment that empties a protected box into a protocol-designated payee scores as a drain.",
-   "disposition": "ESCALATED, not fixed: attacker-cost accounting is the roadmap's parked 'pricing / worth-weighted objectives; economic probes \u2014 separate spec' (phase 2 spec, non-goals). This firing is the concrete evidence for that spec. The fixture is untouched.",
-   "consequence": "M4's `found` is confounded: the mutant IS really exploitable (the 1-nanoERG purchase is a genuine keyless theft and is in family \u2014 the hunt scored 710 hits), but its drainable verdict cannot be distinguished from overpayment noise without a cost-aware objective. Recorded as rawDrainable=true, confounded=true, attributable=false.",
+   "disposition": "HISTORICAL custody-v1 escalation, superseded by recognized-attacker-receipts-v1. Preserved explanation of the former control firing; current rows are authoritative.",
+   "consequence": "HISTORICAL: M4 was confounded under the former custody objective. Current rows record an attributable detection and a clean original under recognized-attacker-receipts-v1; do not use this historical narrative as current authority.",
    "mutant": "M4"
   }
  ],
- "negativeControlsNote": "Every original runs in both configurations, asserted in the harness; a drainable original must be pre-recorded in escalatedFindings (M4) or the run fails. Six original verdicts are notUnderProbes, but M1 has 868 invalid synthesis-on probes and supplies no evaluated-script evidence. M4 remains the escalated, confounded firing.",
+ "negativeControlsNote": "All 8 originals have notunderprobes verdicts in both recorded configurations. M1 has 1976 invalid synthesis-on probes and supplies no evaluated-script evidence. The M4 escalation below is historical custody-v1 evidence, not a current control firing.",
  "harnessValidity": {
   "knownDetectableControl": {
    "id": "C-incident",
@@ -1323,7 +1323,7 @@
  "attributableDetections": 4,
  "rawDrainableOnProven": 4,
  "confounded": [],
- "foundNote": "raw drainable verdicts on proven mutants: see rawDrainableOnProven (1, all confounded)",
+ "foundNote": "Current rows: 4 raw drainable verdicts on proven mutants, 4 attributable detections, 0 confounded. These are preflight results, not node-validated claims.",
  "rejectionAccounting": "Rejections are recorded only for synthesisOn. Invalid takes precedence over conservation, then missingKey, then script. Accepted probes with no measured leak are neither hits nor rejections. Deterministic counts are asserted; wall-clock timings are diagnostic only.",
  "baselineRepairs": {
   "M5": {
@@ -1339,7 +1339,7 @@
     },
     "verdict": "notunderprobes"
    },
-   "note": "Same before/after counts for mutant and negative control. Fixed the corpus box_json adapter to emit equivalent raw registers for ScenarioBox and txcheck, and restored the template successor from 0 to 10000000000 nanoERG. Probe count falls by 1200; conservation refusals fall by 768 and script refusals by 518; accepted no-hit probes rise from 0 to 86."
+   "note": "HISTORICAL fixture-repair measurement (not the current synthesis baseline): Same before/after counts for mutant and negative control. Fixed the corpus box_json adapter to emit equivalent raw registers for ScenarioBox and txcheck, and restored the template successor from 0 to 10000000000 nanoERG. Probe count falls by 1200; conservation refusals fall by 768 and script refusals by 518; accepted no-hit probes rise from 0 to 86."
   },
   "M7": {
    "oldReportedScriptRejections": 29448,
@@ -1355,7 +1355,7 @@
     },
     "verdict": "notunderprobes"
    },
-   "note": "Before the fixture repair, all 29448 probes were invalid on both mutant and control, previously misreported as script rejections. Template input/output references now use $amm-pool. The witness already used $amm-pool in both places. Probe counts, hits, verdicts, and caps are unchanged; corrected rejection counts are recorded in the rows above. Roles and objective are unchanged."
+   "note": "HISTORICAL fixture-repair measurement (not the current synthesis baseline): Before the fixture repair, all 29448 probes were invalid on both mutant and control, previously misreported as script rejections. Template input/output references now use $amm-pool. The witness already used $amm-pool in both places. Probe counts, hits, verdicts, and caps are unchanged; corrected rejection counts are recorded in the rows above. Roles and objective are unchanged."
   }
  }
 }

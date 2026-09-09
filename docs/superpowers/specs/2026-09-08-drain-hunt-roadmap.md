@@ -1,3 +1,10 @@
+# Historical record — superseded
+
+**The governing plan is [../../ROADMAP.md](../../ROADMAP.md).** All build lists and authority
+claims below are historical, not active instructions. In particular, txcheck is
+unsigned preflight, not node acceptance. P00 renames v1 `confirmed` to
+`reproduced-in-scenario`; measured historical records retain their original labels.
+
 # Drain hunt — roadmap beyond phase 2
 
 > Planning record, 2026-09-08. Sits above the per-phase design records
@@ -363,6 +370,10 @@ pieces, in order:
 through the pipeline rather than around it.
 
 ## Cross-cutting invariants
+
+**Superseded authority:** use the [active authority rules](../../../README.md#authority-rules)
+and [governing roadmap](../../ROADMAP.md). The original oracle invariant below
+is retained only as history; replaying txcheck does not establish node acceptance.
 
 These hold in every phase; a change that breaks one is a redesign, not an
 increment.

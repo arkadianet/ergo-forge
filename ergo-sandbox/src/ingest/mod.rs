@@ -72,6 +72,8 @@ pub enum Status {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct ContractReport {
+    #[serde(flatten)]
+    pub claim: crate::claim::ClaimMetadata,
     pub path: PathBuf,
     pub status: Status,
     /// Full error, including compiler position and source line when available.
@@ -101,6 +103,7 @@ pub struct IngestResult {
 /// heuristics or a search for whichever value happens to compile.
 pub fn ingest_source(source: &str, options: &IngestOptions) -> IngestResult {
     let mut report = ContractReport {
+        claim: crate::claim::ClaimMetadata::INGEST,
         path: PathBuf::new(),
         status: Status::NotCompiled,
         reason: None,
@@ -316,6 +319,8 @@ fn placeholder(name: &str, t: &str) -> Result<TypedValue, String> {
 
 #[derive(Debug, Serialize)]
 pub struct BatchReport {
+    #[serde(flatten)]
+    pub claim: crate::claim::ClaimMetadata,
     pub contracts: Vec<ContractReport>,
     pub compiled: usize,
     pub not_compiled: usize,
@@ -334,6 +339,7 @@ pub fn ingest_directory(root: &Path, options: &IngestOptions) -> Result<BatchRep
         let mut report = match std::fs::read_to_string(&path) {
             Ok(source) => ingest_source(&source, options).report,
             Err(e) => ContractReport {
+                claim: crate::claim::ClaimMetadata::INGEST,
                 path: PathBuf::new(),
                 status: Status::NotCompiled,
                 reason: Some(format!("read error: {e}")),
@@ -354,6 +360,7 @@ pub fn ingest_directory(root: &Path, options: &IngestOptions) -> Result<BatchRep
         .count();
     let not_compiled = contracts.len() - compiled;
     Ok(BatchReport {
+        claim: crate::claim::ClaimMetadata::INGEST,
         contracts,
         compiled,
         not_compiled,

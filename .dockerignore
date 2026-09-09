@@ -4,3 +4,6 @@ logs
 docs
 *.md
 !ui/**
+
+# Test-only DOM dependency is not part of the browser distribution.
+ui/node_modules

@@ -1,12 +1,10 @@
-//! Transaction validation: "will this transaction validate?" — every input's
-//! script run in the real context (SELF at its index, all inputs in order,
-//! all outputs, data inputs, that input's extension), plus the
-//! transaction-level checks the node makes before scripts: ERG and token
-//! conservation (one new token may be minted with the first input's id).
+//! Unsigned preflight: run selected script reductions and balance checks on
+//! supplied/default scenario context. This is a candidate filter, not the full
+//! node transaction-validation pipeline or a prediction of inclusion.
 //!
-//! Signatures are not checked — the transaction is unsigned by design. An
-//! input whose script reduces to a sigma proposition is reported as needing
-//! a signature and does not invalidate the transaction.
+//! Signatures are not checked. A residual sigma proposition records a needed
+//! signature and can still pass preflight. Box references, IDs and context are
+//! caller-supplied/synthetic; no node-validated claim is produced here.
 
 use std::collections::BTreeMap;
 
@@ -73,12 +71,16 @@ pub struct InputCheck {
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TxCheck {
-    /// Every script passes or needs a signature, and the balances hold.
+    #[serde(flatten)]
+    pub claim: crate::claim::ClaimMetadata,
+    /// Selected script/balance checks passed; full node validation has not run.
+    pub preflight_passed: bool,
+    /// Deprecated compatibility alias for `preflight_passed`, never node acceptance.
     pub valid: bool,
     /// Inputs whose script reduced to a sigma proposition.
     pub signatures_needed: usize,
     pub inputs: Vec<InputCheck>,
-    /// Human-readable reasons the transaction would be rejected.
+    /// Human-readable reasons preflight failed.
     pub problems: Vec<String>,
     pub erg_in: u64,
     pub erg_out: u64,
@@ -86,7 +88,7 @@ pub struct TxCheck {
 }
 
 /// Run the check. Errors are marshalling only (a request no check can be
-/// made of); a rejected transaction is a `TxCheck` with `valid: false`.
+/// made of); a failed preflight is a `TxCheck` with `preflightPassed: false` (`valid` alias).
 pub fn check(req: &TxRequest) -> Result<TxCheck, SandboxError> {
     let network_name = match req.network.as_deref() {
         Some("testnet") => Some("testnet".to_string()),
@@ -312,6 +314,8 @@ pub fn check(req: &TxRequest) -> Result<TxCheck, SandboxError> {
 
     let valid = problems.is_empty();
     Ok(TxCheck {
+        claim: crate::claim::ClaimMetadata::PREFLIGHT,
+        preflight_passed: valid,
         valid,
         signatures_needed,
         inputs,

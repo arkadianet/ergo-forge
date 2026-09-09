@@ -54,6 +54,7 @@ pub async fn inspect(
     let (completeness, raw_placeholders, truncated) = dto::completeness_parts(&report);
 
     Ok(Json(dto::InspectResponse {
+        claim: ergo_sandbox::claim::ClaimMetadata::STATIC,
         rent: dto::rent_for(&bytes, None),
         plain: plain.paths,
         plain_complete: plain.complete,

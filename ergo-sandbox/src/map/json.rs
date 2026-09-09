@@ -27,6 +27,13 @@ pub const FORMAT_VERSION: u32 = 1;
 #[must_use]
 pub fn canonical(m: &ProtocolMap) -> Value {
     let mut root = Map::new();
+    root.extend(
+        serde_json::to_value(crate::claim::ClaimMetadata::STATIC)
+            .expect("static labels serialize")
+            .as_object()
+            .expect("labels are an object")
+            .clone(),
+    );
     root.insert("formatVersion".into(), json!(FORMAT_VERSION));
     root.insert(
         "seed".into(),
@@ -170,6 +177,7 @@ fn finding_json(m: &ProtocolMap, f: &SetFinding) -> Value {
         "lint": f.finding.lint,
         "triage": f.finding.triage,
         "severity": f.finding.severity.label(),
+        "severityMeaning": "review-priority",
         "from": node_ref(m, &f.from),
         "to": target_json(m, &f.to),
         "message": f.finding.message,

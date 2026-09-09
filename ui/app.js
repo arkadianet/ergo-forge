@@ -175,7 +175,7 @@ function render(r) {
 
     const chip = document.createElement("span");
     chip.className = `chip ${f.severity}`;
-    chip.textContent = f.severity.toUpperCase();
+    chip.textContent = `${f.severity.toUpperCase()} review priority`;
     li.appendChild(chip);
 
     const lint = document.createElement("span");
@@ -208,13 +208,6 @@ function render(r) {
   $("no-findings").hidden = r.findings.length > 0;
   $("result").hidden = false;
 }
-
-const HUNT_VERDICTS = {
-  spendableByAnyone: ["Spendable by anyone", "bad"],
-  movableByAnyone: ["Movable by anyone (funds stay in the contract)", "warn"],
-  requiresProof: ["Requires a proof — see who below", "ok"],
-  notUnderProbes: ["Not spendable under these probes (not a proof of safety)", "neutral"],
-};
 
 async function huntFor(input, network) {
   const generation = ++huntGeneration;
@@ -277,12 +270,8 @@ async function huntFor(input, network) {
 }
 
 function renderHunt(h) {
-  const [label, cls] = HUNT_VERDICTS[h.verdict] || [h.verdict, "neutral"];
-  const verdictEl = $("hunt-verdict");
-  verdictEl.textContent = label;
-  verdictEl.className = `hunt-verdict ${cls}`;
+  ClaimLabels.renderHunt(h, $("hunt-verdict"), $("hunt-synthetic"));
   const undeterminedOnSynthetic = h.selfSynthetic && h.verdict === "notUnderProbes";
-  $("hunt-synthetic").hidden = !undeterminedOnSynthetic;
   // The real box is the fix; put the form in front of the user.
   if (undeterminedOnSynthetic) $("self-box").closest("details").open = true;
 
@@ -679,7 +668,7 @@ function renderCompiled(c) {
     const li = document.createElement("li");
     li.dataset.severity = f.severity;
     const chip = document.createElement("span");
-    chip.className = `chip ${f.severity}`; chip.textContent = f.severity.toUpperCase();
+    chip.className = `chip ${f.severity}`; chip.textContent = `${f.severity.toUpperCase()} review priority`;
     const lint = document.createElement("span"); lint.className = "lint"; lint.textContent = f.lint;
     const msg = document.createElement("div"); msg.textContent = f.message;
     const snip = document.createElement("code"); snip.className = "snippet"; snip.textContent = f.snippet;
@@ -714,11 +703,9 @@ async function huntTree(treeHex, network) {
       body: JSON.stringify({ input: treeHex, network }),
     });
     const h = await res.json();
-    const [label, cls] = HUNT_VERDICTS[h.verdict] || [h.verdict, "neutral"];
     const el = $("c-hunt");
-    el.textContent = label + (h.selfSynthetic && h.verdict === "notUnderProbes" ? " — SELF was synthetic; use Read mode with a real box for more" : "");
-    el.className = `hunt-verdict ${cls}`;
-    if (h.residuals && h.residuals.length) el.textContent += ` · requires: ${h.residuals.join(" | ")}`;
+    ClaimLabels.renderHunt(h, el);
+    if (h.residuals && h.residuals.length) el.textContent += ` · observed proof requirements: ${h.residuals.join(" | ")}`;
   } catch (e) {
     $("c-hunt").textContent = `Hunt failed: ${e}`;
   }
@@ -1074,7 +1061,7 @@ $("wizard").addEventListener("submit", async (e) => {
     $("build-address").textContent = body.p2s;
     $("build-tree").textContent = body.treeHex;
     renderQr(body.p2s);
-    $("build-hunt").textContent = "Checking who can spend it…";
+    $("build-hunt").textContent = "Sampling spending scenarios…";
     status.hidden = true;
     buildStep(3);
     const hunt = await (await fetch("/api/v1/hunt", {
@@ -1090,12 +1077,9 @@ $("wizard").addEventListener("submit", async (e) => {
       "nft-sale": "Anyone who pays you the price and the creator the royalty in one transaction takes the token — no key needed. Only you can cancel.",
       "htlc": "The receiver can claim before the deadline by revealing the secret phrase; after it, only you can take the funds back. Share the hash, never the phrase, until the other side of the swap is locked.",
     }[recipe.name];
-    $("build-hunt").textContent = special || {
-      requiresProof: "Only the people you named can spend from this address, and only under the rules above. Nobody else can.",
-      spendableByAnyone: "Warning: anyone could spend from this address as it stands. Check your answers before sending anything.",
-      movableByAnyone: "Anyone can move the funds, but only back into this same contract.",
-      notUnderProbes: recipe.name === "burn" ? "No transaction can ever satisfy this contract; only storage rent (below) can ever move anything out of it." : "Nobody could spend it in our checks.",
-    }[hunt.verdict] || "";
+    ClaimLabels.renderHunt(hunt, $("build-hunt"));
+    if (special) $("build-hunt").textContent += ` · Recipe description (static): ${special}`;
+
   } catch (err) {
     status.textContent = `Something went wrong: ${err}`;
   } finally {
@@ -1753,7 +1737,7 @@ $("validate-tx").addEventListener("click", async () => {
   let req;
   try { req = JSON.parse($("txjson").value); } catch (e) { status.textContent = `JSON does not parse: ${e.message}`; status.hidden = false; return; }
   if (req && req.inputs && !req.tx) req = { tx: req };
-  status.textContent = "Validating…"; status.hidden = false;
+  status.textContent = "Running preflight…"; status.hidden = false;
   $("vtx-result").hidden = true;
   try {
     const res = await fetch("/api/v1/validate-tx", {
@@ -1762,10 +1746,7 @@ $("validate-tx").addEventListener("click", async () => {
     const body = await res.json();
     if (!res.ok) { status.textContent = `Error: ${(body.error && body.error.message) || res.status}`; return; }
     const v = $("vtx-verdict");
-    v.textContent = body.valid
-      ? `Would validate — ${body.signaturesNeeded} signature(s) needed. ERG in ${body.ergIn}, out ${body.ergOut}, at height ${body.height}.`
-      : `Would be rejected. ERG in ${body.ergIn}, out ${body.ergOut}, at height ${body.height}.`;
-    v.className = `hunt-verdict ${body.valid ? "ok" : "bad"}`;
+    ClaimLabels.renderPreflight(body, v);
     const probs = $("vtx-problems"); probs.textContent = "";
     for (const p of body.problems) { const li = document.createElement("li"); li.textContent = p; probs.appendChild(li); }
     const tb = $("vtx-rows"); tb.textContent = "";
@@ -2623,12 +2604,9 @@ $("map-export").addEventListener("click", () => {
 for (const id of ["map-input", "map-kind", "map-depth", "map-nodes"]) $(id).addEventListener(id === "map-input" ? "input" : "change", invalidateMap);
 
 
-// Static findings explicitly disclose that no consensus confirmation ran.
+// Static review priority and scenario reproduction never imply node acceptance.
 function appendTriage(li, finding) {
   const note = document.createElement("div");
-  const triage = finding.triage;
-  note.textContent = triage
-    ? `${triage.state}: ${triage.explanation}`
-    : "unconfirmed: Static finding only; the consensus reducer has not been consulted.";
+  ClaimLabels.renderTriage(finding.triage, note);
   li.appendChild(note);
 }

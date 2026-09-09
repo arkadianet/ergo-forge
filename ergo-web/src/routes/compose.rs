@@ -25,6 +25,8 @@ pub struct ComposeRequest {
 
 #[derive(Serialize)]
 pub struct ComposeResponse {
+    #[serde(flatten)]
+    pub claim: ergo_sandbox::claim::ClaimMetadata,
     pub source: String,
     pub params: Vec<ergo_sandbox::compile::ParamNeed>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -53,6 +55,7 @@ pub async fn compose_route(
         _ => None,
     };
     Ok(Json(ComposeResponse {
+        claim: composed.claim,
         source: composed.source,
         params: composed.params,
         suite: composed.suite,

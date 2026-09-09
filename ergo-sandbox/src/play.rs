@@ -3,7 +3,9 @@
 //! context (`selfIndex`, all inputs, outputs, data inputs, that input's
 //! context variables and secrets), ERG and tokens must balance (one new
 //! token named after the first input may be minted), and the outputs come
-//! back with the ids the chain would give them. The state itself lives
+//! back with deterministic simulation IDs. Scenario proofs use a supplied/default
+//! message, not canonical transaction signing bytes. Full node validation has
+//! not run. The state itself lives
 //! with the caller: the request carries the boxes, the response the new
 //! ones. Nothing here touches a network.
 
@@ -65,6 +67,8 @@ pub struct PlayInputResult {
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlayResult {
+    #[serde(flatten)]
+    pub claim: crate::claim::ClaimMetadata,
     pub ok: bool,
     pub tx_id: String,
     pub inputs: Vec<PlayInputResult>,
@@ -127,8 +131,8 @@ pub fn apply(req: &PlayRequest) -> Result<PlayResult, SandboxError> {
         }
     }
 
-    // A deterministic transaction id for the sandbox: the inputs, the
-    // height and the outputs' bytes are what a real id commits to.
+    // A deterministic simulation ID, not the node's canonical transaction ID.
+    // Preserve this legacy encoding so saved Play chains remain reproducible.
     let tx_id: [u8; 32] = {
         let mut m = Vec::new();
         for b in &inputs {
@@ -243,6 +247,7 @@ pub fn apply(req: &PlayRequest) -> Result<PlayResult, SandboxError> {
     }
     let ok = all_ok && problems.is_empty();
     Ok(PlayResult {
+        claim: crate::claim::ClaimMetadata::SIMULATION,
         ok,
         tx_id: hex::encode(tx_id),
         inputs: results,

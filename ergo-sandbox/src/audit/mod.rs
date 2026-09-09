@@ -29,10 +29,10 @@ const LINTS: &[fn(&Node) -> Vec<Finding>] = &[
     lints::trust_assumptions,
 ];
 
-/// Whether the audit saw the whole contract.
+/// Recovery coverage of the lifted representation, not property/audit completeness.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub enum Completeness {
-    /// Every construct lifted; findings cover the whole tree.
+    /// Every construct lifted; the fixed static observations ran over that recovery.
     Complete,
     /// The lift left raw placeholders or hit the depth ceiling. Part of the
     /// contract was not analysed — absence of findings proves nothing.

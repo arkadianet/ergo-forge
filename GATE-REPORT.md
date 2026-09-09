@@ -1,3 +1,10 @@
+# Historical #95 / triage v1 report
+
+This report records the pre-P00 implementation at `ee4ac6a`. Its `confirmed`
+label meant scenario reproduction through txcheck, not full node validation or
+lint causation. Current v2 records use `reproduced-in-scenario`; see
+[ROADMAP.md](docs/ROADMAP.md#p00--amend-95-and-make-all-current-claims-truthful).
+
 # Finding confirmation gate
 
 Implemented on `feat/gate`; offline analysis only.

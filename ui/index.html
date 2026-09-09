@@ -302,13 +302,14 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
 
       <h2>Spendability</h2>
       <p class="hint">Can someone with no key spend this box? Six probes on the
-         consensus reducer, no proof, no context variables. A hit is real; a
-         miss only means "not under these probes".</p>
+         consensus reducer, no proof, no context variables. A hit is a passing sampled scenario; full node validation has not run.
+         A miss only means "not under these probes".</p>
       <p id="hunt-verdict" class="hunt-verdict"></p>
       <p id="hunt-rent" class="hint"></p>
       <p id="hunt-synthetic" class="hint" hidden>SELF was synthetic (no
          registers, value 0) — register reads error out. Describe the real box
-         below and re-run for a real answer.</p>
+         below and re-run its scenario; full node validation has not run.</p>
+      <p class="hint">Residual proof requirements observed under these probes; not an exhaustive list of spenders.</p>
       <ul id="hunt-residuals" class="residuals"></ul>
       <details>
         <summary>Probes</summary>
@@ -490,6 +491,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
   <script src="vendor/qrcode.min.js"></script>
   <script src="vendor/blake2b.js"></script>
   <script src="vendor/sha256.js"></script>
+  <script src="claim-labels.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

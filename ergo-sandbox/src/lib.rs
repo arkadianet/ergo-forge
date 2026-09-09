@@ -44,6 +44,7 @@
 pub mod audit;
 pub mod avl;
 pub mod box_build;
+pub mod claim;
 pub mod compile;
 pub mod compose;
 pub mod decompile;

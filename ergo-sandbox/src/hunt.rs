@@ -1,12 +1,13 @@
 //! The spend hunt: **"can someone who holds no key spend this box?"**
 //!
 //! Bounded scenario sampling over the sandbox evaluator. Each probe is a
-//! full consensus reduction of the tree with **no proof and no context
+//! node-engine scenario reduction of the tree with **no proof and no context
 //! variables** — that is what "anyone" means — varying only the two things
 //! an attacker controls freely: the spending height and the outputs.
 //!
-//! A hit is real: the probe's context is a transaction anyone can build. A
-//! miss says only "not under these probes" — see [`Hunt::self_synthetic`].
+//! A hit is a passing sampled scenario; canonical transaction validation has
+//! not run. A miss says only "not under these probes". Synthetic SELF applies
+//! to positive and negative results alike — see [`Hunt::self_synthetic`].
 //!
 //! Design record: `docs/superpowers/specs/2026-09-02-p3b-spend-hunt-design.md`.
 
@@ -29,10 +30,10 @@ pub const DEFAULT_BASE_HEIGHT: u32 = 1_500_000;
 #[serde(rename_all = "camelCase")]
 pub enum OutputShape {
     /// One box with SELF's value and tokens, guarded by `sigmaProp(true)`:
-    /// the funds leave the contract. A pass here means *stealable*.
+    /// the sampled output receives the funds. Canonical validation has not run.
     Attacker,
     /// One box copying SELF entirely (tree, value, tokens, registers): the
-    /// funds stay in the contract. A pass here means *movable by anyone*.
+    /// funds stay in the contract in this sample.
     Preserve,
 }
 
@@ -76,13 +77,13 @@ pub struct Probe {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum HuntVerdict {
-    /// An attacker-output probe passed: anyone can take the funds.
+    /// An attacker-output sample passed without a proof; legacy wire name retained.
     SpendableByAnyone,
-    /// Only preserve-output probes passed: anyone can re-spend the box back
+    /// Only preserve-output samples passed: the sampled output pays back
     /// into the same contract. Often by design (refresh boxes, oracle pools).
     MovableByAnyone,
     /// Nothing passed; at least one probe reduced to a sigma proposition.
-    /// [`Hunt::residuals`] says who can spend.
+    /// [`Hunt::residuals`] records observed proof requirements, not all possible spenders.
     RequiresProof,
     /// Every probe failed or errored. Explicitly *not* "safe".
     NotUnderProbes,
@@ -92,6 +93,8 @@ pub enum HuntVerdict {
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Hunt {
+    #[serde(flatten)]
+    pub claim: crate::claim::ClaimMetadata,
     /// The aggregate verdict.
     pub verdict: HuntVerdict,
     /// Every probe, in the order run.
@@ -99,8 +102,7 @@ pub struct Hunt {
     /// Distinct residual propositions across `needsProof` probes.
     pub residuals: Vec<String>,
     /// True when no `self_box` was supplied, so SELF has no registers and
-    /// value 0. A `notUnderProbes` verdict with this set means "supply the
-    /// real box before drawing a conclusion".
+    /// value 0. Every verdict with this set describes synthetic SELF.
     pub self_synthetic: bool,
 }
 
@@ -236,6 +238,14 @@ pub fn hunt(tree_bytes: &[u8], opts: &HuntOptions) -> Result<Hunt, SandboxError>
     };
 
     Ok(Hunt {
+        claim: crate::claim::ClaimMetadata::legacy(
+            "bounded-scenario-sampling",
+            if self_synthetic {
+                "synthetic SELF; caller-supplied/default context"
+            } else {
+                "caller-supplied SELF and data inputs; default/generated scenario material"
+            },
+        ),
         verdict,
         probes,
         residuals,

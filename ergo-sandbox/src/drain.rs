@@ -10,8 +10,9 @@
 //! transaction shape, whether any arrangement the attacker controls — input
 //! order, decoy box contents, free-payee recipients, drained successors, and
 //! (phase 2) invented outputs — extracts value. The consensus reducer
-//! ([`crate::txcheck::check`]) is the only oracle: a hit is a transaction
-//! anyone can build and get mined.
+//! is invoked through unsigned preflight ([`crate::txcheck::check`]), the
+//! candidate filter. A hit is conditional on declared roles, protocolNfts and
+//! objective; canonical transaction validation has not run.
 //!
 //! The hunt enumerates a bounded space and does not search:
 //!
@@ -24,7 +25,7 @@
 //! - **payout construction**, verbatim or *drain mode*: successors of
 //!   protected boxes drop to a minimal keep-value and one token of each id,
 //!   and the first free-payee output receives everything else, with exact
-//!   conservation so the probe is a mineable transaction;
+//!   conservation for the preflight candidate;
 //! - **output synthesis** (phase 2, opt-in via the request's `synthesis`
 //!   block): blind re-treeing or sourced prefix padding of one declared
 //!   fixed-payee output, companion re-creations with padded token layouts (fillers
@@ -555,11 +556,13 @@ pub struct SynthesisCaps {
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DrainReport {
+    #[serde(flatten)]
+    pub claim: crate::claim::ClaimMetadata,
     pub verdict: DrainVerdict,
     pub objective_version: &'static str,
     pub objective_policy: Option<ObjectivePolicy>,
     pub attacker_public_keys: Vec<String>,
-    /// First accepted transaction, including zero-score results for review.
+    /// First preflight-passing candidate, including zero-score results for review.
     pub first_accounting: Option<DrainAccounting>,
     /// Probes evaluated (post-deduplication).
     pub probes_run: usize,
@@ -678,6 +681,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
     }
     if !shape_errors.is_empty() {
         return Ok(DrainReport {
+            claim: crate::claim::ClaimMetadata::legacy("unsigned-preflight", "caller-declared contract set, roles, protocolNfts and objective; generated scenario material; signatures not checked"),
             verdict: DrainVerdict::InvalidShape,
             objective_version: "recognized-attacker-receipts-v1",
             objective_policy: req.objective.clone(),
@@ -1230,6 +1234,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
         DrainVerdict::NotUnderProbes
     };
     Ok(DrainReport {
+        claim: crate::claim::ClaimMetadata::legacy("unsigned-preflight", "caller-declared contract set, roles, protocolNfts and objective; generated scenario material; signatures not checked"),
         verdict,
         objective_version: "recognized-attacker-receipts-v1",
         objective_policy: req.objective.clone(),

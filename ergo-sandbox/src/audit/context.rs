@@ -76,6 +76,8 @@ pub struct ContextFinding {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct ContextAudit {
+    #[serde(flatten)]
+    pub claim: crate::claim::ClaimMetadata,
     pub findings: Vec<ContextFinding>,
     pub completeness: Completeness,
     /// False for incomplete, ambiguous, or mismatched input sets.
@@ -170,6 +172,7 @@ pub fn audit_with_contracts(lifted: &Lifted, set: &ContractSet<'_>) -> ContextAu
         })
         .collect();
     ContextAudit {
+        claim: crate::claim::ClaimMetadata::STATIC,
         findings,
         completeness: local.completeness,
         context_usable: usable,

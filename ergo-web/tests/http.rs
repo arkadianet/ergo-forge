@@ -866,6 +866,9 @@ async fn validate_tx_runs_every_input_script_and_reports_balances() {
         .json()
         .await
         .unwrap();
+    assert_eq!(res["preflightPassed"], true);
+    assert_eq!(res["nodeValidated"], false);
+    assert_eq!(res["method"], "unsigned-preflight");
     assert_eq!(res["valid"], true, "{res}");
     assert_eq!(res["inputs"][0]["verdict"], "pass");
     assert_eq!(res["ergIn"], 100);
@@ -890,6 +893,9 @@ async fn validate_tx_fetches_missing_boxes_from_the_explorer_when_configured() {
         .unwrap();
     // The fetched box's script is SELF.R4[Int].get > 5 with R4 = 9: passes.
     assert_eq!(res["inputs"][0]["verdict"], "pass", "{res}");
+    assert_eq!(res["preflightPassed"], true);
+    assert_eq!(res["nodeValidated"], false);
+    assert_eq!(res["method"], "unsigned-preflight");
     assert_eq!(res["valid"], true, "{res}");
     assert_eq!(res["height"], 1864624);
 }
@@ -1072,6 +1078,8 @@ async fn play_applies_a_transaction_and_returns_new_boxes() {
         .json()
         .await
         .unwrap();
+    assert_eq!(res["method"], "scenario-simulation");
+    assert_eq!(res["nodeValidated"], false);
     assert_eq!(res["ok"], true, "{res}");
     assert_eq!(res["inputs"][0]["verdict"], "pass", "{res}");
     assert_eq!(
@@ -1173,6 +1181,57 @@ async fn eval_exposes_ranked_reduction_costs_for_success_failure_and_errors() {
             let a = pair[0]["jit"].as_u64().unwrap();
             let b = pair[1]["jit"].as_u64().unwrap();
             assert!(a > b || (a == b && pair[0]["label"].as_str() <= pair[1]["label"].as_str()));
+        }
+    }
+}
+
+#[tokio::test]
+async fn legacy_http_envelopes_preserve_claim_labels() {
+    let base = spawn().await;
+    let client = reqwest::Client::new();
+    for (route, request, method) in [
+        (
+            "inspect",
+            serde_json::json!({"input":"1001040ad191e4c6a704047300"}),
+            "static-analysis",
+        ),
+        (
+            "compile",
+            serde_json::json!({"source":"sigmaProp(true)"}),
+            "static-analysis",
+        ),
+        (
+            "hunt",
+            serde_json::json!({"input":"1001040ad191e4c6a704047300"}),
+            "bounded-scenario-sampling",
+        ),
+        (
+            "eval",
+            serde_json::json!({"source":"sigmaProp(true)","height":1}),
+            "scenario-simulation",
+        ),
+        (
+            "test",
+            serde_json::json!({"source":"sigmaProp(true)","scenarios":[{"name":"sample","height":1,"expect":"pass"}]}),
+            "scenario-simulation",
+        ),
+    ] {
+        let response = client
+            .post(format!("{base}/api/v1/{route}"))
+            .json(&request)
+            .send()
+            .await
+            .unwrap();
+        assert!(response.status().is_success(), "{route}");
+        let result: serde_json::Value = response.json().await.unwrap();
+        assert_eq!(result["nodeValidated"], false, "{route}: {result}");
+        assert_eq!(result["method"], method, "{route}: {result}");
+        assert!(!result["provenance"].as_str().unwrap().is_empty());
+        if route == "inspect" {
+            let finding = &result["findings"][0];
+            assert_eq!(finding["severityMeaning"], "review-priority");
+            assert_eq!(finding["nodeValidated"], false);
+            assert_eq!(finding["triage"]["formatVersion"], 2);
         }
     }
 }

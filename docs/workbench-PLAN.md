@@ -1,3 +1,10 @@
+# Historical record — superseded
+
+**The governing plan is [ROADMAP.md](ROADMAP.md).** All build lists and authority
+claims below are historical, not active instructions. In particular, txcheck is
+unsigned preflight, not node acceptance. P00 renames v1 `confirmed` to
+`reproduced-in-scenario`; measured historical records retain their original labels.
+
 # ErgoScript Workbench — plan
 
 > Working notes (dev-docs is gitignored). Positions the workbench against the two
@@ -42,7 +49,7 @@ Built since (see Phases for the verified records):
    Graceful degradation to honest `<…>` placeholders for hand-built/soft-fork
    trees is in place.
 
-Still missing (the actual build list):
+Historical proposed work (superseded; active queue removed to [ROADMAP.md](ROADMAP.md)):
 3. ~~**Public lifted AST**~~ — **DONE (P2.5).** `decompile::lift_tree` exposes
    `Node { id, kind }` to lints; ids are lift-local pending `ergo_ser::preorder`.
 4. **Audit layer** — static lints over the lifted tree (height guards, `anyOf`
@@ -438,7 +445,7 @@ Still missing (the actual build list):
   plus the no-bundler UI in `ui/`. The WASM build originally planned here is
   blocked (see P4); the HTTP API is the stable boundary in the meantime.
 
-## Open decisions
+## Historical open decisions — no active build authority
 
 - ~~Byte-exact vs canonical re-serialization tolerance~~ — **resolved by P0**:
   394/394 real trees re-serialize byte-exact; the bar is byte-exact.
