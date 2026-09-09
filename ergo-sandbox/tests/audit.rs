@@ -483,3 +483,45 @@ fn binding_by_the_whole_tokens_collection_counts() {
     )
     .is_empty());
 }
+
+#[test]
+fn guarded_successor_alias_survives_compilation_and_is_not_reported() {
+    let tree = lifted(
+        r#"{
+        val successor = OUTPUTS(0)
+        val wellFormed = OUTPUTS(0).R4[Long].isDefined && OUTPUTS(0).R5[Long].isDefined
+        if (!wellFormed) sigmaProp(false) else sigmaProp(
+            successor.R4[Long].get > 0L && successor.R5[Long].get > 0L &&
+            successor.value == SELF.value)
+    }"#,
+    );
+    let source = ergo_sandbox::decompile::print(&tree.node);
+    assert!(
+        source.contains("val "),
+        "alias must survive compilation: {source}"
+    );
+    let findings = audit::audit(&tree).findings;
+    assert!(
+        findings.iter().all(|f| f.lint != "unchecked-get"),
+        "{findings:?}"
+    );
+}
+
+#[test]
+fn unguarded_successor_alias_is_still_reported_after_compilation() {
+    let findings = findings_of(
+        r#"{
+        val successor = OUTPUTS(0)
+        sigmaProp(OUTPUTS(0).R4[Long].isDefined &&
+            successor.R4[Long].get > 0L && successor.R5[Long].get > 0L &&
+            successor.value == SELF.value)
+    }"#,
+    );
+    let gets: Vec<_> = findings
+        .iter()
+        .filter(|f| f.lint == "unchecked-get")
+        .collect();
+    assert_eq!(gets.len(), 1, "{findings:?}");
+    assert!(gets[0].snippet.contains("R5[Long]"));
+    assert_eq!(gets[0].severity, ergo_sandbox::Severity::High);
+}
