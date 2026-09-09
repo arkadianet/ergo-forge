@@ -1,0 +1,5 @@
+{
+  val stored = SELF.R4[Coll[Byte]].get
+  val matched = OUTPUTS.exists({ (box: Box) => box.propositionBytes == script })
+  sigmaProp(blake2b256(stored) == digest && matched && stored == supplied)
+}

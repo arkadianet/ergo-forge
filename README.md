@@ -101,6 +101,11 @@ Example scenario (`sigmaProp(HEIGHT > 100)` failing at height 99):
 See [`ergo-sandbox/README.md`](ergo-sandbox/README.md) for the full scenario
 schema, verdicts, and the Rust API.
 
+For third-party sources with free named constants, `ergo-es ingest <directory>`
+compiles and lifts `.ergo`/`.es` files using reported synthetic bindings, with
+type/value overrides and a row for every failure. See [static source ingestion](docs/ingestion.md)
+and the [Lithos before/after measurement](docs/ingestion-lithos-report.md).
+
 ## In CI
 
 Run your contract suites on every pull request with the composite action —

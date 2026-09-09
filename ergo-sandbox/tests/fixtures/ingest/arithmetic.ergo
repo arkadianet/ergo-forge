@@ -1,0 +1,5 @@
+{
+  val amount = SELF.value / divisor
+  val later = HEIGHT + delay
+  sigmaProp(amount >= minimum && later > HEIGHT && enabled && !disabled)
+}

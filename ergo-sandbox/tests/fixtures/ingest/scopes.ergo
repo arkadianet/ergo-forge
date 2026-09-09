@@ -1,0 +1,9 @@
+{
+  // CONST_GHOST and $ghost must not become parameters. Unicode: λ
+  /* Nested comments: /* anotherGhost */ ignored */
+  val CONST_LOCAL=1
+  val decoded = fromBase16("abcd")
+  val check = Coll(1, 2).exists({ (local: Int) => local > CONST_LOCAL })
+  val outside = { val local = 2; local > 0 }
+  sigmaProp(check && outside && HEIGHT > outsideLimit && decoded.size > 0)
+}
