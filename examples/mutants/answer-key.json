@@ -635,7 +635,7 @@
    },
    "attributable": false,
    "confounded": false,
-   "note": "flip-index: oracle NFT validated on dataInputs(0), rate read from dataInputs(1). Proven keyless drain (hand-built witness: attacker supplies a second, unvalidated data input with R4=0, so scPrice collapses to 0 and the uncirculated SC reserve leaves for free). MISS is out-of-family: the drain needs a data-input substitution and data inputs are passed through verbatim \u2014 all 2216 probes were legitimate SCRIPT rejections, zero invalid, so the honest template is sound. This is the 3c data-input axis's first measurable target."
+   "note": "flip-index: oracle NFT validated on dataInputs(0), rate read from dataInputs(1). Proven keyless drain (hand-built witness supplies a second, unvalidated data input with R4=0, collapsing scPrice to 0). MISS needs TWO things, not one: (a) data-input substitution \u2014 now implemented as an opt-in axis, default off \u2014 and (b) a successor register value COMPUTED from the transaction: `tracked` demands scCircOut == scCircIn + deltaSc, i.e. R4 = 300000 + 999999699999 for the full take. No enumeration family invents that; it is the arithmetic class the roadmap parks at phase 4 (solver-assisted values). Measured with the data axis ON: still notUnderProbes, all 2680 rejections `script` \u2014 the transactions are well formed and the bank refuses them on the tracking rule. So M8 is a phase-4 target, not a 3c one."
   }
  ],
  "missTable": {

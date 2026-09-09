@@ -1328,3 +1328,73 @@ mod synthesis {
         );
     }
 }
+
+/// The data-input axis: an attacker chooses WHICH box a script reads, and may
+/// point it at one of their own. The corpus does not enable this degree (it
+/// costs budget and converts nothing until phase 4 supplies computed register
+/// values — see M8's note), so its behaviour is pinned here directly.
+#[test]
+fn the_data_input_axis_appends_an_attacker_box_and_is_off_by_default() {
+    let base = json!({
+        "inputs": [
+            { "role": "protected", "value": 100000000i64, "ergoTree": "10010101d17300",
+              "tokens": [{ "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "amount": 1 }] },
+            { "role": "attacker", "value": 2000000i64, "ergoTree": "10010101d17300" },
+        ],
+        "dataInputs": [
+            { "value": 1, "ergoTree": "10010101d17300",
+              "registers": { "R4": { "type": "Long", "value": 12000000 } } },
+        ],
+        "outputs": [
+            { "payee": "fixed", "value": 100000000i64, "ergoTree": "10010101d17300",
+              "tokens": [{ "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "amount": 1 }] },
+            { "payee": "free", "value": 2000000i64, "ergoTree": "10010101d17300" },
+        ],
+        "protocolNfts": ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+        "height": 100, "network": "mainnet", "maxProbes": 400,
+    });
+
+    // Default: the degree is off, so every shape reads the declared data
+    // inputs verbatim and no `+data(...)` shape exists.
+    let mut off = base.clone();
+    off["synthesis"] = json!({ "companionRecreations": true });
+    let off = drain(off);
+    assert!(
+        !off.synthesis
+            .shapes
+            .iter()
+            .any(|s| s.shape.contains("+data(")),
+        "the data axis must be off by default: {:?}",
+        off.synthesis.shapes
+    );
+
+    // On: the family pairs every shape with an appended attacker-owned box,
+    // and the zero boundary is present (the value M8's real drain needs).
+    let mut on = base;
+    on["synthesis"] = json!({ "companionRecreations": true, "dataInputs": true });
+    let on = drain(on);
+    let data_shapes: Vec<_> = on
+        .synthesis
+        .shapes
+        .iter()
+        .filter(|s| s.shape.contains("+data("))
+        .collect();
+    assert!(
+        !data_shapes.is_empty(),
+        "the data axis must generate shapes when enabled: {:?}",
+        on.synthesis.shapes
+    );
+    assert!(
+        data_shapes.iter().any(|s| s.shape.contains("+data(R4=0)")),
+        "the zero boundary must be in the family: {data_shapes:?}"
+    );
+    // The declared oracle's own value is carried into the family too — the
+    // attacker may restate what an honest box says, but nothing is invented
+    // from the target script.
+    assert!(
+        data_shapes
+            .iter()
+            .any(|s| s.shape.contains("+data(R4=12000000)")),
+        "observed register values must be in the family: {data_shapes:?}"
+    );
+}
