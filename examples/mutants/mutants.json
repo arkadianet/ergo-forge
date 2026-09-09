@@ -1232,6 +1232,269 @@
    },
    "witnessNote": "pool successor verbatim (the swap maths see deltas 0); swap successor re-treed with the swap's value + NFT",
    "originalSource": "// USE LP swap \u2014 FIXED shape (regression fixture for the 2026-09-08 drain).\n//\n// This is the deployed useLpSwap logic, decompiled from mainnet swap-NFT box\n// ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf, with the\n// ONE missing check restored: the box the swap does its constant-product math\n// on must carry the LP singleton NFT. The deployed contract read the pool\n// positionally as INPUTS(0)/OUTPUTS(0) and never asserted which box that was,\n// so an attacker put a decoy at index 0 and drained the real pool spent\n// alongside it. Binding by the singleton NFT closes the substitution: only the\n// genuine pool holds that token.\n//\n// $lpNft: Coll[Byte]  -- the LP pool's singleton NFT (tokens(0) of the pool)\n{\n  val poolIn      = INPUTS(0)\n  val poolInToks  = poolIn.tokens\n  val poolOut     = OUTPUTS(0)\n  val poolOutToks = poolOut.tokens\n\n  // THE FIX: bind the pool the maths runs on by its singleton NFT, at both the\n  // spent box and its successor. A decoy cannot hold the unique LP token.\n  val poolBound =\n    poolInToks(0)._1  == $lpNft &&\n    poolOutToks(0)._1 == $lpNft\n\n  val ergIn      = poolIn.value\n  val ergDelta   = poolOut.value - ergIn\n  val tokenInY   = poolInToks(2)._2\n  val tokenDelta = poolOutToks(2)._2 - tokenInY\n  val swapSucc   = OUTPUTS(1)\n\n  val validSwap =\n    (poolInToks(1)._2 - poolOutToks(1)._2 == 0L) &&\n    (if (ergDelta > 0L)\n        tokenInY.toBigInt * ergDelta.toBigInt * 997.toBigInt >=\n          (-tokenDelta).toBigInt *\n            (ergIn.toBigInt * 1000.toBigInt + ergDelta.toBigInt * 997.toBigInt)\n     else\n        ergIn.toBigInt * tokenDelta.toBigInt * 997.toBigInt >=\n          (-ergDelta).toBigInt *\n            (tokenInY.toBigInt * 1000.toBigInt + tokenDelta.toBigInt * 997.toBigInt)) &&\n    swapSucc.propositionBytes == SELF.propositionBytes &&\n    swapSucc.value >= SELF.value &&\n    swapSucc.tokens == SELF.tokens\n\n  sigmaProp(poolBound && validSwap)\n}\n"
+  },
+  {
+   "id": "M8",
+   "contract": "bank (AgeUSD shape)",
+   "operator": "flip-index",
+   "defect": "the oracle NFT is validated on dataInputs(0) but the rate is read from dataInputs(1): an unvalidated box the attacker supplies sets the price, so a rate of 0 makes minting cost nothing and the uncirculated SC reserve leaves for free",
+   "params": {
+    "oracleNft": {
+     "type": "Coll[Byte]",
+     "value": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    },
+    "minRatioPercent": {
+     "type": "Int",
+     "value": 400
+    },
+    "maxRatioPercent": {
+     "type": "Int",
+     "value": 800
+    },
+    "feePercent": {
+     "type": "Int",
+     "value": 2
+    },
+    "rcDefaultPrice": {
+     "type": "Long",
+     "value": 1000000
+    }
+   },
+   "diff": {
+    "find": "    val rate = CONTEXT.dataInputs(0).R4[Long].get",
+    "replace": "    val rate = CONTEXT.dataInputs(1).R4[Long].get"
+   },
+   "mutatedSource": "// A reserve-backed stablecoin bank (the shape of AgeUSD / SigmaUSD, in one\n// script). The bank box holds:\n//   value      the ERG reserve\n//   tokens(0)  the bank NFT\n//   tokens(1)  stablecoins (SC) not yet in circulation\n//   tokens(2)  reserve coins (RC) not yet in circulation\n//   R4[Long]   SC in circulation      R5[Long]   RC in circulation\n// The oracle box (data input 0, identified by its NFT) reports in R4 the\n// price of one SC unit in nanoERG. A spend rebuilds the bank as OUTPUTS(0)\n// and does exactly one of: mint SC, redeem SC, mint RC, redeem RC, paying\n// or receiving the nominal price plus a fee, subject to the reserve ratio\n// after the action: minting SC and redeeming RC need it at or above the\n// minimum; minting RC needs it at or below the maximum; redeeming SC is\n// always allowed. SC price is the oracle rate, capped by what the reserve\n// can cover; RC price is the equity per RC, or a default when there is no\n// equity or no RC.\n//\n// $oracleNft: Coll[Byte]\n// $minRatioPercent: Int     -- 400 in SigmaUSD\n// $maxRatioPercent: Int     -- 800 in SigmaUSD\n// $feePercent: Int          -- 2 in SigmaUSD\n// $rcDefaultPrice: Long     -- nanoERG per RC when the equity says nothing\n{\n  val wellFormed = OUTPUTS.size > 0 && OUTPUTS(0).tokens.size == 3 && SELF.tokens.size == 3 &&\n    CONTEXT.dataInputs.size > 0 && CONTEXT.dataInputs(0).tokens.size > 0 &&\n    CONTEXT.dataInputs(0).tokens(0)._1 == $oracleNft &&\n    CONTEXT.dataInputs(0).R4[Long].isDefined &&\n    SELF.R4[Long].isDefined && SELF.R5[Long].isDefined &&\n    OUTPUTS(0).R4[Long].isDefined && OUTPUTS(0).R5[Long].isDefined\n  if (!wellFormed) sigmaProp(false) else {\n    val successor = OUTPUTS(0)\n    // MUTATION (flip-index): wellFormed validates the ORACLE NFT on\n    // dataInputs(0), but the rate is now read from dataInputs(1) \u2014 an\n    // unvalidated box the attacker supplies. Validate one box, use\n    // another: the price feed is attacker-controlled.\n    val rate = CONTEXT.dataInputs(1).R4[Long].get\n    val preserved = successor.propositionBytes == SELF.propositionBytes &&\n      successor.tokens(0) == SELF.tokens(0) &&\n      successor.tokens(1)._1 == SELF.tokens(1)._1 &&\n      successor.tokens(2)._1 == SELF.tokens(2)._1\n\n    val reserveIn = SELF.value\n    val reserveOut = successor.value\n    val scCircIn = SELF.R4[Long].get\n    val rcCircIn = SELF.R5[Long].get\n    val scCircOut = successor.R4[Long].get\n    val rcCircOut = successor.R5[Long].get\n    val deltaSc = SELF.tokens(1)._2 - successor.tokens(1)._2\n    val deltaRc = SELF.tokens(2)._2 - successor.tokens(2)._2\n    val tracked = scCircOut == scCircIn + deltaSc && rcCircOut == rcCircIn + deltaRc &&\n      scCircOut >= 0L && rcCircOut >= 0L\n    val oneAction = (deltaSc != 0L && deltaRc == 0L) || (deltaSc == 0L && deltaRc != 0L)\n\n    val scPrice = if (scCircIn == 0L) rate else min(rate, reserveIn / scCircIn)\n    val equity = reserveIn - scCircIn * scPrice\n    val rcPrice = if (rcCircIn > 0L && equity > 0L) equity / rcCircIn else $rcDefaultPrice\n\n    val amount = if (deltaSc != 0L) deltaSc * scPrice else deltaRc * rcPrice\n    val absAmount = if (amount < 0L) -amount else amount\n    val fee = absAmount * $feePercent.toLong / 100L\n    val deltaReserve = reserveOut - reserveIn\n    val minting = amount > 0L\n    val paid = if (minting) deltaReserve >= absAmount + fee else deltaReserve >= -(absAmount - fee)\n\n    // Ratio after, in percent: reserveOut * 100 / (scCircOut * rate); no SC\n    // out means \"at the maximum\" so RC can still be minted.\n    val ratioOk =\n      if (deltaSc > 0L) reserveOut.toBigInt * 100L.toBigInt >= scCircOut.toBigInt * rate.toBigInt * $minRatioPercent.toBigInt\n      else if (deltaSc < 0L) true\n      else if (deltaRc > 0L) scCircOut == 0L || reserveOut.toBigInt * 100L.toBigInt <= scCircOut.toBigInt * rate.toBigInt * $maxRatioPercent.toBigInt\n      else scCircOut == 0L || reserveOut.toBigInt * 100L.toBigInt >= scCircOut.toBigInt * rate.toBigInt * $minRatioPercent.toBigInt\n\n    sigmaProp(preserved && tracked && oneAction && paid && ratioOk)\n  }\n}\n",
+   "roles": {
+    "protected": [
+     {
+      "index": 0,
+      "why": "the bank box: ERG reserve, bank NFT, uncirculated SC and RC"
+     }
+    ],
+    "attacker": [
+     {
+      "index": 1,
+      "why": "the attacker's own funding box (no key required: the bank script is a pure predicate)"
+     }
+    ]
+   },
+   "template": {
+    "inputs": [
+     {
+      "roleRef": "protected",
+      "value": 10000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "amount": 1
+       },
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 999999700000
+       },
+       {
+        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "amount": 999995000000
+       }
+      ],
+      "registers": {
+       "R4": {
+        "type": "Long",
+        "value": 300000
+       },
+       "R5": {
+        "type": "Long",
+        "value": 5000000
+       }
+      }
+     },
+     {
+      "roleRef": "attacker",
+      "value": 2000000,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 1
+     }
+    ],
+    "dataInputs": [
+     {
+      "roleRef": "oracle",
+      "value": 1,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "amount": 1
+       }
+      ],
+      "registers": {
+       "R4": {
+        "type": "Long",
+        "value": 12000000
+       }
+      }
+     }
+    ],
+    "outputs": [
+     {
+      "roleRef": "fixed",
+      "value": 10000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 5000,
+      "tokens": [
+       {
+        "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "amount": 1
+       },
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 999999699999
+       },
+       {
+        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "amount": 999995000000
+       }
+      ],
+      "registers": {
+       "R4": {
+        "type": "Long",
+        "value": 300001
+       },
+       "R5": {
+        "type": "Long",
+        "value": 5000000
+       }
+      }
+     },
+     {
+      "roleRef": "free",
+      "value": 0,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 5000
+     }
+    ],
+    "height": 5000
+   },
+   "extraTrees": {},
+   "proven": true,
+   "witness": "attacker supplies a second, unvalidated data input with R4=0; scPrice collapses to 0 so minting is free",
+   "missHint": "requires substituting/adding a DATA INPUT. Data inputs are passed through verbatim (drain.rs), so this drain is out of family until the 3c data-input axis exists \u2014 this mutant is that axis's first measurable target.",
+   "witnessTx": {
+    "height": 5000,
+    "inputs": [
+     {
+      "value": 10000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "amount": 1
+       },
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 999999700000
+       },
+       {
+        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "amount": 999995000000
+       }
+      ],
+      "registers": {
+       "R4": {
+        "type": "Long",
+        "value": 300000
+       },
+       "R5": {
+        "type": "Long",
+        "value": 5000000
+       }
+      }
+     },
+     {
+      "value": 2000000,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 1
+     }
+    ],
+    "dataInputs": [
+     {
+      "value": 1,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 1,
+      "tokens": [
+       {
+        "id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "amount": 1
+       }
+      ],
+      "registers": {
+       "R4": {
+        "type": "Long",
+        "value": 12000000
+       }
+      }
+     },
+     {
+      "value": 1,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 1,
+      "registers": {
+       "R4": {
+        "type": "Long",
+        "value": 0
+       }
+      }
+     }
+    ],
+    "outputs": [
+     {
+      "value": 10000000000,
+      "ergoTree": "$mutant",
+      "creationHeight": 5000,
+      "tokens": [
+       {
+        "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "amount": 1
+       },
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 1
+       },
+       {
+        "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "amount": 999995000000
+       }
+      ],
+      "registers": {
+       "R4": {
+        "type": "Long",
+        "value": 999999999999
+       },
+       "R5": {
+        "type": "Long",
+        "value": 5000000
+       }
+      }
+     },
+     {
+      "value": 2000000,
+      "ergoTree": "10010101d17300",
+      "creationHeight": 5000,
+      "tokens": [
+       {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "amount": 999999699999
+       }
+      ]
+     }
+    ]
+   },
+   "witnessNote": "reserve untouched (deltaReserve 0 satisfies the redeem branch once scPrice is 0); 999999699999 SC leave the bank to a sigmaProp(true) sink for zero payment; ratioOk passes because scCircOut * rate * minRatio is 0",
+   "originalSource": "// A reserve-backed stablecoin bank (the shape of AgeUSD / SigmaUSD, in one\n// script). The bank box holds:\n//   value      the ERG reserve\n//   tokens(0)  the bank NFT\n//   tokens(1)  stablecoins (SC) not yet in circulation\n//   tokens(2)  reserve coins (RC) not yet in circulation\n//   R4[Long]   SC in circulation      R5[Long]   RC in circulation\n// The oracle box (data input 0, identified by its NFT) reports in R4 the\n// price of one SC unit in nanoERG. A spend rebuilds the bank as OUTPUTS(0)\n// and does exactly one of: mint SC, redeem SC, mint RC, redeem RC, paying\n// or receiving the nominal price plus a fee, subject to the reserve ratio\n// after the action: minting SC and redeeming RC need it at or above the\n// minimum; minting RC needs it at or below the maximum; redeeming SC is\n// always allowed. SC price is the oracle rate, capped by what the reserve\n// can cover; RC price is the equity per RC, or a default when there is no\n// equity or no RC.\n//\n// $oracleNft: Coll[Byte]\n// $minRatioPercent: Int     -- 400 in SigmaUSD\n// $maxRatioPercent: Int     -- 800 in SigmaUSD\n// $feePercent: Int          -- 2 in SigmaUSD\n// $rcDefaultPrice: Long     -- nanoERG per RC when the equity says nothing\n{\n  val wellFormed = OUTPUTS.size > 0 && OUTPUTS(0).tokens.size == 3 && SELF.tokens.size == 3 &&\n    CONTEXT.dataInputs.size > 0 && CONTEXT.dataInputs(0).tokens.size > 0 &&\n    CONTEXT.dataInputs(0).tokens(0)._1 == $oracleNft &&\n    CONTEXT.dataInputs(0).R4[Long].isDefined &&\n    SELF.R4[Long].isDefined && SELF.R5[Long].isDefined &&\n    OUTPUTS(0).R4[Long].isDefined && OUTPUTS(0).R5[Long].isDefined\n  if (!wellFormed) sigmaProp(false) else {\n    val successor = OUTPUTS(0)\n    val rate = CONTEXT.dataInputs(0).R4[Long].get\n    val preserved = successor.propositionBytes == SELF.propositionBytes &&\n      successor.tokens(0) == SELF.tokens(0) &&\n      successor.tokens(1)._1 == SELF.tokens(1)._1 &&\n      successor.tokens(2)._1 == SELF.tokens(2)._1\n\n    val reserveIn = SELF.value\n    val reserveOut = successor.value\n    val scCircIn = SELF.R4[Long].get\n    val rcCircIn = SELF.R5[Long].get\n    val scCircOut = successor.R4[Long].get\n    val rcCircOut = successor.R5[Long].get\n    val deltaSc = SELF.tokens(1)._2 - successor.tokens(1)._2\n    val deltaRc = SELF.tokens(2)._2 - successor.tokens(2)._2\n    val tracked = scCircOut == scCircIn + deltaSc && rcCircOut == rcCircIn + deltaRc &&\n      scCircOut >= 0L && rcCircOut >= 0L\n    val oneAction = (deltaSc != 0L && deltaRc == 0L) || (deltaSc == 0L && deltaRc != 0L)\n\n    val scPrice = if (scCircIn == 0L) rate else min(rate, reserveIn / scCircIn)\n    val equity = reserveIn - scCircIn * scPrice\n    val rcPrice = if (rcCircIn > 0L && equity > 0L) equity / rcCircIn else $rcDefaultPrice\n\n    val amount = if (deltaSc != 0L) deltaSc * scPrice else deltaRc * rcPrice\n    val absAmount = if (amount < 0L) -amount else amount\n    val fee = absAmount * $feePercent.toLong / 100L\n    val deltaReserve = reserveOut - reserveIn\n    val minting = amount > 0L\n    val paid = if (minting) deltaReserve >= absAmount + fee else deltaReserve >= -(absAmount - fee)\n\n    // Ratio after, in percent: reserveOut * 100 / (scCircOut * rate); no SC\n    // out means \"at the maximum\" so RC can still be minted.\n    val ratioOk =\n      if (deltaSc > 0L) reserveOut.toBigInt * 100L.toBigInt >= scCircOut.toBigInt * rate.toBigInt * $minRatioPercent.toBigInt\n      else if (deltaSc < 0L) true\n      else if (deltaRc > 0L) scCircOut == 0L || reserveOut.toBigInt * 100L.toBigInt <= scCircOut.toBigInt * rate.toBigInt * $maxRatioPercent.toBigInt\n      else scCircOut == 0L || reserveOut.toBigInt * 100L.toBigInt >= scCircOut.toBigInt * rate.toBigInt * $minRatioPercent.toBigInt\n\n    sigmaProp(preserved && tracked && oneAction && paid && ratioOk)\n  }\n}\n"
   }
  ],
  "knownDetectableControl": {
