@@ -3,7 +3,7 @@
  "runner": "ergo-sandbox/tests/mutation_corpus.rs (release build)",
  "methodology": "docs/superpowers/specs/2026-09-08-mutation-corpus-design.md",
  "detectionRate": 0.0,
- "provenMutants": 4,
+ "provenMutants": 5,
  "found": 0,
  "denominatorNote": "proven = a hand-built KEYLESS drain witness validated by txcheck before the hunt ran. M1-M3 were initially misproven (their witnesses validated under txcheck but carry needsProof on the protected input \u2014 the residual requires the beneficiary's/receiver's key): reclassified as keyed-insider, outside the hunt's attacker model, never in the denominator.",
  "caps": {
@@ -23,7 +23,6 @@
   {
    "id": "M1",
    "proven": false,
-   "attackerModel": "keyed-insider",
    "synthesisOff": {
     "capped": false,
     "hits": 0,
@@ -42,12 +41,13 @@
     },
     "verdict": "notunderprobes"
    },
-   "baselineNote": "The template singleton id is 64 non-hex v characters: all 868 synthesis-on probes are invalid. Its separately validated witness remains keyed-insider and outside the proven denominator; this hunt is not evidence of a key refusal. Recorded without changing another fixture in this work order."
+   "attributable": false,
+   "confounded": false,
+   "attackerModel": "keyed-insider"
   },
   {
    "id": "M2",
    "proven": false,
-   "attackerModel": "keyed-insider",
    "synthesisOff": {
     "capped": false,
     "hits": 0,
@@ -65,12 +65,14 @@
      "script": 0
     },
     "verdict": "notunderprobes"
-   }
+   },
+   "attributable": false,
+   "confounded": false,
+   "attackerModel": "keyed-insider"
   },
   {
    "id": "M3",
    "proven": false,
-   "attackerModel": "keyed-insider",
    "synthesisOff": {
     "capped": false,
     "hits": 0,
@@ -88,7 +90,10 @@
      "script": 0
     },
     "verdict": "notunderprobes"
-   }
+   },
+   "attributable": false,
+   "confounded": false,
+   "attackerModel": "keyed-insider"
   },
   {
    "id": "M4",
@@ -112,8 +117,9 @@
     },
     "verdict": "drainable"
    },
-   "note": "found only with synthesis on: the drain needs a NEW output (the attacker's payment box at the sale's price position) while the stock returns to the sale box \u2014 out of phase-1's fixed output set. CONFOUNDED: the same drainable verdict fires on the unmutated original (see escalatedFindings), so it is not attributable to the mutation. The hunt's objective has no conditional sanction, so overpayment probes score as drains; the real 1-nanoERG drain IS in family (710 hits), but the verdict alone cannot discriminate.",
+   "attributable": false,
    "confounded": true,
+   "note": "found only with synthesis on: the drain needs a NEW output (the attacker's payment box at the sale's price position) while the stock returns to the sale box \u2014 out of phase-1's fixed output set. CONFOUNDED: the same drainable verdict fires on the unmutated original (see escalatedFindings), so it is not attributable to the mutation. The hunt's objective has no conditional sanction, so overpayment probes score as drains; the real 1-nanoERG drain IS in family (710 hits), but the verdict alone cannot discriminate.",
    "rawDrainable": true
   },
   {
@@ -138,8 +144,8 @@
     },
     "verdict": "notunderprobes"
    },
-   "missClass": "out-of-family",
-   "missDetail": "the witness moves the bank NFT out of the successor's tokens(0) (a junk token takes its slot): a token-LAYOUT variation of a FIXED output. No synthesis degree re-pads a template output \u2014 only companion RE-CREATIONS get padding. The phase-1 fixed shape cannot express it either. After repairing register transport and the declared successor value (0 to 10000000000 nanoERG), the mutant and original each run 2216 synthesis-on probes: 208 conservation, 1922 script, 0 missingKey, 0 invalid; 86 accepted probes yield no hit. The out-of-family diagnosis survives."
+   "attributable": false,
+   "confounded": false
   },
   {
    "id": "M6",
@@ -163,8 +169,8 @@
     },
     "verdict": "notunderprobes"
    },
-   "missClass": "out-of-family",
-   "missDetail": "the witness re-trees the pool SUCCESSOR (a fixed output) to the attacker's script with reserves intact: drain mode re-trees only the FREE payee, and no synthesis degree modifies a template output's tree. Same missing axis as M5: fixed-output re-pad/re-tree."
+   "attributable": false,
+   "confounded": false
   },
   {
    "id": "M7",
@@ -188,8 +194,34 @@
     },
     "verdict": "notunderprobes"
    },
-   "missClass": "out-of-family",
-   "missDetail": "The swap successor must be re-treed to steal the locked order value; the current output axes do not express it. After correcting the template pool reference to $amm-pool, the mutant still returns notUnderProbes, 0 hits in 29448 probes: 29392 script rejections, 0 invalid, and 56 accepted probes without extraction. The original has 29404 script rejections and 44 accepted probes without extraction. The out-of-family diagnosis survives repair; a separate swap-role mismatch is deferred in REVIEW-FINDINGS.md, so an added axis alone does not establish detection."
+   "attributable": false,
+   "confounded": false
+  },
+  {
+   "id": "M8",
+   "proven": true,
+   "found": false,
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 28,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 2216,
+    "rejections": {
+     "conservation": 0,
+     "invalid": 0,
+     "missingKey": 0,
+     "script": 2216
+    },
+    "verdict": "notunderprobes"
+   },
+   "attributable": false,
+   "confounded": false,
+   "note": "flip-index: oracle NFT validated on dataInputs(0), rate read from dataInputs(1). Proven keyless drain (hand-built witness: attacker supplies a second, unvalidated data input with R4=0, so scPrice collapses to 0 and the uncirculated SC reserve leaves for free). MISS is out-of-family: the drain needs a data-input substitution and data inputs are passed through verbatim \u2014 all 2216 probes were legitimate SCRIPT rejections, zero invalid, so the honest template is sound. This is the 3c data-input axis's first measurable target."
   }
  ],
  "missTable": {
@@ -360,6 +392,28 @@
     },
     "verdict": "notunderprobes"
    }
+  },
+  {
+   "id": "M8",
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 28,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 2216,
+    "rejections": {
+     "conservation": 0,
+     "invalid": 0,
+     "missingKey": 0,
+     "script": 2216
+    },
+    "verdict": "notunderprobes"
+   },
+   "note": "unmutated bank rejects the same shape: the control is clean, so an M8 detection would be attributable"
   }
  ],
  "escalatedFindings": [

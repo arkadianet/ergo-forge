@@ -197,17 +197,39 @@ recorded in `REVIEW-FINDINGS.md`. No role, objective, or proven flag was changed
 | delete-nft-check (M5) | 1 | 0 | 0 |
 | drop-successor-script (M6, M7) | 2 | 0 | 0 |
 | weaken-comparison (M4) | 1 | 0 | 1 (confounded) |
-| **flip-index** | **0** | — | — |
+| **flip-index (M8)** | **1** | 0 | 0 |
 | **positional ↔ unbound-search** | **0** | — | — |
 
-0.00 is a rate over **three of the five operators**. flip-index's only
-candidate (M3) turned out keyed-insider, and positional ↔ unbound-search —
-the USE incident's own class — has no mutant at all yet. Keyless mutants
-for the two uncovered operators are the next increment and are deliberately
-**not** in this PR (candidate sketches: an amm-pool index flip whose
-successor reads land on an attacker-controlled output; a positional →
-unbound-search mutant on the fixed swap's pool binding). If they push the
-rate down, that is also the finding.
+0.00 is a rate over **four of the five operators**. M8 closes flip-index:
+the bank validates its oracle's NFT on `dataInputs(0)` but reads the rate
+from `dataInputs(1)` — one index constant, "validate one box, use another".
+An attacker supplies the genuine oracle at index 0 to pass `wellFormed` and
+their own box at index 1 with `R4 = 0`; `scPrice` collapses to zero, so
+minting reads as a zero-cost action, `paid` reduces to `deltaReserve >= 0`,
+and the uncirculated SC reserve leaves for free with the ERG reserve
+untouched. `ratioOk` passes trivially because `scCircOut * rate * minRatio`
+is zero. Proven with a hand-built keyless witness; the unmutated bank
+rejects the same shape, so a detection here would be attributable.
+
+**M8's miss names a missing axis, which is why it earns its place.** All
+2216 synthesis-on probes were legitimate `script` rejections — zero
+`invalid`, so the honest template is sound — and the drain is unreachable
+because it requires substituting a DATA INPUT, which the hunt passes
+through verbatim. M8 is the 3c data-input axis's first measurable target.
+
+**positional ↔ unbound-search remains uncovered, for a recorded structural
+reason.** A faithful mutant was authored (weaken the fixed swap's
+NFT-bound pool reference at `INPUTS(0)` to an unbound `INPUTS.exists`) and
+verified to accept the reconstructed incident drain while the fixed
+original rejects it — but it is not a single-contract *proven* mutant: the
+mutation leaves swap-successor preservation intact, so the swap's own value
+cannot leave, and draining the pool needs the safe companion pool to emit a
+dust successor, which it refuses. The real incident drained because BOTH
+contracts were broken. That vulnerability is inherently a two-contract
+property and needs multi-contract/multi-tx witness support (roadmap phase 5)
+or a purpose-built self-draining contract. Forcing a single-contract entry
+would add a mutant that drains nothing and pollutes the denominator — not
+added.
 
 ### The must-find control (harness validity, not a mutant)
 
