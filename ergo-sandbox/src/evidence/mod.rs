@@ -1,6 +1,7 @@
 //! Versioned, unvalidated experiment inputs and provenance-bound static results.
-//! This module does not construct canonical transactions or validate execution.
+//! Wire construction delegates to the pinned node; execution is not validated.
 pub mod case;
+pub mod wire;
 pub use case::{
     Analysis, BindingSet, CasePremises, ConstantBinding, EvidenceCase, Origin, Premise,
     RecordedBox, SourceIdentity, SourceRecord, StaticAnalysis,

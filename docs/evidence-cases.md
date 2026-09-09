@@ -76,3 +76,7 @@ rewritten and compilation coverage is not deployment coverage.
 
 P01 stops at saving and inspecting premises. There is no wire codec, validator,
 transaction replay, browser evidence import, new detector or search axis here.
+
+P02 adds the separate [node wire construction path](evidence-wire.md). The P01
+input schema and legacy functions above retain their meaning; wire construction
+still cannot claim transaction acceptance.
