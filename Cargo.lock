@@ -655,6 +655,7 @@ dependencies = [
  "ergo-primitives",
  "ergo-ser",
  "ergo-sigma",
+ "ergo-validation",
  "ergo-wallet",
  "ergo_avltree_rust",
  "hex",

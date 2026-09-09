@@ -1,0 +1,105 @@
+{
+  "blockContext": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": {
+      "activatedScriptVersion": 0,
+      "height": 100,
+      "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+      "preHeaderNBits": 117586360,
+      "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+      "preHeaderTimestamp": 1700000000000,
+      "preHeaderVersion": 1,
+      "preHeaderVotes": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "case": {
+    "deploymentIdentity": "unknown",
+    "formatVersion": 1,
+    "nodeValidated": false,
+    "premises": {
+      "assumptions": {},
+      "boxes": {
+        "origin": "hypothetical",
+        "status": "present",
+        "value": [
+          {
+            "document": {
+              "boxId": "87ca67e4822b4c8777457f779eb98fb3a348fc40d9a3de8940a124ab29c4ad6a",
+              "bytes": "c0843d10010101d17300640000111111111111111111111111111111111111111111111111111111111111111100",
+              "ergoTree": "10010101d17300"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        ]
+      },
+      "constants": {
+        "reason": "binding origins not supplied",
+        "status": "missing"
+      },
+      "context": {
+        "reason": "execution context not supplied",
+        "status": "missing"
+      },
+      "engineRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "source": {
+        "reason": "source identity not supplied",
+        "status": "missing"
+      },
+      "targetBytes": {
+        "reason": "target bytes not supplied",
+        "status": "missing"
+      }
+    }
+  },
+  "formatVersion": 1,
+  "headers": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": []
+  },
+  "localPolicy": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": {
+      "maxTransactionSize": 524288
+    }
+  },
+  "networkRules": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": {
+      "description": "authored keyless/rent vector",
+      "mode": "disabled",
+      "reason": "explicit hypothetical network without EIP-27"
+    }
+  },
+  "parameters": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": {
+      "dataInputCost": 100,
+      "inputCost": 2000,
+      "maxBlockCost": 8001091,
+      "maxBlockSize": 524288,
+      "maxBoxSize": 4096,
+      "maxTokensPerBox": 122,
+      "minValuePerByte": 360,
+      "outputCost": 100,
+      "storageFeeFactor": 1250000,
+      "storagePeriod": 1051200,
+      "tokenAccessCost": 100
+    }
+  },
+  "priorBlockCost": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": 0
+  },
+  "transactionBytes": "0187ca67e4822b4c8777457f779eb98fb3a348fc40d9a3de8940a124ab29c4ad6a0000000001c0843d10010101d17300640000"
+}

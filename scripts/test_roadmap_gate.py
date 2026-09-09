@@ -48,6 +48,25 @@ class RoadmapGateTests(unittest.TestCase):
         gate.check_test_output(output, names)
         self.assert_status('missing-gate', lambda: gate.check_test_output(output.replace(names[0], 'unrelated'), names))
 
+    def test_runner_captures_diagnostics_without_weakening_execution_checks(self):
+        from types import SimpleNamespace
+        unit = copy.deepcopy(next(u for u in self.policy['units'] if u['id'] == 'P03'))
+        unit['implemented'] = True  # Exercise the runner independently of completion status.
+        names = unit['tests']
+        listing = '\n'.join(f'{n}: test' for n in names)
+        output = '\n'.join(f'test {n} ... ok' for n in names)
+        output += f'\ntest result: ok. {len(names)} passed; 0 failed; 0 ignored;'
+        output += '\n---- captured diagnostic ----\nnode outcome detail\n'
+        with patch.object(gate, 'read'), patch.object(gate, 'command', side_effect=[
+            SimpleNamespace(returncode=0, stdout=listing),
+            SimpleNamespace(returncode=0, stdout=output),
+        ]) as command:
+            gate.run_unit(unit, [])
+            self.assertEqual(command.call_args_list[0].args[0][-1], '--list')
+            self.assertEqual(command.call_args_list[1].args[0][-1], '--show-output')
+        self.assert_status('missing-gate', lambda: gate.check_test_output(
+            output.replace(names[0], 'unrelated'), names))
+
     def test_thresholds_are_read_from_policy(self):
         # Mutating the governing threshold must fail without any copied fixture floor.
         changed = copy.deepcopy(self.policy)

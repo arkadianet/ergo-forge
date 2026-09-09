@@ -88,8 +88,14 @@ every endpoint and setting.
 Compilation and scenario reduction use the pinned node engine. Static lints,
 recognition and structural matching do not consult the reducer. Preflight adds
 selected balance checks; it does not establish full node acceptance or future
-inclusion. Current result envelopes disclose their method, provenance limits,
+inclusion. Legacy result envelopes disclose their method, provenance limits,
 and `nodeValidated: false`. Static severity is review priority.
+
+The separate [P03 library validator](docs/node-validation.md) runs the pinned
+node’s full transaction pipeline with explicit state and rules. Its `node-accepted`
+result applies only to those supplied premises; it establishes neither historical
+state nor a property violation or future inclusion. Legacy endpoints keep their
+preflight/simulation meaning.
 
 The [governing roadmap](docs/ROADMAP.md) and [record-only scoreboard](docs/roadmap-metrics.json)
 separate recovery coverage, sampled preflight detection, and node-validated claims.

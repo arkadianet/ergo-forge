@@ -1,0 +1,197 @@
+{
+  "cases": [
+    {
+      "claimStatus": "no-property-claim",
+      "expected": {
+        "stage": "complete",
+        "status": "node-accepted",
+        "totalBlockCost": 12101,
+        "transactionId": "2241d787c541e90e3904f200a4a0b3bb213401b5a59dffa4e81591602e712a3d"
+      },
+      "family": "transaction-pipeline",
+      "files": [
+        {
+          "path": "node-vectors/accepted-keyless-spend.fixture",
+          "sha256": "3405878f4f1d6f52053a066b4eb7987b50bae65527923617fcf81b1015088223"
+        }
+      ],
+      "id": "accepted-keyless-spend",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": "none-P03",
+      "publicationEligibility": "public-authored",
+      "sourceKind": "authored-full-node-vector"
+    },
+    {
+      "claimStatus": "no-property-claim",
+      "expected": {
+        "detail": "DuplicateInput { index: 1 }",
+        "errorVariant": "DuplicateInput",
+        "stage": "structural",
+        "status": "node-rejected"
+      },
+      "family": "transaction-pipeline",
+      "files": [
+        {
+          "path": "node-vectors/duplicate-input-rejection.fixture",
+          "sha256": "b54549a298ef15c866910af0dc2358cb5d2af16bde2cac5c66b87366e87e5c6b"
+        }
+      ],
+      "id": "duplicate-input-rejection",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": "none-P03",
+      "publicationEligibility": "public-authored",
+      "sourceKind": "authored-full-node-vector"
+    },
+    {
+      "claimStatus": "no-property-claim",
+      "expected": {
+        "detail": "OutputFromFuture { index: 0, creation_height: 101, block_height: 100 }",
+        "errorVariant": "OutputFromFuture",
+        "stage": "output-heights",
+        "status": "node-rejected"
+      },
+      "family": "transaction-pipeline",
+      "files": [
+        {
+          "path": "node-vectors/future-output-rejection.fixture",
+          "sha256": "70d332e65f6e93d632856c72b24b0dff28b1d78101f6a1b51b4b7b1c9b11dad1"
+        }
+      ],
+      "id": "future-output-rejection",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": "none-P03",
+      "publicationEligibility": "public-authored",
+      "sourceKind": "authored-full-node-vector"
+    },
+    {
+      "claimStatus": "no-property-claim",
+      "expected": {
+        "detail": "NonCanonical",
+        "errorVariant": "NonCanonical",
+        "stage": "canonical-encoding",
+        "status": "node-rejected"
+      },
+      "family": "transaction-pipeline",
+      "files": [
+        {
+          "path": "node-vectors/canonical-encoding-rejection.fixture",
+          "sha256": "9ec4f83a9669a8ea4ad08697d44d689dd8a77271f7d4bd2ef1ac9106aedff9d1"
+        }
+      ],
+      "id": "canonical-encoding-rejection",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": "none-P03",
+      "publicationEligibility": "public-authored",
+      "sourceKind": "authored-full-node-vector"
+    },
+    {
+      "claimStatus": "no-property-claim",
+      "expected": {
+        "detail": "OutputValueTooLow { index: 0, value: 1, min: 15840 }",
+        "errorVariant": "OutputValueTooLow",
+        "stage": "structural",
+        "status": "node-rejected"
+      },
+      "family": "transaction-pipeline",
+      "files": [
+        {
+          "path": "node-vectors/output-constraint-rejection.fixture",
+          "sha256": "bc273bab8cb47b6c54102f9138ed965166c0e882e5ef6fd326789b666f0b1127"
+        }
+      ],
+      "id": "output-constraint-rejection",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": "none-P03",
+      "publicationEligibility": "public-authored",
+      "sourceKind": "authored-full-node-vector"
+    },
+    {
+      "claimStatus": "no-property-claim",
+      "expected": {
+        "detail": "CostExceeded { current: 80121910, limit: 80010910 }",
+        "errorVariant": "CostExceeded",
+        "stage": "aggregate-cost",
+        "status": "node-rejected"
+      },
+      "family": "transaction-pipeline",
+      "files": [
+        {
+          "path": "node-vectors/aggregate-cost-rejection.fixture",
+          "sha256": "6f7fc2188e54f561940ebd283be71da4da3aa243ce4b60328cad011735028ab0"
+        }
+      ],
+      "id": "aggregate-cost-rejection",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": "none-P03",
+      "publicationEligibility": "public-authored",
+      "sourceKind": "authored-full-node-vector"
+    },
+    {
+      "claimStatus": "no-property-claim",
+      "expected": {
+        "detail": "InputBoxNotFound { box_id: \"87ca67e4822b4c8777457f779eb98fb3a348fc40d9a3de8940a124ab29c4ad6a\" }",
+        "errorVariant": "InputBoxNotFound",
+        "stage": "utxo-resolution",
+        "status": "node-rejected"
+      },
+      "family": "transaction-pipeline",
+      "files": [
+        {
+          "path": "node-vectors/missing-utxo-rejection.fixture",
+          "sha256": "88aea8a0c44e243b1b0deba05e62413d5f13ed76e4f755c1ba1e9155042f853d"
+        }
+      ],
+      "id": "missing-utxo-rejection",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": "none-P03",
+      "publicationEligibility": "public-authored",
+      "sourceKind": "authored-full-node-vector"
+    },
+    {
+      "claimStatus": "no-property-claim",
+      "expected": {
+        "stage": "complete",
+        "status": "node-accepted",
+        "totalBlockCost": 12105,
+        "transactionId": "6ea6db3fd95dd1d39c098aa3b885e4c70cf8dc3e917bcc0455b1d8a7deaef4b8"
+      },
+      "family": "transaction-pipeline",
+      "files": [
+        {
+          "path": "node-vectors/storage-rent-acceptance.fixture",
+          "sha256": "3c6690af6b661c2cd2bbc5dd1fe83cbd61e2c8e549fc163d603a8373c5a9ec18"
+        }
+      ],
+      "id": "storage-rent-acceptance",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": "none-P03",
+      "publicationEligibility": "public-authored",
+      "sourceKind": "authored-full-node-vector"
+    },
+    {
+      "claimStatus": "no-property-claim",
+      "expected": {
+        "detail": "ReemissionRulesViolated(\"an output carries the re-emission token (it must be burned)\")",
+        "errorVariant": "ReemissionRulesViolated",
+        "stage": "node-validation",
+        "status": "node-rejected"
+      },
+      "family": "transaction-pipeline",
+      "files": [
+        {
+          "path": "node-vectors/reemission-rule-rejection.fixture",
+          "sha256": "e79ee2f8cce47e325296ec9cc46feed5b3db48e67cb5545714b523a03aac50c0"
+        }
+      ],
+      "id": "reemission-rule-rejection",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": "none-P03",
+      "publicationEligibility": "public-authored",
+      "sourceKind": "authored-full-node-vector"
+    }
+  ],
+  "formatVersion": 1,
+  "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+  "producer": "generate_node_vectors.rs; direct ergo_validation::tx::validate_transaction",
+  "stateScope": "hypothetical supplied state/rules; no historical or property claims"
+}

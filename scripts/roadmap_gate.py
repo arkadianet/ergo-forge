@@ -248,7 +248,8 @@ def run_unit(unit, records, root=ROOT):
     listed = command(cargo + ['--list'], records, root)
     require(listed.returncode == 0, 'test discovery/build failed')
     check_discovery(listed.stdout, unit['tests'])
-    result = command(cargo + ['--nocapture'], records, root)
+    # Captured diagnostics follow intact status lines; --nocapture can split them.
+    result = command(cargo + ['--show-output'], records, root)
     if result.returncode:
         raise GateError('failed', 'product test command failed')
     check_test_output(result.stdout, unit['tests'])

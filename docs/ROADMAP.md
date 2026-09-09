@@ -23,7 +23,7 @@ Baseline: main `ee4ac6a874531872c27828d94e21e4fe7a1d7f7c`, inspected 2026-09-09.
 
 **ergo-forge is an ErgoScript workbench for building contracts and inspecting deployed code through reproducible experiments on the Rust Ergo node's pinned compiler and execution engine.** Its authoring and audit views share contracts, scenarios, and evidence; every result states whether it is a static observation, a synthetic experiment, or a transaction checked against an explicitly supplied state. It helps people check specific contract claims and investigate counterexamples. It is not a general security certification service, an autonomous vulnerability scanner, a wallet, or a protocol-design generator. New work must improve the fidelity, reproducibility, or interpretation of those experiments; more recipes, detectors, graph features, and search breadth do not qualify by themselves.
 
-This paragraph is suitable for the README now: it does not assert that the node-validated result class already exists. Until P03–P05 ship, that class has zero producers.
+P03 now provides node-accepted execution against supplied premises through the library API. Node-validated property claims still have zero producers until P05; transaction acceptance alone is not a property claim.
 
 ## 2. Freeze / finish / rework / demote ledger
 
@@ -190,7 +190,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
 {
   "schemaVersion": 1,
   "baselineRev": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
-  "completedThrough": "P02",
+  "completedThrough": "P03",
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,
   "units": [
@@ -252,7 +252,18 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "incomplete_context_is_not_node_acceptance",
         "accepted_execution_cannot_be_deserialized_or_fabricated"
       ],
-      "implemented": false
+      "caseIds": [
+        "accepted-keyless-spend",
+        "duplicate-input-rejection",
+        "future-output-rejection",
+        "canonical-encoding-rejection",
+        "output-constraint-rejection",
+        "aggregate-cost-rejection",
+        "missing-utxo-rejection",
+        "storage-rent-acceptance",
+        "reemission-rule-rejection"
+      ],
+      "implemented": true
     },
     {
       "id": "P04",
@@ -377,7 +388,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
 
 P00 implementation amendment: result provenance is descriptive legacy metadata, not P01's case schema. The UI gate uses the production renderer against a DOM, with the exact dev dependency locked in `ui/package-lock.json`. The record-only command is `python3 scripts/roadmap_gate.py --scoreboard-only`; reports default to `target-p00/roadmap-gates/` and include command output and artifact hashes. The explicit `implemented` flag separates planned product units from missing required gates; it never passes a planned unit. These clarify the original gate specification without reducing any threshold.
 
-The runner's gate command is `python3 scripts/roadmap_gate.py --require P05` (substitute the unit ID). It runs each registered target via `cargo test --release -p <package> --test <target> -- --nocapture`, after checking the required test names through `--list`. Whole targets run, not filters that might silently select nothing. Install the pinned DOM-test dependency with `npm ci --prefix ui`. P00 additionally runs `python3 -m unittest discover -s scripts -p 'test_roadmap_gate.py'` and `node --test ui/tests/claim-labels.test.js`; P08 runs `node --test ui/tests/evidence-replay.test.js`. Those extra commands are fixed runner requirements with self-tests, not optional notes.
+The runner's gate command is `python3 scripts/roadmap_gate.py --require P05` (substitute the unit ID). It runs each registered target via `cargo test --release -p <package> --test <target> -- --show-output`, after checking the required test names through `--list`. Whole targets run, not filters that might silently select nothing. Install the pinned DOM-test dependency with `npm ci --prefix ui`. P00 additionally runs `python3 -m unittest discover -s scripts -p 'test_roadmap_gate.py'` and `node --test ui/tests/claim-labels.test.js`; P08 runs `node --test ui/tests/evidence-replay.test.js`. Those extra commands are fixed runner requirements with self-tests, not optional notes.
 
 `python3 scripts/roadmap_gate.py --all-goals` runs the full goal set and returns nonzero while anything is missing or failing. **It is expected to fail today**, first because the runner/new tests do not exist, then because the product obligations are not met. An infrastructure failure is reported as `missing-gate`, never as experimental evidence that a contract is unsafe. The runner writes a machine report distinguishing `missing-gate` (required infrastructure/evidence absent), `failed` (executed product gate failed), `passed`, `stopped`, and `unimplemented` (a registered unit explicitly marked `implemented: false`); none of missing-gate/failed/stopped/unimplemented counts as completion. P00 registers P01–P08 as unimplemented, so the full-goal check fails for unfinished product work rather than misclassifying planned files as broken infrastructure.
 
@@ -493,5 +504,22 @@ completion, P02–P08 were unimplemented.
 P02 execution record: see [P02-REPORT.md](P02-REPORT.md) and the
 [node wire API boundary](evidence-wire.md). P02 is registered as implemented;
 `completedThrough` advances to P02 after P00, P01 and P02 reran green. Acceptance
-names, numeric thresholds and frozen measurements are unchanged. P03–P08 remain
-unimplemented. Codec vectors are not accepted transaction bundles.
+names, numeric thresholds and frozen measurements are unchanged. At P02
+completion, P03–P08 were unimplemented. Codec vectors are not accepted transaction bundles.
+
+P03 execution record: see [P03-REPORT.md](P03-REPORT.md) and the
+[full validator API boundary](node-validation.md). P03 is registered as implemented;
+`completedThrough` advances to P03 after P00–P03 reran green. The policy now names
+the eight acceptance cases explicitly in `caseIds`, plus an enabled re-emission
+rejection to test rule forwarding. This makes the existing prose requirements
+machine-readable and adds a control; the minimum of eight and all other numeric
+thresholds remain unchanged. P04–P08 remain unimplemented. These authored
+hypothetical vectors do not change any frozen measurement or prove a property.
+
+P03 gate-command amendment: the runner uses `--show-output` instead of
+`--nocapture`. Actual P00/P02/P03 runs demonstrated that uncaptured diagnostics
+can split Rust test-status lines, causing false `missing-gate` results even
+with one test thread. Capturing and then showing diagnostics preserves complete
+status lines and all output. Discovery, required names, whole-target execution,
+ignored/zero-test rejection and every threshold are unchanged. The separately
+requested P03 `--nocapture` command is also run directly.
