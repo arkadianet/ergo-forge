@@ -579,11 +579,14 @@ mod map_feed {
         let input_count = request.inputs.len();
         let output_count = request.outputs.len();
         let report = drain_request(request);
-        println!("MAPPED_USE_MEASUREMENT {}", json!({
-            "inputs": input_count, "outputs": output_count,
-            "probesRun": report.probes_run, "capped": report.capped,
-            "synthesis": report.synthesis, "rejections": report.rejections,
-        }));
+        println!(
+            "MAPPED_USE_MEASUREMENT {}",
+            json!({
+                "inputs": input_count, "outputs": output_count,
+                "probesRun": report.probes_run, "capped": report.capped,
+                "synthesis": report.synthesis, "rejections": report.rejections,
+            })
+        );
 
         assert!(report.capped, "900 probes must bind on a 12-input set");
         assert!(

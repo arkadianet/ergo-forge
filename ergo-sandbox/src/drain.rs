@@ -1756,7 +1756,13 @@ fn materialize_synthesized(
             }
             DeclaredOutputEdit::Repad { output, fillers } => {
                 let padding = declared_padding(
-                    &outs, output, fillers, free_output, combo, &req.inputs, point.mint,
+                    &outs,
+                    output,
+                    fillers,
+                    free_output,
+                    combo,
+                    &req.inputs,
+                    point.mint,
                 )?;
                 outs[output].tokens.splice(0..0, padding);
             }
@@ -2044,15 +2050,24 @@ fn declared_padding(
         }
     }
     let mut excluded: HashSet<String> = outs[output]
-        .tokens.iter().map(|t| t.id.to_lowercase()).collect();
-    let attacker_boxes: Vec<ScenarioBox> = combo.iter().zip(inputs)
+        .tokens
+        .iter()
+        .map(|t| t.id.to_lowercase())
+        .collect();
+    let attacker_boxes: Vec<ScenarioBox> = combo
+        .iter()
+        .zip(inputs)
         .filter(|(_, input)| input.role == DrainRole::Attacker)
-        .map(|((_, b), _)| b.clone()).collect();
+        .map(|((_, b), _)| b.clone())
+        .collect();
     let available = tok_in_map(&attacker_boxes);
     let total = sum_boxes(combo.iter().map(|(_, b)| b));
     let mut padding = Vec::with_capacity(count);
     if let Some(amount) = mint {
-        padding.push(TokenAmount { id: MINT_SENTINEL.into(), amount });
+        padding.push(TokenAmount {
+            id: MINT_SENTINEL.into(),
+            amount,
+        });
         if padding.len() == count {
             return Some(padding);
         }
@@ -2062,7 +2077,8 @@ fn declared_padding(
             let id = t.id.to_lowercase();
             if available[&id] > 0
                 && total[&id] > *committed.get(&id).unwrap_or(&0)
-                && excluded.insert(id.clone()) {
+                && excluded.insert(id.clone())
+            {
                 padding.push(TokenAmount { id, amount: 1 });
                 if padding.len() == count {
                     return Some(padding);
@@ -3321,7 +3337,8 @@ mod tests {
             ],
             "protocolNfts": ["aa".repeat(32)], "height": 100,
             "synthesis": {"declaredOutputModifications": true, "maxNewOutputs": 0}
-        })).unwrap()
+        }))
+        .unwrap()
     }
 
     #[test]
@@ -3334,13 +3351,25 @@ mod tests {
         let roles: Vec<_> = req.inputs.iter().map(|i| i.role).collect();
         let inputs: Vec<_> = req.inputs.iter().map(|i| i.box_.clone()).collect();
         let axes = AxisIter::build(&req.synthesis, &req, &roles, &inputs, 3, 2);
-        let labels: Vec<_> = axes.shapes.iter().map(|s| s.static_label.as_str()).collect();
-        assert_eq!(&labels[..9], &[
-            "none", "retree(output=0)", "repad(output=0,fillers=1)",
-            "repad(output=0,fillers=2)", "repad(output=0,fillers=3)",
-            "retree(output=1)", "repad(output=1,fillers=1)",
-            "repad(output=1,fillers=2)", "repad(output=1,fillers=3)",
-        ]);
+        let labels: Vec<_> = axes
+            .shapes
+            .iter()
+            .map(|s| s.static_label.as_str())
+            .collect();
+        assert_eq!(
+            &labels[..9],
+            &[
+                "none",
+                "retree(output=0)",
+                "repad(output=0,fillers=1)",
+                "repad(output=0,fillers=2)",
+                "repad(output=0,fillers=3)",
+                "retree(output=1)",
+                "repad(output=1,fillers=1)",
+                "repad(output=1,fillers=2)",
+                "repad(output=1,fillers=3)",
+            ]
+        );
         assert!(labels[9].starts_with("recreate("));
         for s in &axes.shapes[1..9] {
             assert_eq!(s.new_count(), 0);
@@ -3349,50 +3378,100 @@ mod tests {
         // Arbitrary script bytes have no effect on edit selection/order.
         req.outputs[0].box_.ergo_tree = Some("opaque target script".into());
         let other = AxisIter::build(&req.synthesis, &req, &roles, &inputs, 3, 2);
-        assert_eq!(labels, other.shapes.iter().map(|s| s.static_label.as_str()).collect::<Vec<_>>());
+        assert_eq!(
+            labels,
+            other
+                .shapes
+                .iter()
+                .map(|s| s.static_label.as_str())
+                .collect::<Vec<_>>()
+        );
     }
 
     #[test]
     fn declared_padding_is_sourced_conserved_and_preserves_state() {
         let req = edit_request();
         let inputs: Vec<_> = req.inputs.iter().map(|i| i.box_.clone()).collect();
-        let combo: Vec<_> = inputs.iter().map(|b| ("declared".into(), b.clone())).collect();
-        let target_tree = "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197";
+        let combo: Vec<_> = inputs
+            .iter()
+            .map(|b| ("declared".into(), b.clone()))
+            .collect();
+        let target_tree =
+            "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197";
         for output in 0..2 {
             for count in 0..=3 {
                 for mint in [None, Some(1)] {
-                    if count == 0 && mint.is_some() { continue; }
+                    if count == 0 && mint.is_some() {
+                        continue;
+                    }
                     let shape = ShapeDesc {
-                        edit: Some(if count == 0 { DeclaredOutputEdit::Retree { output } }
-                            else { DeclaredOutputEdit::Repad { output, fillers: count } }),
-                        recreate: None, sinks: 0, static_label: "test".into(),
+                        edit: Some(if count == 0 {
+                            DeclaredOutputEdit::Retree { output }
+                        } else {
+                            DeclaredOutputEdit::Repad {
+                                output,
+                                fillers: count,
+                            }
+                        }),
+                        recreate: None,
+                        sinks: 0,
+                        static_label: "test".into(),
                     };
                     let point = ProbePoint {
-                        shape_index: 0, shape: &shape, out_perm: &[2, 1, 0],
-                        succ: &SuccState::Phase1, split: false, mint, filler_domain: vec![0],
+                        shape_index: 0,
+                        shape: &shape,
+                        out_perm: &[2, 1, 0],
+                        succ: &SuccState::Phase1,
+                        split: false,
+                        mint,
+                        filler_domain: vec![0],
                     };
                     assert!(!point.is_phase1(), "edits cannot take the phase-1 shortcut");
                     let (outs, flags) = materialize_synthesized(
-                        &req, "verbatim", &point, 0, &inputs, &combo, &[],
-                        &HashSet::new(), Some(2), target_tree,
-                    ).unwrap();
+                        &req,
+                        "verbatim",
+                        &point,
+                        0,
+                        &inputs,
+                        &combo,
+                        &[],
+                        &HashSet::new(),
+                        Some(2),
+                        target_tree,
+                    )
+                    .unwrap();
                     assert_eq!(flags, vec![false; 3]);
                     let edited = &outs[2 - output];
                     let original = &req.outputs[output].box_;
                     assert_eq!(edited.value, original.value);
-                    assert_eq!(serde_json::to_value(&edited.registers).unwrap(),
-                        serde_json::to_value(&original.registers).unwrap());
+                    assert_eq!(
+                        serde_json::to_value(&edited.registers).unwrap(),
+                        serde_json::to_value(&original.registers).unwrap()
+                    );
                     assert_eq!(edited.creation_height, original.creation_height);
                     assert_eq!(edited.tokens.len(), original.tokens.len() + count);
-                    assert_eq!(serde_json::to_value(&edited.tokens[count..]).unwrap(),
-                        serde_json::to_value(&original.tokens).unwrap());
-                    assert_eq!(edited.ergo_tree.as_deref(), if count == 0 { Some(target_tree) }
-                        else { original.ergo_tree.as_deref() });
+                    assert_eq!(
+                        serde_json::to_value(&edited.tokens[count..]).unwrap(),
+                        serde_json::to_value(&original.tokens).unwrap()
+                    );
+                    assert_eq!(
+                        edited.ergo_tree.as_deref(),
+                        if count == 0 {
+                            Some(target_tree)
+                        } else {
+                            original.ergo_tree.as_deref()
+                        }
+                    );
                     // The other fixed output is byte-identical after permutation.
-                    assert_eq!(serde_json::to_value(&outs[2 - (1 - output)]).unwrap(),
-                        serde_json::to_value(&req.outputs[1 - output].box_).unwrap());
+                    assert_eq!(
+                        serde_json::to_value(&outs[2 - (1 - output)]).unwrap(),
+                        serde_json::to_value(&req.outputs[1 - output].box_).unwrap()
+                    );
                     let (tx, _) = build_tx_request(&req, &inputs, &outs, 1).unwrap();
-                    assert!(tx_check(&tx).unwrap().valid, "sourced padding must conserve, including mint ids");
+                    assert!(
+                        tx_check(&tx).unwrap().valid,
+                        "sourced padding must conserve, including mint ids"
+                    );
                 }
             }
         }
@@ -3401,7 +3480,12 @@ mod tests {
     #[test]
     fn declared_padding_rejects_unsourced_duplicate_and_already_committed_fillers() {
         let mut req = edit_request();
-        let boxes = |r: &DrainRequest| r.inputs.iter().map(|i| ("declared".into(), i.box_.clone())).collect::<Vec<_>>();
+        let boxes = |r: &DrainRequest| {
+            r.inputs
+                .iter()
+                .map(|i| ("declared".into(), i.box_.clone()))
+                .collect::<Vec<_>>()
+        };
         let outs: Vec<_> = req.outputs.iter().map(|o| o.box_.clone()).collect();
         assert!(declared_padding(&outs, 0, 3, Some(2), &boxes(&req), &req.inputs, None).is_some());
         req.inputs[1].box_.tokens.truncate(1);
@@ -3412,13 +3496,35 @@ mod tests {
         req.inputs[1].role = DrainRole::Attacker;
         let mut committed = outs.clone();
         committed[1].tokens = req.inputs[1].box_.tokens.clone();
-        assert!(declared_padding(&committed, 0, 1, Some(2), &boxes(&req), &req.inputs, None).is_none());
+        assert!(
+            declared_padding(&committed, 0, 1, Some(2), &boxes(&req), &req.inputs, None).is_none()
+        );
         // A token already on the target cannot appear twice.
         committed[0].tokens = req.inputs[1].box_.tokens.clone();
-        assert!(declared_padding(&committed, 0, 1, Some(2), &boxes(&req), &req.inputs, None).is_none());
+        assert!(
+            declared_padding(&committed, 0, 1, Some(2), &boxes(&req), &req.inputs, None).is_none()
+        );
         // Mint supplies one distinct filler, never three imaginary ids.
-        assert!(declared_padding(&committed, 0, 1, Some(2), &boxes(&req), &req.inputs, Some(1)).is_some());
-        assert!(declared_padding(&committed, 0, 2, Some(2), &boxes(&req), &req.inputs, Some(1)).is_none());
+        assert!(declared_padding(
+            &committed,
+            0,
+            1,
+            Some(2),
+            &boxes(&req),
+            &req.inputs,
+            Some(1)
+        )
+        .is_some());
+        assert!(declared_padding(
+            &committed,
+            0,
+            2,
+            Some(2),
+            &boxes(&req),
+            &req.inputs,
+            Some(1)
+        )
+        .is_none());
     }
 
     #[test]
