@@ -1,0 +1,1970 @@
+{
+  "examples/contracts/basics/guarded-register-read.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "409df1c6dd056d15966538b2994f584608a360fca54143e324717a1a84e9a7d6"
+  },
+  "examples/contracts/basics/height-lock.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "6cbc9bf855e0ca8d4a0d5465a206a2fa7d676c50369a7a61cdd6be4c20543ef2"
+  },
+  "examples/contracts/basics/oracle-price-gate.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "ae869920c4db77b376680314d52c46d68a9305781426ae0edccb6057f8c15411"
+  },
+  "examples/contracts/basics/pay-to-public-key.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "970d95ad1f9156c0d9dc60c5ce022c1861a48be5b1933e8892df0582f3c28e3b"
+  },
+  "examples/contracts/basics/self-preserving.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "0d4cedd4ea0cde985f2799386622ef7723d5d285e98406ec93ce85909b6b4f12"
+  },
+  "examples/contracts/basics/two-of-three.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "b745fabfd4bf7579ebfd767550b4d14c9bad35cee778603b18866b3a8d0b4ed4"
+  },
+  "examples/contracts/basics/unguarded-register-read.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "33bb9706814872057f50c27872f95593229691ec33471f75cd0dfc243bd2eb58"
+  },
+  "examples/contracts/chaincash-basis/basis-tracker-basis.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "91ce0faf46480e4170e48c8831ce766662fb6ab7ddd87a45bc70ec2690ae05f4"
+  },
+  "examples/contracts/chaincash-basis/chaincash/layer2-old/note.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "9d733ed1d9814b5d191c1a8542f3888cfa2296d10f8ee5716bf19c13d038010f"
+  },
+  "examples/contracts/chaincash-basis/chaincash/layer2-old/redemption.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "0b889f067f06f41cb78c85a669c4cf051c01deb3ec39b67835c0c5c78301d46b"
+  },
+  "examples/contracts/chaincash-basis/chaincash/layer2-old/redproducer.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "7cb1ae00daac56fc7cac32e3d5040437707c41e44879dfb648719c1e80e2d3dc"
+  },
+  "examples/contracts/chaincash-basis/chaincash/layer2-old/reserve.es": {
+    "bucket": "initial-compile-failed",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": null
+  },
+  "examples/contracts/chaincash-basis/chaincash/offchain/basis-token.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "1c7e6ce9e5e167d93ea286539a7709f610cca9b8123fdbae788d6ece2b4a3966"
+  },
+  "examples/contracts/chaincash-basis/chaincash/offchain/basis.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "91ce0faf46480e4170e48c8831ce766662fb6ab7ddd87a45bc70ec2690ae05f4"
+  },
+  "examples/contracts/chaincash-basis/chaincash/onchain/note.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "9a1c511b78d211fc5048ea5aef13cfb963491078a89e3d775d010c7fd3d4e075"
+  },
+  "examples/contracts/chaincash-basis/chaincash/onchain/receipt.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "84dcabfe6db33e2e4ec7e6cecbd8445d76c7ae73f65677c8844421238099e0fa"
+  },
+  "examples/contracts/chaincash-basis/chaincash/onchain/reserve.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "ce7ab49feffd52909c38a2e8f05336967d980323a6b416d0c65cd049e044aa4b"
+  },
+  "examples/contracts/crystalpool/buy-token-for-erg.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "a234814773837a22cd92a635b19eb132700809ce811661450b7d5394ecd33bb2"
+  },
+  "examples/contracts/crystalpool/deposit.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "637b4d33952876a2666fa4e1e7b7a044f58dd303f7b85b88ef7f2b2919493b1b"
+  },
+  "examples/contracts/crystalpool/sell-token-for-erg.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "ae68e05e609d5150a00e4b2f7eea90f982ff7cacefdb2beca9524205a5847f62"
+  },
+  "examples/contracts/crystalpool/swap-tokens-denom.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "c45860260450499778570a251565bf9e340594436217069a38a0da44e7ce6429"
+  },
+  "examples/contracts/crystalpool/swap-tokens.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "d10161c9021db4b40514ab59e0a66af2a5420acad2dfad1144cdb61b07019058"
+  },
+  "examples/contracts/curve-trees/CurveTreeVerifier-v6.es": {
+    "bucket": "initial-compile-failed",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": null
+  },
+  "examples/contracts/dexy/bank/arbmint.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "c6b8b096c33659c8e39171fa601e1ac26421225bf8a11902e7b4f1de8adc343e"
+  },
+  "examples/contracts/dexy/bank/bank.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "7b04310d48e4465e759fc01fbf58f38706e0adff099783b27d3f0a216a09738a"
+  },
+  "examples/contracts/dexy/bank/buyback-patched.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "fab9841480d15e0db48b67811a52838ebb058c9671c3f32425aefcb1bf12e796"
+  },
+  "examples/contracts/dexy/bank/buyback.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "fb877f4a8e47e3b63a16f2c678b78d4be9883a492196547c82522f36ef6dcbf3"
+  },
+  "examples/contracts/dexy/bank/freemint.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "8b7daeb5d65ebb253c196269dae18387dac3e1f033c8ad9c2ce2fc0ffca82f9a"
+  },
+  "examples/contracts/dexy/bank/intervention.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "c316f68ee280aaa6f930796c993dfcb61ba005ef81652f9050c03e0708441b27"
+  },
+  "examples/contracts/dexy/bank/payout.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "312f946c060c10409dd454dd3b6c7c914e4aa9a8f8223ce0a4663e9b198c31ed"
+  },
+  "examples/contracts/dexy/bank/update/ballot.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "03f5ca6c9bec09b771f5de392a8ecd82ac5302fb7ac2aa9e51af59e859de3bcd"
+  },
+  "examples/contracts/dexy/bank/update/update.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "48da04849441081231eb0f28fc8011c1a3d5976f493a52bba23973a142adad3f"
+  },
+  "examples/contracts/dexy/gort-dev/emission.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "bb7c03449dd5f44dd45fdaa8996ee3be851bdb637090d46c4c3e37db837137cc"
+  },
+  "examples/contracts/dexy/hodlcoin/hodlcoin.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "ab131a87856c70664856ada925d49ac32c59c195c54dc635c2fa56dd05673b89"
+  },
+  "examples/contracts/dexy/lp/pool/extract.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "0d9fa5e6f735d9c518e4e39500dad3c0f62ce724975dff92a4a985df1616d739"
+  },
+  "examples/contracts/dexy/lp/pool/main.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "bfc61d0731c8ac3e7f618785c69fee7acaeafe40d6e2888c08a433228bf6b5b9"
+  },
+  "examples/contracts/dexy/lp/pool/mint.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "15e28f08cb086adb82035e9444a2eb8a09223b8706b2a9caa86063a7d19743aa"
+  },
+  "examples/contracts/dexy/lp/pool/redeem.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "bb19cbc671ed2f69be83a38e165940052abd6936f21ce1300d0850b83e6e98d1"
+  },
+  "examples/contracts/dexy/lp/pool/swap.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "876847994cb551b720047f54e571d52d67ccb07f0982ca9ab60c3ec0b78f69f8"
+  },
+  "examples/contracts/dexy/lp/proxy/Deposit.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "d3a389980dc3fee85b08ecda379bd74c5effe5a5b559f518580de1c8cea62797"
+  },
+  "examples/contracts/dexy/lp/proxy/Redeem.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "b62626fab30bc72e991849b60486383f51ace922952314f348017c5f79f0bef1"
+  },
+  "examples/contracts/dexy/lp/proxy/SwapBuyV1.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "e0b1a3e8b6e270e49c08931d4eae2b9c26bc476fa62626c64607cb2e6f288dff"
+  },
+  "examples/contracts/dexy/lp/proxy/SwapBuyV2.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "1a9ea40ce76c11c7b896b8f330c24133a7935239cc104e7374ae3e1014559ebd"
+  },
+  "examples/contracts/dexy/lp/proxy/SwapSell.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "d9a8f7aba4d609f3e210f7b31b1acc908adb6630f557cff0352e99fe192d2f5d"
+  },
+  "examples/contracts/dexy/lp/proxy/SwapSellV1.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "0616618b49e9ba0bb5dd217b4fbc579cd783ce782df76d50f3b5d5b260478b43"
+  },
+  "examples/contracts/dexy/tracking.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "db72b75e8ec31b21c10b232ea84c217b2e9abd2cc1cff0d6483bd04df5553d19"
+  },
+  "examples/contracts/hodlcoin/phoenix/phoenix_v1_hodlcoin_bank.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "2433de8e1b800ec29557d7dcc1c6b725b5e26549f264f6008d7568f0202d89e2"
+  },
+  "examples/contracts/hodlcoin/phoenix/phoenix_v1_hodlcoin_fee.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "02325161f355aaec285a5698bc9281124b555607c96cee9f2485e88f5086e1c1"
+  },
+  "examples/contracts/hodlcoin/phoenix/phoenix_v1_hodlcoin_feeTest.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22fa277b6188fe833f5eb884dd362b0f9ca9d8e07ae2d9026f962ae6a15ed0aa"
+  },
+  "examples/contracts/hodlcoin/phoenix/phoenix_v1_hodlcoin_feeTest_mainnet.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "7e6f6a12bbe202c8aa2f05ccc9e0f7eb80935b1f26ced2d45a562778e556639f"
+  },
+  "examples/contracts/hodlcoin/phoenix/phoenix_v1_hodlcoin_proxy.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "511fac24cf80c32903c5775c6f4b26ebdd251323f6a77e2bf34e88c6bfa68fdd"
+  },
+  "examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_bank.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "84e941d4a856ba8b78e26b9dad0654a28cc84b93a1a942ac1c5a84cb20aff9fc"
+  },
+  "examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_fee.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "d79ba6f6efb47e0c79be3193a24d45fa2c05303c98f55a1b6da16354c7136ded"
+  },
+  "examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_feeTest_mainnet.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "060564c79d1b82b8932ad061742af40c5654dd703901a2494be55caac4e04b33"
+  },
+  "examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_feeTest_testnet.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "7ea3fbc3af404ec0027c8226e7a1407f40e7e707ecc384c7a58705ec8a97740f"
+  },
+  "examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_proxy.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "511425d4c547cdf9e2bd251710309d8cb73ee7f788b83311a6b5b988666e66f4"
+  },
+  "examples/contracts/hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_bank.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "2433de8e1b800ec29557d7dcc1c6b725b5e26549f264f6008d7568f0202d89e2"
+  },
+  "examples/contracts/hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_fee.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "02325161f355aaec285a5698bc9281124b555607c96cee9f2485e88f5086e1c1"
+  },
+  "examples/contracts/hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_proxy.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "511fac24cf80c32903c5775c6f4b26ebdd251323f6a77e2bf34e88c6bfa68fdd"
+  },
+  "examples/contracts/hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodltoken_bank.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "af75fdc7e660dc96addae75e7e939881a6548e31ddfab2b45c0b7cd17ddf859c"
+  },
+  "examples/contracts/hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodltoken_fee.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "8844f2690c7f1fe3f1b5b77737d917dee656254bde2223502658f304d20e5f0f"
+  },
+  "examples/contracts/hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodltoken_proxy.es": {
+    "bucket": "initial-compile-failed",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": null
+  },
+  "examples/contracts/lsp/examples/completion_demo.es": {
+    "bucket": "initial-compile-failed",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": null
+  },
+  "examples/contracts/lsp/examples/eip5-multi-sig.es": {
+    "bucket": "initial-compile-failed",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": null
+  },
+  "examples/contracts/lsp/examples/eip5-payment-channel.es": {
+    "bucket": "initial-compile-failed",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": null
+  },
+  "examples/contracts/lsp/examples/eip5-simple-contract.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "e2b41f0d69cc49ae72a4eab0c5edcef880f076e7450d2cc9d32d794fe458cbf1"
+  },
+  "examples/contracts/lsp/examples/hover_demo.es": {
+    "bucket": "initial-compile-failed",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": null
+  },
+  "examples/contracts/lsp/src/main.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "6cbc9bf855e0ca8d4a0d5465a206a2fa7d676c50369a7a61cdd6be4c20543ef2"
+  },
+  "examples/contracts/lsp/src/simple.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "6cbc9bf855e0ca8d4a0d5465a206a2fa7d676c50369a7a61cdd6be4c20543ef2"
+  },
+  "examples/contracts/lsp/src/template_test.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "e2b41f0d69cc49ae72a4eab0c5edcef880f076e7450d2cc9d32d794fe458cbf1"
+  },
+  "examples/contracts/lsp/test_contract.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "c1421068a96e987d1f949638e03302dc7b4b66bd4bcd3a2c65fc948ddb86ff76"
+  },
+  "examples/contracts/lsp/test_simple.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "examples/contracts/lsp/tests/main.test.es": {
+    "bucket": "initial-compile-failed",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": null
+  },
+  "examples/contracts/lsp/tests/simple.test.es": {
+    "bucket": "initial-compile-failed",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": null
+  },
+  "examples/contracts/lsp/tests/template.test.es": {
+    "bucket": "initial-compile-failed",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": null
+  },
+  "examples/contracts/lsp/zed-extension-test.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "7939ada71f8f01a6cf0ef4e2ce46e07897509da9c9c639d9a6879e02e382f27c"
+  },
+  "examples/contracts/protocols/amm/pool.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "85e3e436c0625e2436e2d20afe15c464a140adc6a1f5183fc2e52179ae65dae8"
+  },
+  "examples/contracts/protocols/amm/swap-order.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "022aa78f3a43ae49b3c048daa6451890a355b03da633fa5145d235dcdc258471"
+  },
+  "examples/contracts/protocols/bank/bank.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "2178c93ca815360e5f027f75f7bcebc70b2ca050c1021ee8f8ec123a21ec9703"
+  },
+  "examples/contracts/protocols/mixer/full-mix.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "03f32ae6a516e7abea401fada3ef2845bbf76ac1ed8333626b2c50a269fd16ff"
+  },
+  "examples/contracts/protocols/mixer/half-mix.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "eeb96184fb4741d91c889a65491deb95a0821e7b390468de906718457d716163"
+  },
+  "examples/contracts/protocols/registry/registry.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "b83e1f3b242b7fba82f0d239ec94f449a0b8aee173e2991600583eb2d18dd433"
+  },
+  "examples/contracts/recipes/auction.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "4737a474d1894e86301ab09a06ca325bafa9693677237ad05d198d05d8150ae2"
+  },
+  "examples/contracts/recipes/bounty.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "cda14b4fe3a1fc54cb53cf30d62103f583ec76ff14ae4a799df70bd724f98449"
+  },
+  "examples/contracts/recipes/burn.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "bab7ffd1fb13ef16a8ea9f72ed921ce7d657d3e8dd97fac843f2bc91de1e0d6a"
+  },
+  "examples/contracts/recipes/cliff-vesting.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "eef68c5bbd2ad913bcddbb63f8a21ba9e5b6fa1faf1ba34189da2479e308d919"
+  },
+  "examples/contracts/recipes/escrow.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "0a9ea548ae7a40e23b67d8b02c10c0f25cd09f999abdc524ffa0392e22641414"
+  },
+  "examples/contracts/recipes/htlc.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "d332d924694416ae9219b24a628cd2d8105ad5f1f5b887f3a438113c8035478a"
+  },
+  "examples/contracts/recipes/inheritance.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "35dea1106a7f8d254653f1bb7bdad2fe0f49309ba2393061e8d1cf46ee6d0e32"
+  },
+  "examples/contracts/recipes/nft-sale.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "d2d5a1b38ac803c1abe56bd4f995f87aea3abd8d123a63874c13ebb5efe6a84f"
+  },
+  "examples/contracts/recipes/price-gate.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "c571719a9edf5a6e266d91fc798410c6f16647a89604d8207eab117e2d1e191f"
+  },
+  "examples/contracts/recipes/refundable-payment.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "35dea1106a7f8d254653f1bb7bdad2fe0f49309ba2393061e8d1cf46ee6d0e32"
+  },
+  "examples/contracts/recipes/savings-cap.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "ef5b8ba1c5695f8d9bdc201bbe0588e56c20399e4259534b06fd52ca7ceb3657"
+  },
+  "examples/contracts/recipes/subscription.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "7a59caec2ae1293980cb1205a1c2c7f2cd24a8957a87f553a54e79127c970238"
+  },
+  "examples/contracts/recipes/time-lock.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "5ec881279d51d1e4a8e43d22965729f58d076e3b524f6c22f3a179d13caf6208"
+  },
+  "examples/contracts/recipes/token-sale.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "77db7c18f43b145d1aa6b4b64e4de6822eed3c34b3b410c099371b1b75434e28"
+  },
+  "examples/contracts/recipes/two-of-three.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "0a9ea548ae7a40e23b67d8b02c10c0f25cd09f999abdc524ffa0392e22641414"
+  },
+  "examples/contracts/recipes/vesting.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "5554bb9b8c0844f5d7651039ffc9fffbb82226b6d4559dd3bd1e9c75079afdda"
+  },
+  "examples/contracts/rosen-bridge/Collateral.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "4d8be4fd060541a3f9489acf6cec9a770c9fb61c239568db044078e2302be979"
+  },
+  "examples/contracts/rosen-bridge/Commitment.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "d5f0f0c0ba3373bec2afdc04eb04369ebe75858890953ee47107588d18711221"
+  },
+  "examples/contracts/rosen-bridge/Emission.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "45d0e9f3d037d07d4054d0549126525f78982fb4164daf7fc041f11a32a88da5"
+  },
+  "examples/contracts/rosen-bridge/EventTrigger.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "d77dd1be74f1fefc86b400aef0dfa89d41c43111bd53f722a8b70b164a7eb9f5"
+  },
+  "examples/contracts/rosen-bridge/Fraud.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "46b3fc6c5e7dca387815020ce27680ceab3ca569142740774d1615264e531f5a"
+  },
+  "examples/contracts/rosen-bridge/GuardSign.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "832ad45bc7d7e245458beda4793fa64889b7af75aafac8f5db443e34f3192880"
+  },
+  "examples/contracts/rosen-bridge/Lock.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "476d24d929a0e9acddbcbbcb4a426b858d4aa135561bd1f78e0a42c27daaba5a"
+  },
+  "examples/contracts/rosen-bridge/Permit.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "ea90435718f666b7e1af799f30dbec75336215d60189824962ad7881bbf6f5ee"
+  },
+  "examples/contracts/rosen-bridge/RepoConfig.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "2ecfc95f1d9b9309dba6fa1a82cd40cb38515879abcb44c7e5093cfa617c5c2d"
+  },
+  "examples/contracts/rosen-bridge/RwtRepo.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "304d502b92b7ca61268ad1d5d1855294dc5f7662000d3cd89095ec5776b5c817"
+  },
+  "examples/incidents/use-bank-vault.json#/adminBox/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "9aa8f84869ffb847beb4e8701e1ce32e7c8c20642a8ea3b861883a2977272466"
+  },
+  "examples/incidents/use-bank-vault.json#/deployedTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "84e0cb22c62528805020e98bbe296f834d7a2dce286a320b36adfd5cade31617"
+  },
+  "examples/incidents/use-bank-vault.json#/authorizers/2/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "929f40617b4b88cff28672751d0b0d9aadac311f9a030274a6395d1193834c08"
+  },
+  "examples/incidents/use-bank-vault.json#/authorizers/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "a8ca34d6e0f7e319da40b5387b01622499c3f0b4205fdcc2619f0eebd34f1ac2"
+  },
+  "examples/incidents/use-bank-vault.json#/authorizers/1/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "afcec729101d655fa9ac3d817fe2439399c553cd2289ae245ce1155268901cf6"
+  },
+  "examples/incidents/use-lp-drain.deployed-pool.test.json#/scenarios/0/inputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "a7888908ac41bfbf080d7d5d4a1e31a294f29d7c24da658ae0a9b7fcc363d5c9"
+  },
+  "examples/incidents/use-lp-drain.deployed-pool.test.json#/scenarios/0/outputs/3/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "744c727d6a1478912d1e7052957c2ba466bf9a5a89e9347309a58e2032473278"
+  },
+  "examples/incidents/use-lp-drain.deployed-pool.test.json#/scenarios/0/inputs/1/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "0d2c107a0efb4bb19136cf3c29739fd6ac2202b55b9405afefc4b11c839f9a28"
+  },
+  "examples/incidents/use-lp-drain.deployed-pool.test.json#/scenarios/0/inputs/2/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "6cb27f7aceb09cf3437e88e682d156452602b28f0113d436ae2f56f6a2ee7498"
+  },
+  "examples/incidents/use-lp-drain.deployed-swap.test.json#/scenarios/0/inputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "a7888908ac41bfbf080d7d5d4a1e31a294f29d7c24da658ae0a9b7fcc363d5c9"
+  },
+  "examples/incidents/use-lp-drain.deployed-swap.test.json#/scenarios/0/outputs/3/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "744c727d6a1478912d1e7052957c2ba466bf9a5a89e9347309a58e2032473278"
+  },
+  "examples/incidents/use-lp-drain.deployed-swap.test.json#/scenarios/0/inputs/1/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "0d2c107a0efb4bb19136cf3c29739fd6ac2202b55b9405afefc4b11c839f9a28"
+  },
+  "examples/incidents/use-lp-drain.deployed-swap.test.json#/scenarios/0/inputs/2/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "6cb27f7aceb09cf3437e88e682d156452602b28f0113d436ae2f56f6a2ee7498"
+  },
+  "examples/incidents/use-lp-drain.fixed-swap.test.json#/scenarios/0/inputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "a7888908ac41bfbf080d7d5d4a1e31a294f29d7c24da658ae0a9b7fcc363d5c9"
+  },
+  "examples/incidents/use-lp-drain.fixed-swap.test.json#/scenarios/0/outputs/3/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "744c727d6a1478912d1e7052957c2ba466bf9a5a89e9347309a58e2032473278"
+  },
+  "examples/incidents/use-lp-drain.fixed-swap.test.json#/scenarios/0/inputs/1/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "0d2c107a0efb4bb19136cf3c29739fd6ac2202b55b9405afefc4b11c839f9a28"
+  },
+  "examples/incidents/use-lp-drain.fixed-swap.test.json#/scenarios/0/inputs/2/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "6cb27f7aceb09cf3437e88e682d156452602b28f0113d436ae2f56f6a2ee7498"
+  },
+  "examples/mutants/mutants.json#/mutants/0/template/inputs/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "examples/tests/amm-pool.test.json#/scenarios/63/outputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "examples/tests/amm-swap-order.test.json#/scenarios/0/outputs/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "5c0182d6bfeec0e13f4b3d1ae407e77951c9f9934e2160a598d6043027848dd8"
+  },
+  "examples/tests/amm-swap-order.test.json#/scenarios/0/inputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "examples/tests/auction.test.json#/scenarios/3/outputs/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "970d95ad1f9156c0d9dc60c5ce022c1861a48be5b1933e8892df0582f3c28e3b"
+  },
+  "examples/tests/auction.test.json#/scenarios/0/outputs/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "5c0182d6bfeec0e13f4b3d1ae407e77951c9f9934e2160a598d6043027848dd8"
+  },
+  "examples/tests/auction.test.json#/scenarios/5/outputs/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "6cca69c44fc65e66f901a48d0d2775830071ec8ed6846682ee212b7691d89958"
+  },
+  "examples/tests/bank.test.json#/scenarios/0/dataInputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "examples/tests/cliff-vesting.test.json#/scenarios/2/outputs/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "5c0182d6bfeec0e13f4b3d1ae407e77951c9f9934e2160a598d6043027848dd8"
+  },
+  "examples/tests/compose-state-box.test.json#/scenarios/0/outputs/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "5c545d457a07ad64a1d6810ceab90f7d3a521b29d68b53656224368b9510051a"
+  },
+  "examples/tests/compose-state-box.test.json#/scenarios/4/dataInputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "examples/tests/method-sweep.json#/0/scenario/outputs/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "bbfac43d28495e18c8756a5491fee6d3280674d3c8b73f5b55af80a018248b92"
+  },
+  "examples/tests/method-sweep.json#/0/scenario/dataInputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "examples/tests/mixer-half.test.json#/scenarios/5/outputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "examples/tests/mixer-half.test.json#/scenarios/1/outputs/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "93cc9b965580cf1778e7607f77ed78dd01cf03f90c2cad9c5f63c78a39dfad6f"
+  },
+  "examples/tests/nft-sale.test.json#/scenarios/0/outputs/2/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "970d95ad1f9156c0d9dc60c5ce022c1861a48be5b1933e8892df0582f3c28e3b"
+  },
+  "examples/tests/nft-sale.test.json#/scenarios/0/outputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "5c0182d6bfeec0e13f4b3d1ae407e77951c9f9934e2160a598d6043027848dd8"
+  },
+  "examples/tests/nft-sale.test.json#/scenarios/0/outputs/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "6cca69c44fc65e66f901a48d0d2775830071ec8ed6846682ee212b7691d89958"
+  },
+  "examples/tests/oracle-price-gate.test.json#/scenarios/1/dataInputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "examples/tests/registry.test.json#/scenarios/0/outputs/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "5c0182d6bfeec0e13f4b3d1ae407e77951c9f9934e2160a598d6043027848dd8"
+  },
+  "examples/tests/savings-cap.test.json#/scenarios/3/outputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "5c0182d6bfeec0e13f4b3d1ae407e77951c9f9934e2160a598d6043027848dd8"
+  },
+  "examples/tests/subscription.test.json#/scenarios/5/outputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "970d95ad1f9156c0d9dc60c5ce022c1861a48be5b1933e8892df0582f3c28e3b"
+  },
+  "examples/tests/subscription.test.json#/scenarios/0/outputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "5c0182d6bfeec0e13f4b3d1ae407e77951c9f9934e2160a598d6043027848dd8"
+  },
+  "examples/tests/token-sale.test.json#/scenarios/0/outputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "5c0182d6bfeec0e13f4b3d1ae407e77951c9f9934e2160a598d6043027848dd8"
+  },
+  "examples/tests/token-sale.test.json#/scenarios/2/outputs/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "examples/tests/vesting.test.json#/scenarios/2/outputs/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "5c0182d6bfeec0e13f4b3d1ae407e77951c9f9934e2160a598d6043027848dd8"
+  },
+  "examples/tests/vesting.test.json#/scenarios/6/outputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/0": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "6cbc9bf855e0ca8d4a0d5465a206a2fa7d676c50369a7a61cdd6be4c20543ef2"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/1": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "e8230a0bce6a87daf8abb30133856e5db5ca54747beaa6128442445618ea20ed"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/2": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "fafe1ad05b48da80ddb2493d7397c3e27dbc610be86513eeab01f1c9006419d2"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/3": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "5110e7099bfa2cf5ef830c510624801042683cd5ef21c081876c4a74c11f09c7"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/4": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "e8230a0bce6a87daf8abb30133856e5db5ca54747beaa6128442445618ea20ed"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/5": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "970d95ad1f9156c0d9dc60c5ce022c1861a48be5b1933e8892df0582f3c28e3b"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/6": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "33f774499a2fe10634adc446f82f98d6ac671c236d5f8163a8ddc0d6fd393214"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/7": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "b86f27471cb1d4518e242b0fc57f5a66e51ced705fc8d532b49f4e6fa714d318"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/8": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/9": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "9de8c6f595fa85e4224ac4a8514cc2fbc86d83f91356e73db479b4793060e6d1"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/10": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "e8230a0bce6a87daf8abb30133856e5db5ca54747beaa6128442445618ea20ed"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/11": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "b2971a28f9cccea4dc5ef4fdab37cd428427fe35e780257466b5b46d2e8270eb"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/12": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "dae2a6e6326baf0bde4593ff6cdf9f01a7b49e12349b4f62f562debc4f905900"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/13": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "fe51f1237ca8ab58c079771846120487966fd905dfe3af8fe095842aeb1fe6d3"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/14": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "f283401300ad3a361c239ba0a71aa24f28a1925a1fb68fe2068dfa83513e9bd0"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/15": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "fafe1ad05b48da80ddb2493d7397c3e27dbc610be86513eeab01f1c9006419d2"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/16": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "fafe1ad05b48da80ddb2493d7397c3e27dbc610be86513eeab01f1c9006419d2"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/17": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "33f774499a2fe10634adc446f82f98d6ac671c236d5f8163a8ddc0d6fd393214"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/18": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "33f774499a2fe10634adc446f82f98d6ac671c236d5f8163a8ddc0d6fd393214"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/19": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/20": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22fc9b8ba4c4d42f2529e5229b0d6d81885413ff2eec1c6ef9ef1c7d62dc3cce"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/21": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "46a8d4d11f1f4a4555c4532ddf489d3d189c7dfe156b642d6f092f0b6bb29374"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/22": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "9d733ed1d9814b5d191c1a8542f3888cfa2296d10f8ee5716bf19c13d038010f"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/23": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "7cb1ae00daac56fc7cac32e3d5040437707c41e44879dfb648719c1e80e2d3dc"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/24": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "637b4d33952876a2666fa4e1e7b7a044f58dd303f7b85b88ef7f2b2919493b1b"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/25": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "bb7c03449dd5f44dd45fdaa8996ee3be851bdb637090d46c4c3e37db837137cc"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/26": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "6cbc9bf855e0ca8d4a0d5465a206a2fa7d676c50369a7a61cdd6be4c20543ef2"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/27": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "6cbc9bf855e0ca8d4a0d5465a206a2fa7d676c50369a7a61cdd6be4c20543ef2"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/28": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "c1421068a96e987d1f949638e03302dc7b4b66bd4bcd3a2c65fc948ddb86ff76"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/29": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/30": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "33f774499a2fe10634adc446f82f98d6ac671c236d5f8163a8ddc0d6fd393214"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/31": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "33f774499a2fe10634adc446f82f98d6ac671c236d5f8163a8ddc0d6fd393214"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/32": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/33": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "1d983270d8472ee9c8ca7ae22b1976fcad6024c97bf2d29bc29b5eaba5fb8cb9"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/34": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "3a7995db5074315a38f14032552f6c94a4bc75902fe9b363c23f5ad55be70c50"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/35": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "92eff36c4429f42750bfe83f1e748eaa356c30c3b94447137c73a2b0a0c416e5"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/36": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "719f211d58d8d4316c7387454e5b75fc14609cd608d12881073b4c1e8ab1d174"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/37": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "c0ad26d0932a4285df8c29bf253cc918f1f1696c7eb0c0dbb9056a193cf32aa5"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/38": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "34db3ca4c39f7948d2637af1522296e79762b70ed5909978217f11462a060b7f"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/39": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "b57a6eb3770b55ac1b8a93ee354e85849eb29deeb6ce82fada7529ed2687ba52"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/40": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "f92a5a494c18cd7b166a3142bfd34a861885572889bcc9c697af0a1ce9a4eede"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/41": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "d72d42b19e93e307eb795dffbc91e1332b920f203bc659334623b348b29d7497"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/42": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/43": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/44": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/45": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/46": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/47": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "9593d36691d06ead95a78f0b46c17b2975283cd16d84a141519768fb8cafd23f"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/48": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/49": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/50": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "b003f5bc83bd19d5025319c4f6435aacb52302338234845d7300e2bd6c7728c4"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/51": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/52": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/53": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/54": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "89d4539ea47108c9c89378c266dd984c493dca7214b525ac5307bf4a9eb7a6cd"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/55": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "fab56728f647afeb087892b1f0e0cfe3fd624c6103c6fafb7821189bc06f0685"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/56": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/57": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "33f774499a2fe10634adc446f82f98d6ac671c236d5f8163a8ddc0d6fd393214"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/58": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "f5de6b36e2dff0d0afa63274813e398f6e10ef3ad00ef3c652db9d4c851d5ee6"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/59": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "bf72056ffed46cbc97fded90aba6487052c5366f4f7013fe07d963499cac55d7"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/60": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/61": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "e8230a0bce6a87daf8abb30133856e5db5ca54747beaa6128442445618ea20ed"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/62": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/63": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/64": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "c432a2b136f2a5b46a8ef37e11bafd11f6be3387b6dc57adb69e2193488e908d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/65": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/66": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "33f774499a2fe10634adc446f82f98d6ac671c236d5f8163a8ddc0d6fd393214"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/67": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "332d57994941c33df1ac662dc9c530698f395e864315053711fdbb43055c353e"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/68": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "3c8cd07d7f63aa6f838af6a0225af6c37b0f3304644463286e0606c8a88fe367"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/69": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "914d04b486861d1e7798354b68798239c3784400da09181f72ba26c1db3a323e"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/70": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "fef1e021ceea81061e6cde93781ff86c2e9772c14dea7b19c665f48be4aeba2f"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/71": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "f287726d2f886663aeecc412618ed2c7ef45e8174c4e10c84d9873403576ff05"
+  },
+  "ergo-sandbox/tests/fixtures/compile_corpus_subset.json#/72": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "99d14ab6c7456eabbd00c59166ee4de44f7eaef4a62b3834401c0d4723749102"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/7ba2a85fdb302a181578b1f64cb4a533d89b3f8de4159efece75da41041537f9/items/8/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "c2fc52b9f7d85fc3ddf91845800dc0802f5d1b3ebb63356e20d326b403cdaf74"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/14/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "3c0ca228481bc5cfd48fff182d7cac59574bd5f13658624366ebab1b1ea5b16e"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/18/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "a4a432463c241c078c29bb687c53899cee45e77d43540e67dc79d35f9f396f28"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/11/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "6caaa52b76ae88ac09aa98eb4d3630f22c0c8406c9ad34d810f43890f90510e3"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/7ba2a85fdb302a181578b1f64cb4a533d89b3f8de4159efece75da41041537f9/items/20/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "0797806afc8e8e4f9e87b38bd45b9b0a5aa5b607e09e5a122890fc2fde6c9ccf"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/16/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "1b5e35c00d3ebfd69ef9705998bc031632a55a367560bc457727165e8bedc9b1"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "18ed13267e5dac17eef6e07f388b3946c7f11e1b4b656231baa4494ee92e4e17"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/7ba2a85fdb302a181578b1f64cb4a533d89b3f8de4159efece75da41041537f9/items/3/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "be3efec40d3d6814430733512ab77d9cf3433d001114a996d473eb96bc59f691"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/6/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "e5c286050f51045dbafc156621052855968a26838975d7e96bd53a4eb5cab9f0"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/5/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "bba62bfee77252f5f405acb0fcfff7d25391e4f28997d5145e73a6e72d9be48a"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/7ba2a85fdb302a181578b1f64cb4a533d89b3f8de4159efece75da41041537f9/items/2/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "c2b9652a91b4031a25fd3802dfc688e4904cff2ea14f958b15560de594e329be"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "8311f6bca9ee239ac7eddc5a81d4b92e043aa5e496b97d82895291dc1fa615be"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/7ba2a85fdb302a181578b1f64cb4a533d89b3f8de4159efece75da41041537f9/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "352aabdb5b920d1c6952c1995b9ca09bb0354ec64fe9666e2475ebba23230ff6"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/610735cbf197f9de67b3628129feaa5a52403286859d140be719467c0fb94328/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "c0bb0ecdce04b7ab47cc439e22b9c9d3103a64122b10df6be34ec5f94f5e6a78"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/7ba2a85fdb302a181578b1f64cb4a533d89b3f8de4159efece75da41041537f9/items/5/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "3a406330e068082a6bf531fa504e929a0e03ea2d0731535db23f93da0d9eb85e"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/12/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "28e9185e4795a2916468c538c97b99199c50a6f09f2f6489916a58300e0e4043"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/13/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "74a383027af1f2402a40cc2a3253ddf8d45cadac39c118a25661b3e62bd2d1d5"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/4/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "08b970a584f13f5ee96a66125f6e6408387d557e3ef8f7dd1a8d506dfd6c05c5"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/2/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "b198108c9298db8ba2b73887839a3dadd033ea941fc2e92ed758188b1712291c"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/17/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "ba12cbe09a85fa02ba5b440aacb7ad3d7e0c261efe2549bec8322f7a910aeb17"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/3/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "50d550a8d16ed198223920530d83a608f3719fc537feed3c2195a10bbe240134"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/6183680b1c4caaf8ede8c60dc5128e38417bc5b656321388b22baa43a9d150c2/items/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "d1353e21f594a8b75d0fadd996e1492e84a56361ca9c6ca47fd77d2e172a70d1"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/7/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "3839c9a05d935b7bea8ab994e5dc5b7ca7b58d3974a7e0dea088aff03f68b688"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/9/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "e5ed93b4346dcec24fe9cf4fc0561fc17c89ac3ac6a1f177a08dedebe5fa8958"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/10/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "cb30318aa216705da272a658ddb076b6183adbd4e11af25e91d8726332729906"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/15/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "ff972ba245710c3d4568c1277d7c6f21aafff9e7ecaf87334bb98bf9dcfc5d0e"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/3c45f29a5165b030fdb5eaf5d81f8108f9d8f507b31487dd51f4ae08fe07cf4a/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "5c12f484fa7fbbaca68274b38d4708c57405355e9a452e35f10fd5be0988b5b4"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/1ff9d7da132defd21fb421e1a94959a3618e6cac38a23e903770a26f29be8e51/items/8/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "bdfadd044fc2ecf6a54f085cadbe410a9598261fb6fb8818bdf56be3d39c894f"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/6183680b1c4caaf8ede8c60dc5128e38417bc5b656321388b22baa43a9d150c2/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "6eb6fe93fb60380d345d5e4d7df1a638d797c00df794e64ca2c0a599811883ea"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/10b755771f7253cff9727a9ca54bb2867e22b1b236657051c47ea9556c517e10/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "e9009eb06b8da9faf7e5c3bbcf4c77576e894d0e36f45bc84073181d064c1e67"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/4675c1819c3e22add72b73f4b7e83eb743d45013b4ee2d8a63e215de9bc6f57f/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "ae81ed02d71ed0917c33c800057843710a2eec013328a0e652b17391f07454c2"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/75d7bfbfa6d165bfda1bad3e3fda891e67ccdcfc7b4410c1790923de2ccc9f7f/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "75d09ba132c27e7f37e7aa4d0a0f40a98acd34dfb8d93d9a88f7771cbbc570a5"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/a40bedb08a32c0258405f950af5a133c397630f89f7d31fb00b3ab9811d29e6a/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "a5f3844888e2115ec0db358c398fcf9257879cbcad1596b7290cdf9cd7eb4118"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/ff7b7eff3c818f9dc573ca03a723a7f6ed1615bf27980ebd4a6c91986b26f801/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "0d2c107a0efb4bb19136cf3c29739fd6ac2202b55b9405afefc4b11c839f9a28"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/26ef992a598eadfddabfd3c51509fb277b075c943b17199407f68c467b9de1ae/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "cf24784d64b25c05bfdfedb94f248cb4aa6e590d7b6406af011a8a583e563fd8"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/471057efea32bf406d529902217844a258d3d6bedfcdcd3cfbab01872cc0b74c/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "0450a3810f19f14e24aa5eb488e226f31ffb9fed128d0ebee7a5ebe75acf4f7d"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/905ecdef97381b92c2f0ea9b516f312bfb18082c61b24b40affa6a55555c77c7/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "c663db21aefe0f119c0a21e309b73a19d87eaac6983fb30c441c7d53ff10f5c8"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/97ad159235d25d05d7efc5863b5d360f89d7d668409502058be3e7aac177b9cb/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "774a317715e63e77ebbad2b6f63bb91ca9d2e58cee6cc6255884eff8120f9c07"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/74f906985e763192fc1d8d461e29406c75b7952da3a89dbc83fe1b889971e455/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "094d2e5ebc51dff4b2cd1bb0d0b4bf0cb6cbd9cf5df259132ea0951596afcf74"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/3fefa1e3fef4e7abbdc074a20bdf751675f058e4bcce5cef0b38bb9460be5c6a/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "90995c4a300a88d4c27ef089efe0ee57dce3d70e17a21bdebbbc677fe9ba1013"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/6597acef421c21a6468a2b58017df6577b23f00099d9e0772c0608deabdf6d13/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "77214876886c21afd55ce1210d1160f60ef38672dc65dc484d75a9bf27615b19"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/610735cbf197f9de67b3628129feaa5a52403286859d140be719467c0fb94328/items/1/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "db5b7179da095937f4abd187e60447ddc87e83f327dda0d05d077d3f0efee5e7"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/615be55206b1fea6d7d6828c1874621d5a6eb0e318f98a4e08c94a786f947cec/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "4bc03005722a2c351380c4ad3874cb08f23c273e4731f041ee3ae31825a87166"
+  },
+  "ergo-sandbox/tests/fixtures/map/dexy-gold.json#/boxesByToken/d1c9e20657b4e37de3cd279a994266db34b18e6e786371832ad014fd46583198/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "4778791e6f12f6b8203a46f24c722debaa3a3ad87ca4be78efa4668440824a55"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/e1d7fcb9c033970d8485c200efc9febbb17244639c17c57a4c14b76bbd559183/items/9/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "97c5e88c7c2f518a82beaf9f4a84f8950b5c6912e1a4e3f3c16fd4ad226a33f8"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/17/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "31c061e4f5b9a0a3dfa56821c41dca436f0e302f2c8209269e34b5baee7fce16"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/e1d7fcb9c033970d8485c200efc9febbb17244639c17c57a4c14b76bbd559183/items/13/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "a4a432463c241c078c29bb687c53899cee45e77d43540e67dc79d35f9f396f28"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/e1d7fcb9c033970d8485c200efc9febbb17244639c17c57a4c14b76bbd559183/items/15/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "3b5b95c385a6edcdb8acf11fadc59d4a9402294e4813b01346212fdc66bba6e7"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/e1d7fcb9c033970d8485c200efc9febbb17244639c17c57a4c14b76bbd559183/items/11/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "1b5e35c00d3ebfd69ef9705998bc031632a55a367560bc457727165e8bedc9b1"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/e1d7fcb9c033970d8485c200efc9febbb17244639c17c57a4c14b76bbd559183/items/8/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "543f8a8843e824515ce06fc7e46ff511a07417489723ccdae6147d499416226f"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/e1d7fcb9c033970d8485c200efc9febbb17244639c17c57a4c14b76bbd559183/items/16/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "f0bcaf9bdc7f7349a57a0a14e5dae262353d619611ce24caae8d8e6981528d46"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/8/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "0ef4a819bdb779c4447d3249370810e3559911f99017a3d26876c44f156c5187"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/28/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "c90af5d6f8c7145311046281d479e0346263f7ac0f15335b0690d1ad9c7c868e"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/e1d7fcb9c033970d8485c200efc9febbb17244639c17c57a4c14b76bbd559183/items/14/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "6e4fd4a2b56f0af207f36b18d3934f8c21d80f42164c4db80369e5d3ab545b12"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/9/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "7331434881470cab653f87c97b8bfa22505eec46fcc02b4d577063cc55e3189a"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/31/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "d720376d9ffc9f80515e9874e9d5ed0cdc41716ff5f3e05eacdb32d0aceefd53"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/6/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "986ec069eee0a7868760cdc7b3263f34ab8bf7012f0550a5001665e46b71d3b5"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/2/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "23a148aa0561297db344a094cd6fb4c33a0f62b52dc3e2337d80cd7f8aac0e14"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/30/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "fec249f60612708b991b223c54e26cc03b68a10e28a6c64511862890512e6006"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/4/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "8124aab37126d0e69c6729d7e6159b709660226a1bcf45a1a9d3837317bad73a"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/22/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "d72dcdd40faf04d86cb4237acd2823d62ef3e0b125769393bac1d024e99cbf09"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/e1d7fcb9c033970d8485c200efc9febbb17244639c17c57a4c14b76bbd559183/items/5/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "11985360a3ed11662530697c5f39e380063e8154718c571274a43116f6206485"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "c0bb0ecdce04b7ab47cc439e22b9c9d3103a64122b10df6be34ec5f94f5e6a78"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/e1d7fcb9c033970d8485c200efc9febbb17244639c17c57a4c14b76bbd559183/items/6/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "84317348c3fd472fa58b12970552ce4523f89cb8dcc5aa721c42a2f85efd88b7"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/21/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "24440e789b068e3236afc381fba56caef84afc21fb6b5a5766b9cd94945a65e6"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/10/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "75f81a2eca86a9c7b802b782dec3f8144de3e06053b9b0f4c423662eb5c75060"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/e1d7fcb9c033970d8485c200efc9febbb17244639c17c57a4c14b76bbd559183/items/3/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "f6cace080b9d20b3305492dafd88e7348b9495894ce4acf1301a27609a5d825d"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/11/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "920beb54b15d4d4cfc390990351ca54e8aa27799a9cdaaa590671c7b5833c0cf"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/e1d7fcb9c033970d8485c200efc9febbb17244639c17c57a4c14b76bbd559183/items/4/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "9a8a860841c70d2dd78f4069a16120b2aa52d6a8fb7191f5d4b47df337a53c74"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "bced7464be5dd41d63fea22ef16303346a8cb884916a59e4591c9f887c036a6d"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/15/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "643eeaf3404a46b33bc9463526d5e82ac176707e175674e4af484736b617ef11"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/e1d7fcb9c033970d8485c200efc9febbb17244639c17c57a4c14b76bbd559183/items/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "09a2e5b2fbd1ec9dc0bdd40d8e5f9147e1260d9b8476a9edc10d2a5b0230f790"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/25/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "a00165cdd736febd3fe108ae49710cf034fe980838d655729bbc31c158e2399d"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/23/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "43cb6477067727c63ce49dc9838c92a6c901a1fc5496e15cab810923afd85069"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/16/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "ebb102c7917c0ac06ae49b8d1fd4cebff1d5a8ccd61ba2d5c0b8e6d3e92f6e79"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/e1d7fcb9c033970d8485c200efc9febbb17244639c17c57a4c14b76bbd559183/items/12/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "ba12cbe09a85fa02ba5b440aacb7ad3d7e0c261efe2549bec8322f7a910aeb17"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/3/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "1ab1eca6b2597e46d44abcf41edb5be1bf51427d1e7489c14ec33c5335d1d351"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/e1d7fcb9c033970d8485c200efc9febbb17244639c17c57a4c14b76bbd559183/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "31b5934118c3b1b940afc508a3ca1ec019328798b011ee79189293fad7ce8ab4"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/18/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "7a154d57219523e761867c4732fb3aba9bb9a3c6a6c1021f17b3d2b4477362ea"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/24/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "bde81f04b68ae2daf91af400ee78e628f7c8f94e84f9ea03c880647224d32a68"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/e1d7fcb9c033970d8485c200efc9febbb17244639c17c57a4c14b76bbd559183/items/2/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "f26b2747eb0686ca30c9fe0fd8fc1963e4381604de6ba196ea72e5047f43f2b2"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ae399fcb751e8e247d0da8179a2bcca2aa5119fff9c85721ffab9cdc9a3cb2dd/items/20/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "e0fdebab2eb86b466d6e9bf0d825a84fe2c7d4152cc4482b0ffe85e93217b260"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/e1d7fcb9c033970d8485c200efc9febbb17244639c17c57a4c14b76bbd559183/items/7/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "d70ee7fe1f1089261e9b33ab8f27ebb62828f6e576c80cc50e19cef8d4646a4f"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/e1d7fcb9c033970d8485c200efc9febbb17244639c17c57a4c14b76bbd559183/items/10/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "ff972ba245710c3d4568c1277d7c6f21aafff9e7ecaf87334bb98bf9dcfc5d0e"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/74fa4aee3607ceb7bdefd51a856861b5dbfa434a8f6c93bfe967de8ed1a30a78/items/18/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "3aec9b60f59be468eb40cc8b8496f27aca89a380dbda6288b80bd21695ccdcb5"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/dcce07af04ea4f9b7979336476594dc16321547bcc9c6b95a67cb1a94192da4f/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "9aa8f84869ffb847beb4e8701e1ce32e7c8c20642a8ea3b861883a2977272466"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/6a2b821b5727e85beb5e78b4efb9f0250d59cd48481d2ded2c23e91ba1d07c66/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "609451ab633847648a01a8b8e34f39380f80860c2bf87f7b960e9302b0cd4d9b"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/74fa4aee3607ceb7bdefd51a856861b5dbfa434a8f6c93bfe967de8ed1a30a78/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "27959481fb4b6804866c37a8f5e8cbc8de2835da74cb87b4e17b51f90ab5c42e"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/2cf9fb512f487254777ac1d086a55cda9e74a1009fe0d30390a3792f050de58f/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "88105d4a11a325d2b373f52929ba618a5674a397c76e9b702305f71ea7b755d8"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/47472f675d7791462520d78b6c676e65c23b7c11ca54d73d3e031aadb5d56be2/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "12ca637f6df91d5a00f6bf50ca740d88f0d58f6e37dd70ada3ea3e55f830070d"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/78c24bdf41283f45208664cd8eb78e2ffa7fbb29f26ebb43e6b31a46b3b975ae/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "84e0cb22c62528805020e98bbe296f834d7a2dce286a320b36adfd5cade31617"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/30e273698c85bbe66319904c499bfefbd76f51487688d674b20623715ff0741b/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "1b3470cd02164ccb6a7eb41eb72da86ba3f896ea1bdcc57c612c58c6582a83af"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "0d2c107a0efb4bb19136cf3c29739fd6ac2202b55b9405afefc4b11c839f9a28"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/a2482fca4ca774ef9d3896977e3677b031597c6e312b0c10d47157bb0d6ed69f/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "929f40617b4b88cff28672751d0b0d9aadac311f9a030274a6395d1193834c08"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/1bfea21924f670ca5f13dd6819ed3bf833ec5a3113d5b6ae87d806db29b94b9a/items/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "837738328f450a4ebd1e770d17b3506c7d3a12a51a646e016c4843bd6df8c024"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "6cb27f7aceb09cf3437e88e682d156452602b28f0113d436ae2f56f6a2ee7498"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/19b7f2e2f11052c020800c8b620660f9f0b5fd5b3f2beacc8b44af960477a694/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "2ef8b6dc11aac18152be8154badad29e3ed2822312306c9e8ab6f9641a72d779"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/40db16e1ed50b16077b19102390f36b41ca35c64af87426d04af3b9340859051/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "a8ca34d6e0f7e319da40b5387b01622499c3f0b4205fdcc2619f0eebd34f1ac2"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/c79bef6fe21c788546beab08c963999d5ef74151a9b7fd6c1843f626eea0ecf5/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "afcec729101d655fa9ac3d817fe2439399c553cd2289ae245ce1155268901cf6"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/dbf655f0f6101cb03316e931a689412126fefbfb7c78bd9869ad6a1a58c1b424/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "8d91cbab9e6bef5626f36537c8bc4b8301bafb6f35523d8c474c1b41ed5f7fb0"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/dcce07af04ea4f9b7979336476594dc16321547bcc9c6b95a67cb1a94192da4f/items/1/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "01bc266a215d39246b591eecdfead4e1a9e0c74e4f3fbfe9202d5c9c3b3dc703"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/bc685d6ad1703ba5775736308fd892807edc04f48ba7a52e802fab241a59962c/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "745dd12ec119f86336bbf5734518da38ca60448827a0de0bd40ae5030a461933"
+  },
+  "ergo-sandbox/tests/fixtures/map/use-lp.json#/boxesByToken/35bc71897cd44d1a624285c54a0be66b69d1c61674603ed89dfe136f32035f0e/items/0/ergoTree": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "truncated": false,
+    "tree_sha256": "4778791e6f12f6b8203a46f24c722debaa3a3ad87ca4be78efa4668440824a55"
+  }
+}

@@ -52,8 +52,8 @@ pub enum NodeKind {
     Global(String, Vec<Node>),
     /// AtLeast(k, Coll[...]) — k-of-n signature threshold.
     AtLeast(Box<Node>, Box<Node>),
-    /// Fallback: fully-parenthesized structural form for anything not yet
-    /// lifted (renders via the inspect printer).
+    /// Fallback: an explicit `<…>` placeholder for anything not yet lifted.
+    /// May contain an inspect rendering, but is never claimed to be source.
     Raw(String),
 }
 

@@ -6,3 +6,6 @@ docs/superpowers/plans/
 
 # The ergo-explorer MCP server writes its logs into the working directory.
 logs/
+
+# Isolated build output for decompiler robustness work.
+/target-dc/
