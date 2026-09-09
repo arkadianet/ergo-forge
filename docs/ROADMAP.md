@@ -539,3 +539,10 @@ P04 execution record: see [P04-REPORT.md](P04-REPORT.md) and the
 implemented. Its completed prefix advances only after P00–P04 rerun green.
 The signed execution is hypothetical supplied-state evidence, not a property
 claim. P05–P08 remain unimplemented; legacy endpoints and frozen search stay unchanged.
+
+P05 attempt stopped on 2026-09-10 (local date), under the existing section 6
+`missing-provenance` rule. See [P05-REPORT.md](P05-REPORT.md) and the
+machine-readable [stop record](roadmap-stops.json). The required public USE
+case lacked a fully backed validation context; a prototype's hypothetical-context
+green results are not accepted. P05 remains unimplemented and `completedThrough`
+remains P04. No acceptance requirement or policy threshold is amended.

@@ -1,0 +1,19 @@
+{
+  "formatVersion": 1,
+  "purpose": "Stop evidence only; no admitted P05 claim, no corpus or baseline change.",
+  "retrievedAtUTC": "2026-09-09",
+  "artifacts": {
+    "public-block.fixture": {
+      "source": "https://api.ergoplatform.com/api/v1/blocks/83a985afb17f0352206916e168609f7fc9f1da83daffc659db9cff2e2bb954c1",
+      "sha256": "d2e02773edea726e569e2ac9f3acb90d975d24b2cc82d604757a31a01884190f"
+    },
+    "public-transaction.fixture": {
+      "source": "https://api.ergoplatform.com/api/v1/transactions/5371373d346aade57f684ead23f386e3441ffb2cb7a860babe96e3c5048b2725",
+      "sha256": "388678856086920d98d7679c74da198a66be207abe4201526c46b82665102da8"
+    },
+    "rejected-use-candidate.fixture": {
+      "source": "Uncommitted P05 attempt; rejected as public-incident acceptance evidence. Inputs reconstructed from local archive; non-height context borrowed from P03 hypothetical fixture.",
+      "sha256": "48ba19765637ff7bb00728082a5e54d8ed14b5a9ad115398c3c370efa56ad135"
+    }
+  }
+}
