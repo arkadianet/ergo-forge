@@ -75,7 +75,7 @@ pub fn delegated_reserves(root: &Node) -> Vec<Finding> {
                 for slot in &successor.id_slots {
                     if !evidence.amounts.contains(&(key.clone(), slot.clone())) {
                         missing.push(format!(
-                            "tokens({slot})._1 is preserved but tokens({slot})._2 has no companion amount constraint"
+                            "tokens({slot})._1 is preserved but tokens({slot})._2 has no recognised companion amount constraint: unbounded unless token slot {slot} is a supply-1 singleton, which this analysis cannot observe"
                         ));
                     }
                 }
@@ -90,9 +90,9 @@ pub fn delegated_reserves(root: &Node) -> Vec<Finding> {
                 ir_id: None,
                 message: format!(
                     "{key} preserves SELF's identity, but {}; reserve guarantees for these \
-                     assets are delegated to other transaction requirements. Review the \
-                     authorising inputs and companion contracts; delegation may be intentional \
-                     and is not evidence of exploitability.",
+                     assets may depend on singleton supply or other transaction requirements. Review the \
+                     authorising inputs and companion contracts; reserve checks may be delegated intentionally \
+                     and this is not evidence of exploitability.",
                     missing.join("; ")
                 ),
                 snippet: key.clone(),
