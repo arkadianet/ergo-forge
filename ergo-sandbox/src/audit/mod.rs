@@ -15,7 +15,11 @@ pub use visit::children;
 use crate::{Lifted, Node};
 
 /// Every lint, applied in order. Findings are sorted afterwards.
-const LINTS: &[fn(&Node) -> Vec<Finding>] = &[lints::unchecked_get, lints::unbound_box_reserves];
+const LINTS: &[fn(&Node) -> Vec<Finding>] = &[
+    lints::unchecked_get,
+    lints::unbound_box_reserves,
+    lints::delegated_reserves,
+];
 
 /// Whether the audit saw the whole contract.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

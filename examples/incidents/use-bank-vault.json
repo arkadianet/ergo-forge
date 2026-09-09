@@ -119,7 +119,23 @@
   "verdict": "clean",
   "findings": [],
   "ranOn": "the deployed tree's decompiled proposition, recompiled at treeVersion 3 and audited (audit::audit, Completeness::Complete)",
-  "recorded": "2026-09-08",
-  "note": "CLEAN IS NOT SAFE. The lint keys on reserve math with positional box reads and NFT-binding fixes; the vault HAS the NFT-binding shape (OUTPUTS(1) pins the script bytes and the bank NFT's id AND amount), so it passes. What the lint does not check - and what the vault script leaves unpinned - is the successor's ERG value and the treasury token's AMOUNT (tokens(1) is compared by id only). The vault's own script therefore permits a dust successor carrying the bank NFT and one treasury token: every reserve guarantee is delegated to the three script authorizers. This is the sharpened flagship question: do useFreeMint/useArbitrageMint/usePayout constrain the bank's value? The empirical run needs those three companions as inputs (the admin box is P2PK and refused by the gate, so it contributes nothing)."
+  "recorded": "2026-09-09",
+  "note": "CLEAN IS NOT SAFE. The lint keys on reserve math with positional box reads and NFT-binding fixes; the vault HAS the NFT-binding shape (OUTPUTS(1) pins the script bytes and the bank NFT's id AND amount), so it passes. What the lint does not check - and what the vault script leaves unpinned - is the successor's ERG value and the treasury token's AMOUNT (tokens(1) is compared by id only). The vault's own script therefore permits a dust successor carrying the bank NFT and one treasury token: every reserve guarantee is delegated to the three script authorizers. This is the sharpened flagship question: do useFreeMint/useArbitrageMint/usePayout constrain the bank's value? The empirical run needs those three companions as inputs (the admin box is P2PK and refused by the gate, so it contributes nothing). UPDATE 2026-09-09: the gap this note describes is now covered by its own lint. `delegated-reserves` flags OUTPUTS(1) for exactly the two unpinned assets named above (successor ERG value; treasury token amount). `unbound-box-reserves` still returns clean, correctly \u2014 the vault has the NFT-binding shape it keys on. Clean from one lint, flagged by another, is the honest reading of this contract."
+ },
+ "lintDelegatedReserves": {
+  "lint": "delegated-reserves",
+  "verdict": "1 finding",
+  "recorded": "2026-09-09",
+  "findings": [
+   {
+    "severity": "Medium",
+    "successor": "OUTPUTS(1)",
+    "cites": [
+     "ERG value has no recognised bound relating it to SELF.value",
+     "tokens(1)._1 is preserved but tokens(1)._2 has no companion amount constraint"
+    ]
+   }
+  ],
+  "note": "This lint exists because of the note on the unbound-box-reserves record above. That note said CLEAN IS NOT SAFE and named the gap exactly: the vault pins its successor's identity but neither the successor's ERG value nor the treasury token's amount. delegated-reserves now catches that shape by name. Clean from one lint and flagged by another is the honest reading: the vault's own script permits a dust successor, and every reserve guarantee is delegated to the three script authorizers. Delegation may be intentional; it is a review obligation, not evidence of exploitability."
  }
 }
