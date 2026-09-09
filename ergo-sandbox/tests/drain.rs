@@ -496,7 +496,8 @@ mod map_feed {
             );
             request.max_probes = Some(max_probes);
             request.synthesis = serde_json::from_value(json!({
-                "maxNewOutputs": 2, "companionRecreations": true, "successorStates": true,
+                "declaredOutputModifications": true,
+            "maxNewOutputs": 2, "companionRecreations": true, "successorStates": true,
                 "splits": true, "mints": true, "permuteOutputs": true
             }))
             .expect("synthesis block");
@@ -570,11 +571,22 @@ mod map_feed {
         // shape `none` alone has >12k points — and keeps the debug-build CI
         // cost at ~40 s instead of ~2 min.)
         request.synthesis = serde_json::from_value(json!({
+            "declaredOutputModifications": true,
             "maxNewOutputs": 2, "companionRecreations": true, "successorStates": true,
             "splits": true, "mints": true, "permuteOutputs": true
         }))
         .expect("synthesis block");
+        let input_count = request.inputs.len();
+        let output_count = request.outputs.len();
         let report = drain_request(request);
+        println!(
+            "MAPPED_USE_MEASUREMENT {}",
+            json!({
+                "inputs": input_count, "outputs": output_count,
+                "probesRun": report.probes_run, "capped": report.capped,
+                "synthesis": report.synthesis, "rejections": report.rejections,
+            })
+        );
 
         assert!(report.capped, "900 probes must bind on a 12-input set");
         assert!(
@@ -844,7 +856,7 @@ mod synthesis {
         assert_eq!(
             report.synthesis.axis_order,
             vec![
-                "synthesized-output shapes",
+                "output shapes: none → declared-output modifications → companion re-creations → sinks",
                 "output permutation",
                 "per-successor states",
                 "value splits",

@@ -7,6 +7,7 @@
   "synthesis": {
    "maxNewOutputs": 2,
    "companionRecreations": true,
+   "declaredOutputModifications": true,
    "successorStates": true,
    "splits": true,
    "mints": true,

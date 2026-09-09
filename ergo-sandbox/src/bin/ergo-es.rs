@@ -1114,7 +1114,8 @@ fn cmd_drain(args: &[String]) -> Result<(), String> {
             .map(|s| format!("{}({}/{})", s.shape, s.run, s.generated))
             .collect();
         println!(
-            "  synthesis: recreations:{} states:{} splits:{} mints:{} permuteOutputs:{} | caps: newOutputs {}, states {}, outPerms {}, probes {}",
+            "  synthesis: declaredEdits:{} recreations:{} states:{} splits:{} mints:{} permuteOutputs:{} | caps: newOutputs {}, states {}, outPerms {}, probes {}",
+            d.declared_output_modifications,
             d.companion_recreations,
             d.successor_states,
             d.splits,
