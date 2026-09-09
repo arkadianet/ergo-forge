@@ -286,6 +286,40 @@ index, are not recognised — those are false positives. A computed index
 (`INPUTS(i)` for a derived `i`) is out of scope, and `val` names are collected
 tree-wide rather than per block (lift assigns globally-unique names).
 
+### `height-guards` (Low / Medium) and `trust-assumptions` (Medium)
+
+`height-guards` reports a height-only result alternative with a literal lower
+bound (Low: review whether permissionless release is intended), or a HEIGHT
+conditional selecting identical branches (Medium: review the intended time
+restriction). Ordinary owner-authorised timelocks are not flagged.
+
+`trust-assumptions` reports an extracted register from a positional data input
+without a recognised box-id/token-id equality to a literal or SELF-rooted value.
+It also recognises direct token `exists` identity predicates, as used by Rosen.
+This is a provenance review: other key/value checks may intentionally suffice.
+The whole-tree absence check does not prove that a recognised identity equality
+is enforced on every branch, nor validate signatures, AVL proofs or freshness.
+
+Real positives include the basic permissionless height lock, Crystalpool's
+deposit with identical height branches, and Chaincash's note that authenticates
+a reserve key without fixing its identity. Real negatives include the recipe
+timelock/HTLC, Crystalpool's sell order, the NFT-bound basic and Chaincash oracles,
+and Rosen's guard NFT search. Tests compile the corpus sources and instantiate
+only their external parameters/placeholders.
+
+Measured 2026-09-09: on 110 seed trees, height guards add **9 findings on 9
+trees** and trust assumptions add **3 findings on 2 trees**; 1 tree is Partial.
+On 279 mainnet trees, both add **0 findings**; 2 trees are Partial. All 12 new
+seed findings were reviewed. Eight previously clean seed examples gain only
+informational height-release findings; no existing clean test was relaxed.
+Existing lint behavior is unchanged.
+
+The [design and review record](../docs/superpowers/specs/2026-09-09-more-audit-lints-design.md)
+states exact rules, per-finding reviews and limits. `anyOf` shadowing is deferred:
+no genuine unmodified corpus positive was established. General unvalidated
+register/context-variable analysis is also deferred pending authentication and
+data-flow reasoning; neither lint's silence is a safety verdict.
+
 ## Protocol map (`map`)
 
 **Given one artifact of a deployed protocol — an NFT, an address, or a

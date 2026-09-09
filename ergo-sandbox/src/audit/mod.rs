@@ -19,6 +19,8 @@ const LINTS: &[fn(&Node) -> Vec<Finding>] = &[
     lints::unchecked_get,
     lints::unbound_box_reserves,
     lints::delegated_reserves,
+    lints::height_guards,
+    lints::trust_assumptions,
 ];
 
 /// Whether the audit saw the whole contract.
