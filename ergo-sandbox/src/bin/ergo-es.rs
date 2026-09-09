@@ -20,6 +20,7 @@ fn main() -> ExitCode {
     let rest = &args[1..];
     let result = match cmd.as_str() {
         "compile" => cmd_compile(rest),
+        "tree" => cmd_tree(rest),
         "ingest" => cmd_ingest(rest),
         "params" => cmd_params(rest),
         "eval" => cmd_eval(rest),
@@ -57,6 +58,9 @@ fn usage() {
         "ergo-es — ErgoScript workbench CLI
 
 USAGE:
+  ergo-es tree <address|boxId|treeHex> [--json] [--network mainnet|testnet]
+               [--source fixture.json | --explorer URL]
+      Decode offline, or explicitly resolve a box, then decompile and audit.
   ergo-es ingest <directory> [--params params.json] [--tree-version N]
                  [--network mainnet|testnet] [--json] [--no-infer]
       Compile and lift .ergo/.es sources for static tooling, with reported
@@ -1452,4 +1456,99 @@ fn cmd_point(args: &[String]) -> Result<(), String> {
     };
     println!("{out}");
     Ok(())
+}
+
+fn cmd_tree(args: &[String]) -> Result<(), String> {
+    let input = args
+        .first()
+        .ok_or("tree needs an address, box id or tree hex")?;
+    let mut network = None;
+    let mut fixture = None;
+    let mut explorer = None;
+    let mut json = false;
+    let mut i = 1;
+    while i < args.len() {
+        match args[i].as_str() {
+            "--json" => json = true,
+            flag @ ("--network" | "--source" | "--explorer") => {
+                i += 1;
+                let value = args.get(i).ok_or_else(|| format!("{flag} needs a value"))?;
+                match flag {
+                    "--network" => network = Some(parse_network(value)?),
+                    "--source" => fixture = Some(value.clone()),
+                    _ => explorer = Some(value.clone()),
+                }
+            }
+            flag => return Err(format!("unknown tree option `{flag}`")),
+        }
+        i += 1;
+    }
+    if fixture.is_some() && explorer.is_some() {
+        return Err("--source and --explorer are mutually exclusive".into());
+    }
+    // Offline inputs never initialize a source, even with EXPLORER_URL set.
+    let offline = ergo_sandbox::tree::ingest_tree(input, network, None);
+    let report = match offline {
+        Ok(report) => report,
+        Err(e) if e == "box lookup requires --source, --explorer or EXPLORER_URL" => {
+            let source: Box<dyn ergo_sandbox::map::source::ChainSource> =
+                if let Some(path) = fixture {
+                    Box::new(
+                        serde_json::from_str::<ergo_sandbox::map::Fixture>(
+                            &std::fs::read_to_string(&path).map_err(|e| format!("{path}: {e}"))?,
+                        )
+                        .map_err(|e| e.to_string())?,
+                    )
+                } else {
+                    let url = explorer
+                        .or_else(|| std::env::var("EXPLORER_URL").ok())
+                        .ok_or(e)?;
+                    tree_explorer(&url)?
+                };
+            ergo_sandbox::tree::ingest_tree(input, network, Some(source.as_ref()))?
+        }
+        Err(e) => return Err(e),
+    };
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
+        );
+    } else {
+        println!(
+            "tree: {}\nnetwork: {}\np2s: {}",
+            report.tree_hex, report.network, report.addresses.p2s
+        );
+        if let Some(a) = &report.addresses.p2pk {
+            println!("p2pk: {a}");
+        }
+        if let Some(a) = &report.addresses.p2sh {
+            println!("p2sh: {a}");
+        }
+        if let Some(b) = &report.box_data {
+            println!(
+                "box: {}",
+                serde_json::to_string(b).map_err(|e| e.to_string())?
+            );
+        }
+        println!("{}\naudit: {}", report.source, report.audit);
+        for note in report.notes {
+            println!("note: {note}");
+        }
+    }
+    Ok(())
+}
+
+fn tree_explorer(url: &str) -> Result<Box<dyn ergo_sandbox::map::source::ChainSource>, String> {
+    #[cfg(feature = "explorer")]
+    {
+        Ok(Box::new(ergo_sandbox::map::explorer::ExplorerSource::new(
+            url,
+        )))
+    }
+    #[cfg(not(feature = "explorer"))]
+    {
+        let _ = url;
+        Err("live box lookup requires the explorer feature; --source works offline".into())
+    }
 }

@@ -166,3 +166,44 @@ Engine crates are consumed from `arkadianet/ergo` via pinned git
 revisions (`Cargo.toml`) — bump deliberately, the node is the oracle.
 
 Drain requests require an explicit authorization policy; see [drain accounting](docs/drain-accounting.md) for the formula, key declarations and release terms.
+
+### Ingest an address or deployed box
+
+```sh
+ergo-es tree 4MQyML64GnzMxZgm --json
+ergo-es tree 10010101d17300
+ergo-es tree <boxId> --explorer https://api.ergoplatform.com --json
+ergo-es tree <boxId> --source recorded-chain.json --json
+```
+
+The library entry point is `ergo_sandbox::tree::ingest_tree(input, network,
+source)`, accepting an optional `&dyn ChainSource` (including `RecordingSource`).
+P2S, P2PK and P2SH addresses decode offline with checksum and prefix validation.
+Address networks are detected automatically; `--network mainnet|testnet` enforces
+an expected network. Trees and box IDs carry no network: their address forms use
+mainnet unless `--network testnet` is supplied. Select an explorer for that network.
+
+Box lookup requires explicit `--explorer URL` or `EXPLORER_URL`, using the same
+`ExplorerSource` as `map`, and the `explorer` build feature. `--source` replays a
+recorded `Fixture` without network support. Address/tree inputs never query a
+source, even with explorer configuration present. Exactly 64 hex characters mean
+a box ID; prefix a 32-byte tree with `tree:` to disambiguate. Explicit `address:`
+and `box:` prefixes are also accepted.
+
+JSON format version 1 has fixed fields `formatVersion`, `treeHex`, `network`,
+`addresses` (`p2s`, `p2pk`, `p2sh`), `boxData`, `source`, `audit`, and `notes`.
+Unavailable address forms and absent box data are `null`. Address forms decode to
+the exact reported tree; `p2sh` is present only for a standard P2SH wrapper.
+`boxData` preserves `boxId`, `ergoTree`, `value` (nanoERG), ordered `tokens`
+(`id`, `amount`), raw `additionalRegisters`, `creationHeight`, and `inclusionHeight`.
+`source` is decompiled text. `audit` contains the existing lint findings plus
+`complete`, `rawPlaceholders`, and `truncated`; a partial lift is never reported
+as a complete audit. For P2SH, only the hash-check spending wrapper is recoverable;
+the underlying script preimage is unavailable and is **not audited**.
+
+Feed the exact tree into a scenario or the existing audit command:
+
+```sh
+ergo-es tree 4MQyML64GnzMxZgm --json | jq '{tree: .treeHex, height: 100}' | ergo-es eval - --json
+ergo-es audit "$(ergo-es tree 4MQyML64GnzMxZgm --json | jq -r .treeHex)"
+```

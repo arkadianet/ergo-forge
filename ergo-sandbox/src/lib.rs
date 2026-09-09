@@ -61,6 +61,7 @@ pub mod recognize;
 pub mod rent;
 pub mod scenario;
 pub mod testsuite;
+pub mod tree;
 pub mod txcheck;
 
 pub use audit::{Finding, Severity};
