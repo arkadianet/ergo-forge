@@ -251,6 +251,7 @@ fn report(
                     continue;
                 }
                 out.push(Finding {
+                    triage: Default::default(),
                     lint: "unbound-box-reserves",
                     severity: if payments.contains(&key) {
                         Severity::Low

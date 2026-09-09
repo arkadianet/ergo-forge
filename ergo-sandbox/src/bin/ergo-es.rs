@@ -21,6 +21,7 @@ fn main() -> ExitCode {
     let result = match cmd.as_str() {
         "compile" => cmd_compile(rest),
         "tree" => cmd_tree(rest),
+        "triage" => cmd_triage(rest),
         "match" => cmd_match(rest),
         "ingest" => cmd_ingest(rest),
         "params" => cmd_params(rest),
@@ -65,6 +66,7 @@ USAGE:
   ergo-es match <source.es|treeHex> <treeHex> [--params p.json] [--json]
       Compare program structure with constant leaves treated as holes.
       A match does not prove behavioural equivalence or safety.
+  ergo-es triage <request.json>
   ergo-es ingest <directory> [--params params.json] [--tree-version N]
                  [--network mainnet|testnet] [--json] [--no-infer]
       Compile and lift .ergo/.es sources for static tooling, with reported
@@ -1621,5 +1623,19 @@ fn cmd_match(args: &[String]) -> Result<(), String> {
         }
         println!("{}\n{}", report.similarity_definition, report.limitation);
     }
+    Ok(())
+}
+
+fn cmd_triage(args: &[String]) -> Result<(), String> {
+    let path = args.first().ok_or("triage needs a request JSON path")?;
+    let text = std::fs::read_to_string(path).map_err(|e| e.to_string())?;
+    let req = serde_json::from_str(&text).map_err(|e| e.to_string())?;
+    let finding = ergo_sandbox::decompile::with_large_stack(move || {
+        ergo_sandbox::audit::triage::triage(&req)
+    })?;
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&finding).map_err(|e| e.to_string())?
+    );
     Ok(())
 }

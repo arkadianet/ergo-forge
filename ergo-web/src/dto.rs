@@ -15,6 +15,7 @@ pub struct InspectRequest {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FindingDto {
+    pub triage: ergo_sandbox::audit::triage::Triage,
     pub lint: &'static str,
     pub severity: &'static str,
     pub node_id: u64,
@@ -52,6 +53,7 @@ impl FindingDto {
     pub fn from_engine(f: &ergo_sandbox::Finding) -> Self {
         Self {
             lint: f.lint,
+            triage: f.triage.clone(),
             severity: match f.severity {
                 ergo_sandbox::Severity::High => "high",
                 ergo_sandbox::Severity::Medium => "medium",

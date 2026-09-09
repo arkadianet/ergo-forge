@@ -43,6 +43,7 @@ pub fn trust_assumptions(root: &Node) -> Vec<Finding> {
         .into_iter()
         .filter(|(key, _)| !bound.contains(key))
         .map(|(key, (node_id, register))| Finding {
+            triage: Default::default(),
             lint: "trust-assumptions",
             severity: Severity::Medium,
             node_id,

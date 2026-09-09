@@ -168,6 +168,7 @@ fn edge_json(m: &ProtocolMap, e: &Edge) -> Value {
 fn finding_json(m: &ProtocolMap, f: &SetFinding) -> Value {
     json!({
         "lint": f.finding.lint,
+        "triage": f.finding.triage,
         "severity": f.finding.severity.label(),
         "from": node_ref(m, &f.from),
         "to": target_json(m, &f.to),

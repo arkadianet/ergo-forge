@@ -350,6 +350,7 @@ fn walk(
         if !receiver(recv, vals).is_some_and(|key| guarded.contains(&key)) {
             let (severity, message) = classify(recv, params);
             out.push(Finding {
+                triage: Default::default(),
                 lint: "unchecked-get",
                 severity,
                 node_id: n.id,

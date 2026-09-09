@@ -84,6 +84,7 @@ pub fn delegated_reserves(root: &Node) -> Vec<Finding> {
                 return None;
             }
             Some(Finding {
+                triage: Default::default(),
                 lint: "delegated-reserves",
                 severity: Severity::Medium,
                 node_id: successor.node_id,
