@@ -26,7 +26,8 @@
 //!   and the first free-payee output receives everything else, with exact
 //!   conservation so the probe is a mineable transaction;
 //! - **output synthesis** (phase 2, opt-in via the request's `synthesis`
-//!   block): companion re-creations with padded token layouts (fillers
+//!   block): blind re-treeing or sourced prefix padding of one declared
+//!   fixed-payee output, companion re-creations with padded token layouts (fillers
 //!   *sourced* from attacker inputs — never conjured), new attacker sinks,
 //!   per-successor `{verbatim, minimized}` states, one deterministic value
 //!   split, minted placeholders sized from the declared request alone, and
@@ -92,7 +93,7 @@ pub const MINT_SENTINEL: &str = "*mint-first-input-box-id*";
 /// The pinned probe-axis order, outermost first (phase-2 spec, Decision 1).
 /// Recorded in every report.
 pub const AXIS_ORDER: [&str; 7] = [
-    "synthesized-output shapes",
+    "output shapes: none → declared-output modifications → companion re-creations → sinks",
     "output permutation",
     "per-successor states",
     "value splits",
@@ -122,6 +123,9 @@ pub struct Synthesis {
     /// from attacker inputs — never conjured).
     #[serde(default)]
     pub companion_recreations: bool,
+    /// Blind edits of at most one fixed-payee declared output: re-tree, or
+    /// prepend 1..=3 sourced filler tokens. Independent of maxNewOutputs.
+    pub declared_output_modifications: bool,
     /// Each script-matched successor independently `{verbatim, minimized}`
     /// (`2^s` combinations, capped at `max_successor_states`).
     #[serde(default)]
@@ -159,6 +163,7 @@ impl Default for Synthesis {
         Synthesis {
             max_new_outputs: None,
             companion_recreations: false,
+            declared_output_modifications: false,
             successor_states: false,
             max_successor_states: DEFAULT_MAX_SUCCESSOR_STATES,
             splits: false,
@@ -173,7 +178,8 @@ impl Synthesis {
     /// Whether any synthesis degree is on. An inactive block is byte-identical
     /// to phase 1.
     pub fn active(&self) -> bool {
-        self.companion_recreations
+        self.declared_output_modifications
+            || self.companion_recreations
             || self.successor_states
             || self.splits
             || self.mints
@@ -431,6 +437,8 @@ pub struct ShapeTally {
     pub shape: String,
     /// Probes the generator materialized (post filler-sourcing, pre dedup).
     pub generated: usize,
+    /// Points skipped before generation because funding/padding was unavailable.
+    pub construction_skipped: usize,
     /// Probes executed against the oracle (post dedup).
     pub run: usize,
     /// This shape's slice of the total-probe cap (the allocator's ceiling
@@ -514,6 +522,7 @@ pub struct SynthesisRecord {
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SynthesisDegrees {
+    pub declared_output_modifications: bool,
     pub companion_recreations: bool,
     pub successor_states: bool,
     pub splits: bool,
@@ -792,6 +801,9 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
             "companion re-creations: {companions_considered} companion(s) considered, 0 qualified              (no companion carries an amount-1 token at index 0..=3); the axis will generate nothing"
         ));
     }
+    if syn.declared_output_modifications {
+        notes.push("declared-output modifications: at most one fixed output per probe; re-tree or prepend 1..=3 distinct sourced fillers, retaining the token sequence. Unsourced or unbalanced edits are skipped before generation (constructionSkipped); simultaneous edits and first-token replacement are outside this family".into());
+    }
     if syn_enabled {
         for (s, truncated) in axes.out_perms_truncated.iter().enumerate() {
             if *truncated {
@@ -864,6 +876,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
             shape_tallies.push(ShapeTally {
                 shape: s.tally_label(f),
                 generated: 0,
+                construction_skipped: 0,
                 run: 0,
                 budget,
                 capacity: budget,
@@ -919,6 +932,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                             probes_total += 1;
                             if probes_run >= shape_ceiling {
                                 capped = true;
+                                shape_starved[point.shape_index] = true;
                                 break 'shape;
                             }
                             // Realized input order: external slots keep their positions;
@@ -982,7 +996,10 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                                     }
                                     // Unsourced padding or an unfundable shape: not
                                     // generated at all (never a conservation tally).
-                                    None => continue,
+                                    None => {
+                                        shape_tallies[tally].construction_skipped += 1;
+                                        continue;
+                                    }
                                 }
                             };
 
@@ -1236,6 +1253,7 @@ fn synthesis_record(
         enabled: syn.active(),
         degrees: SynthesisDegrees {
             companion_recreations: syn.companion_recreations,
+            declared_output_modifications: syn.declared_output_modifications,
             successor_states: syn.successor_states,
             splits: syn.splits,
             mints: syn.mints,
@@ -1271,10 +1289,19 @@ struct Recreate {
     nft_index: usize,
 }
 
-/// A synthesized-output shape: at most one companion re-creation plus
+/// One fixed output, addressed by its declared index before permutation.
+/// Separate shapes (and slices) for every edit, never a powerset.
+#[derive(Debug, Clone)]
+enum DeclaredOutputEdit {
+    Retree { output: usize },
+    Repad { output: usize, fillers: usize },
+}
+
+/// A synthesized-output shape: one declared edit OR at most one companion re-creation plus
 /// attacker sinks (`new_count() ≤ maxNewOutputs`).
 #[derive(Debug, Clone)]
 struct ShapeDesc {
+    edit: Option<DeclaredOutputEdit>,
     /// The re-creation, if any: the companion slot and the token index to
     /// move. A companion qualifies through any token it carries at amount 1
     /// — the syntactic shape of a box-identifying singleton. (The map's
@@ -1349,6 +1376,7 @@ impl ProbePoint<'_> {
     fn is_phase1(&self) -> bool {
         matches!(self.succ, SuccState::Phase1)
             && self.shape.new_count() == 0
+            && self.shape.edit.is_none()
             && self.out_perm.iter().enumerate().all(|(i, &p)| i == p)
             && !self.split
             && self.mint.is_none()
@@ -1391,15 +1419,37 @@ impl AxisIter {
     ) -> Self {
         let max_new = syn.resolved_max_new_outputs();
 
-        // Axis 1: synthesized-output shapes, in the pinned order — none →
+        // Axis 1: output shapes, in the pinned order — none → declared edits →
         // companion re-creations → re-creation + sink → sinks. A companion
         // qualifies through any token it carries at amount 1 (see
         // `ShapeDesc.recreate` — deliberately not `protocolNfts`).
         let mut shapes: Vec<ShapeDesc> = vec![ShapeDesc {
+            edit: None,
             recreate: None,
             sinks: 0,
             static_label: "none".to_string(),
         }];
+        if syn.declared_output_modifications {
+            for (output, declared) in req.outputs.iter().enumerate() {
+                if declared.payee != Payee::Fixed {
+                    continue;
+                }
+                shapes.push(ShapeDesc {
+                    edit: Some(DeclaredOutputEdit::Retree { output }),
+                    recreate: None,
+                    sinks: 0,
+                    static_label: format!("retree(output={output})"),
+                });
+                for fillers in 1..=3 {
+                    shapes.push(ShapeDesc {
+                        edit: Some(DeclaredOutputEdit::Repad { output, fillers }),
+                        recreate: None,
+                        sinks: 0,
+                        static_label: format!("repad(output={output},fillers={fillers})"),
+                    });
+                }
+            }
+        }
         let mut recreations: Vec<Recreate> = Vec::new();
         if syn.companion_recreations {
             for (slot, role) in roles.iter().enumerate() {
@@ -1420,6 +1470,7 @@ impl AxisIter {
         }
         for rc in &recreations {
             shapes.push(ShapeDesc {
+                edit: None,
                 recreate: Some(rc.clone()),
                 sinks: 0,
                 static_label: format!("recreate(companion={},nft={})", rc.slot, rc.nft_index),
@@ -1428,6 +1479,7 @@ impl AxisIter {
         if syn.companion_recreations && max_new >= 2 {
             for rc in &recreations {
                 shapes.push(ShapeDesc {
+                    edit: None,
                     recreate: Some(rc.clone()),
                     sinks: 1,
                     static_label: format!(
@@ -1439,6 +1491,7 @@ impl AxisIter {
         }
         if max_new >= 1 {
             shapes.push(ShapeDesc {
+                edit: None,
                 recreate: None,
                 sinks: 1,
                 static_label: "sinks(1)".to_string(),
@@ -1446,6 +1499,7 @@ impl AxisIter {
         }
         if syn.splits && max_new >= 2 {
             shapes.push(ShapeDesc {
+                edit: None,
                 recreate: None,
                 sinks: 2,
                 static_label: "sinks(2)".to_string(),
@@ -1494,7 +1548,10 @@ impl AxisIter {
             .iter()
             .map(|s| {
                 let mut v: Vec<Option<u64>> = vec![None];
-                if syn.mints && s.new_count() >= 1 {
+                if syn.mints
+                    && (s.new_count() >= 1
+                        || matches!(s.edit, Some(DeclaredOutputEdit::Repad { .. })))
+                {
                     v.extend(amounts.iter().map(|&a| Some(a)));
                 }
                 v
@@ -1686,6 +1743,23 @@ fn materialize_synthesized(
     if payout == "drain" {
         if let Some(f) = free_output {
             outs[f].ergo_tree = Some(attacker_tree.to_string());
+        }
+    }
+
+    // Declared edits follow state selection, before conservation and output
+    // permutation. Selection never inspects a target tree. A re-treed
+    // successor still has the state chosen for its ORIGINAL declared slot.
+    if let Some(edit) = &shape.edit {
+        match *edit {
+            DeclaredOutputEdit::Retree { output } => {
+                outs[output].ergo_tree = Some(attacker_tree.to_string());
+            }
+            DeclaredOutputEdit::Repad { output, fillers } => {
+                let padding = declared_padding(
+                    &outs, output, fillers, free_output, combo, &req.inputs, point.mint,
+                )?;
+                outs[output].tokens.splice(0..0, padding);
+            }
         }
     }
 
@@ -1912,6 +1986,17 @@ fn materialize_synthesized(
         }
     }
 
+    // Declared edits cannot rely on burning an asset or on the legacy free
+    // payee's verbatim token merge overcommitting a sourced filler. Skip
+    // unbalanced materializations before they become generated probes.
+    if shape.edit.is_some() {
+        let mut tokens_out = tok_in_map(&outs);
+        tokens_out.remove(MINT_SENTINEL);
+        if tokens_out != tok_in_map(realized_inputs) {
+            return None;
+        }
+    }
+
     // 5. Assemble and apply the output permutation (axis 2).
     let mut all: Vec<ScenarioBox> = outs;
     let mut all_flags = flags;
@@ -1933,6 +2018,59 @@ fn materialize_synthesized(
         permuted_flags.push(all_flags[src]);
     }
     Some((permuted, permuted_flags))
+}
+
+/// An enabled mint variant supplies the first filler through the existing
+/// first-input-id sentinel; remaining fillers use attacker-slot/token-order
+/// sourcing, as for companion
+/// padding. Reserve every other fixed output's holdings before selecting
+/// fillers: merely seeing an id in an input does not make it available.
+#[allow(clippy::too_many_arguments)]
+fn declared_padding(
+    outs: &[ScenarioBox],
+    output: usize,
+    count: usize,
+    free_output: Option<usize>,
+    combo: &[(String, ScenarioBox)],
+    inputs: &[DrainInput],
+    mint: Option<u64>,
+) -> Option<Vec<TokenAmount>> {
+    let mut committed = BTreeMap::<String, u128>::new();
+    for (index, b) in outs.iter().enumerate() {
+        if Some(index) != free_output {
+            for t in &b.tokens {
+                *committed.entry(t.id.to_lowercase()).or_default() += t.amount as u128;
+            }
+        }
+    }
+    let mut excluded: HashSet<String> = outs[output]
+        .tokens.iter().map(|t| t.id.to_lowercase()).collect();
+    let attacker_boxes: Vec<ScenarioBox> = combo.iter().zip(inputs)
+        .filter(|(_, input)| input.role == DrainRole::Attacker)
+        .map(|((_, b), _)| b.clone()).collect();
+    let available = tok_in_map(&attacker_boxes);
+    let total = sum_boxes(combo.iter().map(|(_, b)| b));
+    let mut padding = Vec::with_capacity(count);
+    if let Some(amount) = mint {
+        padding.push(TokenAmount { id: MINT_SENTINEL.into(), amount });
+        if padding.len() == count {
+            return Some(padding);
+        }
+    }
+    for b in &attacker_boxes {
+        for t in &b.tokens {
+            let id = t.id.to_lowercase();
+            if available[&id] > 0
+                && total[&id] > *committed.get(&id).unwrap_or(&0)
+                && excluded.insert(id.clone()) {
+                padding.push(TokenAmount { id, amount: 1 });
+                if padding.len() == count {
+                    return Some(padding);
+                }
+            }
+        }
+    }
+    None
 }
 
 /// Lowercased token holdings of the realized inputs.
@@ -3162,6 +3300,127 @@ mod tests {
         );
     }
 
+    fn edit_request() -> DrainRequest {
+        serde_json::from_value(json!({
+            "inputs": [
+                {"role": "protected", "value": 10_000_000, "ergoTree": "10010101d17300",
+                 "tokens": [{"id": "aa".repeat(32), "amount": 1}]},
+                {"role": "attacker", "value": 10_000_000, "ergoTree": "10010101d17300",
+                 "tokens": [
+                    {"id": "bb".repeat(32), "amount": 1},
+                    {"id": "cc".repeat(32), "amount": 1},
+                    {"id": "dd".repeat(32), "amount": 1}
+                 ]}
+            ],
+            "outputs": [
+                {"payee": "fixed", "value": 8_000_000, "ergoTree": "10010101d17300",
+                 "registers": {"R4": {"type": "raw", "value": "0554"}},
+                 "tokens": [{"id": "aa".repeat(32), "amount": 1}]},
+                {"payee": "fixed", "value": 2_000_000, "ergoTree": "10010101d17300"},
+                {"payee": "free", "value": 0, "ergoTree": "10010101d17300"}
+            ],
+            "protocolNfts": ["aa".repeat(32)], "height": 100,
+            "synthesis": {"declaredOutputModifications": true, "maxNewOutputs": 0}
+        })).unwrap()
+    }
+
+    #[test]
+    fn declared_edits_are_single_fixed_targets_before_permutation_and_recreations() {
+        let mut req = edit_request();
+        req.synthesis.companion_recreations = true;
+        req.synthesis.permute_outputs = true;
+        req.synthesis.max_new_outputs = Some(1);
+        req.inputs[1].role = DrainRole::Companion;
+        let roles: Vec<_> = req.inputs.iter().map(|i| i.role).collect();
+        let inputs: Vec<_> = req.inputs.iter().map(|i| i.box_.clone()).collect();
+        let axes = AxisIter::build(&req.synthesis, &req, &roles, &inputs, 3, 2);
+        let labels: Vec<_> = axes.shapes.iter().map(|s| s.static_label.as_str()).collect();
+        assert_eq!(&labels[..9], &[
+            "none", "retree(output=0)", "repad(output=0,fillers=1)",
+            "repad(output=0,fillers=2)", "repad(output=0,fillers=3)",
+            "retree(output=1)", "repad(output=1,fillers=1)",
+            "repad(output=1,fillers=2)", "repad(output=1,fillers=3)",
+        ]);
+        assert!(labels[9].starts_with("recreate("));
+        for s in &axes.shapes[1..9] {
+            assert_eq!(s.new_count(), 0);
+            assert!(s.recreate.is_none());
+        }
+        // Arbitrary script bytes have no effect on edit selection/order.
+        req.outputs[0].box_.ergo_tree = Some("opaque target script".into());
+        let other = AxisIter::build(&req.synthesis, &req, &roles, &inputs, 3, 2);
+        assert_eq!(labels, other.shapes.iter().map(|s| s.static_label.as_str()).collect::<Vec<_>>());
+    }
+
+    #[test]
+    fn declared_padding_is_sourced_conserved_and_preserves_state() {
+        let req = edit_request();
+        let inputs: Vec<_> = req.inputs.iter().map(|i| i.box_.clone()).collect();
+        let combo: Vec<_> = inputs.iter().map(|b| ("declared".into(), b.clone())).collect();
+        let target_tree = "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197";
+        for output in 0..2 {
+            for count in 0..=3 {
+                for mint in [None, Some(1)] {
+                    if count == 0 && mint.is_some() { continue; }
+                    let shape = ShapeDesc {
+                        edit: Some(if count == 0 { DeclaredOutputEdit::Retree { output } }
+                            else { DeclaredOutputEdit::Repad { output, fillers: count } }),
+                        recreate: None, sinks: 0, static_label: "test".into(),
+                    };
+                    let point = ProbePoint {
+                        shape_index: 0, shape: &shape, out_perm: &[2, 1, 0],
+                        succ: &SuccState::Phase1, split: false, mint, filler_domain: vec![0],
+                    };
+                    assert!(!point.is_phase1(), "edits cannot take the phase-1 shortcut");
+                    let (outs, flags) = materialize_synthesized(
+                        &req, "verbatim", &point, 0, &inputs, &combo, &[],
+                        &HashSet::new(), Some(2), target_tree,
+                    ).unwrap();
+                    assert_eq!(flags, vec![false; 3]);
+                    let edited = &outs[2 - output];
+                    let original = &req.outputs[output].box_;
+                    assert_eq!(edited.value, original.value);
+                    assert_eq!(serde_json::to_value(&edited.registers).unwrap(),
+                        serde_json::to_value(&original.registers).unwrap());
+                    assert_eq!(edited.creation_height, original.creation_height);
+                    assert_eq!(edited.tokens.len(), original.tokens.len() + count);
+                    assert_eq!(serde_json::to_value(&edited.tokens[count..]).unwrap(),
+                        serde_json::to_value(&original.tokens).unwrap());
+                    assert_eq!(edited.ergo_tree.as_deref(), if count == 0 { Some(target_tree) }
+                        else { original.ergo_tree.as_deref() });
+                    // The other fixed output is byte-identical after permutation.
+                    assert_eq!(serde_json::to_value(&outs[2 - (1 - output)]).unwrap(),
+                        serde_json::to_value(&req.outputs[1 - output].box_).unwrap());
+                    let (tx, _) = build_tx_request(&req, &inputs, &outs, 1).unwrap();
+                    assert!(tx_check(&tx).unwrap().valid, "sourced padding must conserve, including mint ids");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn declared_padding_rejects_unsourced_duplicate_and_already_committed_fillers() {
+        let mut req = edit_request();
+        let boxes = |r: &DrainRequest| r.inputs.iter().map(|i| ("declared".into(), i.box_.clone())).collect::<Vec<_>>();
+        let outs: Vec<_> = req.outputs.iter().map(|o| o.box_.clone()).collect();
+        assert!(declared_padding(&outs, 0, 3, Some(2), &boxes(&req), &req.inputs, None).is_some());
+        req.inputs[1].box_.tokens.truncate(1);
+        assert!(declared_padding(&outs, 0, 2, Some(2), &boxes(&req), &req.inputs, None).is_none());
+        // Victim-held ids do not become filler funding.
+        req.inputs[1].role = DrainRole::Companion;
+        assert!(declared_padding(&outs, 0, 1, Some(2), &boxes(&req), &req.inputs, None).is_none());
+        req.inputs[1].role = DrainRole::Attacker;
+        let mut committed = outs.clone();
+        committed[1].tokens = req.inputs[1].box_.tokens.clone();
+        assert!(declared_padding(&committed, 0, 1, Some(2), &boxes(&req), &req.inputs, None).is_none());
+        // A token already on the target cannot appear twice.
+        committed[0].tokens = req.inputs[1].box_.tokens.clone();
+        assert!(declared_padding(&committed, 0, 1, Some(2), &boxes(&req), &req.inputs, None).is_none());
+        // Mint supplies one distinct filler, never three imaginary ids.
+        assert!(declared_padding(&committed, 0, 1, Some(2), &boxes(&req), &req.inputs, Some(1)).is_some());
+        assert!(declared_padding(&committed, 0, 2, Some(2), &boxes(&req), &req.inputs, Some(1)).is_none());
+    }
+
     #[test]
     fn mint_probes_omit_zero_amounts_derived_from_templates() {
         let mut req = dummy_request();
@@ -3196,6 +3455,7 @@ mod tests {
         assert!(phase1[1].tokens.is_empty());
 
         let shape = ShapeDesc {
+            edit: None,
             recreate: None,
             sinks: 0,
             static_label: "none".into(),

@@ -2,9 +2,9 @@
  "recorded": "2026-09-09",
  "runner": "ergo-sandbox/tests/mutation_corpus.rs (release build)",
  "methodology": "docs/superpowers/specs/2026-09-08-mutation-corpus-design.md",
- "detectionRate": 0.4,
+ "detectionRate": 0.6,
  "provenMutants": 5,
- "found": 2,
+ "found": 3,
  "denominatorNote": "proven = a hand-built KEYLESS drain witness validated by txcheck before the hunt ran. M1-M3 were initially misproven (their witnesses validated under txcheck but carry needsProof on the protected input \u2014 the residual requires the beneficiary's/receiver's key): reclassified as keyed-insider, outside the hunt's attacker model, never in the denominator.",
  "caps": {
   "maxProbes": 50000,
@@ -12,6 +12,7 @@
   "synthesis": {
    "maxNewOutputs": 2,
    "companionRecreations": true,
+   "declaredOutputModifications": true,
    "successorStates": true,
    "splits": true,
    "mints": true,
@@ -40,10 +41,10 @@
     "objectivePolicy": {
      "terms": []
     },
-    "probesRun": 868,
+    "probesRun": 988,
     "rejections": {
      "conservation": 0,
-     "invalid": 868,
+     "invalid": 988,
      "missingKey": 0,
      "script": 0
     },
@@ -73,11 +74,11 @@
     "objectivePolicy": {
      "terms": []
     },
-    "probesRun": 2856,
+    "probesRun": 3576,
     "rejections": {
      "conservation": 0,
      "invalid": 0,
-     "missingKey": 2856,
+     "missingKey": 3576,
      "script": 0
     },
     "verdict": "notunderprobes"
@@ -106,11 +107,11 @@
     "objectivePolicy": {
      "terms": []
     },
-    "probesRun": 2856,
+    "probesRun": 3576,
     "rejections": {
      "conservation": 0,
      "invalid": 0,
-     "missingKey": 2856,
+     "missingKey": 3576,
      "script": 0
     },
     "verdict": "notunderprobes"
@@ -222,11 +223,11 @@
       }
      ]
     },
-    "probesRun": 1704,
+    "probesRun": 2676,
     "rejections": {
      "conservation": 0,
      "invalid": 0,
-     "missingKey": 1384,
+     "missingKey": 2194,
      "script": 0
     },
     "verdict": "drainable"
@@ -379,22 +380,23 @@
       }
      ]
     },
-    "probesRun": 2216,
+    "probesRun": 2592,
     "rejections": {
      "conservation": 208,
      "invalid": 0,
      "missingKey": 0,
-     "script": 1922
+     "script": 2298
     },
     "verdict": "notunderprobes"
    },
    "attributable": false,
-   "confounded": false
+   "confounded": false,
+   "note": "Still out of family after 3a: its witness REPLACES the first token with junk, and this family prepends sourced fillers rather than replacing \u2014 first-token replacement is explicitly outside it."
   },
   {
    "id": "M6",
    "proven": true,
-   "found": false,
+   "found": true,
    "synthesisOff": {
     "capped": false,
     "firstAccounting": {
@@ -476,21 +478,22 @@
       0
      ]
     },
-    "hits": 0,
+    "hits": 14,
     "objectivePolicy": {
      "terms": []
     },
-    "probesRun": 1652,
+    "probesRun": 2004,
     "rejections": {
      "conservation": 0,
      "invalid": 0,
      "missingKey": 0,
-     "script": 1536
+     "script": 1874
     },
-    "verdict": "notunderprobes"
+    "verdict": "drainable"
    },
-   "attributable": false,
-   "confounded": false
+   "attributable": true,
+   "confounded": false,
+   "note": "CONVERTED by the 3a declared-output axis: the pool successor is re-treed to the attacker, so its reserves land in a recognized attacker-spendable output."
   },
   {
    "id": "M7",
@@ -554,16 +557,16 @@
       0
      ]
     },
-    "hits": 12,
+    "hits": 34,
     "objectivePolicy": {
      "terms": []
     },
-    "probesRun": 29448,
+    "probesRun": 35280,
     "rejections": {
      "conservation": 0,
      "invalid": 0,
      "missingKey": 0,
-     "script": 29392
+     "script": 35202
     },
     "verdict": "drainable"
    },
@@ -621,12 +624,12 @@
       }
      ]
     },
-    "probesRun": 2216,
+    "probesRun": 2680,
     "rejections": {
      "conservation": 0,
      "invalid": 0,
      "missingKey": 0,
-     "script": 2216
+     "script": 2680
     },
     "verdict": "notunderprobes"
    },
@@ -675,10 +678,10 @@
     "objectivePolicy": {
      "terms": []
     },
-    "probesRun": 868,
+    "probesRun": 988,
     "rejections": {
      "conservation": 0,
-     "invalid": 868,
+     "invalid": 988,
      "missingKey": 0,
      "script": 0
     },
@@ -704,11 +707,11 @@
     "objectivePolicy": {
      "terms": []
     },
-    "probesRun": 2856,
+    "probesRun": 3576,
     "rejections": {
      "conservation": 0,
      "invalid": 0,
-     "missingKey": 2856,
+     "missingKey": 3576,
      "script": 0
     },
     "verdict": "notunderprobes"
@@ -733,11 +736,11 @@
     "objectivePolicy": {
      "terms": []
     },
-    "probesRun": 2856,
+    "probesRun": 3576,
     "rejections": {
      "conservation": 0,
      "invalid": 0,
-     "missingKey": 2856,
+     "missingKey": 3576,
      "script": 0
     },
     "verdict": "notunderprobes"
@@ -844,11 +847,11 @@
       }
      ]
     },
-    "probesRun": 1704,
+    "probesRun": 2676,
     "rejections": {
      "conservation": 0,
      "invalid": 0,
-     "missingKey": 1700,
+     "missingKey": 2662,
      "script": 0
     },
     "verdict": "notunderprobes"
@@ -996,12 +999,12 @@
       }
      ]
     },
-    "probesRun": 2216,
+    "probesRun": 2592,
     "rejections": {
      "conservation": 208,
      "invalid": 0,
      "missingKey": 0,
-     "script": 1922
+     "script": 2298
     },
     "verdict": "notunderprobes"
    }
@@ -1093,12 +1096,12 @@
     "objectivePolicy": {
      "terms": []
     },
-    "probesRun": 1652,
+    "probesRun": 2004,
     "rejections": {
      "conservation": 0,
      "invalid": 0,
      "missingKey": 0,
-     "script": 1536
+     "script": 1888
     },
     "verdict": "notunderprobes"
    }
@@ -1162,12 +1165,12 @@
     "objectivePolicy": {
      "terms": []
     },
-    "probesRun": 29448,
+    "probesRun": 35280,
     "rejections": {
      "conservation": 0,
      "invalid": 0,
      "missingKey": 0,
-     "script": 29404
+     "script": 35236
     },
     "verdict": "notunderprobes"
    }
@@ -1221,12 +1224,12 @@
       }
      ]
     },
-    "probesRun": 2216,
+    "probesRun": 2680,
     "rejections": {
      "conservation": 0,
      "invalid": 0,
      "missingKey": 0,
-     "script": 2216
+     "script": 2680
     },
     "verdict": "notunderprobes"
    },
@@ -1256,8 +1259,8 @@
   }
  },
  "detectionRateNote": "attributable detections / proven mutants. A drainable verdict counts only when the mutant's own unmutated control is CLEAN in the same configuration \u2014 a hit that also fires on the original says nothing about the mutation. Derived by the harness, not flagged by hand.",
- "attributableDetections": 2,
- "rawDrainableOnProven": 2,
+ "attributableDetections": 3,
+ "rawDrainableOnProven": 3,
  "confounded": [],
  "foundNote": "raw drainable verdicts on proven mutants: see rawDrainableOnProven (1, all confounded)",
  "rejectionAccounting": "Rejections are recorded only for synthesisOn. Invalid takes precedence over conservation, then missingKey, then script. Accepted probes with no measured leak are neither hits nor rejections. Deterministic counts are asserted; wall-clock timings are diagnostic only.",
