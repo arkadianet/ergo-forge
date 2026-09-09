@@ -1,0 +1,4 @@
+{
+  val check = sigmaProp(HEIGHT > 10)
+  (owner || check) && (check && backup)
+}

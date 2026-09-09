@@ -20,6 +20,7 @@ fn main() -> ExitCode {
     let rest = &args[1..];
     let result = match cmd.as_str() {
         "compile" => cmd_compile(rest),
+        "ingest" => cmd_ingest(rest),
         "params" => cmd_params(rest),
         "eval" => cmd_eval(rest),
         "decompile" => cmd_decompile(rest),
@@ -56,6 +57,11 @@ fn usage() {
         "ergo-es — ErgoScript workbench CLI
 
 USAGE:
+  ergo-es ingest <directory> [--params params.json] [--tree-version N]
+                 [--network mainnet|testnet] [--json] [--no-infer]
+      Compile and lift .ergo/.es sources for static tooling, with reported
+      synthetic bindings. Overrides: name -> {{type, value}} or {{type}}.
+      Reports every source; non-zero exit if any fails or none are found.
   ergo-es compile <source-file> [--tree-version N] [--network mainnet|testnet]
                   [--params params.json]
       Compile ErgoScript source to ErgoTree bytes + P2S/P2SH addresses.
@@ -157,6 +163,101 @@ fn read_input(arg: &str) -> Result<String, String> {
 }
 
 // ── compile ──────────────────────────────────────────────────────────────────
+
+fn cmd_ingest(args: &[String]) -> Result<(), String> {
+    use ergo_sandbox::ingest::{ingest_directory, IngestOptions, Status};
+    let root = args.first().ok_or("ingest needs a directory")?;
+    let mut options = IngestOptions::default();
+    let mut json = false;
+    let mut i = 1;
+    while i < args.len() {
+        match args[i].as_str() {
+            "--json" => json = true,
+            "--no-infer" => options.infer_constants = false,
+            flag @ ("--params" | "--tree-version" | "--network") => {
+                i += 1;
+                let value = args.get(i).ok_or_else(|| format!("{flag} needs a value"))?;
+                match flag {
+                    "--params" => {
+                        options.overrides = serde_json::from_str(
+                            &std::fs::read_to_string(value).map_err(|e| format!("{value}: {e}"))?,
+                        )
+                        .map_err(|e| format!("{value}: {e}"))?
+                    }
+                    "--tree-version" => {
+                        options.tree_version = value
+                            .parse()
+                            .map_err(|_| format!("bad tree version `{value}`"))?
+                    }
+                    _ => options.network = parse_network(value)?,
+                }
+            }
+            flag => return Err(format!("unknown ingest option `{flag}`")),
+        }
+        i += 1;
+    }
+    let report = ingest_directory(Path::new(root), &options)?;
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
+        );
+    } else {
+        println!("contract\tstatus\treason / bindings");
+        for row in &report.contracts {
+            let status = if row.status == Status::Compiled {
+                "compiled"
+            } else {
+                "not compiled"
+            };
+            let bindings = row
+                .bindings
+                .iter()
+                .map(|b| {
+                    format!(
+                        "{}: {} ({:?}, lines {:?})",
+                        b.parameter, b.bound.r#type, b.origin, b.lines
+                    )
+                })
+                .collect::<Vec<_>>()
+                .join(", ");
+            println!(
+                "{}\t{status}\t{}",
+                row.path.display(),
+                row.reason.as_deref().unwrap_or(&bindings)
+            );
+            if row.reason.is_some() && !bindings.is_empty() {
+                println!("  bindings: {bindings}");
+            }
+            for note in &row.notes {
+                println!("  {note}");
+            }
+            if row.raw_lift_nodes.is_some_and(|n| n > 0) || row.lift_truncated == Some(true) {
+                println!(
+                    "  partial lift: raw nodes={:?}, truncated={:?}",
+                    row.raw_lift_nodes, row.lift_truncated
+                );
+            }
+        }
+        println!(
+            "compiled={} not_compiled={} total={}",
+            report.compiled,
+            report.not_compiled,
+            report.contracts.len()
+        );
+    }
+    if report.contracts.is_empty() {
+        return Err("no .ergo/.es sources found".into());
+    }
+    if report.not_compiled > 0 {
+        return Err(format!(
+            "{} of {} contracts did not compile",
+            report.not_compiled,
+            report.contracts.len()
+        ));
+    }
+    Ok(())
+}
 
 fn cmd_compile(args: &[String]) -> Result<(), String> {
     let Some(src_ref) = args.first() else {

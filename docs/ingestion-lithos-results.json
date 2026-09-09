@@ -1,0 +1,1714 @@
+{
+  "corpus_revision": "e7a9994b9560e0c6d057e7cc0a59c0cb796e4d44",
+  "compiler_revision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+  "files": [
+    {
+      "path": "collateral/Collateral_Enforcer.ergo",
+      "sha256": "59daf591e4ea68d618007573684ec1872e0fefa5df736c5583eb902ddf7f2789"
+    },
+    {
+      "path": "collateral/Collateral_Mainnet.ergo",
+      "sha256": "ce7cefe7324bfb09d3fa3b56d56398f5e00a67c04d7cfa7db2919bb1de04e2cb"
+    },
+    {
+      "path": "collateral/Collateral_Testnet.ergo",
+      "sha256": "14e018295c1cdc4b96b33722e2c6cfcbd428d917d92c2744339a6aa0fca414bf"
+    },
+    {
+      "path": "collateral/Emission_Config.ergo",
+      "sha256": "e9202fda6e51ae32ca0ee927b01620f19b749ba6e3b0527f2fb76503d3fa2fab"
+    },
+    {
+      "path": "collateral/Emission_Gate.ergo",
+      "sha256": "3c7ba2ad13c9d8a1eef1d901ae1d7b43f7e3d585343a0266b720d75b3975c5a8"
+    },
+    {
+      "path": "collateral/Emission_Guard.ergo",
+      "sha256": "d557e95b8e9e33518a30725edc1ab08f3fa318958ff4900a22210309addf9368"
+    },
+    {
+      "path": "collateral/LIT_Emissions.ergo",
+      "sha256": "6adbf3983bfccdfd5724cc8df331319bd21415e73a20144c1bb2f446cf0cd90e"
+    },
+    {
+      "path": "dictionaries/MinerData_Guard.ergo",
+      "sha256": "1d274d109b48b8b21beed649c79d63b573aeff910e3a53b418ab9008cc62511a"
+    },
+    {
+      "path": "dictionaries/MinerData_Logic.ergo",
+      "sha256": "8260a6ec0489e8db7aa47c1f4872b3754441938db4b2ee23ce8f70191ceaa840"
+    },
+    {
+      "path": "dictionaries/MinerDictionary.ergo",
+      "sha256": "fda8ff095f97806d57e7c691de2ce72da6b641ede8d7f77b0d9037229f1c0827"
+    },
+    {
+      "path": "fraudproofs/FP_IncorrectN.ergo",
+      "sha256": "b79001844674eb49b32d153f13386903e6f0dc814e64bc7a9911dfd13ee42cec"
+    },
+    {
+      "path": "fraudproofs/FP_InvalidDiff.ergo",
+      "sha256": "5962c9557170b9c6eb260d0b670de1ddc9e1f9603800d815164fd188ec350d86"
+    },
+    {
+      "path": "fraudproofs/FP_InvalidFormat.ergo",
+      "sha256": "3eef699bba6dea3fec35890ce06dc1fc0f7b9787c667e3b0ed67961b4eb6fc4d"
+    },
+    {
+      "path": "fraudproofs/FP_MalformedGE.ergo",
+      "sha256": "f69b5b5e4b9b11667d63750fd426242d6e7515c17642e07a59d915720ea1cfa2"
+    },
+    {
+      "path": "fraudproofs/FP_MalformedGenesis.ergo",
+      "sha256": "3e99b20eecefafe0c3ca91d8a18a298a0f20a6ec1696f1d2afb878c0d97b72bf"
+    },
+    {
+      "path": "fraudproofs/FP_NonMatchingCommitment.ergo",
+      "sha256": "d5587cb0146719ccef88c406ada5cf5c644ff91c4df82265c85fcf0f627ff445"
+    },
+    {
+      "path": "fraudproofs/FP_NonUniqueHeaders.ergo",
+      "sha256": "74d3ebd5a56d7e276c034ed73c503debcd123c11513f406d8477d14328c039c9"
+    },
+    {
+      "path": "fraudproofs/FP_NotInWindow.ergo",
+      "sha256": "b9c901ee38ccd6a3382a747c9e9abec3e428ef77541f95786e287db33329fea8"
+    },
+    {
+      "path": "fraudproofs/FP_TransactionNotIncluded.ergo",
+      "sha256": "60b4356077fe45bc1182abdce3ec1718dc09df8e0838cdc628bbbb384248390b"
+    },
+    {
+      "path": "lithosdex/LD_FeeVault.ergo",
+      "sha256": "04e4aae861f14aa21dd74b5092abd61fc4b0b99a9db7e80c10b693c9e026f94d"
+    },
+    {
+      "path": "lithosdex/LD_LiquidityPool.ergo",
+      "sha256": "448aa4e0d1ed46bab0f12e1e7375fb1077fa44a44eaa7bf663eb5bed7d3274fa"
+    },
+    {
+      "path": "lithosdex/LD_Provision.ergo",
+      "sha256": "553b2006154d020f8e62e9499ac15399898aa94d01f81420dbf8c29ee6207caa"
+    },
+    {
+      "path": "lithosdex/LD_Provision_Guard.ergo",
+      "sha256": "9d12699f0b1fad0ea192e6794690e8893d1ff608b9b4c715770fcbabf52cc3bb"
+    },
+    {
+      "path": "rollups/Evaluation.ergo",
+      "sha256": "c22906a78072f2a7d3418a3b144c0225711389ade95920a34d81dce8b608bc20"
+    },
+    {
+      "path": "rollups/FP_Control_Testnet.ergo",
+      "sha256": "13135371b0fdf49b1bb01bc8f47e4ac6b5540dcbe70e18abc845b3eb1664c777"
+    },
+    {
+      "path": "rollups/Holding_Guard.ergo",
+      "sha256": "f063bfabff0681a9dc150123775e75d3e76f918adfc1760d5e03d1cd07b6f231"
+    },
+    {
+      "path": "rollups/Holding_Logic.ergo",
+      "sha256": "f8cf03ba0926fd83aeb3d679d6055e8ff9ad9dabd5a365d59105c27e19e4fba4"
+    },
+    {
+      "path": "rollups/Payout.ergo",
+      "sha256": "eecd6ac10afe6f5bb5899be8fc916ba7e2f013655c5aa00ad100a3f6973b5d8f"
+    }
+  ],
+  "baseline": {
+    "contracts": [
+      {
+        "path": "collateral/Collateral_Enforcer.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_LIT_ID",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "collateral/Collateral_Mainnet.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_LIT_ID",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "collateral/Collateral_Testnet.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: _ROLLUP_HOLDING_HASH",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "collateral/Emission_Config.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_TESTNET_PK",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "collateral/Emission_Gate.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_EMISSION_NFT",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "collateral/Emission_Guard.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_EMCONFIG_NFT",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "collateral/LIT_Emissions.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_LIT_ID",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "dictionaries/MinerData_Guard.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_MINERDATA_LOGIC_HASH",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "dictionaries/MinerData_Logic.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_EVICT_DELAY",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "dictionaries/MinerDictionary.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_MD_ID",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "fraudproofs/FP_IncorrectN.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": 3,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "fraudproofs/FP_InvalidDiff.ergo",
+        "status": "not_compiled",
+        "reason": "tree not serializable under a v0 header: UnsignedBigInt constant data; the pinned compiler fixes the wire header at v0 even when tree_version=3 is requested. Header stamping happens only after serialization; no public compile option selects the serialization header.",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "fraudproofs/FP_InvalidFormat.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_NUM_LVLS_MAX",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "fraudproofs/FP_MalformedGE.ergo",
+        "status": "not_compiled",
+        "reason": "tree not serializable under a v0 header: UnsignedBigInt constant data; the pinned compiler fixes the wire header at v0 even when tree_version=3 is requested. Header stamping happens only after serialization; no public compile option selects the serialization header.",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "fraudproofs/FP_MalformedGenesis.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_COLLAT_ERGOTREE",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "fraudproofs/FP_NonMatchingCommitment.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_MD_ID",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "fraudproofs/FP_NonUniqueHeaders.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": 3,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "fraudproofs/FP_NotInWindow.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_NISP_WINDOW",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "fraudproofs/FP_TransactionNotIncluded.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": 3,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "lithosdex/LD_FeeVault.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_PROV_TOKEN",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "lithosdex/LD_LiquidityPool.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_PROVISION_GUARD_HASH",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "lithosdex/LD_Provision.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_VAULT_NFT",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "lithosdex/LD_Provision_Guard.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_PROVISION_LOGIC_HASH",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "rollups/Evaluation.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_BOND_DIVISOR",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "rollups/FP_Control_Testnet.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_TESTNET_PK",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "rollups/Holding_Guard.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_HOLDING_LOGIC_HASH",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "rollups/Holding_Logic.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_BOND_DIVISOR",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "rollups/Payout.ergo",
+        "status": "not_compiled",
+        "reason": "missing parameters: CONST_BOND_DIVISOR",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      }
+    ],
+    "compiled": 3,
+    "not_compiled": 25
+  },
+  "prototype_compile_only": [
+    {
+      "path": "collateral/Collateral_Enforcer.ergo",
+      "status": "compiled",
+      "reason": null
+    },
+    {
+      "path": "collateral/Collateral_Mainnet.ergo",
+      "status": "compiled",
+      "reason": null
+    },
+    {
+      "path": "collateral/Collateral_Testnet.ergo",
+      "status": "not_compiled",
+      "reason": "error: missing parameters: _ROLLUP_HOLDING_HASH"
+    },
+    {
+      "path": "collateral/Emission_Config.ergo",
+      "status": "not_compiled",
+      "reason": "error: type error: Unknown symbol &&, which is used as operation with arguments on SColl(SByte) (pos 1984)"
+    },
+    {
+      "path": "collateral/Emission_Gate.ergo",
+      "status": "compiled",
+      "reason": null
+    },
+    {
+      "path": "collateral/Emission_Guard.ergo",
+      "status": "compiled",
+      "reason": null
+    },
+    {
+      "path": "collateral/LIT_Emissions.ergo",
+      "status": "not_compiled",
+      "reason": "error: type error: Invalid type of condition If: both branches should have the same type but was SColl(STuple([SLong, SLong])) and SColl(STuple([SColl(SByte), SLong])) (pos 12124)"
+    },
+    {
+      "path": "dictionaries/MinerData_Guard.ergo",
+      "status": "compiled",
+      "reason": null
+    },
+    {
+      "path": "dictionaries/MinerData_Logic.ergo",
+      "status": "compiled",
+      "reason": null
+    },
+    {
+      "path": "dictionaries/MinerDictionary.ergo",
+      "status": "not_compiled",
+      "reason": "error: type error: operation ==: SameTypeRequired(\"equality operands must have the same type after upcast; got (SColl(SByte), SLong)\") (pos 5300)"
+    },
+    {
+      "path": "fraudproofs/FP_IncorrectN.ergo",
+      "status": "compiled",
+      "reason": null
+    },
+    {
+      "path": "fraudproofs/FP_InvalidDiff.ergo",
+      "status": "not_compiled",
+      "reason": "error: tree not serializable under a v0 header: UnsignedBigInt constant data"
+    },
+    {
+      "path": "fraudproofs/FP_InvalidFormat.ergo",
+      "status": "compiled",
+      "reason": null
+    },
+    {
+      "path": "fraudproofs/FP_MalformedGE.ergo",
+      "status": "not_compiled",
+      "reason": "error: tree not serializable under a v0 header: UnsignedBigInt constant data"
+    },
+    {
+      "path": "fraudproofs/FP_MalformedGenesis.ergo",
+      "status": "compiled",
+      "reason": null
+    },
+    {
+      "path": "fraudproofs/FP_NonMatchingCommitment.ergo",
+      "status": "not_compiled",
+      "reason": "error: type error: operation ==: SameTypeRequired(\"equality operands must have the same type after upcast; got (SColl(SByte), SLong)\") (pos 6971)"
+    },
+    {
+      "path": "fraudproofs/FP_NonUniqueHeaders.ergo",
+      "status": "compiled",
+      "reason": null
+    },
+    {
+      "path": "fraudproofs/FP_NotInWindow.ergo",
+      "status": "compiled",
+      "reason": null
+    },
+    {
+      "path": "fraudproofs/FP_TransactionNotIncluded.ergo",
+      "status": "compiled",
+      "reason": null
+    },
+    {
+      "path": "lithosdex/LD_FeeVault.ergo",
+      "status": "compiled",
+      "reason": null
+    },
+    {
+      "path": "lithosdex/LD_LiquidityPool.ergo",
+      "status": "compiled",
+      "reason": null
+    },
+    {
+      "path": "lithosdex/LD_Provision.ergo",
+      "status": "compiled",
+      "reason": null
+    },
+    {
+      "path": "lithosdex/LD_Provision_Guard.ergo",
+      "status": "compiled",
+      "reason": null
+    },
+    {
+      "path": "rollups/Evaluation.ergo",
+      "status": "not_compiled",
+      "reason": "error: type error: operation ==: SameTypeRequired(\"equality operands must have the same type after upcast; got (SColl(SByte), SLong)\") (pos 8355)"
+    },
+    {
+      "path": "rollups/FP_Control_Testnet.ergo",
+      "status": "not_compiled",
+      "reason": "error: type error: Invalid argument type for ||, expected SigmaProp but was SColl(SByte) (pos 1189)"
+    },
+    {
+      "path": "rollups/Holding_Guard.ergo",
+      "status": "compiled",
+      "reason": null
+    },
+    {
+      "path": "rollups/Holding_Logic.ergo",
+      "status": "not_compiled",
+      "reason": "error: type error: operation ==: SameTypeRequired(\"equality operands must have the same type after upcast; got (SColl(SByte), SLong)\") (pos 10454)"
+    },
+    {
+      "path": "rollups/Payout.ergo",
+      "status": "compiled",
+      "reason": null
+    }
+  ],
+  "after": {
+    "contracts": [
+      {
+        "path": "collateral/Collateral_Enforcer.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_LIT_ID",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "e99e1a6b1b7a75b9eb3725c15a172931022c64e16e9a25e07ce868486d320694"
+            },
+            "origin": "inferred",
+            "lines": [
+              95,
+              97
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 3,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "collateral/Collateral_Mainnet.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_LIT_ID",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "e99e1a6b1b7a75b9eb3725c15a172931022c64e16e9a25e07ce868486d320694"
+            },
+            "origin": "inferred",
+            "lines": [
+              32,
+              82,
+              95,
+              154,
+              155
+            ]
+          },
+          {
+            "parameter": "CONST_GATE_HASH",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "f152cc0a77eedf735784c79e7f647be80abbeabb055a10e7eb5b89ebe81c4da9"
+            },
+            "origin": "inferred",
+            "lines": [
+              116
+            ]
+          },
+          {
+            "parameter": "CONST_EMCONFIG_NFT",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "9219f8e096f960c5a7806f890e64a2b053271380a559b3e3e1d6b1f3ee4a6576"
+            },
+            "origin": "inferred",
+            "lines": [
+              132
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 0,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "collateral/Collateral_Testnet.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "_ROLLUP_HOLDING_HASH",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "41696a728058a277e90827d8186e197b92e4834b856d9ab33eaa5010599dcd6d"
+            },
+            "origin": "inferred",
+            "lines": [
+              26
+            ]
+          },
+          {
+            "parameter": "_FIXED_RATE",
+            "bound": {
+              "type": "Long",
+              "value": 16
+            },
+            "origin": "inferred",
+            "lines": [
+              34,
+              41
+            ]
+          },
+          {
+            "parameter": "_FOUNDER_INIT_REWARD",
+            "bound": {
+              "type": "Long",
+              "value": 76
+            },
+            "origin": "inferred",
+            "lines": [
+              34
+            ]
+          },
+          {
+            "parameter": "_FIXED_RATE_PERIOD",
+            "bound": {
+              "type": "Long",
+              "value": 31
+            },
+            "origin": "inferred",
+            "lines": [
+              35,
+              36
+            ]
+          },
+          {
+            "parameter": "_EPOCH_LENGTH",
+            "bound": {
+              "type": "Long",
+              "value": 29
+            },
+            "origin": "inferred",
+            "lines": [
+              35,
+              36
+            ]
+          },
+          {
+            "parameter": "_ONE_EPOCH_REDUCTION",
+            "bound": {
+              "type": "Long",
+              "value": 63
+            },
+            "origin": "inferred",
+            "lines": [
+              41
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 0,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "collateral/Emission_Config.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_TESTNET_PK",
+            "bound": {
+              "type": "SigmaProp",
+              "value": "021f265a03b1211955b2d344d37c37951dffbf656361c0dadac9f8da7c3915f534"
+            },
+            "origin": "inferred",
+            "lines": [
+              55
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 0,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "collateral/Emission_Gate.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_EMISSION_NFT",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "5446d3a3e32686f4f105fb46fd594b10eb69d2f7af9cf34337f59e3f88544087"
+            },
+            "origin": "inferred",
+            "lines": [
+              28
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 0,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "collateral/Emission_Guard.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_EMCONFIG_NFT",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "9219f8e096f960c5a7806f890e64a2b053271380a559b3e3e1d6b1f3ee4a6576"
+            },
+            "origin": "inferred",
+            "lines": [
+              21
+            ]
+          },
+          {
+            "parameter": "CONST_EM_SCRIPT_HASH",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "71311484eea09c84073eddb18f2ddbb85114e3d4e02b6427701163a312825233"
+            },
+            "origin": "inferred",
+            "lines": [
+              25
+            ]
+          },
+          {
+            "parameter": "CONST_EMISSION_NFT",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "5446d3a3e32686f4f105fb46fd594b10eb69d2f7af9cf34337f59e3f88544087"
+            },
+            "origin": "inferred",
+            "lines": [
+              26
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 0,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "collateral/LIT_Emissions.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_LIT_ID",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "e99e1a6b1b7a75b9eb3725c15a172931022c64e16e9a25e07ce868486d320694"
+            },
+            "origin": "inferred",
+            "lines": [
+              53,
+              143,
+              262,
+              280,
+              351,
+              376,
+              439
+            ]
+          },
+          {
+            "parameter": "CONST_F1",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "c871dddffc7461278ed8b3493e7bd2c2bcc307c88558b2bc18d32c4aab5eff9c"
+            },
+            "origin": "inferred",
+            "lines": [
+              215
+            ]
+          },
+          {
+            "parameter": "CONST_F2",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "0b08358232858e5a33fb244658d9d6d92fd349aa72d29f6ef7ff8abdf63495f8"
+            },
+            "origin": "inferred",
+            "lines": [
+              215
+            ]
+          },
+          {
+            "parameter": "CONST_F3",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "a5457f833c5fe905ea49c4ebe527dc629e9ddbeae6e5a0b8ff254d91df953ce1"
+            },
+            "origin": "inferred",
+            "lines": [
+              215
+            ]
+          },
+          {
+            "parameter": "CONST_GATE_HASH",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "f152cc0a77eedf735784c79e7f647be80abbeabb055a10e7eb5b89ebe81c4da9"
+            },
+            "origin": "inferred",
+            "lines": [
+              256,
+              300,
+              328,
+              417
+            ]
+          },
+          {
+            "parameter": "CONST_COLLATERAL_HASH",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "a7e88f0882cbac3e54f827384d50b5536895a41f3ff1eacdfc558531115576ff"
+            },
+            "origin": "inferred",
+            "lines": [
+              347
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 0,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "dictionaries/MinerData_Guard.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_MINERDATA_LOGIC_HASH",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "66aef91f218275d4e0da424e60d6874ec9377e4a2aa100e9db95d8ff92206b6f"
+            },
+            "origin": "inferred",
+            "lines": [
+              40
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 0,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "dictionaries/MinerData_Logic.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_EVICT_DELAY",
+            "bound": {
+              "type": "Long",
+              "value": 19
+            },
+            "origin": "inferred",
+            "lines": [
+              62
+            ]
+          },
+          {
+            "parameter": "CONST_NISP_WINDOW",
+            "bound": {
+              "type": "Long",
+              "value": 90
+            },
+            "origin": "inferred",
+            "lines": [
+              76,
+              79
+            ]
+          },
+          {
+            "parameter": "CONST_ROLLUP_LIFETIME",
+            "bound": {
+              "type": "Long",
+              "value": 76
+            },
+            "origin": "inferred",
+            "lines": [
+              76
+            ]
+          },
+          {
+            "parameter": "CONST_MD_ID",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "b744a054fa68ab56c9a0efd46015fbd554274162dd2a326488e4607214fad246"
+            },
+            "origin": "inferred",
+            "lines": [
+              106
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 3,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "dictionaries/MinerDictionary.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_MD_ID",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "b744a054fa68ab56c9a0efd46015fbd554274162dd2a326488e4607214fad246"
+            },
+            "origin": "inferred",
+            "lines": [
+              68
+            ]
+          },
+          {
+            "parameter": "CONST_MINERDATA_PROPBYTES",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "57a1aaad3d4410495e63f2c493169ce9333125aee35bb4b1af8e3fa27a4024c8"
+            },
+            "origin": "inferred",
+            "lines": [
+              107,
+              216,
+              226
+            ]
+          },
+          {
+            "parameter": "CONST_MIN_DATA_BOX_AMNT",
+            "bound": {
+              "type": "Long",
+              "value": 18
+            },
+            "origin": "inferred",
+            "lines": [
+              108
+            ]
+          },
+          {
+            "parameter": "CONST_NISP_WINDOW",
+            "bound": {
+              "type": "Long",
+              "value": 90
+            },
+            "origin": "inferred",
+            "lines": [
+              119
+            ]
+          },
+          {
+            "parameter": "CONST_EVICT_DELAY",
+            "bound": {
+              "type": "Long",
+              "value": 19
+            },
+            "origin": "inferred",
+            "lines": [
+              126,
+              181
+            ]
+          },
+          {
+            "parameter": "CONST_DATA_LIFETIME",
+            "bound": {
+              "type": "Long",
+              "value": 15
+            },
+            "origin": "inferred",
+            "lines": [
+              131,
+              132
+            ]
+          },
+          {
+            "parameter": "CONST_REGISTER_SLACK",
+            "bound": {
+              "type": "Long",
+              "value": 23
+            },
+            "origin": "inferred",
+            "lines": [
+              132
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 0,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "fraudproofs/FP_IncorrectN.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": 3,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "fraudproofs/FP_InvalidDiff.ergo",
+        "status": "not_compiled",
+        "reason": "tree not serializable under a v0 header: UnsignedBigInt constant data; the pinned compiler fixes the wire header at v0 even when tree_version=3 is requested. Header stamping happens only after serialization; no public compile option selects the serialization header.",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "fraudproofs/FP_InvalidFormat.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_NUM_LVLS_MAX",
+            "bound": {
+              "type": "Int",
+              "value": 99
+            },
+            "origin": "inferred",
+            "lines": [
+              201
+            ]
+          },
+          {
+            "parameter": "CONST_TX_PROOF_MIN",
+            "bound": {
+              "type": "Int",
+              "value": 20
+            },
+            "origin": "inferred",
+            "lines": [
+              202
+            ]
+          },
+          {
+            "parameter": "CONST_TX_PROOF_MAX",
+            "bound": {
+              "type": "Int",
+              "value": 94
+            },
+            "origin": "inferred",
+            "lines": [
+              202
+            ]
+          },
+          {
+            "parameter": "CONST_TX_SIZE_MIN",
+            "bound": {
+              "type": "Int",
+              "value": 12
+            },
+            "origin": "inferred",
+            "lines": [
+              204
+            ]
+          },
+          {
+            "parameter": "CONST_COLLAT_BOX_MIN",
+            "bound": {
+              "type": "Int",
+              "value": 59
+            },
+            "origin": "inferred",
+            "lines": [
+              204
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 3,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "fraudproofs/FP_MalformedGE.ergo",
+        "status": "not_compiled",
+        "reason": "tree not serializable under a v0 header: UnsignedBigInt constant data; the pinned compiler fixes the wire header at v0 even when tree_version=3 is requested. Header stamping happens only after serialization; no public compile option selects the serialization header.",
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": null,
+        "raw_lift_nodes": null,
+        "lift_truncated": null
+      },
+      {
+        "path": "fraudproofs/FP_MalformedGenesis.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_COLLAT_ERGOTREE",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "0feda0bf3db863ec3bf074879f7db4605ec78e29f3abef100972372b6c9ca6e6"
+            },
+            "origin": "inferred",
+            "lines": [
+              182,
+              183
+            ]
+          },
+          {
+            "parameter": "CONST_COLLAT_TOKEN",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "4b4cb1d8178f00513d6edf8554c98e777ab85115c433a2911bcc9bddfd6dd541"
+            },
+            "origin": "inferred",
+            "lines": [
+              189
+            ]
+          },
+          {
+            "parameter": "CONST_HOLDING_ERGOTREE",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "1c1c185fd3398d0acc05bc521872a7406852e473a95bc68de63ac4fb1d05d83d"
+            },
+            "origin": "inferred",
+            "lines": [
+              249,
+              250
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 3,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "fraudproofs/FP_NonMatchingCommitment.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_MD_ID",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "b744a054fa68ab56c9a0efd46015fbd554274162dd2a326488e4607214fad246"
+            },
+            "origin": "inferred",
+            "lines": [
+              89
+            ]
+          },
+          {
+            "parameter": "CONST_MINERDATA_PROPBYTES",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "57a1aaad3d4410495e63f2c493169ce9333125aee35bb4b1af8e3fa27a4024c8"
+            },
+            "origin": "inferred",
+            "lines": [
+              128
+            ]
+          },
+          {
+            "parameter": "CONST_NISP_WINDOW",
+            "bound": {
+              "type": "Long",
+              "value": 90
+            },
+            "origin": "inferred",
+            "lines": [
+              143
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 3,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "fraudproofs/FP_NonUniqueHeaders.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": 3,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "fraudproofs/FP_NotInWindow.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_NISP_WINDOW",
+            "bound": {
+              "type": "Long",
+              "value": 90
+            },
+            "origin": "inferred",
+            "lines": [
+              131
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 3,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "fraudproofs/FP_TransactionNotIncluded.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [],
+        "notes": [],
+        "requested_tree_version": 3,
+        "actual_tree_version": 3,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "lithosdex/LD_FeeVault.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_PROV_TOKEN",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "5c72b2bfa19b8cacf6ba94105562d82a5cc5a8cecb3ba9691a24ee81cc1ed736"
+            },
+            "origin": "inferred",
+            "lines": [
+              100
+            ]
+          },
+          {
+            "parameter": "CONST_POOL_NFT",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "9d5aa68e8be20a8d23c19f9be8f268e9196bdb6c5e7082a0385aeec16bb14833"
+            },
+            "origin": "inferred",
+            "lines": [
+              149
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 3,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "lithosdex/LD_LiquidityPool.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_PROVISION_GUARD_HASH",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "601897b433190a65ce9eb0ea10a2bb16d40544aa3675cfac8424c7d619484bda"
+            },
+            "origin": "inferred",
+            "lines": [
+              219,
+              255,
+              338,
+              347
+            ]
+          },
+          {
+            "parameter": "CONST_VAULT_NFT",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "eb644a4bce15353fd782691ff8c4196da3852984c0c6dc41df2cb477d7bb3b62"
+            },
+            "origin": "inferred",
+            "lines": [
+              281,
+              371
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 0,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "lithosdex/LD_Provision.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_VAULT_NFT",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "eb644a4bce15353fd782691ff8c4196da3852984c0c6dc41df2cb477d7bb3b62"
+            },
+            "origin": "inferred",
+            "lines": [
+              97
+            ]
+          },
+          {
+            "parameter": "CONST_POOL_NFT",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "9d5aa68e8be20a8d23c19f9be8f268e9196bdb6c5e7082a0385aeec16bb14833"
+            },
+            "origin": "inferred",
+            "lines": [
+              104,
+              147
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 0,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "lithosdex/LD_Provision_Guard.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_PROVISION_LOGIC_HASH",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "eafd8deb227cce420892ece94fa3b7c074c35d72e4c45514840fb0f2c96d9bef"
+            },
+            "origin": "inferred",
+            "lines": [
+              39
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 0,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "rollups/Evaluation.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_BOND_DIVISOR",
+            "bound": {
+              "type": "Long",
+              "value": 71
+            },
+            "origin": "inferred",
+            "lines": [
+              71
+            ]
+          },
+          {
+            "parameter": "CONST_MIN_ENTRY_BOND",
+            "bound": {
+              "type": "Long",
+              "value": 43
+            },
+            "origin": "inferred",
+            "lines": [
+              72
+            ]
+          },
+          {
+            "parameter": "CONST_PERIOD_LENGTH",
+            "bound": {
+              "type": "Long",
+              "value": 83
+            },
+            "origin": "inferred",
+            "lines": [
+              80,
+              160
+            ]
+          },
+          {
+            "parameter": "CONST_FP_ID",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "84d58d9cf74feff7cac02bb7d310503831133ba7e13578ce4e0821489c4ffdd0"
+            },
+            "origin": "inferred",
+            "lines": [
+              82
+            ]
+          },
+          {
+            "parameter": "CONST_PAYOUT_PROPBYTES",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "ec57db6819299dc739769ad6f965133bdab048beef9801c4f63feb126a195d7f"
+            },
+            "origin": "inferred",
+            "lines": [
+              180
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 0,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "rollups/FP_Control_Testnet.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_TESTNET_PK",
+            "bound": {
+              "type": "SigmaProp",
+              "value": "021f265a03b1211955b2d344d37c37951dffbf656361c0dadac9f8da7c3915f534"
+            },
+            "origin": "inferred",
+            "lines": [
+              35
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 0,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "rollups/Holding_Guard.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_HOLDING_LOGIC_HASH",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "e9410d9d27f377179c49bb94363d5f9eaca80d11b0457bb513f1f92e2e94a0eb"
+            },
+            "origin": "inferred",
+            "lines": [
+              49
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 0,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "rollups/Holding_Logic.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_BOND_DIVISOR",
+            "bound": {
+              "type": "Long",
+              "value": 71
+            },
+            "origin": "inferred",
+            "lines": [
+              93
+            ]
+          },
+          {
+            "parameter": "CONST_MIN_ENTRY_BOND",
+            "bound": {
+              "type": "Long",
+              "value": 43
+            },
+            "origin": "inferred",
+            "lines": [
+              94
+            ]
+          },
+          {
+            "parameter": "CONST_PERIOD_LENGTH",
+            "bound": {
+              "type": "Long",
+              "value": 83
+            },
+            "origin": "inferred",
+            "lines": [
+              100,
+              191
+            ]
+          },
+          {
+            "parameter": "CONST_EVAL_PROPBYTES",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "b03b2907e9fa169ac1d76a8158cdc20d8275d5da73a4034c0e08dca44e8fd0f7"
+            },
+            "origin": "inferred",
+            "lines": [
+              198
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 0,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      },
+      {
+        "path": "rollups/Payout.ergo",
+        "status": "compiled",
+        "reason": null,
+        "bindings": [
+          {
+            "parameter": "CONST_BOND_DIVISOR",
+            "bound": {
+              "type": "Long",
+              "value": 71
+            },
+            "origin": "inferred",
+            "lines": [
+              51
+            ]
+          },
+          {
+            "parameter": "CONST_MIN_ENTRY_BOND",
+            "bound": {
+              "type": "Long",
+              "value": 43
+            },
+            "origin": "inferred",
+            "lines": [
+              52
+            ]
+          },
+          {
+            "parameter": "CONST_FEE_HASH",
+            "bound": {
+              "type": "Coll[Byte]",
+              "value": "628706d7e8b0077f8d98e10ceb7fe97e2e3e22808752d654e0b9a37e63c4d92e"
+            },
+            "origin": "inferred",
+            "lines": [
+              73
+            ]
+          }
+        ],
+        "notes": [
+          "Static ingestion uses synthetic values and representative types; numeric contexts choose the widest observed width. Values, collection lengths and SigmaProp structure are assumptions. Compiler folding may change or remove value-dependent branches; this is not a deployment-equivalent tree."
+        ],
+        "requested_tree_version": 3,
+        "actual_tree_version": 0,
+        "raw_lift_nodes": 0,
+        "lift_truncated": false
+      }
+    ],
+    "compiled": 26,
+    "not_compiled": 2
+  }
+}

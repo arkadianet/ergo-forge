@@ -1,0 +1,4 @@
+{
+  val token = SELF.tokens(0)
+  sigmaProp(token._1 == asset && token._2 >= quantity)
+}

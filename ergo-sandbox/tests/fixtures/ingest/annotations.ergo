@@ -1,0 +1,6 @@
+{
+  val limit: Long = declared
+  def compare(x: Long): Boolean = x > threshold
+  val amount = if (HEIGHT > 0) SELF.value else fallback
+  sigmaProp(compare(limit) && amount > 0L && HEIGHT > $height)
+}

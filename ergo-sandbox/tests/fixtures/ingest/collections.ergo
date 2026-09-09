@@ -1,0 +1,4 @@
+{
+  val first = weights(0)
+  sigmaProp(first >= SELF.value && octets(0) == 1.toByte && weights.size > 0)
+}
