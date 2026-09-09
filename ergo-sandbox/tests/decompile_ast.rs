@@ -137,3 +137,24 @@ fn lifted_nodes_carry_shared_preorder_ir_ids() {
     assert_eq!(child_ir, vec![2, 3]);
     assert!(lifted.ir_ids.values().all(|&i| i < n));
 }
+
+/// Required by Lithos's guard/enforcer pair. Preserve explicit type arguments
+/// and context-variable ids, including non-SigmaProp execution result types.
+#[test]
+fn context_execution_operations_roundtrip_without_placeholders() {
+    for source in [
+        "sigmaProp(CONTEXT.getVarFromInput[Byte](0, 0).get == 1.toByte)",
+        "sigmaProp(CONTEXT.getVarFromInput[GroupElement](0, 2).get == SELF.R4[GroupElement].get)",
+        "executeFromVar[SigmaProp](64) && executeFromVar[SigmaProp](65)",
+        "sigmaProp(executeFromVar[Int](7) > HEIGHT)",
+        "sigmaProp(executeFromVar[Boolean](1))",
+    ] {
+        let original = tree_of(source);
+        let lifted = decompile::lift_tree(&original, true);
+        assert_eq!(lifted.raw_placeholders, 0, "{source}");
+        assert!(!lifted.truncated);
+        let rendered = decompile::print(&lifted.node);
+        let rebuilt = tree_of(&rendered);
+        assert_eq!(original, rebuilt, "{source} -> {rendered}");
+    }
+}

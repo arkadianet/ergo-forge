@@ -766,6 +766,16 @@ pub(crate) fn lift_op_inner(
                 }
                 return NodeKind::Raw("<Box.getReg v6: expected one explicit element type>".into());
             }
+            // Context.getVarFromInput[T] carries its element type on wire.
+            if *type_id == 101 && *method_id == 12 && args.len() == 2 {
+                if let [tpe] = type_args.as_slice() {
+                    return NodeKind::Method(
+                        Box::new(lift(obj, cx, constants)),
+                        format!("getVarFromInput[{}]", crate::inspect::type_str(tpe)),
+                        args.iter().map(|a| lift(a, cx, constants)).collect(),
+                    );
+                }
+            }
             if !type_args.is_empty() {
                 return NodeKind::Raw(format!(
                     "<method {type_id}.{method_id}: unsupported explicit type arguments>"
@@ -805,9 +815,14 @@ pub(crate) fn lift_op_inner(
         Payload::GetVar { var_id, tpe } => {
             NodeKind::GetVar(*var_id as i64, crate::inspect::type_str(tpe))
         }
-        Payload::DeserializeContext { .. } | Payload::DeserializeRegister { .. } => {
-            NodeKind::Raw(debug())
-        }
+        Payload::DeserializeContext { id, tpe } => NodeKind::Global(
+            format!("executeFromVar[{}]", crate::inspect::type_str(tpe)),
+            vec![Node {
+                id: cx.alloc_id(),
+                kind: NodeKind::Int(i64::from(*id)),
+            }],
+        ),
+        Payload::DeserializeRegister { .. } => NodeKind::Raw(debug()),
         Payload::SigmaCollection { items } => {
             // SigmaAnd/SigmaOr recompile from `&&`/`||` chains over sigma
             // children (0xED BinAnd on SigmaProps lifts to 0xEA on compile).

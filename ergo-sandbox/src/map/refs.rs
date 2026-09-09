@@ -358,3 +358,115 @@ fn scan_value_math(n: &Node, vals: &Vals, out: &mut TreeRefs) {
         scan_value_math(c, vals, out);
     }
 }
+
+/// A binding necessary for the root proposition to succeed. Unlike `tree_refs`,
+/// this is proof material: unused definitions and optional checks do not count.
+#[derive(Debug, Clone)]
+pub struct RequiredBinding {
+    pub site: String,
+    pub binding: Binding,
+    pub identity: String,
+    pub node_id: u64,
+}
+
+type Required = BTreeMap<(String, Binding, String), u64>;
+
+/// Conservative positive predicate analysis. Conjunction unions requirements;
+/// alternatives intersect them. A literal false branch cannot succeed. Unknown
+/// constructs contribute no facts. A bounded walk fails closed on exhaustion.
+#[must_use]
+pub fn required_bindings(root: &Node) -> Vec<RequiredBinding> {
+    let mut vals = Vals::new();
+    collect_vals(root, &mut vals);
+    let mut budget = 100_000;
+    let required = required(root, &vals, &mut budget, 0).unwrap_or_default();
+    if budget == 0 {
+        return Vec::new();
+    }
+    required
+        .into_iter()
+        .map(|((site, binding, identity), node_id)| RequiredBinding {
+            site,
+            binding,
+            identity,
+            node_id,
+        })
+        .collect()
+}
+
+fn conjunction(a: Option<Required>, b: Option<Required>) -> Option<Required> {
+    let mut a = a?;
+    a.extend(b?);
+    Some(a)
+}
+
+fn alternative(a: Option<Required>, b: Option<Required>) -> Option<Required> {
+    match (a, b) {
+        (Some(mut a), Some(b)) => {
+            a.retain(|k, _| b.contains_key(k));
+            Some(a)
+        }
+        (a, None) | (None, a) => a,
+    }
+}
+
+fn required(n: &Node, vals: &Vals, budget: &mut usize, depth: usize) -> Option<Required> {
+    if *budget == 0 || depth > 512 {
+        *budget = 0;
+        return Some(Required::new());
+    }
+    *budget -= 1;
+    let n = deref(n, vals);
+    let mut recurse = |n| required(n, vals, budget, depth + 1);
+    match &n.kind {
+        NodeKind::Bool(false) => None,
+        NodeKind::Const(s) if s == "sigmaProp(false)" => None,
+        NodeKind::Block(_, result) => recurse(result),
+        NodeKind::Infix("&&", a, b) => conjunction(recurse(a), recurse(b)),
+        NodeKind::Infix("||", a, b) => alternative(recurse(a), recurse(b)),
+        NodeKind::If(c, yes, no) => match deref(c, vals).kind {
+            NodeKind::Bool(true) => recurse(yes),
+            NodeKind::Bool(false) => recurse(no),
+            _ => alternative(conjunction(recurse(c), recurse(yes)), recurse(no)),
+        },
+        NodeKind::Global(name, args) if name == "sigmaProp" && args.len() == 1 => recurse(&args[0]),
+        NodeKind::Global(name, args) if (name == "allOf" || name == "allZK") && args.len() == 1 => {
+            if let NodeKind::Coll(_, items) = &deref(&args[0], vals).kind {
+                let mut facts = Some(Required::new());
+                for item in items {
+                    facts = conjunction(facts, recurse(item));
+                }
+                facts
+            } else {
+                Some(Required::new())
+            }
+        }
+        NodeKind::Infix("==", a, b) => {
+            let mut refs = TreeRefs::default();
+            for (lhs, rhs) in [(&**a, &**b), (&**b, &**a)] {
+                binding_pair(lhs, rhs, vals, &mut refs);
+            }
+            let mut facts = Required::new();
+            for r in refs.slots.values() {
+                for identity in &r.nft_constants {
+                    facts.insert((r.key.clone(), Binding::Nft, identity.clone()), n.id);
+                }
+                for identity in &r.script_hashes {
+                    facts.insert((r.key.clone(), Binding::ScriptHash, identity.clone()), n.id);
+                }
+                if r.self_successor && r.key.starts_with("OUTPUTS(") {
+                    facts.insert(
+                        (
+                            r.key.clone(),
+                            Binding::SelfSuccessor,
+                            "SELF.propositionBytes".into(),
+                        ),
+                        n.id,
+                    );
+                }
+            }
+            Some(facts)
+        }
+        _ => Some(Required::new()),
+    }
+}

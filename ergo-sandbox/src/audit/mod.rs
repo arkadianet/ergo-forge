@@ -5,6 +5,11 @@
 //! chain. See `docs/superpowers/specs/2026-08-31-lift-target-ast-design.md`.
 
 pub mod boxrefs;
+pub mod context;
+pub use context::{
+    audit_with_contracts, ContextAudit, ContextFinding, ContractSet, DischargeEvidence, Execution,
+    FindingStatus, InputContract,
+};
 pub mod finding;
 pub mod lints;
 pub mod visit;
@@ -24,7 +29,7 @@ const LINTS: &[fn(&Node) -> Vec<Finding>] = &[
 ];
 
 /// Whether the audit saw the whole contract.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub enum Completeness {
     /// Every construct lifted; findings cover the whole tree.
     Complete,
