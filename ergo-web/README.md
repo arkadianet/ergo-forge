@@ -413,3 +413,98 @@ accepted, bad selfBox → 400), and the eval endpoint (pass / fail / error /
 needsProof verdicts, compile error → 400, empty scenario → 400).
 `cargo test -p ergo-sandbox` must stay at its baseline (39 passed) — the engine
 is not modified by this crate.
+
+### Reader workflow and protocol maps
+
+The browser opens in **Read**. Paste an address or ErgoTree hex for local
+source recovery, or a box ID for lookup through the configured explorer.
+Auto detection treats 64 hex characters as a box ID; select **ErgoTree hex**
+explicitly for a script of exactly 32 bytes. Chain availability and the
+explorer's network are shown before a request. **Choose a box from chain**
+lets an address's returned boxes be selected individually; selecting a box
+reads its own script and replaces the spending context.
+
+**Test this contract** opens the reader's test tools. In Read, scenarios
+without `source`/`tree` use the recovered tree and, unless overridden, the
+selected box as SELF. Suites and exported suites use the recovered tree.
+Scenario heights remain explicit; the shortcut seeds the selected box's
+lookup height (or 1500000 without a lookup). In Write, the same tools use the
+editor's source and parameters. Changing reader input invalidates the old
+context, and late responses cannot replace a newer contract's results.
+
+`POST /api/v1/map` follows references using the engine's existing protocol
+map implementation. It is a reading endpoint; it does not run drain hunts.
+
+```json
+{
+  "input": "<64-character box ID>",
+  "kind": "boxId",
+  "network": "mainnet",
+  "maxNodes": 24,
+  "maxDepth": 2
+}
+```
+
+`kind` is required: `boxId`, `address`, `tokenId` or `transactionId`.
+`network` defaults to `mainnet`. Live traversal requires `EXPLORER_URL` and
+a matching `EXPLORER_NETWORK`; unconfigured is 501, network mismatch is 400.
+`maxNodes` accepts 1–64; `maxDepth` accepts 0–4 (0 maps only the seed
+frontier). Invalid caps and malformed IDs return the standard JSON 400.
+A missing seed is 404; explorer failures are 502.
+
+An optional `fixture` accepts the engine's format-version-1 **recorded
+chain fixture**. This always runs offline, even if an explorer is configured
+or the recording contains a URL. Missing recorded answers are errors, not
+empty results. `ui/examples/reader-map.json` is a small, explicitly synthetic
+oracle-reading example used by the browser's **Try an offline example**.
+
+The response is a web-owned DTO:
+
+- `seed`: input and kind; `network`; `source`: kind, height, recorded flag.
+- `caps`: requested node/depth bounds; `truncated`: omitted nodes, depth
+  boundaries, omitted frontier boxes and omitted holders by token/script
+  hash, or null when no cap was hit. Other traversal bounds use the engine's
+  `MapOptions::default()` (frontier 16, holders 2 per token/script hash,
+  page size 100, fetch cap 32 per query).
+- `nodes`: box ID, tree hex, nanoERG `value` **as a decimal string**, depth,
+  completeness and optional tree error. The tree can be sent to `/inspect`.
+- `edges`: source box ID, target box ID or `unresolved` reason, `binding`,
+  identity dimensions in `covers`, code `site`, optional `singleton`.
+
+The UI renders box cards and a typed reference table, retains unresolved
+edges and truncation notices, opens each node's source, and downloads this
+response as `protocol-map.json`. That download is a **map result**, not a
+chain fixture and not the CLI's canonical map schema. The file picker accepts
+chain fixtures under 900 KB to leave room inside the 1 MiB request envelope.
+
+Map work uses the shared engine budget and large stack. The engine's live
+explorer client runs synchronously inside that blocking job and can retry
+slow requests; a large live map can take minutes. Browser cancellation
+suppresses obsolete results but does not cancel an engine job. Its permit
+remains held until completion. A map is the set reached at the reported
+height, not a protocol-completeness claim. Map nodes contain scripts and token
+metadata, not registers or a complete spending context; source navigation
+therefore clears any previous SELF. Fetch the box separately for testing.
+
+### Browser regression checks
+
+No npm installation or browser bundle is needed. The runner drives
+`/usr/bin/chromium-browser --headless` through CDP using Node's built-in
+WebSocket and saves screenshots under `ui/ux-review/screenshots/`.
+Use separate terminals for the two test instances and synthetic explorer:
+
+```bash
+CARGO_TARGET_DIR=/home/rkadias/.cache/cargo-target cargo build --release -p ergo-web
+BIND_ADDR=127.0.0.1:8099 /home/rkadias/.cache/cargo-target/release/ergo-web
+python3 ergo-web/tests/reader-explorer.py 8101
+BIND_ADDR=127.0.0.1:8100 EXPLORER_URL=http://127.0.0.1:8101 /home/rkadias/.cache/cargo-target/release/ergo-web
+node ergo-web/tests/browser.mjs http://127.0.0.1:8099 http://127.0.0.1:8100
+```
+
+Run from the repository root with Node 22 or newer. Ports 8099, 8100 and
+8101 are review instances only; the service on 8090 is not involved. Browser
+checks cover reader/editor context isolation, stale responses, source
+navigation, typed edges and caps, offline/live lookup, box selection,
+network mismatch, keyboard tabs, mobile layout, and the existing Build,
+Write, Play, eval, tests, examples, point and validation surfaces. Live
+explorer paths use synthetic data served on loopback.

@@ -410,3 +410,53 @@ body.wide { max-width: 96rem; }
   padding: 0.5rem 1.1rem; border: 0; border-radius: 6px; background: var(--accent); color: #06222e; font-weight: 600; cursor: pointer;
 }
 #tx-send:disabled, #tour-next:disabled { opacity: 0.5; cursor: wait; }
+
+/* Reader entry, contract context, and typed protocol references. */
+.brand-note { color: var(--dim); font-size: 0.85rem; font-weight: 400; margin-left: 0.5rem; }
+.reader-intro { margin: 1.5rem 0 1rem; }
+.reader-intro h2 { font-size: 1.55rem; margin: 0; color: var(--text); }
+.reader-intro p { margin: 0.5rem 0; }
+.reader-actions, .source-heading, .reader-result-bar { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; margin: 1rem 0; }
+.source-heading h2 { margin: 0; margin-right: auto; }
+.reader-result-bar { border-top: 1px solid var(--line); padding-top: 1.3rem; }
+#read-completeness { background: var(--panel); color: var(--accent); border: 1px solid var(--line); }
+#reader-tools, .protocol-map { border: 1px solid var(--line); border-radius: 8px; padding: 1rem; margin-top: 1.5rem; background: var(--panel); }
+#reader-tools > summary, .protocol-map > summary { color: var(--accent); font-weight: 600; cursor: pointer; }
+#chain-panel { margin-top: 1rem; }
+#chain-boxes { width: 100%; margin-top: 0.75rem; }
+#read .input-row > input { min-width: 0; flex: 1; }
+#read .input-row { flex-wrap: wrap; }
+#read-kind, #examples, #network { padding: 0.5rem; max-width: 100%; }
+#map-depth, #map-nodes { width: 4.5rem; }
+#map-input { min-width: 12rem; }
+.map-boxes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 0.8rem; }
+.map-box { padding: 1rem; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); min-width: 0; }
+.map-box h3 { margin: 0 0 0.6rem; font-size: 1rem; }
+.map-box code { overflow-wrap: anywhere; font-size: 0.8rem; }
+.edge-detail { display: block; margin-top: 0.4rem; overflow-wrap: anywhere; }
+.table-scroll { overflow-x: auto; }
+#map-edges td { vertical-align: top; overflow-wrap: anywhere; }
+.file-button { cursor: pointer; border: 1px solid var(--line); border-radius: 5px; padding: 0.4rem 0.7rem; font-size: 0.85rem; }
+.file-button input { display: block; max-width: 13rem; font-size: 0.75rem; margin-top: 0.3rem; }
+button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-visible, pre:focus-visible, .table-scroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 620px) {
+  #read > .input-row > #input { flex-basis: 100%; }
+  #read > .input-row > button { flex: 1; }
+  .brand-note { display: block; margin-left: 0; }
+  #reader-tools, .protocol-map { padding: 0.75rem; }
+  #map-input { flex-basis: 100%; }
+  #map-edges td { min-width: 8rem; }
+  #map-edges td:last-child { min-width: 10rem; }
+  .reader-actions { gap: 0.5rem; }
+}
+#read-kind, #map-kind, #map-input, #map-depth, #map-nodes, #chain-input, #chain-boxes {
+  padding: 0.55rem 0.65rem; background: var(--bg); color: var(--text);
+  border: 1px solid var(--line); border-radius: 6px; font: inherit; font-size: 0.85rem;
+}
+#chain-input { min-width: 0; flex: 1; }
+#map-go { padding: 0.55rem 1rem; border: 0; border-radius: 6px; background: var(--accent); color: #06222e; font-weight: 600; cursor: pointer; }
+#map-go:disabled { opacity: 0.5; cursor: wait; }
+#map-result table { width: 100%; }
+@media (max-width: 620px) {
+  #read #map-input { flex-basis: 100%; min-width: 0; }
+}

@@ -3,52 +3,88 @@
 
 const $ = (id) => document.getElementById(id);
 
-// One inspection at a time: Enter in the input box and the button share this.
-let inFlight = false;
-// Hunt requests can overlap (re-run while one is pending); only the latest
-// response may render.
+// Reader state is separate from the editor. A newer read owns all results.
+let contextGeneration = 0;
+let readGeneration = 0;
+let readController = null;
+let lastRead = null;
 let huntGeneration = 0;
+let explorerConfig = { explorer: false };
 
-async function read() {
-  if (inFlight) return;
+async function readerRequest(path, payload, signal) {
+  const res = await fetch(`/api/v1/${path}`, {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify(payload), signal,
+  });
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.error?.message || `Request failed (${res.status})`);
+  return body;
+}
+
+function invalidateRead() {
+  ++contextGeneration;
+  ++readGeneration;
+  ++huntGeneration;
+  readController?.abort();
+  lastRead = null;
+  $("result").hidden = true;
+  $("partial-banner").hidden = true;
+  $("read-go").disabled = false;
+  $("reader-test-context").textContent = "Read a contract first. Scenarios and suites here use that contract’s ErgoTree.";
+  for (const id of ["eval-result", "tests-result", "eval-status", "tests-status"]) $(id).hidden = true;
+}
+
+async function read(context = {}) {
+  // Click events are not reader context.
+  if (context instanceof Event) context = {};
+  invalidateRead();
+  const generation = readGeneration;
   const input = $("input").value.trim();
-  const network = $("network").value;
+  const network = context.network || $("network").value;
+  const kind = $("read-kind").value;
   const status = $("status");
-  const banner = $("partial-banner");
-  const result = $("result");
-
-  if (!input) {
-    status.textContent = "Paste an address or ErgoTree hex first.";
-    status.hidden = false;
-    return;
-  }
-
-  inFlight = true;
+  $("self-box").value = context.box ? JSON.stringify(context.box) : "";
+  $("data-inputs").value = "";
+  $("height").value = context.height || "";
+  status.hidden = false;
+  if (!input) { status.textContent = "Paste an address, box ID or ErgoTree hex first, or choose an example."; return; }
+  readController = new AbortController();
+  const signal = readController.signal;
   $("read-go").disabled = true;
   status.textContent = "Reading contract…";
-  status.hidden = false;
-  banner.hidden = true;
-  result.hidden = true;
-
   try {
-    const res = await fetch("/api/v1/inspect", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ input, network }),
-    });
-    const body = await res.json();
-    if (!res.ok) {
-      status.textContent = `Error: ${(body.error && body.error.message) || res.status}`;
-      return;
-    }
+    if (kind === "boxId" && !/^[0-9a-f]{64}$/i.test(input)) throw new Error("A box ID must contain exactly 64 hex characters.");
+    if (kind === "tree" && !/^(?:[0-9a-f]{2})+$/i.test(input)) throw new Error("ErgoTree hex must contain pairs of hex characters (0–9, a–f).");
+    let treeInput = input;
+    let box = context.box;
+    const isBox = kind === "boxId" || (kind === "auto" && /^[0-9a-f]{64}$/i.test(input));
+    if (isBox && !box) {
+      await configReady;
+      if (!explorerConfig.explorer) throw new Error("This looks like a box ID. Chain lookup is unavailable on this instance. Paste its ErgoTree or address, or select ErgoTree hex if these 32 bytes are a script.");
+      if (network !== explorerConfig.network) throw new Error(`This explorer serves ${explorerConfig.network}. Select that network to look up a box.`);
+      status.textContent = "Fetching box, then recovering its source…";
+      const found = await readerRequest("lookup", { input }, signal);
+      box = found.boxes?.[0];
+      if (!box?.ergoTree) throw new Error("The explorer returned no readable box.");
+      treeInput = box.ergoTree;
+      $("self-box").value = JSON.stringify(box);
+      $("height").value = found.height || "";
+    } else if (box) treeInput = box.ergoTree;
+    const body = await readerRequest("inspect", { input: treeInput, network }, signal);
+    if (generation !== readGeneration) return;
+    lastRead = { ...body, network, box, height: $("height").value };
     render(body);
+    $("read-completeness").textContent = body.completeness === "complete" ? "Source recovered" : "Partial source";
+    $("read-origin").textContent = box ? `Box ${box.boxId?.slice(0, 12) || "from chain"}… · ${network}` : `ErgoTree · ${network} · no box context`;
+    $("reader-test-context").textContent = `Testing the recovered tree ${body.treeHex.slice(0, 20)}… on ${network}. Explicit source or tree in a scenario overrides it.`;
+    $("read-copy-status").textContent = "";
     status.hidden = true;
-    await huntFor(input, network);
+    // Reading finishes as soon as source is ready. Probes own their own status.
+    huntFor(body.treeHex, network);
   } catch (e) {
-    status.textContent = `Request failed: ${e}`;
+    if (generation === readGeneration && e.name !== "AbortError") status.textContent = e.message || String(e);
   } finally {
-    inFlight = false;
-    $("read-go").disabled = false;
+    if (generation === readGeneration) $("read-go").disabled = false;
   }
 }
 
@@ -180,6 +216,11 @@ const HUNT_VERDICTS = {
 };
 
 async function huntFor(input, network) {
+  const generation = ++huntGeneration;
+  $("hunt-probes").textContent = "";
+  $("hunt-residuals").textContent = "";
+  $("hunt-rent").textContent = "";
+  $("hunt-synthetic").hidden = true;
   const verdictEl = $("hunt-verdict");
   verdictEl.textContent = "Hunting…";
   verdictEl.className = "hunt-verdict";
@@ -215,7 +256,6 @@ async function huntFor(input, network) {
       return;
     }
   }
-  const generation = ++huntGeneration;
   try {
     const res = await fetch("/api/v1/hunt", {
       method: "POST",
@@ -296,23 +336,37 @@ let lastCompiled = null; // { treeHex } for the scenario panel
 const paramTypes = ["Int", "Long", "Coll[Byte]", "SigmaProp", "GroupElement", "Boolean", "Byte", "Short", "BigInt", "Coll[Long]", "String"];
 
 function setMode(mode) {
+  ++contextGeneration;
   for (const m of ["build", "write", "read", "play"]) {
     const on = m === mode;
     $(m).hidden = !on;
     $(`mode-${m}`).classList.toggle("active", on);
     $(`mode-${m}`).setAttribute("aria-selected", String(on));
+    $(`mode-${m}`).tabIndex = on ? 0 : -1;
+    $(`mode-${m}`).setAttribute("aria-controls", m);
+    $(m).setAttribute("role", "tabpanel");
+    $(m).setAttribute("aria-labelledby", `mode-${m}`);
   }
   // The developer panels (scenario, tests, validate) live in Write's right
   // column and below Read; Build and Play do without them.
   const dev = $("dev-panels");
   if (mode === "write") { $("dev-slot").appendChild(dev); showTab(document.querySelector(".rtab.active")?.dataset.tab || "result"); }
-  else if (mode === "read") { $("read").appendChild(dev); showTab("all"); }
+  else if (mode === "read") { $("read-dev-slot").appendChild(dev); showTab("all"); }
   dev.hidden = mode === "build" || mode === "play";
   document.body.classList.toggle("wide", mode === "write" || mode === "play");
   if (mode === "write") editor.refresh();
+  for (const id of ["eval-result", "tests-result", "eval-status", "tests-status"]) $(id).hidden = true;
   if (mode === "play") renderPlay();
 }
 $("mode-play").addEventListener("click", () => setMode("play"));
+document.querySelector(".modes").addEventListener("keydown", e => {
+  const tabs = [...document.querySelectorAll(".modes [role=tab]")];
+  const current = tabs.indexOf(document.activeElement);
+  if (current < 0 || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
+  e.preventDefault();
+  const next = e.key === "Home" ? 0 : e.key === "End" ? tabs.length - 1 : (current + (e.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+  setMode(tabs[next].id.slice(5)); tabs[next].focus();
+});
 
 // Right-column tabs in Write.
 function showTab(name) {
@@ -1644,10 +1698,11 @@ val contract: ErgoContract = ErgoTreeContract.fromErgoTree(
   copyText(code, "appkit snippet copied.");
 });
 
-let firstVisit = true;
-try { firstVisit = !localStorage.getItem("ergo-forge-seen"); localStorage.setItem("ergo-forge-seen", "1"); } catch (e) { /* storage blocked: treat as a first visit */ }
-if (location.hash.startsWith("#s=")) loadShared(location.hash.slice(3));
-else if (location.hash === "#build" || firstVisit) setMode("build");
+// Initialise after all modes (including Play) have declared their state.
+window.addEventListener("DOMContentLoaded", () => {
+  if (location.hash.startsWith("#s=")) loadShared(location.hash.slice(3));
+  else setMode(["#build", "#write", "#play"].includes(location.hash) ? location.hash.slice(1) : "read");
+});
 
 // ── validate a transaction ───────────────────────────────────────────────
 
@@ -1697,14 +1752,11 @@ function currentSuite() {
     return { error: `Scenarios JSON does not parse: ${e.message}` };
   }
   if (!Array.isArray(scenarios)) return { error: "Scenarios must be a JSON array." };
-  return {
-    suite: {
-      source: editorValue(),
-      params: collectParams(),
-      network: $("write-network").value,
-      scenarios,
-    },
-  };
+  if (!$("read").hidden) {
+    if (!lastRead) return { error: "Read a contract first, or switch to Write to test the editor’s source." };
+    return { suite: { tree: lastRead.treeHex, network: lastRead.network, scenarios } };
+  }
+  return { suite: { source: editorValue(), params: collectParams(), network: $("write-network").value, scenarios } };
 }
 
 async function runTests() {
@@ -1717,12 +1769,14 @@ async function runTests() {
   status.textContent = "Running…";
   status.hidden = false;
   $("tests-result").hidden = true;
+  const contextAtStart = contextGeneration;
   try {
     const res = await fetch("/api/v1/test", {
       method: "POST", headers: { "content-type": "application/json" },
       body: JSON.stringify(suite),
     });
     const body = await res.json();
+    if (contextAtStart !== contextGeneration) return;
     if (!res.ok) {
       status.textContent = `Error: ${(body.error && body.error.message) || res.status}`;
       return;
@@ -1792,24 +1846,29 @@ async function runScenario() {
     return;
   }
   if (scenario && typeof scenario === "object" && scenario.source == null && scenario.tree == null) {
-    if (!lastCompiled) {
-      status.textContent = "Compile something in Write mode first, or give the scenario a source or tree.";
-      status.hidden = false;
-      return;
+    if (!$("read").hidden) {
+      if (!lastRead) { status.textContent = "Read a contract first, or supply a source or tree in the scenario."; status.hidden = false; return; }
+      scenario.tree = lastRead.treeHex;
+      scenario.network = scenario.network || lastRead.network;
+      if (scenario.selfBox == null && $("self-box").value.trim()) {
+        try { scenario.selfBox = JSON.parse($("self-box").value); }
+        catch (e) { status.textContent = `Box JSON does not parse: ${e.message}`; status.hidden = false; return; }
+      }
+    } else {
+      if (!lastCompiled) { status.textContent = "Compile something in Write mode first, or give the scenario a source or tree."; status.hidden = false; return; }
+      scenario.source = editor.getValue();
+      const params = collectParams();
+      if (Object.keys(params).length) scenario.params = params;
+      scenario.network = scenario.network || $("write-network").value;
+      scenario.fromEditor = true;
     }
-    // The editor's own contract: send the source (and its parameter
-    // values) so the run's values can be positioned back onto it.
-    scenario.source = editor.getValue();
-    const params = collectParams();
-    if (Object.keys(params).length) scenario.params = params;
-    scenario.network = scenario.network || $("write-network").value;
-    scenario.fromEditor = true;
   }
   evalInFlight = true;
   $("run").disabled = true;
   status.textContent = "Evaluating…";
   status.hidden = false;
   result.hidden = true;
+  const contextAtStart = contextGeneration;
   try {
     const res = await fetch("/api/v1/eval", {
       method: "POST",
@@ -1817,6 +1876,7 @@ async function runScenario() {
       body: JSON.stringify(scenario),
     });
     const body = await res.json();
+    if (contextAtStart !== contextGeneration) return;
     if (!res.ok) {
       status.textContent = `Error: ${(body.error && body.error.message) || res.status}`;
       return;
@@ -1932,77 +1992,97 @@ let fetchedBoxes = [];
 
 async function loadConfig() {
   try {
-    const cfg = await (await fetch("/api/v1/config")).json();
+    const res = await fetch("/api/v1/config");
+    if (!res.ok) throw new Error("Configuration unavailable");
+    const cfg = await res.json();
+    explorerConfig = cfg;
     if (cfg.height) { chainHeight = cfg.height; chainHeightAt = Date.now(); chainNetwork = cfg.network || "mainnet"; }
-    if (cfg.explorer) {
-      $("chain-panel").hidden = false;
-      $("footer-note").textContent =
-        "source, findings and verdicts are computed locally; this instance fetches box data from a configured explorer when you ask it to.";
-    }
-  } catch (e) { /* stay in the no-outbound mode */ }
+    $("reader-connection").textContent = cfg.explorer
+      ? `Chain lookup available on ${cfg.network}. Addresses and ErgoTree hex are read locally; box IDs are fetched when you press Read.`
+      : "Offline mode: addresses and ErgoTree hex work locally. Box IDs need an explorer; try an example or open a recorded protocol fixture.";
+    $("chain-fetch").disabled = !cfg.explorer;
+    if (cfg.explorer) $("footer-note").textContent = "source is recovered locally; requested chain lookups and live protocol maps use the configured explorer.";
+  } catch (e) {
+    $("reader-connection").textContent = "Could not check chain lookup availability. You can still read an address or ErgoTree hex locally.";
+  }
 }
 
-function useFetchedBox(i) {
+async function useFetchedBox(i) {
   const b = fetchedBoxes[i];
   if (!b) return;
-  const { boxId, ...scenarioBox } = b;
-  $("self-box").value = JSON.stringify(scenarioBox);
-  $("self-box").closest("details").open = true;
-  const input = $("input").value.trim();
-  if (input) huntFor(input, $("network").value);
+  $("input").value = b.boxId;
+  $("read-kind").value = "boxId";
+  await read({ box: b, height: fetchedHeight, network: fetchedNetwork });
 }
-
+let fetchedHeight = null;
+let fetchedNetwork = "mainnet";
+let lookupGeneration = 0;
 $("chain-fetch").addEventListener("click", async () => {
+  const generation = ++lookupGeneration;
+  const network = $("network").value;
   const status = $("chain-status");
   const target = $("chain-input").value.trim() || $("input").value.trim();
-  if (!target) { status.textContent = "Read an address first, or give a box id."; status.hidden = false; return; }
-  status.textContent = "Fetching…"; status.hidden = false;
+  status.hidden = false;
+  if (!target) { status.textContent = "Paste an address or box ID to fetch."; return; }
+  if (network !== explorerConfig.network) { status.textContent = `This explorer serves ${explorerConfig.network}. Select that network first.`; return; }
+  status.textContent = "Fetching boxes…";
+  $("chain-fetch").disabled = true;
   $("chain-boxes").hidden = true;
   try {
-    const res = await fetch("/api/v1/lookup", {
-      method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ input: target }),
-    });
-    const body = await res.json();
-    if (!res.ok) { status.textContent = `Lookup failed: ${(body.error && body.error.message) || res.status}`; return; }
+    const body = await readerRequest("lookup", { input: target });
+    if (generation !== lookupGeneration) return;
     fetchedBoxes = body.boxes || [];
-    if (body.height) $("height").value = String(body.height);
-    if (!fetchedBoxes.length) { status.textContent = "No unspent boxes at that address."; return; }
-    const sel = $("chain-boxes");
-    sel.textContent = "";
+    fetchedHeight = body.height;
+    fetchedNetwork = network;
+    if (!fetchedBoxes.length) { status.textContent = "No unspent boxes at that address. You can still read its contract with Read."; return; }
+    const sel = $("chain-boxes"); sel.textContent = "";
     fetchedBoxes.forEach((b, i) => {
-      const o = document.createElement("option");
-      o.value = String(i);
-      const regs = Object.keys(b.registers || {}).join(",") || "no registers";
-      o.textContent = `${(b.boxId || "").slice(0, 12)}… · ${b.value} nanoERG · ${(b.tokens || []).length} token(s) · ${regs}`;
+      const o = document.createElement("option"); o.value = String(i);
+      o.textContent = `${(b.boxId || "").slice(0, 12)}… · ${b.value} nanoERG · ${(b.tokens || []).length} token(s) · ${Object.keys(b.registers || {}).join(", ") || "no registers"}`;
       sel.appendChild(o);
     });
     sel.hidden = false;
-    status.textContent = `${fetchedBoxes.length} box(es); using the first as SELF at height ${body.height || "?"}.`;
-    useFetchedBox(0);
-  } catch (e) {
-    status.textContent = `Lookup failed: ${e}`;
-  }
+    status.textContent = `${fetchedBoxes.length} box(es) returned (up to 20). Select a box to read its own contract. Height ${body.height || "unavailable"}.`;
+    await useFetchedBox(0);
+  } catch (e) { if (generation === lookupGeneration) status.textContent = `Lookup failed: ${e.message}`; }
+  finally { $("chain-fetch").disabled = !explorerConfig.explorer; }
 });
 $("chain-boxes").addEventListener("change", (e) => useFetchedBox(Number(e.target.value)));
-loadConfig().then(loadRecipes);
+const configReady = loadConfig();
+configReady.then(loadRecipes);
 
 $("rehunt").addEventListener("click", () => {
-  const input = $("input").value.trim();
-  if (input) huntFor(input, $("network").value);
+  if (lastRead) huntFor(lastRead.treeHex, lastRead.network);
 });
 $("examples").addEventListener("change", (e) => {
   if (!e.target.value) return;
   $("input").value = e.target.value;
+  $("read-kind").value = "tree";
   $("network").value = "mainnet";
   e.target.value = "";
   read();
 });
-$("read-go").addEventListener("click", read);
-$("input").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") read();
+$("read-go").addEventListener("click", () => read());
+$("input").addEventListener("keydown", (e) => { if (e.key === "Enter") read(); });
+for (const id of ["input", "network", "read-kind"]) $(id).addEventListener(id === "input" ? "input" : "change", () => {
+  invalidateRead();
+  ++lookupGeneration;
+  $("status").hidden = true;
+  $("chain-boxes").hidden = true;
+  if (id === "network") invalidateMap();
 });
-
+$("copy-source").addEventListener("click", async () => {
+  if (!lastRead) return;
+  try { await navigator.clipboard.writeText(lastRead.source); $("read-copy-status").textContent = "Source copied."; }
+  catch (e) { $("read-copy-status").textContent = "Clipboard unavailable. Select and copy the recovered source above."; }
+});
+$("read-test").addEventListener("click", () => {
+  $("reader-tools").open = true;
+  const scenario = { height: Number(lastRead?.height) || 1500000 };
+  $("scenario").value = JSON.stringify(scenario, null, 2);
+  $("reader-tools").scrollIntoView({ block: "start" });
+  $("scenario").focus({ preventScroll: true });
+});
 
 // ── Play: a sandbox chain in the browser ──────────────────────────────────
 //
@@ -2328,3 +2408,154 @@ function stopTour() { tour = null; $("tour").hidden = true; highlight(null); }
 for (const b of document.querySelectorAll(".tour-start")) b.addEventListener("click", () => { tour = { name: b.dataset.tour, i: 0 }; $("tour").hidden = false; tourStep(); });
 $("tour-next").addEventListener("click", async () => { if (!tour) return; tour.i += 1; if (tour.i >= TOURS[tour.name].length) { stopTour(); return; } await tourStep(); });
 $("tour-stop").addEventListener("click", stopTour);
+
+// ── Protocol map: read-only traversal and source navigation ──────────────
+let mapFixture = null;
+let mapResult = null;
+let mapGeneration = 0;
+let mapController = null;
+function invalidateMap() {
+  ++mapGeneration;
+  mapController?.abort();
+  mapResult = null;
+  $("map-result").hidden = true;
+  $("map-status").hidden = true;
+  $("map-go").disabled = false;
+}
+const shortBox = (id) => `${id.slice(0, 10)}…${id.slice(-6)}`;
+
+$("open-map").addEventListener("click", () => {
+  $("protocol-map").open = true;
+  if (!$("map-input").value && $("input").value.trim()) {
+    $("map-input").value = lastRead?.box?.boxId || lastRead?.address || $("input").value.trim();
+    $("map-kind").value = lastRead?.box ? "boxId" : lastRead ? "address" : "boxId";
+  }
+  $("protocol-map").scrollIntoView({ block: "start" });
+  $("map-input").focus({ preventScroll: true });
+});
+
+function setMapFixture(fixture, label) {
+  invalidateMap();
+  mapFixture = fixture;
+  mapResult = null;
+  $("map-result").hidden = true;
+  $("map-live").hidden = !fixture;
+  $("map-live").disabled = !explorerConfig.explorer;
+  $("map-context").textContent = fixture
+    ? `${label} · recorded height ${fixture.height}. No explorer requests. Choose the network used by this recording above.`
+    : "Live explorer · uses the reader’s network and the instance’s configured explorer.";
+}
+
+async function runMap() {
+  const generation = ++mapGeneration;
+  mapController?.abort();
+  mapController = new AbortController();
+  const status = $("map-status");
+  status.hidden = false;
+  $("map-result").hidden = true;
+  mapResult = null;
+  const payload = { input: $("map-input").value.trim(), kind: $("map-kind").value, network: $("network").value,
+    maxDepth: Number($("map-depth").value), maxNodes: Number($("map-nodes").value) };
+  if (!payload.input) { status.textContent = "Enter a starting point or try the offline example."; return; }
+  if (mapFixture) payload.fixture = mapFixture;
+  status.textContent = mapFixture ? "Mapping recorded contracts…" : "Following contract references on the explorer… This may take a few minutes.";
+  $("map-go").disabled = true;
+  try {
+    const body = await readerRequest("map", payload, mapController.signal);
+    if (generation !== mapGeneration) return;
+    mapResult = body;
+    renderMap(body);
+    status.hidden = true;
+  } catch (e) {
+    if (generation === mapGeneration && e.name !== "AbortError") status.textContent = `Map unavailable: ${e.message}`;
+  } finally {
+    // Another run owns the button only if it is still fetching.
+    if (generation === mapGeneration) $("map-go").disabled = false;
+  }
+}
+
+function renderMap(m) {
+  const unresolved = m.edges.filter(e => e.unresolved != null).length;
+  $("map-summary").textContent = `${m.nodes.length} boxes · ${m.edges.length} references · ${unresolved} unresolved · height ${m.source.height} · ${m.network} · ${m.source.recorded ? "recorded source" : "live explorer"}`;
+  const partial = m.nodes.filter(n => !n.complete).length;
+  const limits = [];
+  if (m.truncated) {
+    const t = m.truncated;
+    limits.push(`Traversal stopped at a limit: ${t.nodes} boxes omitted, ${t.depth} boxes at the depth boundary, ${t.frontier} seed boxes omitted, ${Object.values(t.perToken).reduce((a,b)=>a+b,0)} token holders omitted, ${Object.values(t.perScriptHash).reduce((a,b)=>a+b,0)} script matches omitted.`);
+  }
+  if (partial) limits.push(`${partial} contract(s) could not be fully read.`);
+  if (unresolved) limits.push(`${unresolved} reference(s) could not be resolved to a mapped box.`);
+  $("map-limits").textContent = limits.join(" ");
+  $("map-limits").hidden = !limits.length;
+  const labels = new Map(m.nodes.map((n, i) => [n.boxId, `Box ${i + 1}`]));
+  const boxes = $("map-boxes"); boxes.textContent = "";
+  for (const n of m.nodes) {
+    const card = document.createElement("article"); card.className = "map-box";
+    const title = document.createElement("h3"); title.textContent = `${labels.get(n.boxId)} · depth ${n.depth}`;
+    const id = document.createElement("code"); id.textContent = n.boxId;
+    const meta = document.createElement("p"); meta.className = "hint";
+    meta.textContent = `${n.value} nanoERG · ${n.complete ? "source recoverable" : "partial or unreadable source"}`;
+    const btn = document.createElement("button"); btn.type = "button"; btn.className = "secondary"; btn.textContent = `Read ${labels.get(n.boxId)}`;
+    btn.addEventListener("click", async () => {
+      $("input").value = n.treeHex; $("read-kind").value = "tree"; $("network").value = m.network;
+      await read({ network: m.network });
+      if (lastRead?.treeHex === n.treeHex) {
+        $("read-origin").textContent = `${labels.get(n.boxId)} · ${shortBox(n.boxId)} · map height ${m.source.height} · script only; spending context not included`;
+        $("result").scrollIntoView({ block: "start" }); $("source").focus({ preventScroll: true });
+      }
+    });
+    card.append(title, id, meta, btn);
+    if (n.treeError) { const err = document.createElement("p"); err.textContent = n.treeError; card.append(err); }
+    boxes.append(card);
+  }
+  const edges = $("map-edges"); edges.textContent = "";
+  for (const e of m.edges) {
+    const tr = document.createElement("tr");
+    const relation = document.createElement("td");
+    relation.textContent = `${labels.get(e.from) || shortBox(e.from)} → ${e.to ? labels.get(e.to) || shortBox(e.to) : "Unresolved"}`;
+    if (e.unresolved != null) { const why = document.createElement("code"); why.className = "edge-detail"; why.textContent = e.unresolved; relation.append(why); }
+    const binding = document.createElement("td");
+    binding.textContent = e.binding + (e.singleton == null ? "" : e.singleton ? " · singleton" : " · fungible token");
+    const cover = document.createElement("span"); cover.className = "edge-detail hint";
+    cover.textContent = e.covers.length ? `Identifies: ${e.covers.join(", ")}` : "No identity dimensions pinned"; binding.append(cover);
+    const site = document.createElement("td"); const code = document.createElement("code"); code.textContent = e.site; site.append(code);
+    tr.append(relation, binding, site); edges.append(tr);
+  }
+  if (!m.edges.length) { const tr = document.createElement("tr"); const td = document.createElement("td"); td.colSpan = 3; td.textContent = "No references found within this traversal. This does not establish that the contract is standalone."; tr.append(td); edges.append(tr); }
+  $("map-result").hidden = false;
+}
+$("map-go").addEventListener("click", runMap);
+$("map-input").addEventListener("keydown", e => { if (e.key === "Enter") runMap(); });
+$("map-demo").addEventListener("click", async () => {
+  try {
+    const res = await fetch("examples/reader-map.json");
+    if (!res.ok) throw new Error("Could not load the offline example.");
+    const fixture = await res.json();
+    setMapFixture(fixture, "Synthetic learning example: a contract reads an oracle box");
+    $("map-input").value = "11".repeat(32); $("map-kind").value = "boxId";
+    $("map-depth").value = "2"; $("map-nodes").value = "24";
+    await runMap();
+  } catch (e) { $("map-status").hidden = false; $("map-status").textContent = e.message; }
+});
+$("map-file").addEventListener("change", async e => {
+  const file = e.target.files[0]; if (!file) return;
+  try {
+    if (file.size > 900000) throw new Error("Use a chain fixture under 900 KB (the API request limit is 1 MiB).");
+    const fixture = JSON.parse(await file.text());
+    if (fixture?.formatVersion !== 1 || !fixture.boxes) throw new Error("Expected a recorded chain fixture with formatVersion 1 and boxes. An exported map is a result, not a chain fixture.");
+    setMapFixture(fixture, file.name);
+    const first = Object.keys(fixture.boxes)[0];
+    $("map-input").value = first || ""; $("map-kind").value = "boxId";
+    $("map-status").textContent = "Recording opened. Choose a starting point and press Map contracts."; $("map-status").hidden = false;
+  } catch (err) { $("map-status").textContent = err.message; $("map-status").hidden = false; }
+  e.target.value = "";
+});
+$("map-live").addEventListener("click", () => { setMapFixture(null); $("map-status").hidden = true; });
+$("map-export").addEventListener("click", () => {
+  if (!mapResult) return;
+  const url = URL.createObjectURL(new Blob([JSON.stringify(mapResult, null, 2) + "\n"], { type: "application/json" }));
+  const link = document.createElement("a"); link.href = url; link.download = "protocol-map.json"; link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+
+for (const id of ["map-input", "map-kind", "map-depth", "map-nodes"]) $(id).addEventListener(id === "map-input" ? "input" : "change", invalidateMap);
