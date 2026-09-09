@@ -351,6 +351,7 @@ fn chain_box(id: &str, tree: &str, value: u64, tokens: &[(&str, u64)]) -> ChainB
             .collect(),
         creation_height: 1_000_000,
         inclusion_height: 1_000_000,
+        registers: BTreeMap::new(),
     }
 }
 
