@@ -246,6 +246,7 @@ fn shape_errors_are_verdicts_not_panics() {
 
 mod map_feed {
     use super::*;
+    use ergo_sandbox::drain::DrainRole;
     use ergo_sandbox::map::{map, Fixture, MapOptions, ProtocolMap, Seed};
 
     fn load(name: &str) -> Fixture {
@@ -268,6 +269,69 @@ mod map_feed {
             "value": 2000000,
             "ergoTree": "10010101d17300",
         })
+    }
+
+    #[test]
+    fn registers_survive_fixture_map_and_request() {
+        const SEED: &str = "4ecaa1aac9846b1454563ae51746db95a3a40ee9f8c5f5301afbe348ae803d41";
+        const POOL: &str = "661fd7516b4a834073396862616f6f7ad5183fd9e693bb54804fb910b6e1598c";
+        const SWAP: &str = "a78290a343683e9d5ba16837958608c2e5e7a4f6ea451148d95c5a990e07304e";
+        const ORACLE: &str = "3264dbed972175dafbdc9f9834c6dcc624530ced0e1fc4c0d6b0eb582b660deb";
+        const R4: &str = "040e"; // Serialized Int(7).
+
+        for register in [
+            json!(R4),
+            json!({"serializedValue": R4, "sigmaType": "SInt", "renderedValue": "7"}),
+        ] {
+            let mut archive = serde_json::to_value(load("use-lp.json")).unwrap();
+            for recorded in archive["boxesByToken"]
+                .as_object_mut()
+                .unwrap()
+                .values_mut()
+            {
+                for b in recorded["items"].as_array_mut().unwrap() {
+                    if [POOL, SWAP, ORACLE].contains(&b["boxId"].as_str().unwrap()) {
+                        b["additionalRegisters"] = json!({"R4": register});
+                    }
+                }
+            }
+            let fixture = Fixture::from_json(&archive.to_string()).expect("register fixture");
+            // Recording and replay must retain the serialized bytes too.
+            let fixture = Fixture::from_json(&fixture.to_json().unwrap()).unwrap();
+            let m = map(&fixture, &Seed::TokenId(SEED.into()), &recorded_opts()).unwrap();
+            let (request, skipped) = ergo_sandbox::drain::request_from_map(
+                &m,
+                serde_json::from_value(attacker()).unwrap(),
+            );
+            for id in [POOL, SWAP, ORACLE] {
+                assert_eq!(m.nodes[id].chain_box.registers["R4"], R4);
+                assert!(!skipped.iter().any(|skipped| skipped == id));
+            }
+            for (id, role) in [(POOL, DrainRole::Protected), (SWAP, DrainRole::Companion)] {
+                let input = request
+                    .inputs
+                    .iter()
+                    .find(|i| i.box_.box_id.as_deref() == Some(id))
+                    .unwrap();
+                assert_eq!(input.role, role);
+                assert_eq!(input.box_.registers["R4"].r#type, "raw");
+                assert_eq!(input.box_.registers["R4"].value, R4);
+            }
+            let data = request
+                .data_inputs
+                .iter()
+                .find(|b| b.box_id.as_deref() == Some(ORACLE))
+                .unwrap();
+            assert_eq!(data.registers["R4"].r#type, "raw");
+            assert_eq!(data.registers["R4"].value, R4);
+            let successor = request
+                .outputs
+                .iter()
+                .find(|o| o.box_.box_id.as_deref() == Some(POOL))
+                .unwrap();
+            assert_eq!(successor.box_.registers["R4"].r#type, "raw");
+            assert_eq!(successor.box_.registers["R4"].value, R4);
+        }
     }
 
     /// The recorded chain state is POST-drain (height 1,868,438 — both pools

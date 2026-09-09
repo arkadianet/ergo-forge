@@ -2362,9 +2362,8 @@ impl From<&crate::map::Role> for DrainRole {
     }
 }
 
-/// A mapped chain box as a scenario box. The archive shape carries no
-/// additional registers, which is a fidelity limit only for scripts that
-/// read R4–R9 of *other* inputs.
+/// A mapped chain box as a scenario box. Serialized register constants are
+/// carried verbatim in the raw-hex form required by `box_json`.
 #[must_use]
 pub fn scenario_box_from_chain(b: &crate::map::source::ChainBox) -> ScenarioBox {
     ScenarioBox {
@@ -2379,7 +2378,19 @@ pub fn scenario_box_from_chain(b: &crate::map::source::ChainBox) -> ScenarioBox 
             })
             .collect(),
         creation_height: b.creation_height,
-        registers: Default::default(),
+        registers: b
+            .registers
+            .iter()
+            .map(|(name, hex)| {
+                (
+                    name.clone(),
+                    crate::TypedValue {
+                        r#type: "raw".to_string(),
+                        value: json!(hex),
+                    },
+                )
+            })
+            .collect(),
         box_id: Some(b.box_id.clone()),
         extension: Default::default(),
     }

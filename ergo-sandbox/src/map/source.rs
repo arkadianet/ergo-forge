@@ -9,6 +9,8 @@
 //! trusted as typed — the same discipline `ergo-web`'s `lookup` route applies
 //! to explorer responses.
 
+use std::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
 
 /// Why a chain query produced no answer.
@@ -50,6 +52,16 @@ pub struct ChainBox {
     /// Tokens in index order.
     #[serde(default)]
     pub tokens: Vec<ChainToken>,
+    /// R4–R9 as serialized constant hex, preserved without decoding. Accepts
+    /// node hex strings and explorer objects containing `serializedValue`.
+    /// Older recordings without this field cannot recover omitted registers.
+    #[serde(
+        default,
+        rename = "additionalRegisters",
+        alias = "registers",
+        deserialize_with = "deserialize_registers"
+    )]
+    pub registers: BTreeMap<String, String>,
     /// Height the box was created at.
     #[serde(default)]
     pub creation_height: u32,
@@ -58,6 +70,45 @@ pub struct ChainBox {
     /// it 0, which degrades the order to box id alone — still deterministic.
     #[serde(default)]
     pub inclusion_height: u32,
+}
+
+fn deserialize_registers<'de, D>(deserializer: D) -> Result<BTreeMap<String, String>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let value = serde_json::Value::deserialize(deserializer)?;
+    parse_registers(&value).map_err(serde::de::Error::custom)
+}
+
+/// A decoded-only register cannot be losslessly reconstructed. Report that
+/// source limitation explicitly instead of silently dropping the entry.
+pub(super) fn parse_registers(
+    value: &serde_json::Value,
+) -> Result<BTreeMap<String, String>, String> {
+    if value.is_null() {
+        return Ok(BTreeMap::new());
+    }
+    let entries = value
+        .as_object()
+        .ok_or_else(|| "additionalRegisters must be an object".to_string())?;
+    entries
+        .iter()
+        .map(|(name, value)| {
+            value
+                .as_str()
+                .or_else(|| {
+                    value
+                        .get("serializedValue")
+                        .and_then(serde_json::Value::as_str)
+                })
+                .map(|hex| (name.clone(), hex.to_string()))
+                .ok_or_else(|| {
+                    format!(
+                        "register {name} cannot be represented as raw hex: missing serializedValue"
+                    )
+                })
+        })
+        .collect()
 }
 
 impl ChainBox {
@@ -169,4 +220,33 @@ pub trait ChainSource {
 
     /// A transaction's inputs and outputs, for a transaction seed.
     fn transaction(&self, tx_id: &str) -> Result<TxBoxes, SourceError>;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn absent_registers_are_empty_and_decoded_only_registers_report_a_limit() {
+        let mut b = json!({"boxId": "00", "ergoTree": "10010101d17300", "value": 1});
+        assert!(serde_json::from_value::<ChainBox>(b.clone())
+            .unwrap()
+            .registers
+            .is_empty());
+        for empty in [json!({}), serde_json::Value::Null] {
+            b["additionalRegisters"] = empty;
+            assert!(serde_json::from_value::<ChainBox>(b.clone())
+                .unwrap()
+                .registers
+                .is_empty());
+        }
+        b["additionalRegisters"] = json!({"R4": {"sigmaType": "SInt", "renderedValue": "7"}});
+        let error = serde_json::from_value::<ChainBox>(b)
+            .unwrap_err()
+            .to_string();
+        assert!(
+            error.contains("register R4 cannot be represented as raw hex: missing serializedValue")
+        );
+    }
 }

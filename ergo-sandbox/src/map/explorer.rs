@@ -83,33 +83,39 @@ impl ExplorerSource {
 /// the chain actually said. `creationHeight`/`settlementHeight` are the
 /// exception and default to 0, which only degrades the selection order to box
 /// id alone — documented on [`ChainBox`].
-fn to_box(v: &Value) -> Option<ChainBox> {
-    Some(ChainBox {
-        box_id: v.get("boxId")?.as_str()?.to_ascii_lowercase(),
-        ergo_tree: v.get("ergoTree")?.as_str()?.to_ascii_lowercase(),
-        value: v.get("value")?.as_u64()?,
-        tokens: match v.get("assets") {
-            None | Some(Value::Null) => Vec::new(),
-            Some(a) => a
-                .as_array()?
-                .iter()
-                .map(|t| {
-                    Some(ChainToken {
-                        id: t.get("tokenId")?.as_str()?.to_ascii_lowercase(),
-                        amount: t.get("amount")?.as_u64()?,
+fn to_box(v: &Value) -> Result<ChainBox, SourceError> {
+    let registers = super::source::parse_registers(&v["additionalRegisters"])
+        .map_err(|e| SourceError::Backend(format!("box {}: {e}", v["boxId"])))?;
+    let parse = || {
+        Some(ChainBox {
+            box_id: v.get("boxId")?.as_str()?.to_ascii_lowercase(),
+            ergo_tree: v.get("ergoTree")?.as_str()?.to_ascii_lowercase(),
+            value: v.get("value")?.as_u64()?,
+            registers,
+            tokens: match v.get("assets") {
+                None | Some(Value::Null) => Vec::new(),
+                Some(a) => a
+                    .as_array()?
+                    .iter()
+                    .map(|t| {
+                        Some(ChainToken {
+                            id: t.get("tokenId")?.as_str()?.to_ascii_lowercase(),
+                            amount: t.get("amount")?.as_u64()?,
+                        })
                     })
-                })
-                .collect::<Option<Vec<_>>>()?,
-        },
-        creation_height: v.get("creationHeight").and_then(Value::as_u64).unwrap_or(0) as u32,
-        // `settlementHeight` is the height the box entered the chain at — the
-        // stable half of the map's canonical selection order.
-        inclusion_height: v
-            .get("settlementHeight")
-            .or_else(|| v.get("inclusionHeight"))
-            .and_then(Value::as_u64)
-            .unwrap_or(0) as u32,
-    })
+                    .collect::<Option<Vec<_>>>()?,
+            },
+            creation_height: v.get("creationHeight").and_then(Value::as_u64).unwrap_or(0) as u32,
+            // `settlementHeight` is the height the box entered the chain at — the
+            // stable half of the map's canonical selection order.
+            inclusion_height: v
+                .get("settlementHeight")
+                .or_else(|| v.get("inclusionHeight"))
+                .and_then(Value::as_u64)
+                .unwrap_or(0) as u32,
+        })
+    };
+    parse().ok_or_else(|| SourceError::Backend(format!("box {}: unusable JSON", v["boxId"])))
 }
 
 /// A page of boxes. One unusable item fails the whole page: silently dropping
@@ -122,10 +128,7 @@ fn to_page(v: &Value) -> Result<Page, SourceError> {
             .ok_or_else(|| SourceError::Backend("explorer page `items` is not an array".into()))?
             .iter()
             .map(to_box)
-            .collect::<Option<Vec<_>>>()
-            .ok_or_else(|| {
-                SourceError::Backend("explorer page holds a box the map cannot read".into())
-            })?,
+            .collect::<Result<Vec<_>, _>>()?,
     };
     Ok(Page {
         items,
@@ -152,7 +155,7 @@ impl ChainSource for ExplorerSource {
 
     fn box_by_id(&self, box_id: &str) -> Result<ChainBox, SourceError> {
         let v = self.get(&format!("/api/v1/boxes/{box_id}"))?;
-        to_box(&v).ok_or_else(|| SourceError::Backend(format!("box {box_id}: unusable JSON")))
+        to_box(&v)
     }
 
     fn boxes_by_token_id(
@@ -200,12 +203,12 @@ impl ChainSource for ExplorerSource {
                 None | Some(Value::Null) => Ok(Vec::new()),
                 Some(a) => a
                     .as_array()
-                    .and_then(|a| a.iter().map(to_box).collect::<Option<Vec<_>>>())
                     .ok_or_else(|| {
-                        SourceError::Backend(format!(
-                            "transaction {tx_id}: `{k}` holds a box the map cannot read"
-                        ))
-                    }),
+                        SourceError::Backend(format!("transaction {tx_id}: `{k}` is not an array"))
+                    })?
+                    .iter()
+                    .map(to_box)
+                    .collect(),
             }
         };
         Ok(TxBoxes {
@@ -354,5 +357,37 @@ impl<S: ChainSource> ChainSource for RecordingSource<S> {
             .transactions
             .insert(tx_id.to_string(), t.clone());
         Ok(t)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn explorer_registers_survive_box_and_page_parsing() {
+        let mut b = json!({
+            "boxId": "00", "ergoTree": "10010101d17300", "value": 1,
+            "additionalRegisters": {
+                "R4": {"serializedValue": "040e", "sigmaType": "SInt", "renderedValue": "7"},
+                "R5": "050e"
+            }
+        });
+        let parsed = to_box(&b).unwrap();
+        assert_eq!(parsed.registers["R4"], "040e");
+        assert_eq!(parsed.registers["R5"], "050e");
+        assert_eq!(
+            to_page(&json!({"items": [b.clone()]})).unwrap().items,
+            vec![parsed]
+        );
+
+        b["additionalRegisters"]["R4"] = json!({"renderedValue": "7"});
+        let error = to_page(&json!({"items": [b]})).unwrap_err().to_string();
+        assert!(
+            error.contains("register R4 cannot be represented as raw hex: missing serializedValue")
+        );
+        let empty = json!({"boxId": "00", "ergoTree": "10010101d17300", "value": 1});
+        assert!(to_box(&empty).unwrap().registers.is_empty());
     }
 }
