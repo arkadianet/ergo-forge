@@ -24,8 +24,9 @@ constraints from the compiler-UI doc.
 ## What exists vs. what's missing
 
 Exists (engine-level, grounded):
-- compile + templates (`ergo-compiler` M1–M4; 95/110 byte-parity). **Positions are
-  partial:** `CompileError::pos()` returns real offsets for `Parse`/`Bind` only;
+- compile + templates (`ergo-compiler` M1–M4; 95/110 byte-parity). **Positions
+  note (2026-09-09): the gap described below was closed upstream — see item 6.
+  Original text kept for the record:** **Positions are partial:** `CompileError::pos()` returns real offsets for `Parse`/`Bind` only;
   `Type`/`Root`/`Emit`/`Write` return `0` because `TypedExpr` carries no positions
   (typecheck.rs:101, E12). Type errors — the class a playground user hits most —
   are not underlinable today. See P5.
@@ -49,8 +50,21 @@ Still missing (the actual build list):
    ("spendable by anyone?" hunts) over the sandbox, cost hot-spot reports.
 5. **Standalone browser shell** — the classroom for non-node-operators;
    WASM bindings over the engine.
-6. **Positions** — type errors carry no source offset, so the editor cannot
-   underline the most common failure. Node-side work; blocks the LSP story.
+6. ~~**Positions**~~ — **DONE upstream (E12 lifted).** This item said type
+   errors carry no source offset. That is no longer true, and has not been
+   since before the rev this repo pins (`94680433`): `ergo-compiler`'s
+   `typecheck.rs` now states that every user-facing reject
+   (`Parse`/`Bind`/`Type`) carries a real 0-based byte offset, with
+   positions riding on `TypedExpr`. Only the post-typecheck phases
+   (`Root`/`Emit`/`Serializer`/`Write`) still return `0`, and that is
+   correct parity — the route-level Scala throws carry no `SourceContext`
+   either, so the oracle records `0:0` for them. "Fixing" those would
+   break parity, not improve it.
+
+   The remaining question is a SHELL question, not an engine one: whether
+   the editor actually consumes the offset it is now handed and underlines
+   the failure. That belongs to the browser shell (item 5), not to
+   node-side work.
 
 ## Verification bar (decided)
 
