@@ -1015,6 +1015,7 @@ fn set_findings(nodes: &BTreeMap<String, MapNode>, edges: &[Edge]) -> Vec<SetFin
             }
             out.push(SetFinding {
                 finding: Finding {
+                    triage: Default::default(),
                     lint: LINT_UNBOUND_SET,
                     severity: Severity::High,
                     node_id: e.node_id,
@@ -1056,6 +1057,7 @@ fn set_findings(nodes: &BTreeMap<String, MapNode>, edges: &[Edge]) -> Vec<SetFin
         }
         out.push(SetFinding {
             finding: Finding {
+                triage: Default::default(),
                 lint: LINT_ASYMMETRY,
                 severity: Severity::Medium,
                 node_id: e.node_id,

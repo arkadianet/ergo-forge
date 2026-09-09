@@ -245,7 +245,7 @@ impl DrainRole {
 
 /// One declared input: a role and its box (flattened, so a protocol map's
 /// node record plus a role is a valid entry).
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DrainInput {
     pub role: DrainRole,
@@ -265,7 +265,7 @@ pub enum Payee {
 }
 
 /// One declared output.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DrainOutput {
     #[serde(default)]
@@ -277,7 +277,7 @@ pub struct DrainOutput {
 /// The drain-hunt request: a labelled contract set and one fixed transaction
 /// shape. Roles are caller-supplied and overridable; the protocol map's node
 /// roles feed them directly (`unknown` is refused here, as in the map).
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DrainRequest {
     pub inputs: Vec<DrainInput>,
@@ -563,6 +563,8 @@ pub struct DrainReport {
     pub first_accounting: Option<DrainAccounting>,
     /// Probes evaluated (post-deduplication).
     pub probes_run: usize,
+    /// Actual calls to txcheck, excluding transaction-construction failures.
+    pub oracle_calls: usize,
     /// Probes generated. `probes_run < probes_total` only under the cap.
     pub probes_total: usize,
     pub capped: bool,
@@ -682,6 +684,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
             attacker_public_keys: req.attacker_public_keys.clone(),
             first_accounting: None,
             probes_run: 0,
+            oracle_calls: 0,
             probes_total: 0,
             capped: false,
             hits: 0,
@@ -832,6 +835,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
 
     let mut probes_total = 0usize;
     let mut probes_run = 0usize;
+    let mut oracle_calls = 0usize;
     let mut hits = 0usize;
     let mut best: Option<(u128, DrainHit)> = None;
     let mut seen: HashSet<String> = HashSet::new();
@@ -977,9 +981,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                                 {
                                     Some(o) => {
                                         let flags = vec![false; o.len()];
-                                        if syn_enabled {
-                                            shape_tallies[tally].generated += 1;
-                                        }
+                                        shape_tallies[tally].generated += 1;
                                         (o, flags)
                                     }
                                     None => {
@@ -1036,9 +1038,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                                 continue;
                             }
                             probes_run += 1;
-                            if syn_enabled {
-                                shape_tallies[tally].run += 1;
-                            }
+                            shape_tallies[tally].run += 1;
 
                             // ── oracle: full transaction validation ──
                             let probe_seq = probes_run;
@@ -1057,6 +1057,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
                                     continue;
                                 }
                             };
+                            oracle_calls += 1;
                             let check = match tx_check(&tx_request) {
                                 Ok(c) => c,
                                 Err(_) => {
@@ -1235,6 +1236,7 @@ pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
         attacker_public_keys: req.attacker_public_keys.clone(),
         first_accounting,
         probes_run,
+        oracle_calls,
         probes_total,
         capped,
         hits,

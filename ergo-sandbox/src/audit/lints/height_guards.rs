@@ -36,6 +36,7 @@ pub fn height_guards(root: &Node) -> Vec<Finding> {
 
 fn finding(n: &Node, severity: Severity, message: &str) -> Finding {
     Finding {
+        triage: Default::default(),
         lint: "height-guards",
         severity,
         node_id: n.id,

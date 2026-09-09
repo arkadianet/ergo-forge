@@ -12,6 +12,7 @@ pub use context::{
 };
 pub mod finding;
 pub mod lints;
+pub mod triage;
 pub mod visit;
 
 pub use finding::{snippet, Finding, Severity, SNIPPET_MAX};

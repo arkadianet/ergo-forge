@@ -154,3 +154,50 @@ Its regression coverage lives in `ergo-sandbox/tests/audit.rs`:
   not evaluate its P2PK script (it is the attacker's box, not the protocol's).
 - **No timeline claims.** This corpus documents the *mechanism*, not how fast
   it was found. The same LP contract had legitimate swaps long before the drain.
+
+## Recorded finding triage
+
+From the repository root (use your worktree's isolated target directory):
+
+```sh
+CARGO_TARGET_DIR=./target-gate cargo run --release -p ergo-sandbox --bin ergo-es -- triage examples/incidents/use-lp.triage.json > deployed-triage.json
+CARGO_TARGET_DIR=./target-gate cargo run --release -p ergo-sandbox --bin ergo-es -- triage examples/incidents/fixed/use-lp.triage.json > fixed-triage.json
+```
+
+These committed requests select the pool's `delegated-reserves` finding at
+node 31. They differ only in the companion swap's compiled contract. The
+finding persists on the pool in both sets; the fixed swap supplies the missing
+binding. The deployed set reaches `confirmed`; the fixed set reaches
+`not-reproduced`. **Absence of a result under a bound is not evidence of
+absence. Not-reproduced does not mean safe.** Confirmation means the declared
+contract set reached the declared objective, not that the selected lint alone
+caused it.
+
+A triage request is a JSON object with `inputIndex` (declared spending input),
+`lint`, `nodeId` (from `ergo-es audit <tree-hex>`), and `drain` (a complete
+drain-hunt request). Commit that object to make the check reproducible.
+The selected input must be protected or companion and have explicit
+`ergoTree` bytes. Triage re-audits those bytes and rejects a stale anchor.
+Choose roles, authorization policy, and search bounds for the actual protocol:
+the incident's empty `objective.terms` declares no authorized releases and
+must not be copied blindly to contracts allowing payments or withdrawals.
+
+Each output is a finding with recorded triage evidence: the full request,
+hunt report, resolved synthesis caps, shape tallies, probe and oracle-call
+counts, and (for confirmation) the winning transaction plus its independently
+replayed reducer verdict. Extract `triage.evidence.request` to rerun triage,
+`triage.evidence.request.drain` to run `ergo-es drain`, or
+`triage.evidence.hunt.best.witness.txRequest` to run `ergo-es validate-tx`.
+Malformed shapes and incomplete objectives stay unconfirmed with their hunt
+notes; they cannot become bounded negative results. Ordinary audit findings
+start unconfirmed and explicitly disclose that the reducer was not consulted.
+
+To regenerate the two request files mechanically from the incident boxes and
+fixed source:
+
+```sh
+CARGO_TARGET_DIR=./target-gate cargo run --release -p ergo-sandbox --example triage_incident_requests
+```
+
+The regression tests also verify that the fixed request's bytes match the
+committed fixed source and parameters.

@@ -191,6 +191,7 @@ function render(r) {
     snip.className = "snippet";
     snip.textContent = f.snippet;
     li.appendChild(snip);
+    appendTriage(li, f);
 
     li.tabIndex = 0;
     li.title = "Click to highlight in the source";
@@ -683,6 +684,7 @@ function renderCompiled(c) {
     const msg = document.createElement("div"); msg.textContent = f.message;
     const snip = document.createElement("code"); snip.className = "snippet"; snip.textContent = f.snippet;
     li.append(chip, lint, msg, snip);
+    appendTriage(li, f);
     if (f.offset != null) {
       const where = document.createElement("span");
       where.className = "where";
@@ -2619,3 +2621,14 @@ $("map-export").addEventListener("click", () => {
 });
 
 for (const id of ["map-input", "map-kind", "map-depth", "map-nodes"]) $(id).addEventListener(id === "map-input" ? "input" : "change", invalidateMap);
+
+
+// Static findings explicitly disclose that no consensus confirmation ran.
+function appendTriage(li, finding) {
+  const note = document.createElement("div");
+  const triage = finding.triage;
+  note.textContent = triage
+    ? `${triage.state}: ${triage.explanation}`
+    : "unconfirmed: Static finding only; the consensus reducer has not been consulted.";
+  li.appendChild(note);
+}

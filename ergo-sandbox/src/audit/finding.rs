@@ -36,6 +36,8 @@ impl Severity {
 /// One lint result, anchored to a node in the lifted tree.
 #[derive(Debug, Clone, Serialize)]
 pub struct Finding {
+    /// Recorded local consensus confirmation, initially static-only.
+    pub triage: super::triage::Triage,
     /// Stable machine-readable lint id, e.g. `"unchecked-get"`.
     pub lint: &'static str,
     pub severity: Severity,
