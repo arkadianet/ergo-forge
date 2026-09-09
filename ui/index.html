@@ -3,24 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ergo-web — ErgoScript playground</title>
+  <title>ergo-forge — read and test ErgoScript</title>
   <link rel="stylesheet" href="vendor/codemirror/codemirror.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>ErgoScript playground</h1>
-    <p><strong>Build</strong> a contract by answering a few questions,
-       <strong>Write</strong> one in ErgoScript, <strong>Read</strong> what
-       an address on the Ergo blockchain actually does, or <strong>Play</strong> with contracts on a sandbox chain. Everything is checked
-       with the same code the Ergo network itself uses.</p>
+    <h1>ergo-forge <span class="brand-note">ErgoScript workbench</span></h1>
+    <p>Read the rules behind an Ergo contract. Explore related contracts, test a spending context, or write your own.</p>
   </header>
 
   <main>
     <nav class="modes" role="tablist">
+      <button id="mode-read" class="mode active" role="tab" aria-selected="true">Read</button>
       <button id="mode-build" class="mode" role="tab" aria-selected="false">Build</button>
-      <button id="mode-write" class="mode active" role="tab" aria-selected="true">Write</button>
-      <button id="mode-read" class="mode" role="tab" aria-selected="false">Read</button>
+      <button id="mode-write" class="mode" role="tab" aria-selected="false">Write</button>
       <button id="mode-play" class="mode" role="tab" aria-selected="false">Play</button>
     </nav>
 
@@ -238,11 +235,28 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
       <details><summary>History</summary><ul id="play-history" class="residuals"></ul></details>
     </section>
 
-    <section id="read" class="pane" hidden>
+    <section id="read" class="pane">
+    <div class="reader-intro">
+      <h2>Read a contract</h2>
+      <p>Paste an address, box ID, or ErgoTree hex to recover readable ErgoScript from the compiled contract.</p>
+      <p id="reader-connection" class="hint" role="status">Checking chain lookup availability…</p>
+    </div>
     <section class="input-row">
       <input id="input" type="text" spellcheck="false"
-             aria-label="Contract address or ErgoTree hex"
-             placeholder="Address or ErgoTree hex, e.g. 1001040ad191e4c6a704047300">
+             aria-label="Contract address, box ID or ErgoTree hex"
+             placeholder="Address, box ID or ErgoTree hex">
+      <select id="read-kind" aria-label="Input type">
+        <option value="auto">Auto detect</option><option value="tree">ErgoTree hex</option><option value="boxId">Box ID</option><option value="address">Address</option>
+      </select>
+      <select id="network" aria-label="network">
+        <option value="mainnet" selected>mainnet</option>
+        <option value="testnet">testnet</option>
+      </select>
+      <button id="read-go">Read</button>
+    </section>
+
+    <div class="reader-actions">
+      <label for="examples">Try a contract</label>
       <select id="examples" aria-label="examples">
         <option value="">examples…</option>
         <option value="1001040ad191e4c6a704047300">unguarded register read</option>
@@ -252,14 +266,19 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
         <option value="0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197">pay-to-public-key</option>
         <option value="1014040004000e208c27dd9d8a35aac1e3167d58858c0a8b4059b277da790552e37eba22df9b903504000400040204020101040205a0c21e040204080500040c040204a0c21e0402050a05c8010402d806d601b2a5730000d602b5db6501fed9010263ed93e4c67202050ec5a7938cb2db63087202730100017302d603b17202d604e4c6b272027303000605d605d90105049590720573047204e4c6b272029972057305000605d606b07202860273067307d901063c400163d803d6088c720601d6098c720801d60a8c72060286029a72097308ededed8c72080293c2b2a5720900d0cde4c6720a040792c1b2a5720900730992da720501997209730ae4c6720a0605ea02d1ededededededed93cbc27201e4c6a7060e927203730b93db63087201db6308a793e4c6720104059db07202730cd9010741639a8c720701e4c68c72070206057e72030593e4c6720105049ae4c6a70504730d92c1720199c1a77e9c9a7203730e730f058c72060292da720501998c72060173109972049d9c720473117312b2ad7202d9010763cde4c672070407e4c6b2a5731300040400">oracle pool (mainnet)</option>
       </select>
-      <select id="network" aria-label="network">
-        <option value="mainnet" selected>mainnet</option>
-        <option value="testnet">testnet</option>
-      </select>
-      <button id="read-go">Read</button>
-    </section>
-
-    <p id="status" class="status" hidden></p>
+      <button type="button" id="open-map" class="secondary">Explore a protocol map</button>
+    </div>
+    <details id="chain-panel">
+      <summary>Choose a box from chain</summary>
+      <p class="hint">Fetch a box ID or the unspent boxes at an address, then read the selected box with its actual registers and height.</p>
+      <div class="write-row">
+        <input id="chain-input" aria-label="Address or box ID to fetch" spellcheck="false" placeholder="Address or box ID (defaults to the reader input)">
+        <button id="chain-fetch" disabled>Fetch boxes</button>
+      </div>
+      <select id="chain-boxes" aria-label="Choose a fetched box to read" hidden></select>
+      <p id="chain-status" class="status" role="status" hidden></p>
+    </details>
+    <p id="status" class="status" role="status" hidden></p>
     <div id="partial-banner" class="banner" hidden>
       <strong>Part of this contract could not be decompiled.</strong>
       <span id="partial-detail"></span>
@@ -267,11 +286,14 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
     </div>
 
     <section id="result" hidden>
+      <div class="reader-result-bar"><span id="read-completeness" class="chip"></span><span id="read-origin" class="hint"></span></div>
       <h2>In plain words</h2>
       <ul id="plain" class="plain"></ul>
-      <p id="plain-note" class="hint" hidden>Parts shown as code are clauses the reader could not put into words; the source below is the whole truth.</p>
-      <h2>Source</h2>
-      <pre id="source"></pre>
+      <p id="plain-note" class="hint" hidden>Parts shown as code could not be put into words. Check the recovered source and its completeness status.</p>
+      <div class="source-heading"><h2>Recovered source</h2><button type="button" id="copy-source" class="secondary tiny">Copy source</button><button type="button" id="read-test" class="secondary tiny">Test this contract</button></div>
+      <p class="hint">Reconstructed from ErgoTree bytes. Original names and comments are not stored on chain.</p>
+      <pre id="source" tabindex="0"></pre>
+      <p id="read-copy-status" class="hint" role="status"></p>
 
       <h2>Findings</h2>
       <ul id="findings"></ul>
@@ -307,25 +329,41 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
         <input id="height" type="number" min="1" placeholder="default: 1500000">
         <button id="rehunt">Re-run hunt</button>
       </details>
-      <details id="chain-panel" hidden open>
-        <summary>Fetch from chain</summary>
-        <p class="hint">This instance is configured with an explorer. Fetch the
-           unspent boxes at the address you read (or a box by id) and use one as
-           the real SELF; the spending height follows the chain tip.</p>
-        <div class="write-row">
-          <input id="chain-input" type="text" spellcheck="false" placeholder="address (defaults to the one above) or box id">
-          <button id="chain-fetch">Fetch boxes</button>
-        </div>
-        <select id="chain-boxes" aria-label="fetched boxes" hidden></select>
-        <p id="chain-status" class="status" hidden></p>
-      </details>
-
       <h2>Wire form</h2>
       <dl class="wire">
         <dt>tree hex</dt><dd><code id="tree-hex"></code></dd>
         <dt>address</dt><dd><code id="address"></code></dd>
       </dl>
     </section>
+    <details id="protocol-map" class="protocol-map">
+      <summary>Protocol map <span class="hint">— follow related contracts</span></summary>
+      <p>Start with one box, address, token ID or transaction. Follow the references in its contracts and open each box’s source.</p>
+      <p class="hint">A map shows reachable boxes at a recorded height. Dynamic references and unavailable indexes may remain unresolved; it is not a complete inventory of a protocol.</p>
+      <label for="map-input">Starting point</label>
+      <div class="input-row">
+        <input id="map-input" placeholder="Box ID, address, token ID or transaction ID" spellcheck="false">
+        <select id="map-kind" aria-label="Map starting point type"><option value="boxId">Box ID</option><option value="address">Address</option><option value="tokenId">Token ID</option><option value="transactionId">Transaction ID</option></select>
+        <button id="map-go" type="button">Map contracts</button>
+      </div>
+      <div class="reader-actions">
+        <label for="map-depth">Depth</label><input id="map-depth" type="number" min="0" max="4" value="2">
+        <label for="map-nodes">Max boxes</label><input id="map-nodes" type="number" min="1" max="64" value="24">
+        <button id="map-demo" type="button" class="secondary">Try an offline example</button>
+        <label class="file-button secondary">Open chain fixture<input id="map-file" type="file" accept=".json,application/json"></label>
+        <button id="map-live" type="button" class="secondary" hidden>Use live explorer</button>
+      </div>
+      <p id="map-context" class="hint">Uses the reader’s network. Live mapping needs a configured explorer; the offline example works everywhere.</p>
+      <p id="map-status" class="status" role="status" hidden></p>
+      <div id="map-result" hidden>
+        <div class="source-heading"><h2>Contract set</h2><button id="map-export" type="button" class="secondary tiny">Download map JSON</button></div>
+        <p id="map-summary"></p><p id="map-limits" class="banner" hidden></p>
+        <div id="map-boxes" class="map-boxes"></div>
+        <h2>References between contracts</h2>
+        <p class="hint">NFT = token identity · script hash / bytes = contract identity · position = a slot in the transaction. Unresolved references stay visible.</p>
+        <div class="table-scroll" tabindex="0" aria-label="Contract references"><table class="probes"><thead><tr><th>From → to</th><th>Reference type</th><th>Code location</th></tr></thead><tbody id="map-edges"></tbody></table></div>
+      </div>
+    </details>
+    <details id="reader-tools"><summary>Test the contract you’re reading</summary><p id="reader-test-context" class="hint">Read a contract first. Scenarios and suites here use that contract’s ErgoTree.</p><div id="read-dev-slot"></div></details>
     </section>
   </main>
 
@@ -361,7 +399,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
   <section class="scenario" data-panel="tests">
     <h2>Tests</h2>
     <p class="hint">Named scenarios with the verdict each must produce, run
-       against the editor's compiled contract. Save the whole thing as
+       against the active contract (Read or Write). Save the whole thing as
        <code>contract.test.json</code> and run <code>ergo-es test</code> in CI.</p>
     <label for="tests">Scenarios JSON — an array of <code>{ name, expect, ...scenario }</code></label>
     <textarea id="tests" rows="7" spellcheck="false">[

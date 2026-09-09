@@ -1,0 +1,51 @@
+{
+  "formatVersion": 1,
+  "kind": "synthetic-learning-example",
+  "height": 1200,
+  "boxes": {
+    "1111111111111111111111111111111111111111111111111111111111111111": {
+      "boxId": "1111111111111111111111111111111111111111111111111111111111111111",
+      "ergoTree": "1004040004000e20aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa05c801d801d601b2db6501fe730000d1ed938cb2db6308720173010001730291e4c6720104057303",
+      "value": 1000000000,
+      "tokens": [],
+      "creationHeight": 1000
+    },
+    "2222222222222222222222222222222222222222222222222222222222222222": {
+      "boxId": "2222222222222222222222222222222222222222222222222222222222222222",
+      "ergoTree": "100104d00fd191a37300",
+      "value": 1000000,
+      "tokens": [
+        {
+          "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "amount": 1
+        }
+      ],
+      "creationHeight": 1000
+    }
+  },
+  "tokens": {
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": {
+      "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "emissionAmount": 1
+    }
+  },
+  "boxesByToken": {
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": {
+      "items": [
+        {
+          "boxId": "2222222222222222222222222222222222222222222222222222222222222222",
+          "ergoTree": "100104d00fd191a37300",
+          "value": 1000000,
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            }
+          ],
+          "creationHeight": 1000
+        }
+      ],
+      "total": 1
+    }
+  }
+}

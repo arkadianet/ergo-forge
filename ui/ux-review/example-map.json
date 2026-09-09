@@ -1,0 +1,59 @@
+{
+  "seed": {
+    "kind": "boxId",
+    "input": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "network": "mainnet",
+  "source": {
+    "kind": "synthetic-learning-example",
+    "height": 1200,
+    "recorded": true
+  },
+  "caps": {
+    "maxNodes": 24,
+    "maxDepth": 2
+  },
+  "truncated": null,
+  "nodes": [
+    {
+      "boxId": "1111111111111111111111111111111111111111111111111111111111111111",
+      "treeHex": "1004040004000e20aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa05c801d801d601b2db6501fe730000d1ed938cb2db6308720173010001730291e4c6720104057303",
+      "value": "1000000000",
+      "depth": 0,
+      "complete": true,
+      "treeError": null
+    },
+    {
+      "boxId": "2222222222222222222222222222222222222222222222222222222222222222",
+      "treeHex": "100104d00fd191a37300",
+      "value": "1000000",
+      "depth": 1,
+      "complete": true,
+      "treeError": null
+    }
+  ],
+  "edges": [
+    {
+      "from": "1111111111111111111111111111111111111111111111111111111111111111",
+      "to": "2222222222222222222222222222222222222222222222222222222222222222",
+      "unresolved": null,
+      "binding": "data-input",
+      "covers": [
+        "tokenId"
+      ],
+      "site": "CONTEXT.dataInputs(0)",
+      "singleton": null
+    },
+    {
+      "from": "1111111111111111111111111111111111111111111111111111111111111111",
+      "to": "2222222222222222222222222222222222222222222222222222222222222222",
+      "unresolved": null,
+      "binding": "nft",
+      "covers": [
+        "tokenId"
+      ],
+      "site": "CONTEXT.dataInputs(0)",
+      "singleton": true
+    }
+  ]
+}
