@@ -178,6 +178,121 @@ is attributable to a change rather than to the batch. If steering does not
 move the rate, that is a bet we can now prove we lost — say so, and keep the
 axes.
 
+## Amendment, 2026-09-09 — what the first real audit changed
+
+Everything below phase 3 was written to make the drain hunt **deeper**. A
+day of evidence says the binding constraints are **breadth** and
+**composition**, not depth. Three measurements, all from today:
+
+1. **Ingestion is the real bottleneck.** Pointed at a live third-party
+   protocol (Lithos, 28 contracts, ~4,900 lines, launching this month), the
+   forge could compile **3 of 28**. Not because the contracts are exotic —
+   because they bind their constants by name (`CONST_*` via ErgoScript's
+   named-constant substitution) and nothing in the forge supplies them.
+   Hand-writing a type-inferring parameter supplier took it to **18 of 28**
+   in one sitting. A detector that cannot read 89% of its target is not
+   limited by its detection depth.
+2. **Composition is where the answers live.** The forge produced two
+   non-noise findings on that protocol. **Both were false positives**, and
+   both were resolved the same way: by tracing *cross-contract delegation*
+   by hand. The config was bound by a guard that executes the flagged script
+   from a context variable; the positional read was pinned by a sibling
+   script co-executed in the same transaction. The forge analyses one
+   contract at a time and cannot see either. This is the same limitation the
+   mutation corpus proved in the abstract (positional ↔ unbound-search is a
+   two-contract property, #82) — the first real audit hit it immediately.
+3. **Precision is a feature.** The same run produced **143 `unchecked-get`
+   findings** on fraud-proof contracts, where a throwing `.get` merely fails
+   the fraud proof. An auditor who has to hand-triage 143 non-issues to find
+   zero real ones stops running the tool. Noise is not free.
+
+So three phases go **before** further axis work. They are numbered A/B/C to
+avoid renumbering the existing plan; read them as sitting between 3 and 4.
+
+### Phase A — ingestion (the tool must be able to read its targets)
+
+- **Named constants.** Support the conventions real protocols use:
+  `CONST_*` bare identifiers, `$param`, and the `.item("NAME", value)`
+  substitution the Ergo tooling uses. Infer types where possible; report
+  every constant that could not be bound, with the contract, rather than
+  skipping the file.
+- **Batch ingest.** Point the forge at a directory, repo or URL and get a
+  per-contract table: compiled / not compiled / why. The measurement IS the
+  deliverable; a protocol's un-analysable fraction is a fact its authors
+  should know.
+- **Tree-version and encoding coverage.** Two Lithos contracts failed on
+  `UnsignedBigInt` constant data under a v0 header. Handle the versions real
+  contracts are written against, or say precisely which are unsupported.
+- **Acceptance:** ingest rate over a corpus of real deployed protocols, not
+  our own examples. Ours all compile by construction — they were written
+  here. That is exactly why they did not surface this.
+
+### Phase B — composition (one transaction, many scripts)
+
+The single largest gap, now evidenced twice. Today the unit of analysis is
+one script. The unit of *security* is a transaction in which several scripts
+execute together and delegate obligations to one another.
+
+- **Co-execution model.** Represent "these scripts run in the same
+  transaction" and let a finding be discharged by a sibling: *"this read is
+  unbound here, and bound by X, which must co-spend."* That converts today's
+  false positives into either a discharged assumption or a real finding —
+  and it is the same machinery that decides whether a delegation actually
+  holds.
+- **Script-from-context.** Lithos executes its emission and enforcer scripts
+  from context variables (`executeFromVar`), validated by hash against a
+  config box. The forge cannot follow that indirection at all: it sees a
+  script with no caller. Real protocols use this to save UTXO space; we
+  should read it.
+- **Multi-contract drains.** This subsumes what phase 5 called
+  multi-transaction chains, and is the prerequisite for the corpus's missing
+  `positional ↔ unbound-search` operator — proven in #82 to be a
+  two-contract property that cannot be a single-contract mutant.
+- **Acceptance:** the two Lithos false positives are discharged
+  automatically, and a two-contract mutant enters the corpus as *proven*.
+
+### Phase C — precision and triage
+
+- **Suppression with reasons.** A finding class that is benign in a context
+  (a throwing `.get` in a fraud proof) should be suppressible *with the
+  reason recorded*, never silently dropped.
+- **Per-lint false-positive tracking.** The mutation corpus measures
+  detection. Nothing measures precision. Add the mirror: a corpus of
+  known-benign patterns each lint must NOT fire on, and report both numbers.
+  A lint that fires on everything scores perfectly on recall.
+- **Acceptance:** noise-to-signal on a real protocol, reported alongside the
+  detection rate. Today's honest figure is 145 findings, 0 real.
+
+### On "fuzzing" — what we have and what we do not
+
+The plan's item 4 promised "scenario fuzzing". What was built is
+**enumeration**: `hunt.rs` says "bounded scenario sampling", and the drain
+hunt walks a *declared finite family* with pinned axis order and allocated
+budget. That is deliberate and it is why a miss can be stated honestly —
+but it is not fuzzing, and the distinction should stop being blurred.
+
+Three things fuzzing would add that enumeration cannot:
+
+- **Randomised/property-based scenarios.** Assert invariants over randomly
+  generated contexts ("no keyless transaction reduces this to true", "value
+  in equals value out") rather than enumerating a family someone declared.
+  Finds shapes nobody thought to declare — which is precisely the corpus's
+  standing criticism of the decoy family.
+- **Coverage-guided steering.** Phase 3d, still gated: the corpus has no
+  cap-truncation misses, so nothing yet says the budget is the constraint.
+- **Differential fuzzing against the node** — the strongest version, and
+  specific to this project's identity. The forge composes the *same*
+  consensus primitives as the reference implementation, and the plan already
+  sets "byte-exact recompilation" as the decompiler's bar. Generalise it:
+  fuzz `compile → decompile → recompile` for byte-identity, and fuzz
+  evaluator agreement against the node on random scenarios. A divergence is
+  unambiguous — one of the two is wrong — and needs no oracle to interpret.
+  This also serves the project's dogfooding purpose directly.
+
+Sequencing: A and C are small and unblock everything else. B is the large
+one and is where the remaining real-world answers live. Fuzzing (differential
+first) sits alongside B; coverage-guided steering stays gated on evidence.
+
 ## Phase 4 — solver-assisted values (the qualitative jump)
 
 Everything through phase 3 finds bugs reachable by **rearranging declared
