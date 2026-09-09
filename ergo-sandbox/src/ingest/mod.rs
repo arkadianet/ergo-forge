@@ -15,6 +15,9 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 use crate::compile::{compile_with_params, ParamError};
+use crate::evidence::{
+    BindingSet, CasePremises, ConstantBinding, EvidenceCase, Origin, Premise, SourceIdentity,
+};
 use crate::{lift_tree, Lifted, TypedValue};
 
 /// A real value, or a known type for which ingestion supplies a placeholder.
@@ -45,7 +48,7 @@ impl Default for IngestOptions {
     }
 }
 
-#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum BindingOrigin {
     Inferred,
@@ -53,7 +56,7 @@ pub enum BindingOrigin {
     ValueOverride,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Binding {
     pub parameter: String,
     pub bound: TypedValue,
@@ -74,6 +77,8 @@ pub enum Status {
 pub struct ContractReport {
     #[serde(flatten)]
     pub claim: crate::claim::ClaimMetadata,
+    /// Provenance accompanies success and failure reports, including missing inputs.
+    pub evidence_case: EvidenceCase,
     pub path: PathBuf,
     pub status: Status,
     /// Full error, including compiler position and source line when available.
@@ -88,6 +93,7 @@ pub struct ContractReport {
 
 /// Synthetic artifacts deliberately omit deployment addresses.
 pub struct IngestedContract {
+    case: EvidenceCase,
     pub tree_bytes: Vec<u8>,
     pub lifted: Lifted,
 }
@@ -103,6 +109,7 @@ pub struct IngestResult {
 /// heuristics or a search for whichever value happens to compile.
 pub fn ingest_source(source: &str, options: &IngestOptions) -> IngestResult {
     let mut report = ContractReport {
+        evidence_case: source_case(Some(source), options),
         claim: crate::claim::ClaimMetadata::INGEST,
         path: PathBuf::new(),
         status: Status::NotCompiled,
@@ -164,9 +171,12 @@ pub fn ingest_source(source: &str, options: &IngestOptions) -> IngestResult {
                 report.actual_tree_version = Some(tree.version);
                 report.raw_lift_nodes = Some(lifted.raw_placeholders);
                 report.lift_truncated = Some(lifted.truncated);
+                bind_report(&mut report, Some(&out.tree_bytes));
+                let case = report.evidence_case.clone();
                 return IngestResult {
                     report,
                     artifact: Some(IngestedContract {
+                        case,
                         tree_bytes: out.tree_bytes,
                         lifted,
                     }),
@@ -268,6 +278,7 @@ fn record(
 
 fn failed(mut report: ContractReport, reason: String) -> IngestResult {
     report.reason = Some(reason);
+    bind_report(&mut report, None);
     IngestResult {
         report,
         artifact: None,
@@ -339,6 +350,7 @@ pub fn ingest_directory(root: &Path, options: &IngestOptions) -> Result<BatchRep
         let mut report = match std::fs::read_to_string(&path) {
             Ok(source) => ingest_source(&source, options).report,
             Err(e) => ContractReport {
+                evidence_case: source_case(None, options),
                 claim: crate::claim::ClaimMetadata::INGEST,
                 path: PathBuf::new(),
                 status: Status::NotCompiled,
@@ -352,6 +364,15 @@ pub fn ingest_directory(root: &Path, options: &IngestOptions) -> Result<BatchRep
             },
         };
         report.path = path.strip_prefix(root).unwrap_or(&path).to_path_buf();
+        let mut premises = report.evidence_case.premises().clone();
+        if let Premise::Present { value, .. } = &mut premises.source {
+            value.record.locator = report.path.to_string_lossy().into_owned();
+        }
+        premises.assumptions.insert(
+            "sourcePath".into(),
+            Premise::supplied(serde_json::json!(report.path)),
+        );
+        report.evidence_case = EvidenceCase::new(premises).expect("ingestion case remains valid");
         contracts.push(report);
     }
     let compiled = contracts
@@ -387,4 +408,176 @@ fn walk(root: &Path, paths: &mut Vec<PathBuf>) -> Result<(), String> {
         }
     }
     Ok(())
+}
+
+impl IngestedContract {
+    /// Legacy public bytes/IR may be read independently; evidence-bearing
+    /// analysis rejects retargeted bytes and re-lifts the bound bytes itself.
+    pub fn evidence_case(&self) -> Result<&EvidenceCase, String> {
+        if self.case.target_bytes()? != self.tree_bytes {
+            return Err("artifact bytes changed; resolve provenance for a new case".into());
+        }
+        Ok(&self.case)
+    }
+    pub fn analyze(
+        &self,
+    ) -> Result<crate::evidence::Analysis<crate::evidence::StaticAnalysis>, String> {
+        self.evidence_case()?.analyze()
+    }
+}
+
+fn source_case(source: Option<&str>, options: &IngestOptions) -> EvidenceCase {
+    let mut premises = CasePremises::unspecified();
+    if let Some(source) = source {
+        premises.source = Premise::supplied(SourceIdentity::supplied(source));
+    }
+    premises.assumptions.insert("compilationOptions".into(), Premise::supplied(serde_json::json!({
+        "treeVersion": options.tree_version,
+        "network": if options.network == NetworkPrefix::Testnet { "testnet" } else { "mainnet" },
+        "inferConstants": options.infer_constants,
+        "overrides": options.overrides,
+    })));
+    EvidenceCase::new(premises).expect("source provenance is representable")
+}
+
+fn evidence_binding(b: &Binding) -> ConstantBinding {
+    ConstantBinding {
+        name: b.parameter.clone(),
+        typed_value: serde_json::to_value(&b.bound).expect("binding serializes"),
+        origin: if b.origin == BindingOrigin::ValueOverride {
+            Origin::CallerSupplied
+        } else {
+            Origin::Hypothetical
+        },
+        mechanism: match b.origin {
+            BindingOrigin::Inferred => "inferred",
+            BindingOrigin::TypeOverride => "type-override",
+            BindingOrigin::ValueOverride => "value-override",
+        }
+        .into(),
+        source_lines: b.lines.clone(),
+    }
+}
+
+fn bind_report(report: &mut ContractReport, target: Option<&[u8]>) {
+    let mut premises = report.evidence_case.premises().clone();
+    let bindings: Vec<_> = report.bindings.iter().map(evidence_binding).collect();
+    let synthetic = bindings.iter().any(|b| b.origin == Origin::Hypothetical);
+    premises.constants = Premise::supplied(BindingSet {
+        bindings,
+        complete: target.is_some(),
+    });
+    if let Some(target) = target {
+        premises.target_bytes = Premise::Present {
+            value: hex::encode(target),
+            origin: if synthetic {
+                Origin::Hypothetical
+            } else {
+                Origin::CallerSupplied
+            },
+        };
+    }
+    premises.assumptions.insert("compilationOutcome".into(), Premise::supplied(serde_json::json!({
+        "status": report.status, "reason": report.reason, "actualTreeVersion": report.actual_tree_version,
+        "rawLiftNodes": report.raw_lift_nodes, "liftTruncated": report.lift_truncated,
+    })));
+    report.evidence_case =
+        EvidenceCase::new(premises).expect("captured bindings remain representable");
+}
+
+/// An archived compilation row is a measurement, not a retained compiler artifact.
+/// Retain recorded binding values/origins; absent source text and target bytes
+/// stay missing. Do not recompile private source to fill an old record.
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordedInventoryRow {
+    pub measurement: serde_json::Value,
+    pub binding_origin_status: &'static str,
+    pub case: EvidenceCase,
+}
+
+pub fn recorded_inventory(
+    document: &serde_json::Value,
+    locator: &str,
+) -> Result<Vec<RecordedInventoryRow>, String> {
+    use crate::evidence::SourceRecord;
+    let files = document["files"]
+        .as_array()
+        .ok_or("inventory has no file identities")?;
+    let rows = document["after"]["contracts"]
+        .as_array()
+        .ok_or("inventory has no compilation rows")?;
+    let revision = document["corpus_revision"]
+        .as_str()
+        .ok_or("inventory has no corpus revision")?;
+    let engine = document["compiler_revision"]
+        .as_str()
+        .ok_or("inventory has no compiler revision")?;
+    let mut by_path = BTreeMap::new();
+    for row in rows {
+        let path = row["path"].as_str().ok_or("compilation row has no path")?;
+        if by_path.insert(path, row).is_some() {
+            return Err("duplicate compilation row".into());
+        }
+    }
+    if files.len() != rows.len() {
+        return Err("source and compilation inventories differ".into());
+    }
+    let mut output = Vec::new();
+    for file in files {
+        let path = file["path"].as_str().ok_or("source identity has no path")?;
+        let row = by_path
+            .remove(path)
+            .ok_or("missing/duplicate source inventory member")?;
+        let mut premises = CasePremises::unspecified();
+        premises.engine_revision = engine.into();
+        premises.source = Premise::Present {
+            origin: Origin::SourceRecorded,
+            value: SourceIdentity {
+                record: SourceRecord {
+                    locator: path.into(),
+                    revision: Some(revision.into()),
+                    sha256: file["sha256"].as_str().ok_or("source hash missing")?.into(),
+                },
+                text: Premise::missing("archived inventory records a hash, not source text"),
+            },
+        };
+        let bindings: Vec<Binding> = serde_json::from_value(
+            row.get("bindings")
+                .ok_or("binding origins missing from inventory row")?
+                .clone(),
+        )
+        .map_err(|e| format!("invalid recorded binding: {e}"))?;
+        let complete = match row["status"].as_str() {
+            Some("compiled") => true,
+            Some("not_compiled") => false,
+            _ => return Err("unknown compilation status".into()),
+        };
+        premises.constants = Premise::Present {
+            origin: Origin::SourceRecorded,
+            value: BindingSet {
+                bindings: bindings.iter().map(evidence_binding).collect(),
+                complete,
+            },
+        };
+        premises.target_bytes = Premise::missing(
+            "compiled bytes were not retained in this archived compilation summary",
+        );
+        premises.assumptions.insert(
+            "compilationMeasurement".into(),
+            Premise::Present {
+                value: row.clone(),
+                origin: Origin::SourceRecorded,
+            },
+        );
+        premises.assumptions.insert("inventoryRecord".into(), Premise::Present {
+            value: serde_json::json!({"locator":locator,"sha256":crate::evidence::case::json_digest(document)}), origin: Origin::SourceRecorded,
+        });
+        output.push(RecordedInventoryRow {
+            measurement: row.clone(),
+            binding_origin_status: "recorded",
+            case: EvidenceCase::new(premises)?,
+        });
+    }
+    Ok(output)
 }

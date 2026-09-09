@@ -50,6 +50,7 @@ pub mod compose;
 pub mod decompile;
 pub mod drain;
 pub mod eval;
+pub mod evidence;
 pub mod hot_spots;
 pub mod hunt;
 pub mod identity;

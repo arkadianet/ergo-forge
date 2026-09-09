@@ -257,3 +257,12 @@ fn take_children(p: &mut Payload) -> Vec<Expr> {
         | Payload::NoneValue { .. } => vec![],
     }
 }
+
+/// Provenance-bearing structural comparison. Both complete case snapshots are
+/// retained; neither structural similarity nor byte equality establishes deployment.
+pub fn match_cases(
+    left: &crate::evidence::EvidenceCase,
+    right: &crate::evidence::EvidenceCase,
+) -> Result<crate::evidence::Analysis<MatchReport>, String> {
+    left.compare(right)
+}

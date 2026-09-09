@@ -190,7 +190,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
 {
   "schemaVersion": 1,
   "baselineRev": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
-  "completedThrough": "P00",
+  "completedThrough": "P01",
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,
   "units": [
@@ -221,7 +221,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "missing_registers_are_not_empty_registers",
         "changing_any_premise_invalidates_cached_evidence"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "P02",
@@ -483,3 +483,9 @@ P00 verification/landing record: see [P00-REPORT.md](P00-REPORT.md). All sixteen
 hygiene items above are implemented. `completedThrough` records the passing
 product-gate prefix, not a claim that a Git commit or remote landing occurred.
 The sandbox mounted `.git` read-only, blocking the requested docs-first commit.
+
+P01 execution record: see [P01-REPORT.md](P01-REPORT.md) and the
+[evidence-case API boundary](evidence-cases.md). P01 is registered as implemented;
+`completedThrough` advances to P01 after rerunning P00 and P01 green. Acceptance
+names, numeric thresholds and frozen measurements are unchanged. P02–P08 remain
+unimplemented.

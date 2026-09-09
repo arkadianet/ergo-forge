@@ -15,14 +15,22 @@ options.overrides.insert(
 );
 let result = ingest_source("sigmaProp(SELF.tokens(0)._1 == asset)", &options);
 assert_eq!(result.report.status, Status::Compiled);
-let artifact = result.artifact.unwrap(); // tree_bytes and lifted
-// Retain result.report alongside the artifact: its bindings are synthetic.
+let artifact = result.artifact.unwrap();
+let analysis = artifact.analyze().unwrap(); // result retains the evidence case
+let saved = serde_json::to_string(artifact.evidence_case().unwrap()).unwrap();
+// The exported case retains each synthetic binding; deployment identity is unknown.
 ```
 
 The ordinary compilation APIs retain their existing behavior. Ingestion is
 opt-in and does not emit deployment addresses. Synthetic values can affect
 compiler folding and remove branches; an ingested tree is not a reproduction
 of the deployment tree. Use real values when exact compilation matters.
+
+P01 attaches a versioned `evidence_case` to every report and retains it inside
+successful artifacts. Use `artifact.analyze()` for provenance-bearing static
+analysis; direct `tree_bytes` / `lifted` access remains a legacy, unbound API.
+The new case APIs and the limits of archived records are described in
+[evidence-cases.md](evidence-cases.md). No ingestion or inference rule changed.
 
 ## CLI and reports
 

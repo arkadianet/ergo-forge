@@ -222,6 +222,26 @@ pub trait ChainSource {
     fn transaction(&self, tx_id: &str) -> Result<TxBoxes, SourceError>;
 }
 
+/// Capture the original source document before the legacy ChainBox defaulting
+/// boundary. Its digest identifies this JSON record, not an Ergo box or UTXO.
+/// No map traversal, selection, or defaulting behavior changes.
+pub fn record_box(
+    document: serde_json::Value,
+    locator: String,
+    revision: Option<String>,
+) -> Result<crate::evidence::RecordedBox, String> {
+    let sha256 = crate::evidence::case::json_digest(&document);
+    crate::evidence::RecordedBox::new(
+        document,
+        crate::evidence::Origin::SourceRecorded,
+        Some(crate::evidence::SourceRecord {
+            locator,
+            revision,
+            sha256,
+        }),
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
