@@ -1,0 +1,482 @@
+{
+ "recorded": "2026-09-09",
+ "runner": "ergo-sandbox/tests/mutation_corpus.rs (release build)",
+ "methodology": "docs/superpowers/specs/2026-09-08-mutation-corpus-design.md",
+ "detectionRate": 0.0,
+ "provenMutants": 5,
+ "found": 0,
+ "denominatorNote": "proven = a hand-built KEYLESS drain witness validated by txcheck before the hunt ran. M1-M3 were initially misproven (their witnesses validated under txcheck but carry needsProof on the protected input \u2014 the residual requires the beneficiary's/receiver's key): reclassified as keyed-insider, outside the hunt's attacker model, never in the denominator.",
+ "caps": {
+  "maxProbes": 50000,
+  "maxPermutations": 120,
+  "synthesis": {
+   "maxNewOutputs": 2,
+   "companionRecreations": true,
+   "successorStates": true,
+   "splits": true,
+   "mints": true,
+   "permuteOutputs": true,
+   "maxOutputPermutations": 24
+  }
+ },
+ "perMutant": [
+  {
+   "id": "M1",
+   "proven": false,
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 28,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 868,
+    "rejections": {
+     "conservation": 0,
+     "invalid": 868,
+     "missingKey": 0,
+     "script": 0
+    },
+    "verdict": "notunderprobes"
+   },
+   "attributable": false,
+   "confounded": false,
+   "attackerModel": "keyed-insider"
+  },
+  {
+   "id": "M2",
+   "proven": false,
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 28,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 2856,
+    "rejections": {
+     "conservation": 0,
+     "invalid": 0,
+     "missingKey": 2856,
+     "script": 0
+    },
+    "verdict": "notunderprobes"
+   },
+   "attributable": false,
+   "confounded": false,
+   "attackerModel": "keyed-insider"
+  },
+  {
+   "id": "M3",
+   "proven": false,
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 28,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 2856,
+    "rejections": {
+     "conservation": 0,
+     "invalid": 0,
+     "missingKey": 2856,
+     "script": 0
+    },
+    "verdict": "notunderprobes"
+   },
+   "attributable": false,
+   "confounded": false,
+   "attackerModel": "keyed-insider"
+  },
+  {
+   "id": "M4",
+   "proven": true,
+   "found": false,
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 28,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 710,
+    "probesRun": 4512,
+    "rejections": {
+     "conservation": 0,
+     "invalid": 0,
+     "missingKey": 3802,
+     "script": 0
+    },
+    "verdict": "drainable"
+   },
+   "attributable": false,
+   "confounded": true,
+   "note": "found only with synthesis on: the drain needs a NEW output (the attacker's payment box at the sale's price position) while the stock returns to the sale box \u2014 out of phase-1's fixed output set. CONFOUNDED: the same drainable verdict fires on the unmutated original (see escalatedFindings), so it is not attributable to the mutation. The hunt's objective has no conditional sanction, so overpayment probes score as drains; the real 1-nanoERG drain IS in family (710 hits), but the verdict alone cannot discriminate.",
+   "rawDrainable": true
+  },
+  {
+   "id": "M5",
+   "proven": true,
+   "found": false,
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 28,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 2216,
+    "rejections": {
+     "conservation": 208,
+     "invalid": 0,
+     "missingKey": 0,
+     "script": 1922
+    },
+    "verdict": "notunderprobes"
+   },
+   "attributable": false,
+   "confounded": false
+  },
+  {
+   "id": "M6",
+   "proven": true,
+   "found": false,
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 28,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 1652,
+    "rejections": {
+     "conservation": 0,
+     "invalid": 0,
+     "missingKey": 0,
+     "script": 1536
+    },
+    "verdict": "notunderprobes"
+   },
+   "attributable": false,
+   "confounded": false
+  },
+  {
+   "id": "M7",
+   "proven": true,
+   "found": false,
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 84,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 29448,
+    "rejections": {
+     "conservation": 0,
+     "invalid": 0,
+     "missingKey": 0,
+     "script": 29392
+    },
+    "verdict": "notunderprobes"
+   },
+   "attributable": false,
+   "confounded": false
+  },
+  {
+   "id": "M8",
+   "proven": true,
+   "found": false,
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 28,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 2216,
+    "rejections": {
+     "conservation": 0,
+     "invalid": 0,
+     "missingKey": 0,
+     "script": 2216
+    },
+    "verdict": "notunderprobes"
+   },
+   "attributable": false,
+   "confounded": false,
+   "note": "flip-index: oracle NFT validated on dataInputs(0), rate read from dataInputs(1). Proven keyless drain (hand-built witness: attacker supplies a second, unvalidated data input with R4=0, so scPrice collapses to 0 and the uncirculated SC reserve leaves for free). MISS is out-of-family: the drain needs a data-input substitution and data inputs are passed through verbatim \u2014 all 2216 probes were legitimate SCRIPT rejections, zero invalid, so the honest template is sound. This is the 3c data-input axis's first measurable target."
+  }
+ ],
+ "missTable": {
+  "out-of-family": [
+   "M5",
+   "M6",
+   "M7 \u2014 missing fixed-output re-pad / re-tree axis; M7 also has a deferred role mismatch (REVIEW-FINDINGS.md), so axis coverage alone does not establish detection."
+  ],
+  "keyed-insider (out of attacker model)": [
+   "M1",
+   "M2",
+   "M3 \u2014 residuals require the beneficiary's/receiver's key; the hunt refuses needsProof on protected inputs by contract. A keyed-insider hunt is a phase-3+ attacker-model extension, not a coverage fix."
+  ],
+  "cap-truncation": [],
+  "role-labelling": [
+   "M7 \u2014 swap is companion in the executable template but protected in the role record; deferred decision, no role changes."
+  ],
+  "arithmetic": [],
+  "invalid fixture (outside proven denominator)": [
+   "M1 \u2014 868 invalid synthesis-on probes on both mutant and control; non-hex synthetic token id. Witness independently classifies as keyed-insider."
+  ]
+ },
+ "negativeControls": [
+  {
+   "id": "M1",
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 28,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 868,
+    "rejections": {
+     "conservation": 0,
+     "invalid": 868,
+     "missingKey": 0,
+     "script": 0
+    },
+    "verdict": "notunderprobes"
+   }
+  },
+  {
+   "id": "M2",
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 28,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 2856,
+    "rejections": {
+     "conservation": 0,
+     "invalid": 0,
+     "missingKey": 2856,
+     "script": 0
+    },
+    "verdict": "notunderprobes"
+   }
+  },
+  {
+   "id": "M3",
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 28,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 2856,
+    "rejections": {
+     "conservation": 0,
+     "invalid": 0,
+     "missingKey": 2856,
+     "script": 0
+    },
+    "verdict": "notunderprobes"
+   }
+  },
+  {
+   "id": "M4",
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 28,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 6,
+    "probesRun": 4512,
+    "rejections": {
+     "conservation": 0,
+     "invalid": 0,
+     "missingKey": 4506,
+     "script": 0
+    },
+    "verdict": "drainable"
+   },
+   "escalated": "see escalatedFindings - the firing is recorded, the fixture untouched"
+  },
+  {
+   "id": "M5",
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 28,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 2216,
+    "rejections": {
+     "conservation": 208,
+     "invalid": 0,
+     "missingKey": 0,
+     "script": 1922
+    },
+    "verdict": "notunderprobes"
+   }
+  },
+  {
+   "id": "M6",
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 28,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 1652,
+    "rejections": {
+     "conservation": 0,
+     "invalid": 0,
+     "missingKey": 0,
+     "script": 1536
+    },
+    "verdict": "notunderprobes"
+   }
+  },
+  {
+   "id": "M7",
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 84,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 29448,
+    "rejections": {
+     "conservation": 0,
+     "invalid": 0,
+     "missingKey": 0,
+     "script": 29404
+    },
+    "verdict": "notunderprobes"
+   }
+  },
+  {
+   "id": "M8",
+   "synthesisOff": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 28,
+    "verdict": "notunderprobes"
+   },
+   "synthesisOn": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 2216,
+    "rejections": {
+     "conservation": 0,
+     "invalid": 0,
+     "missingKey": 0,
+     "script": 2216
+    },
+    "verdict": "notunderprobes"
+   },
+   "note": "unmutated bank rejects the same shape: the control is clean, so an M8 detection would be attributable"
+  }
+ ],
+ "escalatedFindings": [
+  {
+   "raisedBy": "the negative control itself",
+   "original": "token-sale (M4's unmutated original)",
+   "verdict": "drainable (synthesis on, 4512 probes)",
+   "what": "the winning probe has the attacker OVERPAY the seller (20M of the attacker's own nanoERG into the seller's P2PK box) so `paid` passes legitimately and the stock leaves the sale box with it. The seller is fully paid; the attacker loses money. No exploit.",
+   "why": "the leak objective counts protected value that LEFT the protected box, sanctioned only at the free payee's DECLARED amounts, and never subtracts what the attacker SPENT. An overpayment that empties a protected box into a protocol-designated payee scores as a drain.",
+   "disposition": "ESCALATED, not fixed: attacker-cost accounting is the roadmap's parked 'pricing / worth-weighted objectives; economic probes \u2014 separate spec' (phase 2 spec, non-goals). This firing is the concrete evidence for that spec. The fixture is untouched.",
+   "consequence": "M4's `found` is confounded: the mutant IS really exploitable (the 1-nanoERG purchase is a genuine keyless theft and is in family \u2014 the hunt scored 710 hits), but its drainable verdict cannot be distinguished from overpayment noise without a cost-aware objective. Recorded as rawDrainable=true, confounded=true, attributable=false.",
+   "mutant": "M4"
+  }
+ ],
+ "negativeControlsNote": "Every original runs in both configurations, asserted in the harness; a drainable original must be pre-recorded in escalatedFindings (M4) or the run fails. Six original verdicts are notUnderProbes, but M1 has 868 invalid synthesis-on probes and supplies no evaluated-script evidence. M4 remains the escalated, confounded firing.",
+ "harnessValidity": {
+  "knownDetectableControl": {
+   "id": "C-incident",
+   "what": "delete-nft-check applied to examples/incidents/fixed/use-lp-swap.es reconstructs the DEPLOYED vulnerable useLpSwap (both halves of the NFT binding deleted - exactly what the deployed contract lacked). Ground truth: it drained 284,695 ERG on mainnet at height 1,868,204.",
+   "expected": "drainable from the honest shape (synthesis off - phase 1 rediscovers it)",
+   "result": "FOUND",
+   "note": "a pass/fail on the APPARATUS, reported separately - never a corpus mutant, never in the rate's denominator (a found control would move the rate without the hunt changing). Landing this control caught a fixture bug in the control's own template (the swap successor initially lacked the swap NFT, failing swapSucc.tokens == SELF.tokens on every probe) - the control doing its job."
+  }
+ },
+ "detectionRateNote": "attributable detections / proven mutants. A drainable verdict counts only when the mutant's own unmutated control is CLEAN in the same configuration \u2014 a hit that also fires on the original says nothing about the mutation. Derived by the harness, not flagged by hand.",
+ "attributableDetections": 0,
+ "rawDrainableOnProven": 1,
+ "confounded": [
+  "M4"
+ ],
+ "foundNote": "raw drainable verdicts on proven mutants: see rawDrainableOnProven (1, all confounded)",
+ "rejectionAccounting": "Rejections are recorded only for synthesisOn. Invalid takes precedence over conservation, then missingKey, then script. Accepted probes with no measured leak are neither hits nor rejections. Deterministic counts are asserted; wall-clock timings are diagnostic only.",
+ "baselineRepairs": {
+  "M5": {
+   "beforeSynthesisOn": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 3416,
+    "rejections": {
+     "conservation": 976,
+     "invalid": 0,
+     "missingKey": 0,
+     "script": 2440
+    },
+    "verdict": "notunderprobes"
+   },
+   "note": "Same before/after counts for mutant and negative control. Fixed the corpus box_json adapter to emit equivalent raw registers for ScenarioBox and txcheck, and restored the template successor from 0 to 10000000000 nanoERG. Probe count falls by 1200; conservation refusals fall by 768 and script refusals by 518; accepted no-hit probes rise from 0 to 86."
+  },
+  "M7": {
+   "oldReportedScriptRejections": 29448,
+   "beforeSynthesisOnWithInvalidBucket": {
+    "capped": false,
+    "hits": 0,
+    "probesRun": 29448,
+    "rejections": {
+     "conservation": 0,
+     "invalid": 29448,
+     "missingKey": 0,
+     "script": 0
+    },
+    "verdict": "notunderprobes"
+   },
+   "note": "Before the fixture repair, all 29448 probes were invalid on both mutant and control, previously misreported as script rejections. Template input/output references now use $amm-pool. The witness already used $amm-pool in both places. Probe counts, hits, verdicts, and caps are unchanged; corrected rejection counts are recorded in the rows above. Roles and objective are unchanged."
+  }
+ }
+}
