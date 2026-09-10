@@ -1,0 +1,50 @@
+[
+ {
+  "name": "tx-18d03837",
+  "url": "https://api.ergoplatform.com/api/v1/transactions/18d03837d3d169afb5894fc4471aefb27c8808778a69591bc47f0f58a2e70507",
+  "status": 200,
+  "retrievedAt": "2026-09-09T22:15:43+00:00",
+  "rawResponse": "docs/p06-recovery/tx-18d03837.fixture",
+  "sha256": "eecbe73411e4c2c8949cae50bbda1513bd8caa6a8652c2fe485ba14726ac6d4b"
+ },
+ {
+  "name": "tx-94e9396a",
+  "url": "https://api.ergoplatform.com/api/v1/transactions/94e9396a225d627f8609cbf35d93e5533ace01849156d58ec0faae6fdd6b5682",
+  "status": 200,
+  "retrievedAt": "2026-09-09T22:15:43+00:00",
+  "rawResponse": "docs/p06-recovery/tx-94e9396a.fixture",
+  "sha256": "c2165a433b518b9d72d4347987540caba8ae2ade387a5772f70e45dcf5adbb10"
+ },
+ {
+  "name": "block-at-1868090",
+  "url": "https://node.ergo.watch/blocks/at/1868090",
+  "status": 200,
+  "retrievedAt": "2026-09-09T22:15:44+00:00",
+  "rawResponse": "docs/p06-recovery/block-at-1868090.fixture",
+  "sha256": "3437a0a94e80d35fb5f3f6175fe4008934f7e45eee011c99bf6a928a600b6be8"
+ },
+ {
+  "name": "block-at-1868203",
+  "url": "https://node.ergo.watch/blocks/at/1868203",
+  "status": 200,
+  "retrievedAt": "2026-09-09T22:15:45+00:00",
+  "rawResponse": "docs/p06-recovery/block-at-1868203.fixture",
+  "sha256": "148cf94d20f8cb9f47b11145ce8d03fdd4b2f9fbe3cfd923920ff9c83fbf41e6"
+ },
+ {
+  "name": "block-1868090",
+  "url": "https://node.ergo.watch/blocks/bbdab015be2b67476ac32c4df74d9e9308b28773cddcc4fa89900c650c5eccd3",
+  "status": 200,
+  "retrievedAt": "2026-09-09T22:15:47+00:00",
+  "rawResponse": "docs/p06-recovery/block-1868090.fixture",
+  "sha256": "0283a40bceb04fa59b6cb3d2367c0fe2d2dcb0437b84a7fb353bce41b6f72330"
+ },
+ {
+  "name": "block-1868203",
+  "url": "https://node.ergo.watch/blocks/71b29999204aee33af5dda49eb8dde4ac7a7ccd035b9199f6dab77552d3ca3e3",
+  "status": 200,
+  "retrievedAt": "2026-09-09T22:15:49+00:00",
+  "rawResponse": "docs/p06-recovery/block-1868203.fixture",
+  "sha256": "3cfd0ff97ef7a1aeabaad73b90970b32be9e8654b003540ad8de80a70e4f8e84"
+ }
+]

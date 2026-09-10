@@ -1,0 +1,200 @@
+{
+  "formatVersion": 1,
+  "sourceCommit": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
+  "harnessVersion": "roadmap-policy:v1",
+  "baselineArtifactSha256": {
+    "docs/ingestion-lithos-results.json": "1c43bc46d910b11d4e970ce714657175515a0cf61e1ec420b4c58a3d4e7bc69e",
+    "examples/mutants/answer-key.json": "23b8f4ce460b513acd667f0ce117b5322c7963e49342fe092633a8319bb6932e",
+    "examples/mutants/answer-key.custody-v1.json": "4d038f5ab7722e954c44c426719237c9df2098e689f54eb4c679f3348b485259",
+    "ergo-sandbox/tests/fixtures/decompile_corpus_expectations.json": "5d2bfc24d758dac520e24968793fe95a87c1cc673d54fe577d4a93b89768aa69"
+  },
+  "ingest": {
+    "compiled": 26,
+    "rows": 28,
+    "baselineCompiled": 3,
+    "sourceHashes": 28,
+    "corpusRevision": "e7a9994b9560e0c6d057e7cc0a59c0cb796e4d44",
+    "compilerRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+    "members": [
+      {
+        "path": "collateral/Collateral_Enforcer.ergo",
+        "sha256": "59daf591e4ea68d618007573684ec1872e0fefa5df736c5583eb902ddf7f2789"
+      },
+      {
+        "path": "collateral/Collateral_Mainnet.ergo",
+        "sha256": "ce7cefe7324bfb09d3fa3b56d56398f5e00a67c04d7cfa7db2919bb1de04e2cb"
+      },
+      {
+        "path": "collateral/Collateral_Testnet.ergo",
+        "sha256": "14e018295c1cdc4b96b33722e2c6cfcbd428d917d92c2744339a6aa0fca414bf"
+      },
+      {
+        "path": "collateral/Emission_Config.ergo",
+        "sha256": "e9202fda6e51ae32ca0ee927b01620f19b749ba6e3b0527f2fb76503d3fa2fab"
+      },
+      {
+        "path": "collateral/Emission_Gate.ergo",
+        "sha256": "3c7ba2ad13c9d8a1eef1d901ae1d7b43f7e3d585343a0266b720d75b3975c5a8"
+      },
+      {
+        "path": "collateral/Emission_Guard.ergo",
+        "sha256": "d557e95b8e9e33518a30725edc1ab08f3fa318958ff4900a22210309addf9368"
+      },
+      {
+        "path": "collateral/LIT_Emissions.ergo",
+        "sha256": "6adbf3983bfccdfd5724cc8df331319bd21415e73a20144c1bb2f446cf0cd90e"
+      },
+      {
+        "path": "dictionaries/MinerData_Guard.ergo",
+        "sha256": "1d274d109b48b8b21beed649c79d63b573aeff910e3a53b418ab9008cc62511a"
+      },
+      {
+        "path": "dictionaries/MinerData_Logic.ergo",
+        "sha256": "8260a6ec0489e8db7aa47c1f4872b3754441938db4b2ee23ce8f70191ceaa840"
+      },
+      {
+        "path": "dictionaries/MinerDictionary.ergo",
+        "sha256": "fda8ff095f97806d57e7c691de2ce72da6b641ede8d7f77b0d9037229f1c0827"
+      },
+      {
+        "path": "fraudproofs/FP_IncorrectN.ergo",
+        "sha256": "b79001844674eb49b32d153f13386903e6f0dc814e64bc7a9911dfd13ee42cec"
+      },
+      {
+        "path": "fraudproofs/FP_InvalidDiff.ergo",
+        "sha256": "5962c9557170b9c6eb260d0b670de1ddc9e1f9603800d815164fd188ec350d86"
+      },
+      {
+        "path": "fraudproofs/FP_InvalidFormat.ergo",
+        "sha256": "3eef699bba6dea3fec35890ce06dc1fc0f7b9787c667e3b0ed67961b4eb6fc4d"
+      },
+      {
+        "path": "fraudproofs/FP_MalformedGE.ergo",
+        "sha256": "f69b5b5e4b9b11667d63750fd426242d6e7515c17642e07a59d915720ea1cfa2"
+      },
+      {
+        "path": "fraudproofs/FP_MalformedGenesis.ergo",
+        "sha256": "3e99b20eecefafe0c3ca91d8a18a298a0f20a6ec1696f1d2afb878c0d97b72bf"
+      },
+      {
+        "path": "fraudproofs/FP_NonMatchingCommitment.ergo",
+        "sha256": "d5587cb0146719ccef88c406ada5cf5c644ff91c4df82265c85fcf0f627ff445"
+      },
+      {
+        "path": "fraudproofs/FP_NonUniqueHeaders.ergo",
+        "sha256": "74d3ebd5a56d7e276c034ed73c503debcd123c11513f406d8477d14328c039c9"
+      },
+      {
+        "path": "fraudproofs/FP_NotInWindow.ergo",
+        "sha256": "b9c901ee38ccd6a3382a747c9e9abec3e428ef77541f95786e287db33329fea8"
+      },
+      {
+        "path": "fraudproofs/FP_TransactionNotIncluded.ergo",
+        "sha256": "60b4356077fe45bc1182abdce3ec1718dc09df8e0838cdc628bbbb384248390b"
+      },
+      {
+        "path": "lithosdex/LD_FeeVault.ergo",
+        "sha256": "04e4aae861f14aa21dd74b5092abd61fc4b0b99a9db7e80c10b693c9e026f94d"
+      },
+      {
+        "path": "lithosdex/LD_LiquidityPool.ergo",
+        "sha256": "448aa4e0d1ed46bab0f12e1e7375fb1077fa44a44eaa7bf663eb5bed7d3274fa"
+      },
+      {
+        "path": "lithosdex/LD_Provision.ergo",
+        "sha256": "553b2006154d020f8e62e9499ac15399898aa94d01f81420dbf8c29ee6207caa"
+      },
+      {
+        "path": "lithosdex/LD_Provision_Guard.ergo",
+        "sha256": "9d12699f0b1fad0ea192e6794690e8893d1ff608b9b4c715770fcbabf52cc3bb"
+      },
+      {
+        "path": "rollups/Evaluation.ergo",
+        "sha256": "c22906a78072f2a7d3418a3b144c0225711389ade95920a34d81dce8b608bc20"
+      },
+      {
+        "path": "rollups/FP_Control_Testnet.ergo",
+        "sha256": "13135371b0fdf49b1bb01bc8f47e4ac6b5540dcbe70e18abc845b3eb1664c777"
+      },
+      {
+        "path": "rollups/Holding_Guard.ergo",
+        "sha256": "f063bfabff0681a9dc150123775e75d3e76f918adfc1760d5e03d1cd07b6f231"
+      },
+      {
+        "path": "rollups/Holding_Logic.ergo",
+        "sha256": "f8cf03ba0926fd83aeb3d679d6055e8ff9ad9dabd5a365d59105c27e19e4fba4"
+      },
+      {
+        "path": "rollups/Payout.ergo",
+        "sha256": "eecd6ac10afe6f5bb5899be8fc916ba7e2f013655c5aa00ad100a3f6973b5d8f"
+      }
+    ]
+  },
+  "preflight": {
+    "cases": 8,
+    "proven": 5,
+    "attributable": 4,
+    "confounded": 0,
+    "rate": 0.8,
+    "objective": "recognized-attacker-receipts-v1",
+    "members": [
+      "M1",
+      "M2",
+      "M3",
+      "M4",
+      "M5",
+      "M6",
+      "M7",
+      "M8"
+    ],
+    "excluded": [
+      "M1",
+      "M2",
+      "M3"
+    ],
+    "invalidProvenSynthesisOn": 0,
+    "excludedInvalidProbes": {
+      "M1": 1976,
+      "M2": 0,
+      "M3": 0
+    },
+    "capped": [
+      "M7"
+    ],
+    "denominatorCaveat": "independently witnessed keyless preflight mutants only; excludes keyed insiders; not population vulnerability coverage"
+  },
+  "decompiler": {
+    "entries": 339,
+    "buckets": {
+      "byte-identical": 238,
+      "initial-compile-failed": 10,
+      "recompiles-but-differs": 91
+    },
+    "obtainedTrees": 329,
+    "exactTrees": 238
+  },
+  "nodeValidatedClaims": {
+    "value": 0,
+    "producer": "P05 claim_replay; no producer at baseline"
+  },
+  "canonicalAcceptedBundles": {
+    "value": 0,
+    "producer": "P03-P05; no canonical-boundary producer at baseline"
+  },
+  "promotedSearchCandidates": {
+    "value": 0,
+    "producer": "P06 drain_promotion; no producer at baseline"
+  },
+  "deployedSourceEquivalence": {
+    "value": null,
+    "producer": "permissioned deployment-byte comparison manifest; not ingestion"
+  },
+  "realAuditActionablePrecision": {
+    "value": null,
+    "producer": "permissioned hashed adjudicated real-audit case set; not P07 curated precision"
+  },
+  "obligationReviewDuplication": {
+    "value": null,
+    "producer": "P07 obligation_reports curated anchors; real-audit case set separately required"
+  }
+}

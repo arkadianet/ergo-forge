@@ -1,0 +1,34 @@
+[
+  {
+    "unitOrProposal": "P05",
+    "reasonCode": "missing-provenance",
+    "attemptCommit": "05dc9eec5e867076b3e1c27bb5831f008c4e632f",
+    "daysSpent": 1,
+    "gateResults": [
+      {
+        "command": [
+          "python3",
+          "docs/p05-stop-evidence/check_provenance.py"
+        ],
+        "exitCode": 1,
+        "evidenceHashes": {
+          "docs/p05-stop-evidence/check_provenance.py": "c18ff299c86b988687f88cb3e6a51c1c09865724106b4e346fd552873dffb9f0",
+          "docs/p05-stop-evidence/provenance.log": "1e9398a3e31c9631e189cabe42562d4ed5dfaf5bcf236a45b1fb6ecb360cb6ce",
+          "docs/p05-stop-evidence/public-block.fixture": "d2e02773edea726e569e2ac9f3acb90d975d24b2cc82d604757a31a01884190f",
+          "docs/p05-stop-evidence/public-transaction.fixture": "388678856086920d98d7679c74da198a66be207abe4201526c46b82665102da8",
+          "docs/p05-stop-evidence/rejected-use-candidate.fixture": "48ba19765637ff7bb00728082a5e54d8ed14b5a9ad115398c3c370efa56ad135",
+          "docs/p05-stop-evidence/sources.json": "38cdfa7b7eec26bb909d5384f59697528b54aa1fe030a438720496612921893a"
+        }
+      }
+    ],
+    "retainedCapability": "P00\u2013P04 unchanged: scenario preflight/reproduction, canonical case and box codecs, supplied-premise node validation, supported proof production. Existing USE preflight replay remains. No P05 claim authority or replay command retained. Attempt source and preliminary green logs are archived locally under target-p00/p05-attempt, not shipped product evidence. daysSpent records one working day touched, not exhaustion of the four-day ceiling.",
+    "unsupportedClass": "P05 public-incident property claim for USE with full backed validation context. Exact archived inputs and proof are available, but the prototype borrowed hypothetical block context, parameters, rules, empty headers and zero prior cost. Public block/transaction retrieval backs header fields but does not supply the complete validation snapshot. Preliminary green P05 tests did not enforce this provenance requirement and are withdrawn.",
+    "reopenEvidenceRequired": "A complete pinned publishable USE validation snapshot: canonical input/proof material plus backed block context, active parameters and rules, required header window and prior block cost with derivation/source artifacts. Bind and validate the source values in the P05 harness before counting the public incident. Rerun all unchanged P05 floors and all predecessor gates. Do not substitute a hypothetical context, relabel its provenance, or admit a confidential case.",
+    "resolution": {
+      "reasonCode": "source-recovered",
+      "governingDecision": "docs/P05-DECISION.md",
+      "recoveryEvidence": "docs/p05-recovery/retrievals.json",
+      "scope": "Reopen the original P05 gate; all original thresholds and fresh execution gates remain mandatory. The original stop and its evidence are preserved."
+    }
+  }
+]

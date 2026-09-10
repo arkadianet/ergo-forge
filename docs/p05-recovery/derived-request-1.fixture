@@ -1,0 +1,628 @@
+{
+  "formatVersion": 1,
+  "case": {
+    "formatVersion": 1,
+    "deploymentIdentity": "unknown",
+    "nodeValidated": false,
+    "premises": {
+      "engineRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "targetBytes": {
+        "status": "missing",
+        "reason": "target bytes not supplied"
+      },
+      "source": {
+        "status": "missing",
+        "reason": "source identity not supplied"
+      },
+      "constants": {
+        "status": "missing",
+        "reason": "binding origins not supplied"
+      },
+      "boxes": {
+        "status": "present",
+        "value": [
+          {
+            "document": {
+              "boxId": "93899a961cfb2552e17ff27d764fa5b38b860d2f59c8b89d267c150fe01b2a0b",
+              "bytes": "84e6a8f3010008cd038021c7258886cbd7dc99aa867151aec7f1be2f11912d9d851c1bdb48768c58c1e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c04",
+              "ergoTree": "0008cd038021c7258886cbd7dc99aa867151aec7f1be2f11912d9d851c1bdb48768c58c1"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 0; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "3a6696409778b2a965c924461dd4e57499eb46356bb7a10863c7eaf7697db09d"
+            }
+          },
+          {
+            "document": {
+              "boxId": "ce310f97b07a586508bf91144b9384dba6b267cbc1e6643b837724c6a375fde6",
+              "bytes": "82e8a683020008cd03e622ec61a9b29639809eed94bcfe26098d05d854e0ce694bb9b37cfc43304be6e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c05",
+              "ergoTree": "0008cd03e622ec61a9b29639809eed94bcfe26098d05d854e0ce694bb9b37cfc43304be6"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 1; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "8ef235bdaa5dff4d3d938c0737aa56e9f3bce54f2c30519f6c215a3fd4591695"
+            }
+          },
+          {
+            "document": {
+              "boxId": "88f05732ff13da1f3b31975ac01cc4c5cf694a2f3cccf14f2caa215b4dbf664d",
+              "bytes": "b3af90f601100204a00b08cd02c14ccb6a5118fd4cb4418f4a895415c6657cb0cf1d16f1a9295fd925a22a45ccea02d192a39a8cc7a70173007301e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c0c",
+              "ergoTree": "100204a00b08cd02c14ccb6a5118fd4cb4418f4a895415c6657cb0cf1d16f1a9295fd925a22a45ccea02d192a39a8cc7a70173007301"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 2; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "c7fef7f37c60a6601bb00556086452022db114932c0d75dcef4a80b6ea7657b9"
+            }
+          },
+          {
+            "document": {
+              "boxId": "31a8f48304d68abad76aaccc3b227a8dbfad9ce0c4380b8953bf6ca659d447e8",
+              "bytes": "aacabef0010008cd03f537fb556831254951f0ab6d18ba279219ec0b7396fa61e7eb7ae21f210ef30ce9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c17",
+              "ergoTree": "0008cd03f537fb556831254951f0ab6d18ba279219ec0b7396fa61e7eb7ae21f210ef30c"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 3; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "0906a8767a19af9e1583ea89784231297beb598ea6a2aaa1f105be9f4d608793"
+            }
+          },
+          {
+            "document": {
+              "boxId": "d5df6753ba977ee899b0c99e64fd6d6c1c832134e080294773a6d3210cf27129",
+              "bytes": "c7ba9ef1010008cd03ee48c44675d0d7cae38e965888b459fcc65ac3b1c37de6b9d62a5104ba9df662e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c1e",
+              "ergoTree": "0008cd03ee48c44675d0d7cae38e965888b459fcc65ac3b1c37de6b9d62a5104ba9df662"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 4; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "90e3b56c144f8516a641dbaa05dd6f10d8bb729f9aecafb1172e7dc902307550"
+            }
+          },
+          {
+            "document": {
+              "boxId": "a8e936b630726634b61df3e72bf1b7a9fb15ac21bc29a9b6c0a5a8e1799370d2",
+              "bytes": "bceab0f4010008cd03726e042d0aca119775b62aaf6d1dca2b3f6a5a91b99102677662b81967043916e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c20",
+              "ergoTree": "0008cd03726e042d0aca119775b62aaf6d1dca2b3f6a5a91b99102677662b81967043916"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 5; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "de3b6500ffdf74cc4b864ef811887006212d7bf8f97fc93ff9d71cb23f19716f"
+            }
+          },
+          {
+            "document": {
+              "boxId": "968731752e521348da86b5a66c61dd41fbae92602b94a7d0c81cad4514070c95",
+              "bytes": "eeab829a020008cd02bd2a0a75e3d451b0991f232074743bd9f97ab6f3110820f3eb1a6de9a7d0a0a7e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c22",
+              "ergoTree": "0008cd02bd2a0a75e3d451b0991f232074743bd9f97ab6f3110820f3eb1a6de9a7d0a0a7"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 6; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "a31d25591c24da7cbf800d842e0da3970beb062de504ca3e7dbbf9d111cbc1e7"
+            }
+          },
+          {
+            "document": {
+              "boxId": "b1df5c58a939fd1de4edc73f88bc5dccd961620a56a2db865e57d4042d75249c",
+              "bytes": "91e8bff4010008cd03020b4b4edef556d6bb441edf2f9d2323822e5a96d37dce612c296db9865a95f0e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c2b",
+              "ergoTree": "0008cd03020b4b4edef556d6bb441edf2f9d2323822e5a96d37dce612c296db9865a95f0"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 7; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "d050ea32b45df5d099fca6f2dbed4554c3c4ea1f89cba45a7b0f70fd0790c1b6"
+            }
+          },
+          {
+            "document": {
+              "boxId": "9f08fe8afc854c9ebc54715f0ec0bc0007c48d1478484194b5f27ad07637060e",
+              "bytes": "dc95fcf5010008cd02a9aabbd083b8a5e6c9fa195ca0b8c9df3980c091c57166555686dcf29e2a1354e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c38",
+              "ergoTree": "0008cd02a9aabbd083b8a5e6c9fa195ca0b8c9df3980c091c57166555686dcf29e2a1354"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 8; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "9dc15c6ddcdd1aa2350ee931d0e726ff37e09663443433353ea3406e23420538"
+            }
+          },
+          {
+            "document": {
+              "boxId": "11a848cb6765fa65923a8288591629295ddb01c19945f20a01786f2f8060e127",
+              "bytes": "f5cb9fff010008cd03bc7b00daf58698c88b7961b5743e0e772dabb254d3a31b3440512da59b5a9d75e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c3e",
+              "ergoTree": "0008cd03bc7b00daf58698c88b7961b5743e0e772dabb254d3a31b3440512da59b5a9d75"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 9; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "cee0d3014470a047431c8743d6e539fd3290a28a45e076abba2509bcb9f8e542"
+            }
+          },
+          {
+            "document": {
+              "boxId": "86c631f41134f5f6fcbbf9ea9252a87b85aeb60839493d78cb0731687d63c065",
+              "bytes": "ec98e4f8010008cd0235ed2d077a46223b40896057a3b4ece527affa9d3586edf1585518a3b5ac70a7e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c43",
+              "ergoTree": "0008cd0235ed2d077a46223b40896057a3b4ece527affa9d3586edf1585518a3b5ac70a7"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 10; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "f9ce00aea9254f9012624a45a685dda0ff7f4207b119005d3537a14714a5b507"
+            }
+          },
+          {
+            "document": {
+              "boxId": "24bdecc9c686ab43969c530ffcfbd7296906e5d4ebf2cf616d9e240ddb0c8346",
+              "bytes": "aa84fe89020008cd023a064974df6dc3f38eb1d9ecb5ad5e82abf221b07baecb289538c226f1d5369ce9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c47",
+              "ergoTree": "0008cd023a064974df6dc3f38eb1d9ecb5ad5e82abf221b07baecb289538c226f1d5369c"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 11; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "57c8a2ccfdad002170bf395da63f8ca507a7ae5065cf880c360ad824a653d629"
+            }
+          },
+          {
+            "document": {
+              "boxId": "c7f3159a2c516df30ab0ed94d9aa3fdccf9523e0f30b888ff60e7ebb5851800f",
+              "bytes": "b48482fb010008cd0381593a4b30b840dfaaec76d285418983d6099933102743ea44c0057f0cd9ee98e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c4f",
+              "ergoTree": "0008cd0381593a4b30b840dfaaec76d285418983d6099933102743ea44c0057f0cd9ee98"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 12; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "4e696504e5995bb13aec27ea7135af08a67108423fa3c37b4f03dbca6139423a"
+            }
+          },
+          {
+            "document": {
+              "boxId": "c3ebd77116b945aad7f7c16526f7df14424a2079139afe372da6d939614d6447",
+              "bytes": "ffc2bff2010008cd036c211919f132dd2a0244e69680b2c9d1372250974ccee05a90c53793ca3f53eae9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c52",
+              "ergoTree": "0008cd036c211919f132dd2a0244e69680b2c9d1372250974ccee05a90c53793ca3f53ea"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 13; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "b1e1ed189d0f6301c48efc12276542162b3581b0a5045704433dc57c06d17245"
+            }
+          },
+          {
+            "document": {
+              "boxId": "5cda38134a687a8a49d0101bc3188a41cffcc9287a344d8551b17240ee8cdeaa",
+              "bytes": "a6d1d296020008cd0265d385e5c37af1ec387afcff20e27cc042a38893bee694de161909ca7ca96c5be9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c57",
+              "ergoTree": "0008cd0265d385e5c37af1ec387afcff20e27cc042a38893bee694de161909ca7ca96c5b"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 14; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "807ed35d9cdc8f0314bd6580e57282044f400ac1abd9bd0e4a03325cf8f7c82a"
+            }
+          },
+          {
+            "document": {
+              "boxId": "f4e65ec5e5f38c7bf3c27496c75eba65a8bd0a0dc12e9d7b18800b13241804b9",
+              "bytes": "82f9afe6030008cd03aa64b291c8283a07fc6427f61672d02198b989abdd9f794f23acd73680567d2de9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c5c",
+              "ergoTree": "0008cd03aa64b291c8283a07fc6427f61672d02198b989abdd9f794f23acd73680567d2d"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 15; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "eae5f441751bdb06374b252b70abf3118228d4ceba21e7f717b92a56f609059d"
+            }
+          },
+          {
+            "document": {
+              "boxId": "c87f24e3cc026bc03c49f4e91c4ad55b5a8a9afe6df045f39863769ed4c40645",
+              "bytes": "81e2f9d7030008cd03d551dc5057c67989c20827d8b7b89f5ed515918e9f5a5119fe50db9ed94d49e7e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c5d",
+              "ergoTree": "0008cd03d551dc5057c67989c20827d8b7b89f5ed515918e9f5a5119fe50db9ed94d49e7"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 16; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "049f617259bf2c635c7eb770c1ec76c36c3aae007e0c22f11af898dcd1fbfe5b"
+            }
+          },
+          {
+            "document": {
+              "boxId": "13e1f999798bd58b733184933db49c1c7fad86f25ec180f931b8bab80f5716cf",
+              "bytes": "e2a6cdf0010008cd03bd0a98fad3cff4e41cca2600aa93263f51fc42cf3cc76b7c84626d0148297d82e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c60",
+              "ergoTree": "0008cd03bd0a98fad3cff4e41cca2600aa93263f51fc42cf3cc76b7c84626d0148297d82"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 17; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "b941360a11877b6464e6cdfdabd239a5a53214f624f3ac826a0e44ad94788090"
+            }
+          },
+          {
+            "document": {
+              "boxId": "3b20c6733821ce8373c125507418ac5bd9530eac02a06f3daafe0fd4cc12fec0",
+              "bytes": "edd994f8010008cd030b14235e8214ea4e6ff7b049f5feddec7f01a3f99efab80225c2e39f3ddb2cbfe9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c69",
+              "ergoTree": "0008cd030b14235e8214ea4e6ff7b049f5feddec7f01a3f99efab80225c2e39f3ddb2cbf"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 18; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "ba5297f38afdeedb1bf66b948222b8b97dd3f3e084db7d064ff9a7394d602697"
+            }
+          },
+          {
+            "document": {
+              "boxId": "dd750240634295babf3ec797438ffa90710feda7bcf44e276ccfef8fcb306af3",
+              "bytes": "b2c8b4c8030008cd027f347e7dbbb3779a0fe13f37a928ae0bdcfd8f2f794df2bbb107f28f943dc139e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c6c",
+              "ergoTree": "0008cd027f347e7dbbb3779a0fe13f37a928ae0bdcfd8f2f794df2bbb107f28f943dc139"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 19; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "a554db4111be8ed0cccd4b800daa63c90810b2b377ffb802f478e9f69a830f2f"
+            }
+          },
+          {
+            "document": {
+              "boxId": "44561fdd48b48fbfd210b59a588446e96c99859737acc7b5777ceb839c417b41",
+              "bytes": "aba0f7f6010008cd02c4ca1742f555222e8a2db43e9203c185b99da553376a1ead81998e008399a941e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c70",
+              "ergoTree": "0008cd02c4ca1742f555222e8a2db43e9203c185b99da553376a1ead81998e008399a941"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 20; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "c76b3347776f73c38d3ede87a0756a30243f9e4d0217e2489af9be92d9bef4a4"
+            }
+          },
+          {
+            "document": {
+              "boxId": "1528b4780249f71912a4a5a3687aa2ae02e35e8ef2595f10b94361b2afdf33a3",
+              "bytes": "8ce9989a020008cd03fe1f69d69ac88f8d93be63cd56225bcec31d2e2cee51530ef3d86f53c3a7a4bde9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c75",
+              "ergoTree": "0008cd03fe1f69d69ac88f8d93be63cd56225bcec31d2e2cee51530ef3d86f53c3a7a4bd"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 21; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "4d1c276e774ae82543c02ae75cd6152b6913b8b544ed0f35563bd047d5347b7b"
+            }
+          },
+          {
+            "document": {
+              "boxId": "7070b6595d4f3d3fedaafcfc6e66a7224754c7f5f2e1e79fd0fdf796390e9e7c",
+              "bytes": "be8d8490020008cd024e766364179192ce8aa0fa4453a62fa4ad866855221a30d0d5d15c64c71cb59de9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c7f",
+              "ergoTree": "0008cd024e766364179192ce8aa0fa4453a62fa4ad866855221a30d0d5d15c64c71cb59d"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 22; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "6c1aa5db74d55800b04de99dfa2390581ee0d0eacdde93e440ebc7dfd627c20c"
+            }
+          },
+          {
+            "document": {
+              "boxId": "ff2eb536b8236b1fbeff6137a971d34bcabd64b02b6bdfdd588ed411d2cdac7b",
+              "bytes": "c3aada95020008cd028cd571dc7830a2585b53cf8bf36e311dec4100adde361800269e2df50184c220e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c8501",
+              "ergoTree": "0008cd028cd571dc7830a2585b53cf8bf36e311dec4100adde361800269e2df50184c220"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 23; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "ea31bee19f96e95585c8dce0a38c2c8c6d82022251b52450e70ecd70b291b485"
+            }
+          },
+          {
+            "document": {
+              "boxId": "483731ed54b11d26c8c2cb5cf71fe52f6e37013f208fbd9dd23db4617e309e64",
+              "bytes": "98d4f3cd020008cd02051f414e91c4e8c47109f1af8f2b814002a70d1845ccbd0d0d60b953ce77fa16e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c8601",
+              "ergoTree": "0008cd02051f414e91c4e8c47109f1af8f2b814002a70d1845ccbd0d0d60b953ce77fa16"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 24; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "502d531f02cda6b17ea68c580cbe65644fec9b97bc95413513e07f6c5b442ca6"
+            }
+          },
+          {
+            "document": {
+              "boxId": "12f26ea1bc3ec75a8a011bbbf82e893eebb1f81bf7d891757eb9ab50c0fcf75d",
+              "bytes": "a1f3d5c1070008cd027587a913bd26ab78f2bf9f3f9bd21b1f00f6fada6cd08536085f9f91ac54521fe9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7c9101",
+              "ergoTree": "0008cd027587a913bd26ab78f2bf9f3f9bd21b1f00f6fada6cd08536085f9f91ac54521f"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 25; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "1ee539c9677cba678e2078fc60a1e750ff45ef60f9d9b6b995386dd23d6270eb"
+            }
+          },
+          {
+            "document": {
+              "boxId": "9850084bc7bbe9d6cf6056b239594f36a85024e82b486d725d86b8ec28bddcc8",
+              "bytes": "81e0c287020008cd03cd1af40b8be51a479b37dbb4111b43f8261683679205b949ae2d3dac03041062e9ee310000a0af03439b9887a7713130c6d24448df2d9b4711c61ff6093bba86a6ed91be7cb001",
+              "ergoTree": "0008cd03cd1af40b8be51a479b37dbb4111b43f8261683679205b949ae2d3dac03041062"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 26; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "d65a6c90360d5014b03e2247b75c2f85f018aeec629c0d15d687eaabb0432339"
+            }
+          },
+          {
+            "document": {
+              "boxId": "0bd441ad23dfc5cd8e69850c8bbf4ec45da40b10647ecc7d2f3f7389cfd79e90",
+              "bytes": "80ade204102f040605000e2012bbef36eaa5e61b64d519196a1e8ebea360f18aba9b02d2a21b16f26208960f040004000e20b682ad9e8c56c5a0ba7fe2d3d9b2fbd40af989e8870628f4a03ae1022d36f09104040400010004000400010004020400058084af5f040205c0843d04040580897a01000408040205809bee020580897a0580897a040a05809bee02040c0580897a0100040004000e20245957934c20285ada547aa8f2c8e6f7637be86a1985b3e4c36e4e1ad8ce97ab04000402010005c0843d05e0a7120580897a05c09a0c040204040100040004000e20b311425409ff2e8f5901d230788c6628b5846be0b9c66621e4880b086dd5eaef0100d80ad60193b1a57300d60286028300027301d6037302d60495ef7201ed938cb2db6308b2a47303007304017202017305938cb2db6308b2a473060073070172020172037308d605c2a7d606c1a7d607b2a4730900d60895efec72017204938cb2db63087207730a017202017203730bd609b1a4d60a997209730cd1ececec957201d803d60bb2a5730d00d60cc2a7d60dc1a79683050193c2720b720c91c1720b720d90720d730e93c1b2a5730f009c73107eb1b5a4d9010e6393c2720e720c0593c1b2a573110073127313957204d801d60bb2a57314009683050193c5b2a499b1a4731500c5a793c2720b720592c1720b999999720673167317731893c1b2a5731900731a93c1b2a5731b00731c731d957208d805d60bb2a5720a00d60cb1b5a4d9010c63d801d60edb6308720c9591b1720e731eed938cb2720e731f0001732093b2e4c6720c0411732100b2e4c6720704117322007323d60d7e720c05d60e9a73249c7325720dd60f9a73269c7327720d9683060193c5b2a4720a00c5a793c2720b720592c1720b99997206720e720f93c1b2a5720900720e93c1b2a59a7209732800720f9372099a720c7329732a95efecec720172047208938cb2db6308b2a5732b00732c01720201732d732ee9ee3100008f55ae3ee0050d9a179141de31030cf885e9ae26fb66910646682e22b214c61503",
+              "ergoTree": "102f040605000e2012bbef36eaa5e61b64d519196a1e8ebea360f18aba9b02d2a21b16f26208960f040004000e20b682ad9e8c56c5a0ba7fe2d3d9b2fbd40af989e8870628f4a03ae1022d36f09104040400010004000400010004020400058084af5f040205c0843d04040580897a01000408040205809bee020580897a0580897a040a05809bee02040c0580897a0100040004000e20245957934c20285ada547aa8f2c8e6f7637be86a1985b3e4c36e4e1ad8ce97ab04000402010005c0843d05e0a7120580897a05c09a0c040204040100040004000e20b311425409ff2e8f5901d230788c6628b5846be0b9c66621e4880b086dd5eaef0100d80ad60193b1a57300d60286028300027301d6037302d60495ef7201ed938cb2db6308b2a47303007304017202017305938cb2db6308b2a473060073070172020172037308d605c2a7d606c1a7d607b2a4730900d60895efec72017204938cb2db63087207730a017202017203730bd609b1a4d60a997209730cd1ececec957201d803d60bb2a5730d00d60cc2a7d60dc1a79683050193c2720b720c91c1720b720d90720d730e93c1b2a5730f009c73107eb1b5a4d9010e6393c2720e720c0593c1b2a573110073127313957204d801d60bb2a57314009683050193c5b2a499b1a4731500c5a793c2720b720592c1720b999999720673167317731893c1b2a5731900731a93c1b2a5731b00731c731d957208d805d60bb2a5720a00d60cb1b5a4d9010c63d801d60edb6308720c9591b1720e731eed938cb2720e731f0001732093b2e4c6720c0411732100b2e4c6720704117322007323d60d7e720c05d60e9a73249c7325720dd60f9a73269c7327720d9683060193c5b2a4720a00c5a793c2720b720592c1720b99997206720e720f93c1b2a5720900720e93c1b2a59a7209732800720f9372099a720c7329732a95efecec720172047208938cb2db6308b2a5732b00732c01720201732d732e"
+            },
+            "origin": "source-recorded",
+            "record": {
+              "locator": "recorded explorer transaction \"ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1\" input 27; docs/p05-recovery/retrievals.json",
+              "revision": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+              "sha256": "89a1d5409f789e4fd6ed3a95b409b596e93c3c17f21f20eac6787cfa2bcc0788"
+            }
+          }
+        ],
+        "origin": "caller-supplied"
+      },
+      "context": {
+        "status": "missing",
+        "reason": "execution context not supplied"
+      },
+      "assumptions": {
+        "contextDerivation": {
+          "status": "present",
+          "value": {
+            "epochHeader": "393111467f6875e5561f0cdd1c6ba6ea910785654db2323553a378a8c0b9b4ff",
+            "headerWindow": "preceding ten linked, node-serialized headers; newest first",
+            "incidentHeader": "83a985afb17f0352206916e168609f7fc9f1da83daffc659db9cff2e2bb954c1",
+            "membership": "source-recorded, not authenticated historical UTXO inclusion",
+            "network": "explicit mainnet chain-spec at pinned revision",
+            "priorCostDerivation": "fresh pinned-node validation of every preceding transaction in order",
+            "priorTransactions": 1,
+            "retrievalManifest": [
+              {
+                "bytes": 72,
+                "file": "epoch-ids.fixture",
+                "finalUrl": "https://node.ergo.watch/blocks/at/1867776",
+                "name": "epoch-ids",
+                "retrievedAt": "2026-09-09T21:23:13.716179+00:00",
+                "sha256": "36fa8090b880279d5206fe04f4d1195289a7363e10a9337ef8f47cca95f8eb63",
+                "status": 200,
+                "url": "https://node.ergo.watch/blocks/at/1867776"
+              },
+              {
+                "bytes": 12192,
+                "file": "headers.fixture",
+                "finalUrl": "https://node.ergo.watch/blocks/chainSlice?fromHeight=1868194&toHeight=1868204",
+                "name": "headers",
+                "retrievedAt": "2026-09-09T21:23:13.716435+00:00",
+                "sha256": "f7b372a8f1152e190e83dd6aab6c5aca06e276ac89f1980acf984b5ed9318464",
+                "status": 200,
+                "url": "https://node.ergo.watch/blocks/chainSlice?fromHeight=1868194&toHeight=1868204"
+              },
+              {
+                "bytes": 383683,
+                "file": "node-block.fixture",
+                "finalUrl": "https://node.ergo.watch/blocks/83a985afb17f0352206916e168609f7fc9f1da83daffc659db9cff2e2bb954c1",
+                "name": "node-block",
+                "retrievedAt": "2026-09-09T21:23:13.716684+00:00",
+                "sha256": "5b144ecc8b1b75740a5cd1f54bb437be9dcee0461b3470a585383c16c5b0bf02",
+                "status": 200,
+                "url": "https://node.ergo.watch/blocks/83a985afb17f0352206916e168609f7fc9f1da83daffc659db9cff2e2bb954c1"
+              },
+              {
+                "bytes": 1474,
+                "file": "node-info.fixture",
+                "finalUrl": "https://node.ergo.watch/info",
+                "name": "node-info",
+                "retrievedAt": "2026-09-09T21:23:13.716950+00:00",
+                "sha256": "eee404a1e81e62fc74391533cf92f73a954af92ec4286d84bd860515f0002f86",
+                "status": 200,
+                "url": "https://node.ergo.watch/info"
+              },
+              {
+                "bytes": 18687,
+                "file": "epoch-block.fixture",
+                "finalUrl": "https://node.ergo.watch/blocks/393111467f6875e5561f0cdd1c6ba6ea910785654db2323553a378a8c0b9b4ff",
+                "name": "epoch-block",
+                "retrievedAt": "2026-09-09T21:24:31.700334+00:00",
+                "sha256": "e8133fd4678a72c9b811f7d90f36d479a95be9ab9c3f333b3edf9bfe6479d27a",
+                "status": 200,
+                "url": "https://node.ergo.watch/blocks/393111467f6875e5561f0cdd1c6ba6ea910785654db2323553a378a8c0b9b4ff"
+              },
+              {
+                "bytes": 12192,
+                "file": "previous-headers.fixture",
+                "finalUrl": "https://node.ergo.watch/blocks/chainSlice?fromHeight=1868193&toHeight=1868203",
+                "name": "previous-headers",
+                "retrievedAt": "2026-09-09T21:24:31.700591+00:00",
+                "sha256": "dcd763f54688cc8d56de7ac97f4679d65e27ef945da81481a1ae1f14a9c73b6e",
+                "status": 200,
+                "url": "https://node.ergo.watch/blocks/chainSlice?fromHeight=1868193&toHeight=1868203"
+              },
+              {
+                "bytes": 522953,
+                "file": "epoch-chain.fixture",
+                "finalUrl": "https://node.ergo.watch/blocks/chainSlice?fromHeight=1867775&toHeight=1868204",
+                "name": "epoch-chain",
+                "retrievedAt": "2026-09-09T21:24:31.700796+00:00",
+                "sha256": "4fed5acca0fe1013542d4d28e5d3c0620ac02ed9f556bf0aecece3f0c14a7b39",
+                "status": 200,
+                "url": "https://node.ergo.watch/blocks/chainSlice?fromHeight=1867775&toHeight=1868204"
+              },
+              {
+                "bytes": 8613,
+                "file": "prior-0.fixture",
+                "finalUrl": "https://api.ergoplatform.com/api/v1/transactions/10ff5c82991eb44853b7aaf6da95372d9c006e8a18c18809ca9a9a5405356b68",
+                "name": "prior-0",
+                "retrievedAt": "2026-09-09T21:24:31.700990+00:00",
+                "sha256": "fa0c9553ec93b09dcb48ab63e7706060c24f98172cf5d0adb31bb6b06132a812",
+                "status": 200,
+                "url": "https://api.ergoplatform.com/api/v1/transactions/10ff5c82991eb44853b7aaf6da95372d9c006e8a18c18809ca9a9a5405356b68"
+              },
+              {
+                "bytes": 53633,
+                "file": "prior-1.fixture",
+                "finalUrl": "https://api.ergoplatform.com/api/v1/transactions/ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1",
+                "name": "prior-1",
+                "retrievedAt": "2026-09-09T21:24:32.730065+00:00",
+                "sha256": "a88a9e9ebbd3171fd936bfbe06937bce1dbf206e7da90f3bd6e70c49ebd108b5",
+                "status": 200,
+                "url": "https://api.ergoplatform.com/api/v1/transactions/ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1"
+              },
+              {
+                "bytes": 11963,
+                "file": "prior-2.fixture",
+                "finalUrl": "https://api.ergoplatform.com/api/v1/transactions/2b5a56dc2714ebcd1eceaef086edfcc12d4d63eb30ca8a42257ad7df04b57b60",
+                "name": "prior-2",
+                "retrievedAt": "2026-09-09T21:24:33.072324+00:00",
+                "sha256": "1b3b4e9d234f61470ffc8e5efe564ecebcaa4d95bad6b5db479cc306e3f3272f",
+                "status": 200,
+                "url": "https://api.ergoplatform.com/api/v1/transactions/2b5a56dc2714ebcd1eceaef086edfcc12d4d63eb30ca8a42257ad7df04b57b60"
+              },
+              {
+                "bytes": 3012,
+                "file": "prior-3.fixture",
+                "finalUrl": "https://api.ergoplatform.com/api/v1/transactions/6a4d184c397f1b4159d1ca0065d987e41efc23a563c5f0800003dcc50eedb641",
+                "name": "prior-3",
+                "retrievedAt": "2026-09-09T21:24:33.099480+00:00",
+                "sha256": "597ebbcfd76491ba333e2346029489e49d0c29a533448fc3b1063a1eba24761a",
+                "status": 200,
+                "url": "https://api.ergoplatform.com/api/v1/transactions/6a4d184c397f1b4159d1ca0065d987e41efc23a563c5f0800003dcc50eedb641"
+              },
+              {
+                "bytes": 41453,
+                "file": "prior-4.fixture",
+                "finalUrl": "https://api.ergoplatform.com/api/v1/transactions/30c1cacc7f4e30f1b52f1f1da35ae93750bf9187461eb374ecf9d9f9ade3d719",
+                "name": "prior-4",
+                "retrievedAt": "2026-09-09T21:24:33.503510+00:00",
+                "sha256": "3c30e9e7ab7231ffcf4a88e38f92654b12703fdf32cfd3c475ad91128f48000d",
+                "status": 200,
+                "url": "https://api.ergoplatform.com/api/v1/transactions/30c1cacc7f4e30f1b52f1f1da35ae93750bf9187461eb374ecf9d9f9ade3d719"
+              }
+            ],
+            "sourceDirectory": "docs/p05-recovery"
+          },
+          "origin": "source-recorded"
+        },
+        "wireTransaction": {
+          "status": "present",
+          "value": {
+            "bytes": "1c93899a961cfb2552e17ff27d764fa5b38b860d2f59c8b89d267c150fe01b2a0b00017f0300ce310f97b07a586508bf91144b9384dba6b267cbc1e6643b837724c6a375fde600017f030288f05732ff13da1f3b31975ac01cc4c5cf694a2f3cccf14f2caa215b4dbf664d00017f030431a8f48304d68abad76aaccc3b227a8dbfad9ce0c4380b8953bf6ca659d447e800017f0306d5df6753ba977ee899b0c99e64fd6d6c1c832134e080294773a6d3210cf2712900017f0308a8e936b630726634b61df3e72bf1b7a9fb15ac21bc29a9b6c0a5a8e1799370d200017f030a968731752e521348da86b5a66c61dd41fbae92602b94a7d0c81cad4514070c9500017f030cb1df5c58a939fd1de4edc73f88bc5dccd961620a56a2db865e57d4042d75249c00017f030e9f08fe8afc854c9ebc54715f0ec0bc0007c48d1478484194b5f27ad07637060e00017f031011a848cb6765fa65923a8288591629295ddb01c19945f20a01786f2f8060e12700017f031286c631f41134f5f6fcbbf9ea9252a87b85aeb60839493d78cb0731687d63c06500017f031424bdecc9c686ab43969c530ffcfbd7296906e5d4ebf2cf616d9e240ddb0c834600017f0316c7f3159a2c516df30ab0ed94d9aa3fdccf9523e0f30b888ff60e7ebb5851800f00017f0318c3ebd77116b945aad7f7c16526f7df14424a2079139afe372da6d939614d644700017f031a5cda38134a687a8a49d0101bc3188a41cffcc9287a344d8551b17240ee8cdeaa00017f031cf4e65ec5e5f38c7bf3c27496c75eba65a8bd0a0dc12e9d7b18800b13241804b900017f031ec87f24e3cc026bc03c49f4e91c4ad55b5a8a9afe6df045f39863769ed4c4064500017f032013e1f999798bd58b733184933db49c1c7fad86f25ec180f931b8bab80f5716cf00017f03223b20c6733821ce8373c125507418ac5bd9530eac02a06f3daafe0fd4cc12fec000017f0324dd750240634295babf3ec797438ffa90710feda7bcf44e276ccfef8fcb306af300017f032644561fdd48b48fbfd210b59a588446e96c99859737acc7b5777ceb839c417b4100017f03281528b4780249f71912a4a5a3687aa2ae02e35e8ef2595f10b94361b2afdf33a300017f032a7070b6595d4f3d3fedaafcfc6e66a7224754c7f5f2e1e79fd0fdf796390e9e7c00017f032cff2eb536b8236b1fbeff6137a971d34bcabd64b02b6bdfdd588ed411d2cdac7b00017f032e483731ed54b11d26c8c2cb5cf71fe52f6e37013f208fbd9dd23db4617e309e6400017f033012f26ea1bc3ec75a8a011bbbf82e893eebb1f81bf7d891757eb9ab50c0fcf75d00017f03329850084bc7bbe9d6cf6056b239594f36a85024e82b486d725d86b8ec28bddcc800017f03340bd441ad23dfc5cd8e69850c8bbf4ec45da40b10647ecc7d2f3f7389cfd79e9000017f030000001fd4c99dc4010008cd038021c7258886cbd7dc99aa867151aec7f1be2f11912d9d851c1bdb48768c58c1ac83720000d2cb9bd4010008cd03e622ec61a9b29639809eed94bcfe26098d05d854e0ce694bb9b37cfc43304be6ac83720000e3eda7bc01100204a00b08cd02c14ccb6a5118fd4cb4418f4a895415c6657cb0cf1d16f1a9295fd925a22a45ccea02d192a39a8cc7a70173007301ac83720000faadb3c1010008cd03f537fb556831254951f0ab6d18ba279219ec0b7396fa61e7eb7ae21f210ef30cac83720000979e93c2010008cd03ee48c44675d0d7cae38e965888b459fcc65ac3b1c37de6b9d62a5104ba9df662ac837200008ccea5c5010008cd03726e042d0aca119775b62aaf6d1dca2b3f6a5a91b99102677662b81967043916ac83720000be8ff7ea010008cd02bd2a0a75e3d451b0991f232074743bd9f97ab6f3110820f3eb1a6de9a7d0a0a7ac83720000e1cbb4c5010008cd03020b4b4edef556d6bb441edf2f9d2323822e5a96d37dce612c296db9865a95f0ac83720000acf9f0c6010008cd02a9aabbd083b8a5e6c9fa195ca0b8c9df3980c091c57166555686dcf29e2a1354ac83720000c5af94d0010008cd03bc7b00daf58698c88b7961b5743e0e772dabb254d3a31b3440512da59b5a9d75ac83720000bcfcd8c9010008cd0235ed2d077a46223b40896057a3b4ece527affa9d3586edf1585518a3b5ac70a7ac83720000fae7f2da010008cd023a064974df6dc3f38eb1d9ecb5ad5e82abf221b07baecb289538c226f1d5369cac8372000084e8f6cb010008cd0381593a4b30b840dfaaec76d285418983d6099933102743ea44c0057f0cd9ee98ac83720000cfa6b4c3010008cd036c211919f132dd2a0244e69680b2c9d1372250974ccee05a90c53793ca3f53eaac83720000f6b4c7e7010008cd0265d385e5c37af1ec387afcff20e27cc042a38893bee694de161909ca7ca96c5bac83720000d2dca4b7030008cd03aa64b291c8283a07fc6427f61672d02198b989abdd9f794f23acd73680567d2dac83720000d1c5eea8030008cd03d551dc5057c67989c20827d8b7b89f5ed515918e9f5a5119fe50db9ed94d49e7ac83720000b28ac2c1010008cd03bd0a98fad3cff4e41cca2600aa93263f51fc42cf3cc76b7c84626d0148297d82ac83720000bdbd89c9010008cd030b14235e8214ea4e6ff7b049f5feddec7f01a3f99efab80225c2e39f3ddb2cbfac8372000082aca999030008cd027f347e7dbbb3779a0fe13f37a928ae0bdcfd8f2f794df2bbb107f28f943dc139ac83720000fb83ecc7010008cd02c4ca1742f555222e8a2db43e9203c185b99da553376a1ead81998e008399a941ac83720000dccc8deb010008cd03fe1f69d69ac88f8d93be63cd56225bcec31d2e2cee51530ef3d86f53c3a7a4bdac837200008ef1f8e0010008cd024e766364179192ce8aa0fa4453a62fa4ad866855221a30d0d5d15c64c71cb59dac83720000c3e882e6010008cd028cd571dc7830a2585b53cf8bf36e311dec4100adde361800269e2df50184c220ac8372000098929c9e020008cd02051f414e91c4e8c47109f1af8f2b814002a70d1845ccbd0d0d60b953ce77fa16ac83720000a1b1fe91070008cd027587a913bd26ab78f2bf9f3f9bd21b1f00f6fada6cd08536085f9f91ac54521fac83720000819eebd7010008cd03cd1af40b8be51a479b37dbb4111b43f8261683679205b949ae2d3dac03041062ac83720000a6b2a8da010008cd021ab040c5eb36208049647912a375dc314dc3e2e188b444b2c4a8eb459aa7997dac83720000a6b2a8da010008cd02780cf1a6875c1e9d3b608d21f0e555c618f05d863c1817f2877f05468ec5c38fac83720000ede4f351100208cd021ab040c5eb36208049647912a375dc314dc3e2e188b444b2c4a8eb459aa7997d0402eb027300d1ed93b1a5730193a38cc7a701ac83720000b79ddb82061005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a57304ac83720000",
+            "bytesToSign": "1c93899a961cfb2552e17ff27d764fa5b38b860d2f59c8b89d267c150fe01b2a0b00017f0300ce310f97b07a586508bf91144b9384dba6b267cbc1e6643b837724c6a375fde600017f030288f05732ff13da1f3b31975ac01cc4c5cf694a2f3cccf14f2caa215b4dbf664d00017f030431a8f48304d68abad76aaccc3b227a8dbfad9ce0c4380b8953bf6ca659d447e800017f0306d5df6753ba977ee899b0c99e64fd6d6c1c832134e080294773a6d3210cf2712900017f0308a8e936b630726634b61df3e72bf1b7a9fb15ac21bc29a9b6c0a5a8e1799370d200017f030a968731752e521348da86b5a66c61dd41fbae92602b94a7d0c81cad4514070c9500017f030cb1df5c58a939fd1de4edc73f88bc5dccd961620a56a2db865e57d4042d75249c00017f030e9f08fe8afc854c9ebc54715f0ec0bc0007c48d1478484194b5f27ad07637060e00017f031011a848cb6765fa65923a8288591629295ddb01c19945f20a01786f2f8060e12700017f031286c631f41134f5f6fcbbf9ea9252a87b85aeb60839493d78cb0731687d63c06500017f031424bdecc9c686ab43969c530ffcfbd7296906e5d4ebf2cf616d9e240ddb0c834600017f0316c7f3159a2c516df30ab0ed94d9aa3fdccf9523e0f30b888ff60e7ebb5851800f00017f0318c3ebd77116b945aad7f7c16526f7df14424a2079139afe372da6d939614d644700017f031a5cda38134a687a8a49d0101bc3188a41cffcc9287a344d8551b17240ee8cdeaa00017f031cf4e65ec5e5f38c7bf3c27496c75eba65a8bd0a0dc12e9d7b18800b13241804b900017f031ec87f24e3cc026bc03c49f4e91c4ad55b5a8a9afe6df045f39863769ed4c4064500017f032013e1f999798bd58b733184933db49c1c7fad86f25ec180f931b8bab80f5716cf00017f03223b20c6733821ce8373c125507418ac5bd9530eac02a06f3daafe0fd4cc12fec000017f0324dd750240634295babf3ec797438ffa90710feda7bcf44e276ccfef8fcb306af300017f032644561fdd48b48fbfd210b59a588446e96c99859737acc7b5777ceb839c417b4100017f03281528b4780249f71912a4a5a3687aa2ae02e35e8ef2595f10b94361b2afdf33a300017f032a7070b6595d4f3d3fedaafcfc6e66a7224754c7f5f2e1e79fd0fdf796390e9e7c00017f032cff2eb536b8236b1fbeff6137a971d34bcabd64b02b6bdfdd588ed411d2cdac7b00017f032e483731ed54b11d26c8c2cb5cf71fe52f6e37013f208fbd9dd23db4617e309e6400017f033012f26ea1bc3ec75a8a011bbbf82e893eebb1f81bf7d891757eb9ab50c0fcf75d00017f03329850084bc7bbe9d6cf6056b239594f36a85024e82b486d725d86b8ec28bddcc800017f03340bd441ad23dfc5cd8e69850c8bbf4ec45da40b10647ecc7d2f3f7389cfd79e9000017f030000001fd4c99dc4010008cd038021c7258886cbd7dc99aa867151aec7f1be2f11912d9d851c1bdb48768c58c1ac83720000d2cb9bd4010008cd03e622ec61a9b29639809eed94bcfe26098d05d854e0ce694bb9b37cfc43304be6ac83720000e3eda7bc01100204a00b08cd02c14ccb6a5118fd4cb4418f4a895415c6657cb0cf1d16f1a9295fd925a22a45ccea02d192a39a8cc7a70173007301ac83720000faadb3c1010008cd03f537fb556831254951f0ab6d18ba279219ec0b7396fa61e7eb7ae21f210ef30cac83720000979e93c2010008cd03ee48c44675d0d7cae38e965888b459fcc65ac3b1c37de6b9d62a5104ba9df662ac837200008ccea5c5010008cd03726e042d0aca119775b62aaf6d1dca2b3f6a5a91b99102677662b81967043916ac83720000be8ff7ea010008cd02bd2a0a75e3d451b0991f232074743bd9f97ab6f3110820f3eb1a6de9a7d0a0a7ac83720000e1cbb4c5010008cd03020b4b4edef556d6bb441edf2f9d2323822e5a96d37dce612c296db9865a95f0ac83720000acf9f0c6010008cd02a9aabbd083b8a5e6c9fa195ca0b8c9df3980c091c57166555686dcf29e2a1354ac83720000c5af94d0010008cd03bc7b00daf58698c88b7961b5743e0e772dabb254d3a31b3440512da59b5a9d75ac83720000bcfcd8c9010008cd0235ed2d077a46223b40896057a3b4ece527affa9d3586edf1585518a3b5ac70a7ac83720000fae7f2da010008cd023a064974df6dc3f38eb1d9ecb5ad5e82abf221b07baecb289538c226f1d5369cac8372000084e8f6cb010008cd0381593a4b30b840dfaaec76d285418983d6099933102743ea44c0057f0cd9ee98ac83720000cfa6b4c3010008cd036c211919f132dd2a0244e69680b2c9d1372250974ccee05a90c53793ca3f53eaac83720000f6b4c7e7010008cd0265d385e5c37af1ec387afcff20e27cc042a38893bee694de161909ca7ca96c5bac83720000d2dca4b7030008cd03aa64b291c8283a07fc6427f61672d02198b989abdd9f794f23acd73680567d2dac83720000d1c5eea8030008cd03d551dc5057c67989c20827d8b7b89f5ed515918e9f5a5119fe50db9ed94d49e7ac83720000b28ac2c1010008cd03bd0a98fad3cff4e41cca2600aa93263f51fc42cf3cc76b7c84626d0148297d82ac83720000bdbd89c9010008cd030b14235e8214ea4e6ff7b049f5feddec7f01a3f99efab80225c2e39f3ddb2cbfac8372000082aca999030008cd027f347e7dbbb3779a0fe13f37a928ae0bdcfd8f2f794df2bbb107f28f943dc139ac83720000fb83ecc7010008cd02c4ca1742f555222e8a2db43e9203c185b99da553376a1ead81998e008399a941ac83720000dccc8deb010008cd03fe1f69d69ac88f8d93be63cd56225bcec31d2e2cee51530ef3d86f53c3a7a4bdac837200008ef1f8e0010008cd024e766364179192ce8aa0fa4453a62fa4ad866855221a30d0d5d15c64c71cb59dac83720000c3e882e6010008cd028cd571dc7830a2585b53cf8bf36e311dec4100adde361800269e2df50184c220ac8372000098929c9e020008cd02051f414e91c4e8c47109f1af8f2b814002a70d1845ccbd0d0d60b953ce77fa16ac83720000a1b1fe91070008cd027587a913bd26ab78f2bf9f3f9bd21b1f00f6fada6cd08536085f9f91ac54521fac83720000819eebd7010008cd03cd1af40b8be51a479b37dbb4111b43f8261683679205b949ae2d3dac03041062ac83720000a6b2a8da010008cd021ab040c5eb36208049647912a375dc314dc3e2e188b444b2c4a8eb459aa7997dac83720000a6b2a8da010008cd02780cf1a6875c1e9d3b608d21f0e555c618f05d863c1817f2877f05468ec5c38fac83720000ede4f351100208cd021ab040c5eb36208049647912a375dc314dc3e2e188b444b2c4a8eb459aa7997d0402eb027300d1ed93b1a5730193a38cc7a701ac83720000b79ddb82061005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a57304ac83720000",
+            "dataInputCount": 0,
+            "formatVersion": 1,
+            "inputCount": 28,
+            "method": "canonical-wire-construction",
+            "nodeValidated": false,
+            "previousStatePremise": {
+              "reason": "state not supplied; no unspent-state assertion",
+              "status": "missing"
+            },
+            "transactionId": "ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1"
+          },
+          "origin": "caller-supplied"
+        }
+      }
+    }
+  },
+  "transactionBytes": "1c93899a961cfb2552e17ff27d764fa5b38b860d2f59c8b89d267c150fe01b2a0b00017f0300ce310f97b07a586508bf91144b9384dba6b267cbc1e6643b837724c6a375fde600017f030288f05732ff13da1f3b31975ac01cc4c5cf694a2f3cccf14f2caa215b4dbf664d00017f030431a8f48304d68abad76aaccc3b227a8dbfad9ce0c4380b8953bf6ca659d447e800017f0306d5df6753ba977ee899b0c99e64fd6d6c1c832134e080294773a6d3210cf2712900017f0308a8e936b630726634b61df3e72bf1b7a9fb15ac21bc29a9b6c0a5a8e1799370d200017f030a968731752e521348da86b5a66c61dd41fbae92602b94a7d0c81cad4514070c9500017f030cb1df5c58a939fd1de4edc73f88bc5dccd961620a56a2db865e57d4042d75249c00017f030e9f08fe8afc854c9ebc54715f0ec0bc0007c48d1478484194b5f27ad07637060e00017f031011a848cb6765fa65923a8288591629295ddb01c19945f20a01786f2f8060e12700017f031286c631f41134f5f6fcbbf9ea9252a87b85aeb60839493d78cb0731687d63c06500017f031424bdecc9c686ab43969c530ffcfbd7296906e5d4ebf2cf616d9e240ddb0c834600017f0316c7f3159a2c516df30ab0ed94d9aa3fdccf9523e0f30b888ff60e7ebb5851800f00017f0318c3ebd77116b945aad7f7c16526f7df14424a2079139afe372da6d939614d644700017f031a5cda38134a687a8a49d0101bc3188a41cffcc9287a344d8551b17240ee8cdeaa00017f031cf4e65ec5e5f38c7bf3c27496c75eba65a8bd0a0dc12e9d7b18800b13241804b900017f031ec87f24e3cc026bc03c49f4e91c4ad55b5a8a9afe6df045f39863769ed4c4064500017f032013e1f999798bd58b733184933db49c1c7fad86f25ec180f931b8bab80f5716cf00017f03223b20c6733821ce8373c125507418ac5bd9530eac02a06f3daafe0fd4cc12fec000017f0324dd750240634295babf3ec797438ffa90710feda7bcf44e276ccfef8fcb306af300017f032644561fdd48b48fbfd210b59a588446e96c99859737acc7b5777ceb839c417b4100017f03281528b4780249f71912a4a5a3687aa2ae02e35e8ef2595f10b94361b2afdf33a300017f032a7070b6595d4f3d3fedaafcfc6e66a7224754c7f5f2e1e79fd0fdf796390e9e7c00017f032cff2eb536b8236b1fbeff6137a971d34bcabd64b02b6bdfdd588ed411d2cdac7b00017f032e483731ed54b11d26c8c2cb5cf71fe52f6e37013f208fbd9dd23db4617e309e6400017f033012f26ea1bc3ec75a8a011bbbf82e893eebb1f81bf7d891757eb9ab50c0fcf75d00017f03329850084bc7bbe9d6cf6056b239594f36a85024e82b486d725d86b8ec28bddcc800017f03340bd441ad23dfc5cd8e69850c8bbf4ec45da40b10647ecc7d2f3f7389cfd79e9000017f030000001fd4c99dc4010008cd038021c7258886cbd7dc99aa867151aec7f1be2f11912d9d851c1bdb48768c58c1ac83720000d2cb9bd4010008cd03e622ec61a9b29639809eed94bcfe26098d05d854e0ce694bb9b37cfc43304be6ac83720000e3eda7bc01100204a00b08cd02c14ccb6a5118fd4cb4418f4a895415c6657cb0cf1d16f1a9295fd925a22a45ccea02d192a39a8cc7a70173007301ac83720000faadb3c1010008cd03f537fb556831254951f0ab6d18ba279219ec0b7396fa61e7eb7ae21f210ef30cac83720000979e93c2010008cd03ee48c44675d0d7cae38e965888b459fcc65ac3b1c37de6b9d62a5104ba9df662ac837200008ccea5c5010008cd03726e042d0aca119775b62aaf6d1dca2b3f6a5a91b99102677662b81967043916ac83720000be8ff7ea010008cd02bd2a0a75e3d451b0991f232074743bd9f97ab6f3110820f3eb1a6de9a7d0a0a7ac83720000e1cbb4c5010008cd03020b4b4edef556d6bb441edf2f9d2323822e5a96d37dce612c296db9865a95f0ac83720000acf9f0c6010008cd02a9aabbd083b8a5e6c9fa195ca0b8c9df3980c091c57166555686dcf29e2a1354ac83720000c5af94d0010008cd03bc7b00daf58698c88b7961b5743e0e772dabb254d3a31b3440512da59b5a9d75ac83720000bcfcd8c9010008cd0235ed2d077a46223b40896057a3b4ece527affa9d3586edf1585518a3b5ac70a7ac83720000fae7f2da010008cd023a064974df6dc3f38eb1d9ecb5ad5e82abf221b07baecb289538c226f1d5369cac8372000084e8f6cb010008cd0381593a4b30b840dfaaec76d285418983d6099933102743ea44c0057f0cd9ee98ac83720000cfa6b4c3010008cd036c211919f132dd2a0244e69680b2c9d1372250974ccee05a90c53793ca3f53eaac83720000f6b4c7e7010008cd0265d385e5c37af1ec387afcff20e27cc042a38893bee694de161909ca7ca96c5bac83720000d2dca4b7030008cd03aa64b291c8283a07fc6427f61672d02198b989abdd9f794f23acd73680567d2dac83720000d1c5eea8030008cd03d551dc5057c67989c20827d8b7b89f5ed515918e9f5a5119fe50db9ed94d49e7ac83720000b28ac2c1010008cd03bd0a98fad3cff4e41cca2600aa93263f51fc42cf3cc76b7c84626d0148297d82ac83720000bdbd89c9010008cd030b14235e8214ea4e6ff7b049f5feddec7f01a3f99efab80225c2e39f3ddb2cbfac8372000082aca999030008cd027f347e7dbbb3779a0fe13f37a928ae0bdcfd8f2f794df2bbb107f28f943dc139ac83720000fb83ecc7010008cd02c4ca1742f555222e8a2db43e9203c185b99da553376a1ead81998e008399a941ac83720000dccc8deb010008cd03fe1f69d69ac88f8d93be63cd56225bcec31d2e2cee51530ef3d86f53c3a7a4bdac837200008ef1f8e0010008cd024e766364179192ce8aa0fa4453a62fa4ad866855221a30d0d5d15c64c71cb59dac83720000c3e882e6010008cd028cd571dc7830a2585b53cf8bf36e311dec4100adde361800269e2df50184c220ac8372000098929c9e020008cd02051f414e91c4e8c47109f1af8f2b814002a70d1845ccbd0d0d60b953ce77fa16ac83720000a1b1fe91070008cd027587a913bd26ab78f2bf9f3f9bd21b1f00f6fada6cd08536085f9f91ac54521fac83720000819eebd7010008cd03cd1af40b8be51a479b37dbb4111b43f8261683679205b949ae2d3dac03041062ac83720000a6b2a8da010008cd021ab040c5eb36208049647912a375dc314dc3e2e188b444b2c4a8eb459aa7997dac83720000a6b2a8da010008cd02780cf1a6875c1e9d3b608d21f0e555c618f05d863c1817f2877f05468ec5c38fac83720000ede4f351100208cd021ab040c5eb36208049647912a375dc314dc3e2e188b444b2c4a8eb459aa7997d0402eb027300d1ed93b1a5730193a38cc7a701ac83720000b79ddb82061005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a57304ac83720000",
+  "parameters": {
+    "status": "present",
+    "value": {
+      "minValuePerByte": 360,
+      "maxBlockCost": 8001091,
+      "maxBlockSize": 1271009,
+      "maxBoxSize": 4096,
+      "maxTokensPerBox": 122,
+      "inputCost": 2407,
+      "dataInputCost": 100,
+      "outputCost": 298,
+      "tokenAccessCost": 100,
+      "storageFeeFactor": 1250000,
+      "storagePeriod": 1051200
+    },
+    "origin": "source-recorded"
+  },
+  "networkRules": {
+    "status": "present",
+    "value": {
+      "mode": "enabled",
+      "description": "Pinned ergo-chain-spec ChainSpec::mainnet; EIP-27, source-recorded network configuration, not a network inferred from defaults",
+      "activation_height": 777217,
+      "reemission_token_id": "d9a2cc8a09abfaed87afacfbb7daee79a6b26f10c6613fc13d3f3953e5521d1a",
+      "pay_to_reemission_tree": "193c03040004000e20d3feeffa87f2df63a7a15b4905e618ae3ce4c69a7975f171bd314d0b877927b8d1938cb2e4c6b2a5730000020c4d0e730100017302"
+    },
+    "origin": "source-recorded"
+  },
+  "blockContext": {
+    "status": "present",
+    "value": {
+      "height": 1868204,
+      "minerPubkey": "0204b680ae52835e22f12fc3c51c4cd9e18852ac4f4a8131be29920678aceeeebe",
+      "preHeaderTimestamp": 1788813125484,
+      "activatedScriptVersion": 3,
+      "preHeaderVersion": 4,
+      "preHeaderParentId": "71b29999204aee33af5dda49eb8dde4ac7a7ccd035b9199f6dab77552d3ca3e3",
+      "preHeaderNBits": 104808097,
+      "preHeaderVotes": [
+        0,
+        0,
+        0
+      ]
+    },
+    "origin": "source-recorded"
+  },
+  "headers": {
+    "status": "present",
+    "value": [
+      "04a03aaa825ff2182539f217bd93159c97d61c14ffb93f5e3f10c13fec47e0a9f8dc347de95b63fec207b393dda8f309a766947fe9cdb30159f23fd47494bbdaf8e0318de30a8cc283ee452048c3c6906e6df617d7d1d243943f2a8721a1b9709dfd303f1cded6cc420ce864a4102342c99bccbbe454d86817df24edbd31f565c019e29da7ec87348e08878d36f67fe80dd8b6cbfa84558782e4ef020b98479f0b0c1dc914521578063f3ea1ab837200000000033602a81fce83c18c4c591f4aea8f2732f479d6b08a21ec57c0de683e8e3815ad939700208d9fdacd",
+      "04caef63ca7f020057a00b5814e80c14d4fbc79acdf998d3f6a4721d76a5b7bc438c18f742b4b05cbe971eb7b0478ba56b15311e1ddea69329bbb66c2d64ec4b66da5c910270d8188dbbe2e81523037382f6c7ec1fc4704125934f9e8dc0d2fad93c48eec899155048553cbc8a6cdb378f0daedfdddd8f7d66f1619dc64e611ee619fe95a6ec87348e08878d36f67fe80dd8b6cbfa84558782e4ef020b98479f0b0c1dc914521578063f3ea1aa83720000000002bd04525e3e2bba4f910cda41ef195183c8ce8961d40fda5465ff134bdd93be59d345c1922387f5e7",
+      "0417eceec893837d03b2b6d1b2dd2d8c8892ad5b07ce8fba03fd24a2e6aa041bcefbec945f64997e7ff857da60d9b3ad494a9ac6d7c6988272384705e5af0b975c639fb09f3c5d66b55f3834f72d73e66192b645a3b7353191f1e5e258e9f1f34166dc9127c47c9d9bfbd337ae32a0778058a8411343a6fa17e10586392d1e23c119b892a1ec8734308cc898c152f5eb8c03f771efd8d6bd41aab94a5cfe3c9cfcaae631658dde16063f3ea1a98372000000000274e729bb6615cbda94d9d176a2f1525068f12b330e38bbbf387232797dfd891f4753f5b700adb1bc",
+      "0449dfa3c1356097df66127d9b7aab50d86d6a87d7a29e309ffc010feda6b65ecc4c63cf9965abd224dbe828bfaa35429b1132b3ecda464d3ca4ed42bbaa57ca6a20be3a8742587359125335b9b1c8a729f61d079e9cb08d6b2c79f74d85d206ccc06e3492e4749dae6a09d21844d3784fbb677d3c99d29b1302e1cab4a8b1862019a3e99fec8734308cc898c152f5eb8c03f771efd8d6bd41aab94a5cfe3c9cfcaae631658dde16063f3ea1a88372000000000274e729bb6615cbda94d9d176a2f1525068f12b330e38bbbf387232797dfd891f01e6b87e62726c88",
+      "0437be7ff705bad1d6ab5e5d9e707ece4a5ed4f3d03dafa9dbe8adcfda5b0f96bdcd96c225242cfc6c31142ad41360ec49c8f489ef47f72f3c77011c577f506bd8596411db08046ac43b25c207ddd44f7cd42ab9a16eab4f65c1b0dbe44a3c7525aabea9a8b4d6bb367380790cb29ebf3d04996a77dd3f80616c129d5e9ff8db0219c3c39bec8734055d317af0b193fbc03037f387a0110278e8271350b216c0e07ffe321564a28a063f3ea1a78372000000000274e729bb6615cbda94d9d176a2f1525068f12b330e38bbbf387232797dfd891f6b903397311deb79",
+      "047e092f1dcd2b667f946f75e59ff50b671b153982b2ad84e753210b255c4d1f244420e261eca965e47430264d90c943263304df7a37bd85e211c2d90219f012aee8a7ddcf568a939741dee646887db8619cf36b4c20819b4ae11b1df7970f7da4945c9246a84f0e3b50a91cf047ff008cb15a1f0acff56ad74911468f7fca5c1619d8ff95ec8734efaa6d67ed6e9e2e5508c9e60984b36fd29f426357dff60f901473ea6f40199a063f3ea1a683720000000002eeec374f4e660e117fccbfec79e6fe5cdf44ac508fa228bfc654d2973f9bdc9a72e63805eb6aae23",
+      "04480c453826f5d20e65ed84cbfdcdfb3b9f5c31f93d04119182bc21b770edca3f9ca8817b1d861177ada2c6d48fcedfb905778ad532a4c23935330b97f517ecdc81f0d01b67f557f5fb873b4a1b78f8b0acb300f235faf7b12e1f70e285f4a7533910804bbc9c1ad67e019d876d2754115e28ac68d02c2ecb968bad7bcbdb795519b29388ec8734efaa6d67ed6e9e2e5508c9e60984b36fd29f426357dff60f901473ea6f40199a063f3ea1a58372000000000274e729bb6615cbda94d9d176a2f1525068f12b330e38bbbf387232797dfd891f7063486d0738e007",
+      "0428a7f82638bcdbdc3b39596abde4b8c7aa2aabbae0b2d695d114f9023e2df2148e27d2903ed774680273d59a2fe60dda969180b834228d64a0446cf4ad44a5a21556184185bbd7dbf7c3ecf11fe49880e2879fb03f60b5bdb1e813a10ab28d31e5f17d80c1ea6a0e67ef970d59dc8be35cc21bab3c95bd7d718efcf3c44498171981bdeeeb8734efaa6d67ed6e9e2e5508c9e60984b36fd29f426357dff60f901473ea6f40199a063f3ea1a483720000000002bd04525e3e2bba4f910cda41ef195183c8ce8961d40fda5465ff134bdd93be59d340248314497502",
+      "042c60ec906272b55dadd8a722aa2f07afc3311972ad247060f8192271b77361d32310c171e8340da53cfb92d3d65291df67133382b75345c534df4707b73dc1ab778455ce2feb0f36ae49154dc87cf89c6b5d2a85f7904b7c045c718e595fe6b85c6d78dbc199875fc4bf09fe825db7126b69baf38ce6c12c5e9888e8aef3f76519bac9e5eb873453c272d1fa6a9bb53663fda9da47407d91d9de21e264f4f6fdf4b46d44101f5f063f3ea1a38372000000000274e729bb6615cbda94d9d176a2f1525068f12b330e38bbbf387232797dfd891f924aa671f01f51c7",
+      "040556cc7d63dcb484ca1ee8c0e1afc4d848ebd90f0f8919de70da7d005ce2609abc8df029493ce66232ba83790cbd0dd1e9aec2c90fea11c9ce6fed6d7cf2b22ca753813a721796afc7d4a6d1b6eceb38c9d841ccba7c3ab179756760e0f97a9e5d1bef7b2f816d66e12c34e8380008fc22c31b8edbd68c31fb197a5007b79d1119dbf8d2eb873453c272d1fa6a9bb53663fda9da47407d91d9de21e264f4f6fdf4b46d44101f5f063f3ea1a28372000000000274e729bb6615cbda94d9d176a2f1525068f12b330e38bbbf387232797dfd891fe5367eeec18dfc59"
+    ],
+    "origin": "source-recorded"
+  },
+  "localPolicy": {
+    "status": "present",
+    "value": {
+      "maxTransactionSize": 1271009
+    },
+    "origin": "caller-supplied"
+  },
+  "priorBlockCost": {
+    "status": "present",
+    "value": 14059,
+    "origin": "source-recorded"
+  }
+}

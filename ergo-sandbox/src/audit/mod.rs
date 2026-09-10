@@ -12,10 +12,11 @@ pub use context::{
 };
 pub mod finding;
 pub mod lints;
+pub mod obligation;
 pub mod triage;
 pub mod visit;
 
-pub use finding::{snippet, Finding, Severity, SNIPPET_MAX};
+pub use finding::{snippet, Finding, ReviewPriority, Severity, SNIPPET_MAX};
 pub use visit::children;
 
 use crate::{Lifted, Node};
@@ -29,10 +30,10 @@ const LINTS: &[fn(&Node) -> Vec<Finding>] = &[
     lints::trust_assumptions,
 ];
 
-/// Whether the audit saw the whole contract.
+/// Recovery coverage of the lifted representation, not property/audit completeness.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub enum Completeness {
-    /// Every construct lifted; findings cover the whole tree.
+    /// Every construct lifted; the fixed static observations ran over that recovery.
     Complete,
     /// The lift left raw placeholders or hit the depth ceiling. Part of the
     /// contract was not analysed — absence of findings proves nothing.
@@ -45,6 +46,7 @@ pub enum Completeness {
 /// The result of auditing one lifted tree.
 #[derive(Debug, Clone)]
 pub struct Audit {
+    pub obligations: Vec<obligation::Obligation>,
     /// Sorted most-severe first, then by node id — deterministic output.
     pub findings: Vec<Finding>,
     pub completeness: Completeness,
@@ -61,6 +63,7 @@ pub fn audit(lifted: &Lifted) -> Audit {
     }
     findings.sort_by_key(|f| (f.severity, f.node_id));
     Audit {
+        obligations: obligation::group(lifted, &findings),
         findings,
         completeness: if lifted.raw_placeholders == 0 && !lifted.truncated {
             Completeness::Complete

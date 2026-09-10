@@ -1,4 +1,6 @@
-//! Box marshalling: `ScenarioBox` JSON → evaluator `EvalBox`.
+//! Legacy simulation marshalling: `ScenarioBox` JSON → evaluator `EvalBox`.
+//! Canonical construction lives separately in `crate::evidence::wire`; these
+//! permissive adapters cannot promote a scenario to recorded wire evidence.
 //!
 //! Follows the `ergo-validation/src/tx/script/eval_box.rs` conversion shape
 //! but takes values from scenario JSON instead of wire boxes. A synthetic

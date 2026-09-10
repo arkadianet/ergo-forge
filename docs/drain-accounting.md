@@ -55,3 +55,9 @@ components, recognized/unknown indices and terms alongside extraction.
 The phase-3 corpus baseline is in `examples/mutants/answer-key.json`; the previous
 objective's measurements remain in `answer-key.custody-v1.json`. This change does
 not add search axes or alter roles, caps, or rejection precedence.
+
+P05 shares these same function bodies from `drain/accounting.rs` with the strict
+[offline replay path](claim-replay.md). Replay supplies accounting projections
+from a node `AcceptedExecution`; it does not invoke the hunt or alter its oracle,
+family, objective, caps or preflight baseline. Its versioned property binds exact
+spending-box IDs and declared roles to the complete execution bundle.

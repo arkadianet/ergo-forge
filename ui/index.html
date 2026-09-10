@@ -236,6 +236,15 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
     </section>
 
     <section id="read" class="pane">
+    <section id="evidence-replay">
+      <h2>Replay saved evidence</h2>
+      <p>Import a replay bundle or saved replay report. Checks the supplied transaction and declared property locally; no chain lookup or broadcast.</p>
+      <label for="replay-file">Evidence JSON file</label>
+      <input id="replay-file" type="file" accept=".json,.fixture,application/json">
+      <button id="replay-go" type="button">Replay evidence</button>
+      <p id="replay-message" role="status"></p>
+      <div id="replay-result" hidden></div>
+    </section>
     <div class="reader-intro">
       <h2>Read a contract</h2>
       <p>Paste an address, box ID, or ErgoTree hex to recover readable ErgoScript from the compiled contract.</p>
@@ -302,13 +311,14 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
 
       <h2>Spendability</h2>
       <p class="hint">Can someone with no key spend this box? Six probes on the
-         consensus reducer, no proof, no context variables. A hit is real; a
-         miss only means "not under these probes".</p>
+         consensus reducer, no proof, no context variables. A hit is a passing sampled scenario; full node validation has not run.
+         A miss only means "not under these probes".</p>
       <p id="hunt-verdict" class="hunt-verdict"></p>
       <p id="hunt-rent" class="hint"></p>
       <p id="hunt-synthetic" class="hint" hidden>SELF was synthetic (no
          registers, value 0) — register reads error out. Describe the real box
-         below and re-run for a real answer.</p>
+         below and re-run its scenario; full node validation has not run.</p>
+      <p class="hint">Residual proof requirements observed under these probes; not an exhaustive list of spenders.</p>
       <ul id="hunt-residuals" class="residuals"></ul>
       <details>
         <summary>Probes</summary>
@@ -490,6 +500,8 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
   <script src="vendor/qrcode.min.js"></script>
   <script src="vendor/blake2b.js"></script>
   <script src="vendor/sha256.js"></script>
+  <script src="claim-labels.js"></script>
+  <script src="evidence-replay.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

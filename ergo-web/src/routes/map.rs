@@ -31,6 +31,8 @@ pub enum SeedKind {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MapResponse {
+    #[serde(flatten)]
+    claim: ergo_sandbox::claim::ClaimMetadata,
     seed: SeedDto,
     network: String,
     source: SourceDto,
@@ -184,6 +186,7 @@ pub async fn map_route(
                 e => ApiError::Upstream(e.to_string()),
             })?;
             Ok(Json(MapResponse {
+                claim: ergo_sandbox::claim::ClaimMetadata::MAP,
                 seed: SeedDto {
                     kind: req.kind,
                     input,

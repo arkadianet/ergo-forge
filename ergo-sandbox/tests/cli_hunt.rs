@@ -23,10 +23,13 @@ fn tree_hex(src: &str) -> String {
 }
 
 #[test]
-fn hunt_reports_a_trivially_true_tree_as_spendable_by_anyone() {
+fn hunt_reports_a_trivially_true_sample_without_node_validation() {
     let (ok, out, err) = ergo_es(&["hunt", &tree_hex("sigmaProp(true)")]);
     assert!(ok, "stderr: {err}");
-    assert!(out.contains("spendable by anyone"), "stdout: {out}");
+    assert!(
+        out.contains("sample passed without a proof"),
+        "stdout: {out}"
+    );
     // One line per probe with height, shape, and verdict.
     assert_eq!(out.matches("PASS").count(), 6, "stdout: {out}");
 }
@@ -45,7 +48,10 @@ fn hunt_honours_a_caller_height() {
     let tree = tree_hex("sigmaProp(HEIGHT > 3000000)");
     let (ok, out, _) = ergo_es(&["hunt", &tree, "--height", "3000001"]);
     assert!(ok);
-    assert!(out.contains("spendable by anyone"), "stdout: {out}");
+    assert!(
+        out.contains("sample passed without a proof"),
+        "stdout: {out}"
+    );
     assert!(out.contains("3000001"), "stdout: {out}");
 }
 
@@ -111,7 +117,7 @@ fn test_command_prints_a_table_and_exits_nonzero_on_a_failing_case() {
 // ----- ergo-es validate-tx -----
 
 #[test]
-fn validate_tx_command_reports_each_input_and_exits_nonzero_when_invalid() {
+fn validate_tx_command_reports_each_input_and_exits_nonzero_when_preflight_fails() {
     let dir = std::env::temp_dir().join(format!("ergo-es-vtx-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
     let path = dir.join("tx.json");
@@ -122,6 +128,7 @@ fn validate_tx_command_reports_each_input_and_exits_nonzero_when_invalid() {
         "boxes": [ {{ "boxId": "{a}", "value": 100, "ergoTree": "10010101d17300", "assets": [], "additionalRegisters": {{}}, "creationHeight": 1 }} ] }}"#)).unwrap();
     let (ok, out, _) = ergo_es(&["validate-tx", path.to_str().unwrap()]);
     assert!(!ok, "ERG is not conserved: must exit non-zero\n{out}");
+    assert!(out.contains("Preflight failed — full node validation has not run"));
     assert!(
         out.contains("input 0") && out.contains("pass") && out.contains("ERG not conserved"),
         "{out}"

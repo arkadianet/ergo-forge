@@ -65,6 +65,8 @@ pub struct LookupRequest {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct LookupResponse {
+    #[serde(flatten)]
+    claim: ergo_sandbox::claim::ClaimMetadata,
     /// Current chain height, for a realistic spending height.
     pub height: Option<u32>,
     /// Boxes in the scenario shape (`value`, `ergoTree`, `tokens`,
@@ -113,7 +115,14 @@ pub async fn lookup(
         .map(|h| h as u32);
 
     let boxes = raw_boxes.iter().map(to_scenario_box).collect();
-    Ok(Json(LookupResponse { height, boxes }))
+    Ok(Json(LookupResponse {
+        claim: ergo_sandbox::claim::ClaimMetadata::legacy(
+            "source-lookup",
+            "configured explorer response; state membership not independently verified",
+        ),
+        height,
+        boxes,
+    }))
 }
 
 /// One box by id, raw explorer JSON.

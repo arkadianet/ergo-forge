@@ -1,0 +1,15 @@
+{
+  "source": "sigmaProp(SELF.R4[Int].get == 7)",
+  "scenario": {
+    "selfBox": {
+      "registers": {
+        "R4": {
+          "type": "Int",
+          "value": 7
+        }
+      }
+    }
+  },
+  "expectedVerdict": "Pass",
+  "reason": "The supplied SELF has the required register; lifecycle reachability is not proved."
+}

@@ -110,6 +110,8 @@ pub struct CaseResult {
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SuiteResult {
+    #[serde(flatten)]
+    pub claim: crate::claim::ClaimMetadata,
     pub tree_hex: String,
     pub address: String,
     pub cases: Vec<CaseResult>,
@@ -236,6 +238,7 @@ pub fn run(suite: &Suite) -> Result<SuiteResult, SuiteError> {
     }
     let passed = cases.iter().filter(|c| c.passed).count();
     Ok(SuiteResult {
+        claim: crate::claim::ClaimMetadata::SIMULATION,
         failed: cases.len() - passed,
         passed,
         tree_hex,

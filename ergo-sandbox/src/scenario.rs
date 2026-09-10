@@ -201,6 +201,8 @@ pub struct PreHeader {
 /// populated from their dedicated fields.
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
+/// Legacy experiment input, not a complete wire box. Use full recorded bytes
+/// or an explicit hypothetical constructor in `evidence::wire` for P02.
 pub struct ScenarioBox {
     /// Box value in nanoErg (R0).
     #[serde(default)]
@@ -536,4 +538,12 @@ fn bad(tpe: &str, value: &serde_json::Value, expected: &str) -> SandboxError {
 
 fn range(tpe: &str, n: i64, lo: i64, hi: i64) -> SandboxError {
     SandboxError::Scenario(format!("type `{tpe}` value {n} out of range [{lo}, {hi}]"))
+}
+
+impl ScenarioBox {
+    /// ScenarioBox never recorded the creation transaction ID/output index or
+    /// whether defaulted fields were observed. Supplying a box ID is insufficient.
+    pub fn canonical_box(&self) -> Result<crate::evidence::wire::WireBox, String> {
+        Err("legacy ScenarioBox lacks creation reference and field-presence provenance; supply full recorded wire bytes or explicitly construct a new hypothetical box".into())
+    }
 }

@@ -9,7 +9,7 @@ fn run(req: TriageRequest) -> ergo_sandbox::Finding {
 }
 
 #[test]
-fn incident_pair_records_consensus_confirmation_and_bounded_miss() {
+fn incident_pair_records_scenario_reproduction_and_bounded_miss() {
     let deployed: TriageRequest = serde_json::from_str(DEPLOYED).unwrap();
     let fixed: TriageRequest = serde_json::from_str(FIXED).unwrap();
     assert_eq!(deployed.lint, fixed.lint);
@@ -20,7 +20,10 @@ fn incident_pair_records_consensus_confirmation_and_bounded_miss() {
     before["drain"]["inputs"][1]["ergoTree"] = after["drain"]["inputs"][1]["ergoTree"].clone();
     assert_eq!(before, after);
 
-    for (req, state) in [(deployed, "confirmed"), (fixed, "not-reproduced")] {
+    for (req, state) in [
+        (deployed, "reproduced-in-scenario"),
+        (fixed, "not-reproduced"),
+    ] {
         let finding = run(req);
         assert_eq!(finding.triage.state(), state);
         let evidence = finding.triage.evidence().unwrap();
@@ -42,7 +45,7 @@ fn incident_pair_records_consensus_confirmation_and_bounded_miss() {
         let replay: TriageRequest =
             serde_json::from_value(record["triage"]["evidence"]["request"].clone()).unwrap();
         assert_eq!(replay.node_id, finding.node_id);
-        if state == "confirmed" {
+        if state == "reproduced-in-scenario" {
             let hit = evidence.hunt.best.as_ref().unwrap();
             assert!(!hit.shape.is_empty());
             assert!(evidence.reducer_verdict.as_ref().unwrap().valid);

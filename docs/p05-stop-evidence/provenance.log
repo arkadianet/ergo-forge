@@ -1,0 +1,12 @@
+incident: 5371373d346aade57f684ead23f386e3441ffb2cb7a860babe96e3c5048b2725; block height: 1868204; index: 5
+blockContext: present; origin=hypothetical
+parameters: present; origin=hypothetical
+networkRules: present; origin=hypothetical
+headers: present; origin=hypothetical
+priorBlockCost: present; origin=hypothetical
+preHeaderVersion: supplied=1; retrieved=4; equal=False
+preHeaderTimestamp: supplied=1700000000000; retrieved=1788813125484; equal=False
+preHeaderParentId: supplied=4444444444444444444444444444444444444444444444444444444444444444; retrieved=71b29999204aee33af5dda49eb8dde4ac7a7ccd035b9199f6dab77552d3ca3e3; equal=False
+Retrieved transaction records expose no preceding transaction execution costs: True
+This audit does not establish historical UTXO membership or authenticate the explorer.
+missing-provenance: blockContext, parameters, networkRules, headers, priorBlockCost

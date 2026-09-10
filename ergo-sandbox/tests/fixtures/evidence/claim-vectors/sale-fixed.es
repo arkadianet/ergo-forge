@@ -1,0 +1,1 @@
+{ sigmaProp(OUTPUTS(0).propositionBytes == fromBase16("0008cd027f31ebc5462c1fdce1b737ecff52d37d75dea43ce11c74d25aa297165faa2007") && OUTPUTS(0).value >= SELF.tokens(0)._2 * 1000000L) }

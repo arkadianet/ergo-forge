@@ -25,6 +25,8 @@ pub struct Addresses {
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TreeReport {
+    #[serde(flatten)]
+    pub claim: crate::claim::ClaimMetadata,
     pub format_version: u32,
     pub tree_hex: String,
     pub network: String,
@@ -157,12 +159,13 @@ fn report(
         .iter()
         .map(|f| {
             serde_json::json!({
-                "lint": f.lint, "severity": f.severity.label(), "nodeId": f.node_id,
+                "lint": f.lint, "severity": f.severity.label(), "severityMeaning": "review-priority", "triage": f.triage, "nodeId": f.node_id,
                 "irId": f.ir_id, "message": f.message, "snippet": f.snippet
             })
         })
         .collect();
     Ok(TreeReport {
+        claim: crate::claim::ClaimMetadata::STATIC,
         format_version: 1,
         tree_hex: hex::encode(bytes),
         network: if network == NetworkPrefix::Testnet {

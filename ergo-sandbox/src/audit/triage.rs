@@ -1,4 +1,4 @@
-//! Reproducible, bounded confirmation of a finding in a declared contract set.
+//! Bounded scenario reproduction associated with a finding in a declared contract set.
 use serde::{Deserialize, Serialize};
 
 use crate::drain::{drain_hunt, DrainReport, DrainRequest, DrainRole, DrainVerdict};
@@ -7,10 +7,14 @@ use crate::txcheck::{check, TxCheck};
 pub const BOUNDED_WARNING: &str =
     "Absence of a result under a bound is not evidence of absence. Not-reproduced does not mean safe.";
 
-/// Fields are private: only a completed local hunt can create confirmation.
+/// Output-only record. Stored records cannot be imported as verified results;
+/// callers must replay the embedded request. Reducer consultation is not node validation.
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Triage {
+    format_version: u32,
+    #[serde(flatten)]
+    claim: crate::claim::ClaimMetadata,
     state: &'static str,
     consensus_reducer_consulted: bool,
     explanation: &'static str,
@@ -20,6 +24,8 @@ pub struct Triage {
 impl Default for Triage {
     fn default() -> Self {
         Self {
+            format_version: 2,
+            claim: crate::claim::ClaimMetadata::STATIC,
             state: "unconfirmed",
             consensus_reducer_consulted: false,
             explanation: "Static finding only; the consensus reducer has not been consulted.",
@@ -71,7 +77,7 @@ pub struct TriageRequest {
 }
 
 /// Re-audit the selected contract so stale/nonexistent finding anchors fail.
-/// Confirmation is scoped to this contract set and objective, not a proof
+/// Reproduction is scoped to this contract set and objective, not a proof
 /// that the selected lint is the unique cause of the extraction.
 pub fn triage(req: &TriageRequest) -> Result<super::Finding, String> {
     let input = req
@@ -112,12 +118,17 @@ pub fn triage(req: &TriageRequest) -> Result<super::Finding, String> {
         None
     };
     let (state, explanation) = match hunt.verdict {
-        DrainVerdict::Drainable => ("confirmed",
-            "This contract set reached the declared extraction objective. This does not establish that this lint alone caused it."),
+        DrainVerdict::Drainable => ("reproduced-in-scenario",
+            "The sampled scenario reached the declared extraction objective and passed unsigned preflight replay. Full node validation has not run; this does not establish that the selected lint caused the result."),
         DrainVerdict::NotUnderProbes if hunt.oracle_calls > 0 => ("not-reproduced", BOUNDED_WARNING),
         _ => ("unconfirmed", "The hunt did not produce a usable bounded verdict; inspect its notes and objective."),
     };
     finding.triage = Triage {
+        format_version: 2,
+        claim: crate::claim::ClaimMetadata::legacy(
+            "bounded-scenario-reproduction",
+            "declared contract set, roles, protocolNfts and objective; generated scenario material",
+        ),
         state,
         consensus_reducer_consulted: hunt.oracle_calls > 0,
         explanation,

@@ -47,7 +47,27 @@ Pushing a `v*` tag builds and publishes the image to
 
 ## API
 
-Versioned under `/api/v1/`. All responses and errors are JSON; every field is camelCase.
+Legacy operations are under `/api/v1/`; strict evidence replay is under `/api/v2/`.
+All responses and errors are JSON; fields use camelCase.
+
+### `POST /api/v2/replay`
+
+Submit a P05 `ReplayBundle` (the same file accepted by `ergo-es replay`). The
+response is `{ "apiVersion": 2, "result": <unchanged CLI replay report> }`.
+The nested report retains its own `formatVersion: 1`. HTTP 200 means replay
+completed, including `incomplete-or-invalid-premises`, `node-rejected`, and
+`unsupported-property` outcomes; inspect `result.status` and its scopes.
+Malformed bundles use the existing JSON 400 error envelope and oversized
+requests use 413. The shared engine budget, rate limiter and 1 MiB body cap apply.
+
+Read's **Replay saved evidence** panel accepts a bundle, a saved CLI report, or
+this API envelope. Saved verdicts are discarded and only the bundle is replayed.
+The panel displays exact claim/execution scopes, per-premise origins and all
+recorded missing premises, including residual gaps on accepted results. Source
+recordings do not authenticate historical unspentness; hypothetical state stays
+labelled. Replay never fetches boxes, signs, or broadcasts, even with an explorer
+configured. There is no server-side evidence storage.
+
 
 ### `GET /api/v1/health`
 
@@ -132,13 +152,13 @@ curl -s -X POST http://127.0.0.1:8080/api/v1/hunt \
 }
 ```
 
-`verdict` is one of `spendableByAnyone` (an attacker probe passed — a hit is
-a transaction anyone can build), `movableByAnyone` (only preserve probes
-passed: anyone can re-spend the box back into the same contract),
-`requiresProof` (`residuals` lists the distinct sigma propositions — who can
-spend), or `notUnderProbes` (every probe failed or errored; **not** a safety
-claim). Without `selfBox`, `selfSynthetic` is true and any register read
-errors out — supply the real box before concluding anything.
+Legacy wire verdicts are retained: `spendableByAnyone` means an attacker-output
+sample passed without a proof; `movableByAnyone` means a preserving-output sample
+passed. Neither establishes a valid canonical transaction. `requiresProof`
+records distinct residual propositions observed under the probes, not every
+possible spender; `notUnderProbes` is not a safety claim. `selfSynthetic` applies
+to positive and negative results alike. Every response labels method/provenance
+and `nodeValidated: false`; the browser keeps the synthetic warning visible.
 
 ### `POST /api/v1/compile`
 
@@ -226,7 +246,7 @@ Explorer failures are `502 upstream`; an unknown box or address is `404`.
 
 ### `POST /api/v1/validate-tx`
 
-Will this unsigned transaction validate? `{tx, boxes?, height?, network?}`
+Does this unsigned transaction pass selected preflight checks? Full node validation has not run. `{tx, boxes?, height?, network?}`
 where `tx` is the node-format transaction (`inputs` with optional
 `extension`, `dataInputs`, `outputs`) and `boxes` the input and data-input
 boxes in node/explorer shape. Boxes not supplied are fetched from the
@@ -236,7 +256,7 @@ at its real index, all inputs in order, all outputs, the data inputs and
 that input's extension; ERG and token conservation are checked (one new
 token may be minted with the first input's id). Signatures are not checked:
 an input reducing to a sigma proposition counts as `needsProof` and does not
-invalidate. Response: `{valid, signaturesNeeded, inputs[], problems[],
+invalidate. Response: `{method, provenance, nodeValidated: false, preflightPassed, valid, signaturesNeeded, inputs[], problems[],
 ergIn, ergOut, height}`.
 
 ### `POST /api/v1/compose`
@@ -551,3 +571,9 @@ BIND_ADDR=127.0.0.1:8099 EXPLORER_URL= UI_DIR=ui ./target-sh/release/ergo-web
 # In another terminal:
 node ergo-web/tests/positions-browser.mjs http://127.0.0.1:8099
 ```
+
+`valid` is a deprecated alias for `preflightPassed`, never node acceptance.
+All analysis/execution responses carry method/provenance limits and
+`nodeValidated: false`. Static severity means review priority; triage format v2
+uses `reproduced-in-scenario`, with no verified-record import. Play uses
+deterministic simulation IDs and supplied/default proof messages.

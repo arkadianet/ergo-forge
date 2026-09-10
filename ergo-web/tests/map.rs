@@ -41,6 +41,12 @@ async fn offline_map_reaches_related_source_and_preserves_typed_edges() {
     let base = spawn(Some("http://127.0.0.1:1".into())).await;
     let (status, result) = post(&base, &request()).await;
     assert_eq!(status, 200, "{result}");
+    assert_eq!(result["method"], "protocol-map");
+    assert_eq!(result["nodeValidated"], false);
+    assert!(result["provenance"]
+        .as_str()
+        .unwrap()
+        .contains("recorded fixture"));
     assert_eq!(result["seed"]["kind"], "boxId");
     assert_eq!(result["source"]["recorded"], true);
     assert_eq!(result["source"]["height"], 1200);

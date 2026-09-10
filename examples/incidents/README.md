@@ -167,11 +167,11 @@ CARGO_TARGET_DIR=./target-gate cargo run --release -p ergo-sandbox --bin ergo-es
 These committed requests select the pool's `delegated-reserves` finding at
 node 31. They differ only in the companion swap's compiled contract. The
 finding persists on the pool in both sets; the fixed swap supplies the missing
-binding. The deployed set reaches `confirmed`; the fixed set reaches
+binding. The deployed set reaches `reproduced-in-scenario` (record formatVersion 2; unsigned preflight only); the fixed set reaches
 `not-reproduced`. **Absence of a result under a bound is not evidence of
-absence. Not-reproduced does not mean safe.** Confirmation means the declared
-contract set reached the declared objective, not that the selected lint alone
-caused it.
+absence. Not-reproduced does not mean safe.** Reproduction means the sampled scenario reached the declared objective and
+passed unsigned preflight replay. Full node validation has not run, and the
+selected lint has not been established as the cause.
 
 A triage request is a JSON object with `inputIndex` (declared spending input),
 `lint`, `nodeId` (from `ergo-es audit <tree-hex>`), and `drain` (a complete

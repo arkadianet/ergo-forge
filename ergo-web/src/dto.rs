@@ -15,9 +15,14 @@ pub struct InspectRequest {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FindingDto {
+    #[serde(flatten)]
+    pub claim: ergo_sandbox::claim::ClaimMetadata,
     pub triage: ergo_sandbox::audit::triage::Triage,
     pub lint: &'static str,
+    /// Static review priority, not a demonstrated vulnerability severity.
+    pub severity_meaning: &'static str,
     pub severity: &'static str,
+    pub review_priority: ergo_sandbox::audit::ReviewPriority,
     pub node_id: u64,
     pub message: String,
     pub snippet: String,
@@ -34,6 +39,8 @@ pub struct FindingDto {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct InspectResponse {
+    #[serde(flatten)]
+    pub claim: ergo_sandbox::claim::ClaimMetadata,
     /// Storage rent for a minimal box under this contract.
     pub rent: ergo_sandbox::rent::RentEstimate,
     /// The contract in words, one sentence per way to spend; unknown
@@ -47,13 +54,17 @@ pub struct InspectResponse {
     pub raw_placeholders: usize,
     pub truncated: bool,
     pub findings: Vec<FindingDto>,
+    pub obligations: Vec<ergo_sandbox::audit::obligation::Obligation>,
 }
 
 impl FindingDto {
     pub fn from_engine(f: &ergo_sandbox::Finding) -> Self {
         Self {
+            claim: ergo_sandbox::claim::ClaimMetadata::STATIC,
+            severity_meaning: "review-priority",
             lint: f.lint,
             triage: f.triage.clone(),
+            review_priority: f.severity,
             severity: match f.severity {
                 ergo_sandbox::Severity::High => "high",
                 ergo_sandbox::Severity::Medium => "medium",
@@ -121,6 +132,8 @@ pub struct ProbeDto {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct HuntResponse {
+    #[serde(flatten)]
+    pub claim: ergo_sandbox::claim::ClaimMetadata,
     /// Storage rent for the box hunted (the supplied `selfBox` when given,
     /// else a minimal box), with the next collection height when the box's
     /// creation height is known.
@@ -141,6 +154,7 @@ impl HuntResponse {
         rent: ergo_sandbox::rent::RentEstimate,
     ) -> Self {
         Self {
+            claim: h.claim,
             rent,
             tree_hex,
             address,
@@ -177,6 +191,8 @@ impl HuntResponse {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct EvalResponse {
+    #[serde(flatten)]
+    pub claim: ergo_sandbox::claim::ClaimMetadata,
     pub verdict: &'static str,
     /// Values the run computed, positioned in the source when the scenario
     /// was compiled from `source` and the source map aligned.
@@ -243,6 +259,7 @@ impl EvalResponse {
             })
             .collect();
         Self {
+            claim: o.claim,
             hot_spots,
             verdict: verdict_str(o.verdict),
             values: o
@@ -300,6 +317,8 @@ pub struct ParamStatus {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CompileResponse {
+    #[serde(flatten)]
+    pub claim: ergo_sandbox::claim::ClaimMetadata,
     /// Storage rent for a minimal box under this contract.
     pub rent: ergo_sandbox::rent::RentEstimate,
     /// The compiled contract in words (see `InspectResponse::plain`).
@@ -314,6 +333,7 @@ pub struct CompileResponse {
     pub raw_placeholders: usize,
     pub truncated: bool,
     pub findings: Vec<FindingDto>,
+    pub obligations: Vec<ergo_sandbox::audit::obligation::Obligation>,
     pub params: Vec<ParamStatus>,
     /// True when the source was an EIP-5 `@contract def` template,
     /// instantiated with the given parameters.

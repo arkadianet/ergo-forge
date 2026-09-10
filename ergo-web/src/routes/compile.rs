@@ -117,6 +117,7 @@ pub async fn compile_route(
     };
     let (completeness, raw_placeholders, truncated) = dto::completeness_parts(&report);
     Ok(Json(dto::CompileResponse {
+        claim: ergo_sandbox::claim::ClaimMetadata::STATIC,
         rent: dto::rent_for(&out.tree_bytes, None),
         plain: plain.paths,
         plain_complete: plain.complete,
@@ -128,6 +129,7 @@ pub async fn compile_route(
         raw_placeholders,
         truncated,
         findings,
+        obligations: report.obligations,
         params: statuses,
         template,
         positioned,

@@ -275,6 +275,8 @@ impl BoxRule {
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Composed {
+    #[serde(flatten)]
+    pub claim: crate::claim::ClaimMetadata,
     pub source: String,
     pub params: Vec<ParamNeed>,
     /// Generated when values were given: one case per path satisfied, one
@@ -786,6 +788,10 @@ pub fn compose(
         Some(generate_suite(spec, &src, values)?)
     };
     Ok(Composed {
+        claim: crate::claim::ClaimMetadata::legacy(
+            "static-composition",
+            "caller-supplied rule specification; generated scenarios use synthetic context",
+        ),
         source: src,
         params,
         suite,

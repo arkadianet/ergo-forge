@@ -9,5 +9,6 @@ pub mod lookup;
 pub mod map;
 pub mod play;
 pub mod point;
+pub mod replay;
 pub mod test;
 pub mod validate;

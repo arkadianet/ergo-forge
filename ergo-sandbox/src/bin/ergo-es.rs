@@ -20,6 +20,7 @@ fn main() -> ExitCode {
     let rest = &args[1..];
     let result = match cmd.as_str() {
         "compile" => cmd_compile(rest),
+        "replay" => cmd_replay(rest),
         "tree" => cmd_tree(rest),
         "triage" => cmd_triage(rest),
         "match" => cmd_match(rest),
@@ -60,6 +61,8 @@ fn usage() {
         "ergo-es — ErgoScript workbench CLI
 
 USAGE:
+  ergo-es replay <bundle.json> [--json]
+      Offline full-node validation and declared-property replay; broadcasts nothing.
   ergo-es tree <address|boxId|treeHex> [--json] [--network mainnet|testnet]
                [--source fixture.json | --explorer URL]
       Decode offline, or explicitly resolve a box, then decompile and audit.
@@ -67,6 +70,7 @@ USAGE:
       Compare program structure with constant leaves treated as holes.
       A match does not prove behavioural equivalence or safety.
   ergo-es triage <request.json>
+      Version-2 scenario reproduction, not confirmation of the selected lint.
   ergo-es ingest <directory> [--params params.json] [--tree-version N]
                  [--network mainnet|testnet] [--json] [--no-infer]
       Compile and lift .ergo/.es sources for static tooling, with reported
@@ -81,9 +85,9 @@ USAGE:
       expected verdicts); one line per case, non-zero exit on any failure.
       --json prints the stable machine shape (docs/scenario-format.md).
   ergo-es validate-tx <request.json>
-      Will this unsigned transaction validate? {{tx, boxes, height?}}: every
-      input's script runs in the real context; ERG/token conservation is
-      checked. Non-zero exit when the transaction would be rejected.
+      Unsigned preflight {{tx, boxes, height?}}: selected script and balance
+      checks on supplied/default context, without signature checks.
+      Non-zero exit on preflight failure; full node validation has not run.
   ergo-es compose <spec.json> [--params p.json] [--suite out.test.json]
   ergo-es point <secret-hex> [--base <point-hex>]   g^x (or base^x), for scenario secrets
       Assemble ErgoScript from spending paths (who + conditions); with
@@ -104,11 +108,11 @@ USAGE:
       (default mainnet); -v prints every failure reason. Corpora paths
       resolve against the ergo node checkout (sibling of this repo).
   ergo-es audit <hex | --seed | --mainnet | --trees file.json>
-      Static lints over the lifted tree. Single trees print findings;
+      Static lints over the lifted tree. Single trees print review obligations;
       corpora print a summary tally.
   ergo-es hunt <hex | --mainnet [N] | --trees file.json> [--height H] [--self-box file.json]
                [--data-inputs file.json]
-      Spend hunt: can anyone spend this box with no key? Six probes (three
+      Sample spending without a key; full node validation has not run. Six probes (three
       heights x attacker/preserve output) on the consensus reducer.
       --mainnet tallies the corpus; hits go to stderr for hand checks.
   ergo-es map <seed> [--depth N] [--max-nodes N] [--json]
@@ -341,7 +345,7 @@ fn cmd_eval(args: &[String]) -> Result<(), String> {
     if args.iter().any(|a| a == "--json") {
         // The stable, comparable shape (docs/scenario-format.md): what a
         // second reducer prints for the same scenario.
-        let v = serde_json::json!({
+        let mut v = serde_json::json!({
             "formatVersion": 1,
             "verdict": ergo_sandbox::testsuite::verdict_name(outcome.verdict),
             "error": outcome.error,
@@ -352,6 +356,13 @@ fn cmd_eval(args: &[String]) -> Result<(), String> {
             "treeHex": outcome.tree_hex,
             "p2sAddress": outcome.p2s_address,
         });
+        v.as_object_mut().expect("result object").extend(
+            serde_json::to_value(ergo_sandbox::claim::ClaimMetadata::SIMULATION)
+                .expect("labels serialize")
+                .as_object()
+                .expect("label object")
+                .clone(),
+        );
         println!(
             "{}",
             serde_json::to_string_pretty(&v).map_err(|e| e.to_string())?
@@ -848,10 +859,21 @@ fn cmd_audit(args: &[String]) -> Result<(), String> {
                     );
                 }
             }
-            for f in &report.findings {
-                println!("\n{}  {}  node {}", f.severity.label(), f.lint, f.node_id);
-                println!("  {}", f.message);
-                println!("  {}", f.snippet);
+            println!(
+                "{} unresolved review obligation(s)",
+                report.obligations.len()
+            );
+            for obligation in &report.obligations {
+                println!(
+                    "\n{} review priority  {}  [{} anchors]",
+                    obligation.review_priority.label(),
+                    obligation.key,
+                    obligation.anchors.len()
+                );
+                for f in &obligation.anchors {
+                    println!("  node {}: {}", f.node_id, f.message);
+                    println!("  {}", f.snippet);
+                }
             }
             Ok(())
         }
@@ -961,7 +983,7 @@ fn cmd_hunt(args: &[String]) -> Result<(), String> {
                 );
             }
             for res in &r.residuals {
-                println!("  requires: {res}");
+                println!("  observed proof requirement under these probes: {res}");
             }
             println!("  probes:");
             for p in &r.probes {
@@ -1161,8 +1183,8 @@ fn positional_after_flags<'a>(args: &'a [String], value_flags: &[&str]) -> Optio
 fn hunt_verdict_str(v: ergo_sandbox::hunt::HuntVerdict) -> &'static str {
     use ergo_sandbox::hunt::HuntVerdict::*;
     match v {
-        SpendableByAnyone => "spendable by anyone",
-        MovableByAnyone => "movable by anyone",
+        SpendableByAnyone => "sample passed without a proof (full node validation has not run)",
+        MovableByAnyone => "preserving-output sample passed (full node validation has not run)",
         RequiresProof => "requires proof",
         NotUnderProbes => "not under probes",
     }
@@ -1196,7 +1218,10 @@ fn cmd_drain(args: &[String]) -> Result<(), String> {
         DrainVerdict::InvalidShape => "invalid shape",
         DrainVerdict::IncompleteObjective => "incomplete objective",
     };
-    println!("drain: {}", verdict.to_lowercase());
+    println!(
+        "drain: {} (unsigned preflight candidate; full node validation has not run)",
+        verdict.to_lowercase()
+    );
     for n in &report.notes {
         println!("  note: {n}");
     }
@@ -1334,7 +1359,7 @@ fn cmd_test(args: &[String]) -> Result<(), String> {
     let r = ergo_sandbox::decompile::with_large_stack(move || ergo_sandbox::testsuite::run(&suite))
         .map_err(|e| e.to_string())?;
     if args.iter().any(|a| a == "--json") {
-        let v = serde_json::json!({
+        let mut v = serde_json::json!({
             "formatVersion": 1,
             "treeHex": r.tree_hex,
             "address": r.address,
@@ -1345,6 +1370,13 @@ fn cmd_test(args: &[String]) -> Result<(), String> {
             "passed": r.passed,
             "failed": r.failed,
         });
+        v.as_object_mut().expect("result object").extend(
+            serde_json::to_value(ergo_sandbox::claim::ClaimMetadata::SIMULATION)
+                .expect("labels serialize")
+                .as_object()
+                .expect("label object")
+                .clone(),
+        );
         println!(
             "{}",
             serde_json::to_string_pretty(&v).map_err(|e| e.to_string())?
@@ -1408,10 +1440,13 @@ fn cmd_validate_tx(args: &[String]) -> Result<(), String> {
         println!("  problem: {p}");
     }
     if r.valid {
-        println!("valid: yes ({} signature(s) needed)", r.signatures_needed);
+        println!(
+            "Preflight passed — full node validation has not run ({} signature(s) needed)",
+            r.signatures_needed
+        );
         Ok(())
     } else {
-        println!("valid: NO");
+        println!("Preflight failed — full node validation has not run");
         Err(format!("{} problem(s)", r.problems.len()))
     }
 }
@@ -1638,4 +1673,26 @@ fn cmd_triage(args: &[String]) -> Result<(), String> {
         serde_json::to_string_pretty(&finding).map_err(|e| e.to_string())?
     );
     Ok(())
+}
+
+fn cmd_replay(args: &[String]) -> Result<(), String> {
+    if args.is_empty() || args.len() > 2 || (args.len() == 2 && args[1] != "--json") {
+        return Err("usage: ergo-es replay <bundle.json> [--json]".into());
+    }
+    let bytes = std::fs::read(&args[0]).map_err(|e| e.to_string())?;
+    let bundle: ergo_sandbox::evidence::replay::ReplayBundle =
+        serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+    let report = ergo_sandbox::evidence::replay::replay(&bundle);
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
+    );
+    if matches!(
+        report["status"].as_str(),
+        Some("confirmed-violation" | "accepted-nonviolating")
+    ) {
+        Ok(())
+    } else {
+        Err("replay did not establish a supported accepted property result".into())
+    }
 }

@@ -75,6 +75,8 @@ pub struct CostLine {
 /// The full outcome of one scenario evaluation.
 #[derive(Debug, Clone, Serialize)]
 pub struct EvalOutcome {
+    #[serde(flatten)]
+    pub claim: crate::claim::ClaimMetadata,
     /// The decided verdict.
     pub verdict: Verdict,
     /// Runtime evaluation error text, when the script raised one.
@@ -367,6 +369,7 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
         .collect();
 
     let mut outcome = EvalOutcome {
+        claim: crate::claim::ClaimMetadata::SIMULATION,
         verdict: Verdict::Error,
         error: None,
         cost: cost.total_block_cost(),
