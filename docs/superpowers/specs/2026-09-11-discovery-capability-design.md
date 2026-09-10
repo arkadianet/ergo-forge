@@ -2,7 +2,7 @@ An author can declare versioned protocol guarantees, supply a finite initializat
 
 The strongest argument against building this arc is that authoring trustworthy properties, initialization rules and action templates may cost more than writing the regression witnesses directly: the tool could become a second, incomplete protocol implementation whose impressive search results mostly expose mistakes in its own model. A supplied-witness property workbench may be the useful endpoint. The first measured result must be allowed to cancel lifecycle construction and solving, rather than merely postpone them.
 
-Status: **design only**, inspected at `dd8dab6af8c494b86e626ea29a274b08372854c1`. This record authorizes no implementation, behavior change or governing policy edit. Proposed filenames, tests, budgets and numeric targets below are future deliverables, not measured results. [ROADMAP](../../ROADMAP.md), its frozen measurements and its section 6 stops remain authoritative. M05 remains stopped. No product benchmark was rerun for this record.
+Status at initial design: **design only**, inspected at `dd8dab6af8c494b86e626ea29a274b08372854c1`. The subsequent [D00 governing decision](../../discovery/D00-DECISION.md) authorizes only incremental D00 registration and its inventory; all later units and capabilities remain proposed. Proposed filenames, tests, budgets and numeric targets below are future deliverables, not measured results. [ROADMAP](../../ROADMAP.md), its frozen measurements and its section 6 stops remain authoritative. M05 remains stopped. No product benchmark was rerun for this record.
 
 ## 1. End-state and the dependency between capabilities
 
@@ -140,7 +140,7 @@ D04 depends on D02, not D03, intentionally: it must run to record a stop even wh
 
 ### 5.3 Runner-compatible proposed registrations
 
-The JSON below contains **proposed entries for the existing policy's `units` array**, not a second policy source. A future, separately authorized governing change would append D00–D04 unchanged, initially unimplemented. Preserve the existing `schemaVersion`, `baselineRev`, thresholds, scoreboard, stop records/resolutions and P/M units. The runner reads only `docs/ROADMAP.md`; it has no alternate-spec argument. Do not add one or claim these tests run today. M05 is not a dependency and remains stopped; D00 depends on the passing M04 prefix. D04's deliberate dependency is explained above.
+The JSON below contains **proposed entries for the existing policy's `units` array**, not a second policy source. The author-authorized 2026-09-11 decision registers **D00 only**, initially unimplemented, and retains all five entries below as the full proposed queue. D01–D04 remain unregistered; each needs a later governing registration decision. **CI cannot enforce gates for units not yet registered.** This is the explicit cost of incremental scheduling, not a change to CI acceptance semantics. See [the decision](../../discovery/D00-DECISION.md). Preserve the existing `schemaVersion`, `baselineRev`, thresholds, scoreboard, stop records/resolutions and P/M units. The runner reads only `docs/ROADMAP.md`; it has no alternate-spec argument. Do not add one or claim these tests run today. M05 is not a dependency and remains stopped; D00 depends on the passing M04 prefix. D04's deliberate dependency is explained above.
 
 ```json
 [
@@ -224,3 +224,52 @@ Refuse to build or claim:
 - Extra APIs, UI work, live acquisition, protocol contact, wallet integration, broadcast or automatic issue/report delivery within this arc.
 
 The acceptable deliverable is the measured passing prefix and an explicit decision about the remaining allocation, including cancellation when the evidence does not justify building it.
+
+### D00 attempted registration amendment — 2026-09-11 (stopped)
+
+Following PR #99, the author authorized D00 implementation and exact D00–D04
+registration, with only D00 eligible to become implemented, while requiring the
+existing `--ci` gate to exit zero. Section 5.3 overlooked the governing PR #98 CI
+rule: every registered unimplemented unit without a validated stop makes CI fail.
+Consequently even successful D00 implementation cannot meet that combined
+landing contract with D01–D04 false. Unattempted future work cannot be made into
+completed work or assigned fictitious failure evidence to obtain a green build.
+
+The attempted exact append also exposes M00's policy-authentication projection:
+it strips only M entries before checking the frozen P08-policy digest, so D
+entries fail that existing gate. The digest and all underlying frozen facts
+remain correct and unchanged; registration needs an explicit integration change
+to the projection, not a new expected digest.
+
+The [D00 stop report](../../discovery/D00.md) preserves a real run over the exact
+proposed registrations and its restored-policy verification. The amendment is
+to the registration feasibility claim: the queue above remains proposed, with
+its original tests, targets, packages, days, dependencies and false flags; it is
+not appended to the governing policy in this stopped attempt. D00 is not
+implemented. No inventory, node-reference measurement, independent review,
+transfer success or D02 linked-trace replay is claimed.
+
+Before reopening, explicitly reconcile future-unit scheduling with CI's
+all-goal acceptance contract and integrate M00's policy projection while
+preserving its pinned digest. This amendment grants no threshold waiver, new CI
+acceptance state, later-unit implementation or capability 2/3 allocation.
+
+
+### D00 reopening and inventory record — 2026-09-11
+
+The [governing decision](../../discovery/D00-DECISION.md) supersedes the stopped
+registration schedule above. D00 alone is registered; the full proposed queue
+in section 5.3 remains visible. Both historical blockers and their raw evidence
+remain in the [historical stop report](../../discovery/D00-STOP.md) and registry.
+The first was an author instruction error; the second was the latent M00 policy
+projection defect. The original digest and manifest bytes are retained, with
+separate authentication of the exact permitted additions and rejection tests.
+
+The [D00 execution record](../../discovery/D00.md) freezes 24 synthetic rows,
+separate authored answers, a separate null transfer registration and current
+extraction measurements. Each reference transaction receives individual current
+node validation. No D02 linked-trace replay or new-property evaluator exists.
+Independent human review is absent, so semantic measurement is incomplete.
+There is no utility or discovery credit. With no defensible transfer pair, the
+unchanged checkpoint rule cancels capabilities 2 and 3 for this arc; D04 is not
+registered, run or claimed complete here. Capability 1 may remain the endpoint.

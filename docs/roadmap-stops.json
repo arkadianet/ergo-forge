@@ -31,54 +31,84 @@
       "scope": "Reopen the original P05 gate; all original thresholds and fresh execution gates remain mandatory. The original stop and its evidence are preserved."
     }
   },
-{
-  "unitOrProposal": "M05",
-  "reasonCode": "coverage-gate",
-  "attemptCommit": "0add2ebbcb535d63f2af8819f75ba9afaec67326",
-  "daysSpent": 1,
-  "gateResults": [
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "ergo-sandbox",
-        "--release",
-        "--test",
-        "mapping_context_boundary",
-        "--",
-        "--show-output"
-      ],
-      "exitCode": 0,
-      "evidenceHashes": {
-        "ergo-sandbox/tests/mapping_context_boundary.rs": "207723a25d8a71b06ba6dda05c558c9469985a1c485d93e219cf867ffe77ef90",
-        "docs/mapping/m05-stop-results.json": "2ebb00ce2d46a258f45b36f40f0f8b7994698d0f5ad6f25aad4ad86984518497",
-        "ergo-sandbox/tests/fixtures/mapping/m05-stop/different-true-expression.fixture": "0c1daddc6a9b2c6a96e4297ca036eed77f6b19f9b1264579f7af324b95f744da",
-        "ergo-sandbox/tests/fixtures/mapping/m05-stop/false-expression.fixture": "476e6d0b1136336ed078ded89ac56c8ce8dd33388e484e03601463ef6b90c119",
-        "ergo-sandbox/tests/fixtures/mapping/m05-stop/original.fixture": "0a875ce747ee45efcf2d7bbcd932388192fd14ed9b91f58523ffa4febcf31d8b",
-        "docs/mapping/m05-stop-evidence/boundary.log": "5a82c6335c684ae1914ca66d91b87cc60e12ed05fc81b37e2c542148e8b358c3"
+  {
+    "unitOrProposal": "M05",
+    "reasonCode": "coverage-gate",
+    "attemptCommit": "0add2ebbcb535d63f2af8819f75ba9afaec67326",
+    "daysSpent": 1,
+    "gateResults": [
+      {
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "ergo-sandbox",
+          "--release",
+          "--test",
+          "mapping_context_boundary",
+          "--",
+          "--show-output"
+        ],
+        "exitCode": 0,
+        "evidenceHashes": {
+          "ergo-sandbox/tests/mapping_context_boundary.rs": "207723a25d8a71b06ba6dda05c558c9469985a1c485d93e219cf867ffe77ef90",
+          "docs/mapping/m05-stop-results.json": "2ebb00ce2d46a258f45b36f40f0f8b7994698d0f5ad6f25aad4ad86984518497",
+          "ergo-sandbox/tests/fixtures/mapping/m05-stop/different-true-expression.fixture": "0c1daddc6a9b2c6a96e4297ca036eed77f6b19f9b1264579f7af324b95f744da",
+          "ergo-sandbox/tests/fixtures/mapping/m05-stop/false-expression.fixture": "476e6d0b1136336ed078ded89ac56c8ce8dd33388e484e03601463ef6b90c119",
+          "ergo-sandbox/tests/fixtures/mapping/m05-stop/original.fixture": "0a875ce747ee45efcf2d7bbcd932388192fd14ed9b91f58523ffa4febcf31d8b",
+          "docs/mapping/m05-stop-evidence/boundary.log": "5a82c6335c684ae1914ca66d91b87cc60e12ed05fc81b37e2c542148e8b358c3"
+        }
+      },
+      {
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "ergo-sandbox",
+          "--release",
+          "--test",
+          "mapping_context_code",
+          "--",
+          "--show-output"
+        ],
+        "exitCode": 101,
+        "evidenceHashes": {
+          "docs/mapping/m05-stop-evidence/registered-target.log": "8a2ece5702b04a40c79e03a4d75d3094f74b176d6a4a9a0b67dbd2083892760b"
+        }
       }
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "ergo-sandbox",
-        "--release",
-        "--test",
-        "mapping_context_code",
-        "--",
-        "--show-output"
-      ],
-      "exitCode": 101,
-      "evidenceHashes": {
-        "docs/mapping/m05-stop-evidence/registered-target.log": "8a2ece5702b04a40c79e03a4d75d3094f74b176d6a4a9a0b67dbd2083892760b"
+    ],
+    "retainedCapability": "P00-P08 and M00-M04 unchanged. Exact direct Spend/authentication checking, explicit action sets and supplied Spend omission replay remain. A separate passing diagnostic replays two accepted distinct extension programs and a rejected false extension under the same pinned context_scope-positive root, SELF, state and guard. No M05 proof/action capability is registered or claimed. All 67 action expectations remain, with the four Execute dispositions deferred. daysSpent counts one working day touched, not exhaustion of the four-day ceiling. Commands use CARGO_TARGET_DIR=./target-p00. Work is uncommitted because .git is read-only.",
+    "unsupportedClass": "The pinned supported context_scope-positive case mandates input-local execution but neither authenticates config nor constrains its extension hash. The full validator accepts 7f and 93a3a3 with different BLAKE2b-256 digests and identical P. Section 3.2 Execute(input,var,codeDigest) requires exact authenticated bytes, so the M05 supported-necessity and 67/67 action gates cannot both be met within section 3.4 and unchanged pinned answers. This is not a contradiction of an established claim: M03/M04 correctly left Execute unresolved. No arbitrary dispatch or caller-assumed extension constraint is introduced to make it pass.",
+    "reopenEvidenceRequired": "An explicit governing design and versioned denominator decision reconciling context_scope-positive with exact authenticated Execute semantics, retaining every original fixture, expected fact, denominator and result as history; plus independent satisfying, omission and alternative-code controls for the replacement bounded config/hash idiom. Alternatively supply a sound derivation enforcing one fixed digest from the current exact bytes and permitted premises that explains both accepted distinct-digest witnesses without suppressing them. Reopening requires the original four M05 tests (or an explicitly governed replacement), all corpus metrics and the complete predecessor gates; no silent relabeling or scope expansion."
+  },
+  {
+    "unitOrProposal": "D00",
+    "reasonCode": "coverage-gate",
+    "attemptCommit": "a57df087df85813c7f90a6f6f9ad6aaf5b4597cd",
+    "daysSpent": 1,
+    "gateResults": [
+      {
+        "command": [
+          "python3",
+          "docs/discovery/d00-stop-evidence/reproduce_registration.py"
+        ],
+        "exitCode": 1,
+        "evidenceHashes": {
+          "docs/discovery/d00-stop-evidence/reproduce_registration.py": "5e966c2ff890967d26e7c1ed9c1f8902d1b1e3795548db1f893ac7da64c8c476",
+          "docs/discovery/d00-stop-evidence/proposed-roadmap.fixture": "43455fdd79cc637956fbb6c6b01bd17956b54732fb91e6ea70201243a98b3b92",
+          "docs/discovery/d00-stop-evidence/proposed-ci.json": "719fbae4a484135e713d474f2ace163e5c75a010c97e44249ee6a94cbb96315e",
+          "docs/discovery/d00-stop-evidence/proposed-ci.log": "6ebc56519b21238d08f97162c38a32990d7e6d879614029091e589029243c028",
+          "docs/discovery/d00-stop-evidence/registration-receipt.json": "cd6d522f61d8c4dc398b2e3ca97a69d128beccdd3622bae4f8eb91ecf59547ee"
+        }
       }
+    ],
+    "retainedCapability": "P00-P08 and M00-M04 unchanged; M05 remains stopped. No D unit registration or implementation retained. Only the reproducible registration diagnostic, design amendment and stop report are added. All flags, completedThrough, numeric baselines and expected facts are unchanged. daysSpent counts one working day touched, not exhaustion of the two-day ceiling. CARGO_TARGET_DIR=./target-p00; work is uncommitted.",
+    "unsupportedClass": "The combined D00 landing contract: append exact D00-D04 entries, leave D01-D04 false, preserve all-goal CI accepting only passed/validated stopped, yet require --ci exit 0. The actual proposed-registration CI exits 1 with all D units unimplemented. Even passing D00 would leave four rejected statuses. The append also fails M00 legacy_metrics_are_measured_without_baseline_changes because its protected P08 policy projection removes M entries but not D entries; M01-M04 become blocked. No property inventory or reference executions were attempted, and no D01-D04 execution failure or cancellation is claimed.",
+    "reopenEvidenceRequired": "Explicit governing scheduling decision reconciling future false registrations with full-goal CI without falsely completing units or silently accepting unfinished goals; explicit M00 projection integration that preserves its original pinned policy digest and authenticates original P/M registrations and all policy fields. Then the unchanged D00 24-row inventory, separate transfer/reviewer accounting and all registered gates must be implemented and freshly run. Original D00-D04 proposed tests, targets, days, dependencies and denominators remain in the design. No capability 2 or 3 work is authorized by this stop.",
+    "resolution": {
+      "reasonCode": "governing-registration-decision",
+      "governingDecision": "docs/discovery/D00-DECISION.md",
+      "scope": "Reopen the unchanged D00 inventory gate only; preserve both historical blockers and all evidence. Completion requires fresh passing gates."
     }
-  ],
-  "retainedCapability": "P00-P08 and M00-M04 unchanged. Exact direct Spend/authentication checking, explicit action sets and supplied Spend omission replay remain. A separate passing diagnostic replays two accepted distinct extension programs and a rejected false extension under the same pinned context_scope-positive root, SELF, state and guard. No M05 proof/action capability is registered or claimed. All 67 action expectations remain, with the four Execute dispositions deferred. daysSpent counts one working day touched, not exhaustion of the four-day ceiling. Commands use CARGO_TARGET_DIR=./target-p00. Work is uncommitted because .git is read-only.",
-  "unsupportedClass": "The pinned supported context_scope-positive case mandates input-local execution but neither authenticates config nor constrains its extension hash. The full validator accepts 7f and 93a3a3 with different BLAKE2b-256 digests and identical P. Section 3.2 Execute(input,var,codeDigest) requires exact authenticated bytes, so the M05 supported-necessity and 67/67 action gates cannot both be met within section 3.4 and unchanged pinned answers. This is not a contradiction of an established claim: M03/M04 correctly left Execute unresolved. No arbitrary dispatch or caller-assumed extension constraint is introduced to make it pass.",
-  "reopenEvidenceRequired": "An explicit governing design and versioned denominator decision reconciling context_scope-positive with exact authenticated Execute semantics, retaining every original fixture, expected fact, denominator and result as history; plus independent satisfying, omission and alternative-code controls for the replacement bounded config/hash idiom. Alternatively supply a sound derivation enforcing one fixed digest from the current exact bytes and permitted premises that explains both accepted distinct-digest witnesses without suppressing them. Reopening requires the original four M05 tests (or an explicitly governed replacement), all corpus metrics and the complete predecessor gates; no silent relabeling or scope expansion."
-}
+  }
 ]

@@ -1,0 +1,119 @@
+{
+  "command": [
+    "python3",
+    "scripts/roadmap_gate.py",
+    "--ci",
+    "--report",
+    "docs/discovery/d00-stop-evidence/proposed-ci.json"
+  ],
+  "exitCode": 1,
+  "originalRoadmapSha256": "32098ca5ee263217e84f41a15f0e97d907234ae4a31baa7dce5cfd36da9f1c67",
+  "restoredExactly": true,
+  "results": [
+    {
+      "unit": "scoreboard",
+      "status": "passed"
+    },
+    {
+      "unit": "P00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P01",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P02",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P03",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P04",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P05",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P06",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P07",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P08",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M00",
+      "status": "failed",
+      "detail": "product test command failed"
+    },
+    {
+      "unit": "M01",
+      "status": "blocked",
+      "detail": "dependency did not pass"
+    },
+    {
+      "unit": "M02",
+      "status": "blocked",
+      "detail": "dependency did not pass"
+    },
+    {
+      "unit": "M03",
+      "status": "blocked",
+      "detail": "dependency did not pass"
+    },
+    {
+      "unit": "M04",
+      "status": "blocked",
+      "detail": "dependency did not pass"
+    },
+    {
+      "unit": "M05",
+      "status": "stopped",
+      "detail": "recorded stop blocks this unit"
+    },
+    {
+      "unit": "D00",
+      "status": "unimplemented",
+      "detail": "registered product unit is not implemented"
+    },
+    {
+      "unit": "D01",
+      "status": "unimplemented",
+      "detail": "registered product unit is not implemented"
+    },
+    {
+      "unit": "D02",
+      "status": "unimplemented",
+      "detail": "registered product unit is not implemented"
+    },
+    {
+      "unit": "D03",
+      "status": "unimplemented",
+      "detail": "registered product unit is not implemented"
+    },
+    {
+      "unit": "D04",
+      "status": "unimplemented",
+      "detail": "registered product unit is not implemented"
+    }
+  ],
+  "scope": "Real CI over exact proposed false registrations; no D00 implementation or reference execution measurement."
+}
