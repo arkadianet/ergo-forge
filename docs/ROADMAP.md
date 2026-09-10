@@ -203,7 +203,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
 {
   "schemaVersion": 1,
   "baselineRev": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
-  "completedThrough": "D01",
+  "completedThrough": "D02",
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,
   "units": [
@@ -496,6 +496,22 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "property_versions_units_and_limits_fail_closed",
         "bindings_never_infer_missing_roles_or_authority",
         "declaration_identity_binds_all_semantic_premises"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "D02",
+      "depends": [
+        "D01"
+      ],
+      "days": 3,
+      "package": "ergo-sandbox",
+      "target": "property_evaluation",
+      "tests": [
+        "four_property_families_match_independent_operands",
+        "guards_missing_fields_and_overflow_preserve_unknowns",
+        "bounded_response_requires_a_complete_accepted_linked_trace",
+        "property_evaluation_requires_fresh_node_acceptance"
       ],
       "implemented": true
     }
@@ -850,3 +866,15 @@ anchor remains unchanged; exact permitted-additions authentication now covers
 D01 while rejecting prior-field mutations and later-unit appends. M05 remains
 stopped. D02–D04 are unregistered; capability 1 can remain the endpoint and no
 capability 2/3 work is planned by this change.
+
+
+D02 author-authorized implementation record — 2026-09-11:
+D02 alone is registered with the unchanged D01 dependency, three-day ceiling,
+package, target and four test names. Fresh per-step node validation now supports
+checked supplied-trace linkage and the four bounded property families, including
+response horizons 1–4. Only D02's implementation flag and `completedThrough`
+advance. See the [D02 report](discovery/D02.md) for authority limits, adversarial
+checks and real gate output. The D00/D01 pins, schema, M00 anchor, frozen data
+and M05 stop remain unchanged. Exact permitted-additions authentication covers
+D02 and retains earlier mutation/append rejections. D03/D04 remain unregistered;
+capability 1 may remain the endpoint, with no capability 2/3 work planned here.

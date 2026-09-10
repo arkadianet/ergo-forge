@@ -1,0 +1,862 @@
+$ CARGO_TARGET_DIR=./target-p00 cargo test --workspace --release
+   Compiling rustls-webpki v0.103.15
+   Compiling rustls v0.23.43
+   Compiling ureq v3.4.1
+   Compiling tokio-rustls v0.26.4
+   Compiling hyper-rustls v0.27.9
+   Compiling reqwest v0.12.28
+   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-web v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-web)
+    Finished `release` profile [optimized] target(s) in 46.62s
+     Running unittests src/lib.rs (target-p00/release/deps/ergo_sandbox-42b6b76a1e339ff9)
+
+running 32 tests
+test audit::lints::unchecked_get::tests::active_outer_guard_cannot_guard_a_shadowing_lambda_parameter ... ok
+test audit::lints::unchecked_get::tests::aliases_capture_index_bindings_before_shadowing ... ok
+test audit::lints::unchecked_get::tests::box_shadowing_does_not_inherit_guards_and_restores_outer_alias ... ok
+test audit::lints::unchecked_get::tests::box_alias_chains_match_guards_in_both_directions ... ok
+test audit::lints::unchecked_get::tests::boolean_shadowing_hides_and_restores_outer_proofs ... ok
+test audit::lints::unchecked_get::tests::unguarded_aliases_and_different_receivers_are_reported ... ok
+test audit::lints::unchecked_get::tests::lambda_parameters_hide_box_aliases_and_boolean_guards ... ok
+test audit::lints::unchecked_get::tests::unknown_box_binding_can_still_be_guarded_through_a_direct_alias ... ok
+test audit::lints::unchecked_get::tests::known_box_selectors_are_canonicalised ... ok
+test audit::lints::unchecked_get::tests::unsupported_expressions_are_not_assumed_equal ... ok
+test compile::tests::default_text_is_none_for_values_without_a_parser_form ... ok
+test drain::tests::accounting_pins_companions_and_uses_realized_funding_not_data_or_template ... ok
+test drain::tests::declared_edits_are_single_fixed_targets_before_permutation_and_recreations ... ok
+test drain::tests::conditional_terms_bind_payment_and_stock_without_cross_asset_netting ... ok
+test drain::tests::declared_padding_rejects_unsourced_duplicate_and_already_committed_fillers ... ok
+test drain::tests::empty_combinations_terminate ... ok
+test drain::tests::drain_payouts_omit_zero_token_remainders ... ok
+test drain::tests::mint_probes_omit_zero_amounts_derived_from_templates ... ok
+test drain::tests::minted_supply_and_self_funded_change_cannot_score_and_assets_never_net ... ok
+test drain::tests::missing_policy_and_non_victim_allowances_are_explicitly_incomplete ... ok
+test drain::tests::permutations_are_lexicographic_and_capped ... ok
+test drain::tests::recognition_is_exact_declared_keys_only_and_ignores_payee_labels ... ok
+test drain::tests::static_allowances_deduplicate_and_share_source_and_receipt_caps ... ok
+test drain::tests::synthesis_serde_defaults_make_the_omitted_block_all_off ... ok
+test drain::tests::the_axis_odometer_walks_the_pinned_order ... ok
+test drain::tests::the_combo_counter_walks_every_combination_exactly_once ... ok
+test drain::tests::the_decoy_family_is_finite_script_independent_and_includes_the_incident_shape ... ok
+test map::check_relation::scope_tests::existential_forward_capture_cannot_establish_mandatory_facts ... ok
+test map::check_relation::scope_tests::nested_lambda_bindings_do_not_leak_or_repair_forward_captures ... ok
+test map::explorer::tests::explorer_registers_survive_box_and_page_parsing ... ok
+test map::source::tests::absent_registers_are_empty_and_decoded_only_registers_report_a_limit ... ok
+test drain::tests::declared_padding_is_sourced_conserved_and_preserves_state ... ok
+
+test result: ok. 32 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/ergo-es.rs (target-p00/release/deps/ergo_es-a449c1b0674d5a0f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/audit.rs (target-p00/release/deps/audit-c6deb7be9a1c33ce)
+
+running 43 tests
+test a_get_on_a_context_variable_is_low ... ok
+test a_finding_carries_the_ir_id_of_its_node ... ok
+test a_fully_lifted_tree_audits_as_complete ... ok
+test a_get_on_a_lambda_element_is_medium ... ok
+test a_guard_bound_to_a_val_clears_the_get_in_the_then_branch ... ok
+test a_get_through_an_element_property_chain_is_medium ... ok
+test a_guard_bound_to_a_val_clears_the_get_under_and ... ok
+test a_guarded_lambda_element_get_is_not_flagged ... ok
+test a_negated_guard_condition_clears_the_else_branch ... ok
+test a_negated_guard_condition_does_not_clear_the_then_branch ... ok
+test a_self_get_inside_a_lambda_stays_high ... ok
+test a_positive_guard_under_or_still_proves_nothing_for_the_right_operand ... ok
+test a_positional_box_without_reserve_math_is_not_flagged ... ok
+test a_self_successor_pool_is_not_flagged ... ok
+test a_negated_guard_under_or_clears_the_right_operand ... ok
+test a_negated_val_guard_under_or_clears_the_right_operand ... ok
+test a_val_guard_does_not_clear_a_get_outside_its_scope ... ok
+test a_val_guard_composed_of_two_guards_clears_both_gets ... ok
+test a_val_guard_under_or_still_proves_nothing ... ok
+test an_unbound_data_input_reserve_read_is_flagged ... ok
+test bare_register_get_is_flagged ... ok
+test an_or_chain_of_negated_guards_clears_the_tail ... ok
+test an_nft_bound_box_is_not_flagged ... ok
+test children_covers_every_node_of_a_nested_tree ... ok
+test binding_by_the_whole_tokens_collection_counts ... ok
+test findings_carry_a_readable_snippet ... ok
+test binding_by_the_whole_token_pair_counts ... ok
+test binding_to_another_positional_box_does_not_count ... ok
+test get_or_else_is_never_flagged ... ok
+test is_defined_conditional_guards_the_get ... ok
+test is_defined_conjunction_guards_the_get ... ok
+test is_defined_nested_in_conjunction_still_guards ... ok
+test guarded_successor_alias_survives_compilation_and_is_not_reported ... ok
+test is_defined_under_or_does_not_guard_the_get ... ok
+test negated_is_defined_does_not_guard_the_get ... ok
+test reserves_read_only_from_self_are_not_flagged ... ok
+test positional_reserves_without_an_nft_are_flagged ... ok
+test the_deployed_use_bank_contract_is_clean ... ok
+test two_unguarded_gets_produce_two_findings_with_distinct_nodes ... ok
+test the_deployed_use_lp_swap_contract_is_flagged ... ok
+test unguarded_successor_alias_is_still_reported_after_compilation ... ok
+test the_deployed_use_lp_extract_contract_is_clean ... ok
+test the_incident_corpus_fixed_swap_is_clean ... ok
+
+test result: ok. 43 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/audit_context.rs (target-p00/release/deps/audit_context-1725bdeab4440e91)
+
+running 7 tests
+test context_variable_indices_are_not_shared_between_inputs ... ok
+test script_identity_cannot_discharge_data_provider_provenance ... ok
+test serialized_discharge_keeps_original_finding_and_names_its_proof ... ok
+test incomplete_or_unproven_context_never_discharges ... ok
+test only_required_same_slot_bindings_discharge ... ok
+test dexy_lp_real_exploit_gap_stays_high_even_with_pool_companion ... ok
+test phoenix_bank_binds_the_proxy_bank_successor ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/claim_contract.rs (target-p00/release/deps/claim_contract-847ee1bf80cc616f)
+
+running 3 tests
+test legacy_record_cannot_import_as_verified ... ok
+test legacy_results_are_explicitly_preflight_or_simulation ... ok
+test scenario_reproduction_is_not_confirmation ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/claim_replay.rs (target-p00/release/deps/claim_replay-28a8f93a72884d7c)
+
+running 4 tests
+test unknown_policy_cannot_confirm ... ok
+test wrong_companion_or_policy_invalidates_claim ... ok
+test claim_requires_accepted_execution_and_violated_property ... ok
+test offline_replay_reproduces_claim ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/cli_hunt.rs (target-p00/release/deps/cli_hunt-313c8ff261d09fd1)
+
+running 8 tests
+test hunt_reports_a_trivially_true_sample_without_node_validation ... ok
+test hunt_honours_a_caller_height ... ok
+test hunt_reports_the_residual_key_for_p2pk ... ok
+test validate_tx_command_reports_each_input_and_exits_nonzero_when_preflight_fails ... ok
+test hunt_warns_when_self_is_synthetic_and_probes_error ... ok
+test test_command_prints_a_table_and_exits_nonzero_on_a_failing_case ... ok
+test compose_command_prints_source_and_writes_a_suite_with_params ... ok
+test hunt_mainnet_does_not_read_a_flag_value_as_the_corpus_limit ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/cli_json.rs (target-p00/release/deps/cli_json-6558c2f20654f3ec)
+
+running 2 tests
+test eval_json_is_one_object_with_the_verdict_and_cost ... ok
+test test_json_lists_every_case_with_expected_and_actual ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cli_match.rs (target-p00/release/deps/cli_match-9b2e50efb52bdb67)
+
+running 1 test
+test match_cli_source_params_json_text_and_errors ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/compile_params.rs (target-p00/release/deps/compile_params-2509bc4da4f105fd)
+
+running 23 tests
+test a_contract_marker_in_a_comment_or_string_is_not_a_template ... ok
+test a_bare_identifier_resolves_through_the_environment_too ... ok
+test a_coll_byte_parameter_is_substituted_as_hex_inside_string_literals ... ok
+test a_pubkey_parameter_becomes_a_real_prove_dlog ... ok
+test a_dollar_param_does_not_collide_with_a_val_of_the_same_name ... ok
+test a_dollar_identifier_resolves_through_the_environment ... ok
+test a_pubkey_with_surrounding_whitespace_is_still_a_pubkey ... ok
+test a_missing_bare_environment_name_is_reported_as_missing ... ok
+test an_all_caps_string_token_is_a_string_param ... ok
+test a_sigma_prop_parameter_accepts_a_p2pk_address ... ok
+test compile_errors_keep_their_offset ... ok
+test an_eip5_template_default_fills_a_missing_parameter ... ok
+test an_eip5_template_without_a_default_reports_the_missing_parameter ... ok
+test integer_types_accept_exact_decimal_strings ... ok
+test a_string_parameter_is_substituted_inside_string_literals ... ok
+test missing_parameters_are_a_structured_error ... ok
+test an_eip5_template_compiles_with_its_parameters_applied ... ok
+test compile_with_map_returns_the_map_for_plain_sources_and_none_for_templates ... ok
+test scan_does_not_route_a_commented_marker_to_the_template_path ... ok
+test scan_finds_names_with_hints_and_ignores_comments ... ok
+test scan_carries_the_template_param_descriptions_and_the_contract_doc ... ok
+test scan_reports_each_name_once_and_skips_block_comments ... ok
+test scan_lists_eip5_parameters_with_types_and_defaults ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/compose.rs (target-p00/release/deps/compose-55492c9fc4e5e9fb)
+
+running 20 tests
+test a_mint_rule_is_only_about_outputs ... ok
+test an_empty_spec_or_a_path_without_who_or_conditions_is_rejected ... ok
+test an_inheritance_shaped_spec_composes_to_readable_source_with_params ... ok
+test contradictory_rules_are_refused_not_silently_green ... ok
+test composed_source_compiles_and_behaves_like_the_recipe ... ok
+test kept_funds_may_drop_by_at_most_an_amount ... ok
+test a_tokenless_state_box_may_keep_its_tokens_and_let_none_leave ... ok
+test any_and_all_output_rules_and_output_count ... ok
+test miner_rule_and_self_register_rule ... ok
+test the_contracts_own_token_does_not_open_a_token_gate ... ok
+test an_output_mints_a_token_named_after_the_first_input ... ok
+test a_token_is_conserved_across_outputs ... ok
+test k_of_n_who_and_before_condition ... ok
+test a_conserved_token_fits_in_a_single_required_output ... ok
+test token_gate_and_fixed_input_count_agree_in_either_order ... ok
+test data_input_rule_the_oracle_box_by_token_and_register ... ok
+test output_rule_with_self_script_token_and_register_equal_to_height ... ok
+test payment_and_keep_conditions_allocate_outputs_in_order ... ok
+test time_window_box_age_and_input_count ... ok
+test spender_values_hash_preimage_token_gate_and_paid_total ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/decompile_ast.rs (target-p00/release/deps/decompile_ast-afa599a3ca5904a6)
+
+running 6 tests
+test deeply_nested_constant_truncates_instead_of_overflowing ... ok
+test lifted_nodes_carry_shared_preorder_ir_ids ... ok
+test lift_local_ids_are_unique_within_one_tree ... ok
+test lifted_and_decompiled_report_the_same_placeholder_count ... ok
+test lift_then_print_matches_the_fused_render ... ok
+test context_execution_operations_roundtrip_without_placeholders ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/decompile_corpus.rs (target-p00/release/deps/decompile_corpus-0932ddc76d37fb07)
+
+running 2 tests
+test external_compiled_fixtures_measurement ... ignored, external node checkout; set DC_NODE_CHECKOUT and DC_REPORT
+test bundled_contracts_and_compiled_fixtures_round_trip ... ok
+
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.24s
+
+     Running tests/decompile_robustness.rs (target-p00/release/deps/decompile_robustness-d794793c3d66634c)
+
+running 18 tests
+test a_tuple_function_with_mixed_uses_admits_the_fold_arity_gap ... ok
+test composite_constants_use_declared_types_including_empty_collections ... ok
+test reused_binding_ids_keep_statement_order_and_rhs_scope ... ok
+test references_do_not_leak_from_a_finished_lambda_scope ... ok
+test a_function_used_only_by_folds_keeps_byte_exact_shared_calls ... ok
+test group_element_constants_keep_their_type ... ok
+test miner_pubkey_uses_the_case_sensitive_source_name ... ok
+test source_temporaries_preserve_the_ast_and_do_not_capture_names ... ok
+test unavailable_information_is_always_a_visible_structural_placeholder ... ok
+test unsupported_block_items_are_not_silently_dropped ... ok
+test dh_tuple_and_constant_substitution_keep_all_operands ... ok
+test signed_numeric_literals_preserve_the_value_before_casting ... ok
+test register_zero_retains_its_option_type ... ok
+test compiler_retyping_requires_temporary_bindings ... ok
+test collection_index_and_default_keep_the_collection_receiver ... ok
+test tuple_parameters_outside_fold_keep_their_arity ... ok
+test mixed_boolean_precedence_keeps_the_original_grouping ... ok
+test signature_operands_are_never_discarded_or_converted_to_boolean ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/decompile_roundtrip.rs (target-p00/release/deps/decompile_roundtrip-d30aaa738fa1e8ca)
+
+running 9 tests
+test fold_wire_tuple_lambda_is_unwrapped_to_a_two_arg_lambda ... ok
+test mixed_precedence_arithmetic_round_trips ... ok
+test decompile_is_network_aware_for_pk_constants ... ok
+test negation_of_a_constant_renders_as_the_zero_plus_form ... ok
+test fixture_shapes_are_pinned ... ok
+test logical_not_over_a_register_accessor_is_parenthesized ... ok
+test fixture_trees_decompile_and_recompile_byte_identically ... ok
+test mainnet_corpus_holds_the_exact_floor_when_checkout_present ... ok
+test seed_corpus_holds_the_exact_floor_when_checkout_present ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/delegated_reserves.rs (target-p00/release/deps/delegated_reserves-f9db4183e5b5227d)
+
+running 11 tests
+test branch_specific_delegation_is_not_decided ... ok
+test deployed_use_vault_delegates_erg_and_treasury_amount ... ok
+test findings_are_deduplicated_per_successor_and_keep_other_successors_separate ... ok
+test dust_floors_upper_bounds_and_unrelated_reads_do_not_clear_erg_delegation ... ok
+test id_only_slots_explicitly_state_the_unobservable_singleton_assumption ... ok
+test identity_alone_is_enough_and_only_outputs_are_successors ... ok
+test dexy_bank_deliberately_delegates_reserves ... ok
+test direct_and_arithmetic_value_bounds_clear_erg_delegation ... ok
+test token_delegation_is_independent_of_erg_and_specific_to_the_slot ... ok
+test gallery_amm_pool_has_local_reserve_constraints ... ok
+test dexy_mint_and_payout_successors_preserve_their_own_reserves ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/drain.rs (target-p00/release/deps/drain-8832232d248fba23)
+
+running 21 tests
+test shape_errors_are_verdicts_not_panics ... ok
+test declared_attacker_keys_do_not_relax_the_protected_input_gate ... ok
+test synthesis::an_nft_detached_successor_shields_nothing_and_is_reported ... ok
+test synthesis::recreations_fire_without_overloading_protocol_nfts ... ok
+test synthesis::a_minted_placeholder_forges_the_successor_shaped_box ... ok
+test synthesis::omitted_all_off_and_default_synthesis_are_identical ... ok
+test undeclared_objective_reports_incomplete_instead_of_an_extraction_verdict ... ok
+test synthesis::the_pinned_axis_order_survives_truncation ... ok
+test map_feed::registers_survive_fixture_map_and_request ... ok
+test synthesis::malformed_probes_are_invalid_not_script_rejections ... ok
+test the_data_input_axis_appends_an_attacker_box_and_is_off_by_default ... ok
+test synthesis::synthesized_rejections_are_classified_and_tallied ... ok
+test synthesis::per_successor_states_preserve_recognized_receipt_accounting ... ok
+test the_use_lp_drain_is_rediscovered_from_the_honest_template ... ok
+test the_fixed_swap_accepts_the_honest_shape_and_rejects_every_drain ... ok
+test the_gallery_amm_pair_is_not_drainable ... ok
+test map_feed::inherited_quota_counts_as_capacity_not_starvation ... ok
+test synthesis::the_vault_admin_route_is_refused_by_construction ... ok
+test map_feed::the_mapped_dexy_set_feeds_the_hunt_and_has_nothing_left_to_drain ... ok
+test map_feed::the_mapped_use_set_runs_synthesis_shapes_under_a_binding_cap ... ok
+test map_feed::thin_shape_slices_are_named_and_a_healthy_allocation_is_not ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.09s
+
+     Running tests/drain_promotion.rs (target-p00/release/deps/drain_promotion-750b6087847f999d)
+
+running 4 tests
+test unbacked_synthetic_material_stays_preflight ... ok
+test missing_funding_proof_blocks_promotion ... ok
+test associated_lint_is_not_the_confirmed_claim ... ok
+test generated_public_incident_candidate_promotes ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+
+     Running tests/evidence_provenance.rs (target-p00/release/deps/evidence_provenance-f0434e6595601bde)
+
+running 4 tests
+test missing_registers_are_not_empty_registers ... ok
+test structural_match_does_not_establish_deployment ... ok
+test changing_any_premise_invalidates_cached_evidence ... ok
+test synthetic_binding_survives_export_and_import ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/evidence_wire.rs (target-p00/release/deps/evidence_wire-93d96e46a0403933)
+
+running 4 tests
+test legacy_box_missing_reference_cannot_be_promoted ... ok
+test invalid_tree_never_becomes_empty_bytes ... ok
+test wire_box_id_matches_full_serialization ... ok
+test transaction_id_and_message_use_node_bytes_to_sign ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/hot_spots.rs (target-p00/release/deps/hot_spots-126c4c646607625e)
+
+running 5 tests
+test an_empty_trace_has_no_hot_spots ... ok
+test hot_spots_group_by_label_and_rank_by_cost ... ok
+test opcode_labels_are_named_and_keep_their_detail ... ok
+test opcode_variants_with_detail_are_separate_rows ... ok
+test hot_spots_of_a_real_evaluation_sum_to_the_trace_total ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/hunt.rs (target-p00/release/deps/hunt-05bdf6700e39d636)
+
+running 14 tests
+test a_data_input_without_a_tree_is_a_marshalling_error ... ok
+test a_self_box_whose_tree_differs_from_the_input_is_rejected ... ok
+test a_p2pk_contract_requires_proof_and_names_the_key ... ok
+test a_register_read_on_a_synthetic_self_is_not_under_probes_and_says_why ... ok
+test a_future_height_lock_is_found_by_the_plus_one_million_probe ... ok
+test a_self_box_naming_the_same_tree_is_accepted ... ok
+test a_caller_height_moves_the_base_probe ... ok
+test a_contract_that_only_needs_self_preserved_is_movable_not_stealable ... ok
+test every_hunt_runs_three_heights_times_two_output_shapes ... ok
+test unparseable_bytes_are_a_marshalling_error ... ok
+test a_trivially_true_contract_is_spendable_by_anyone ... ok
+test a_supplied_self_box_makes_the_register_read_real ... ok
+test the_supplied_self_creation_height_reaches_the_script ... ok
+test supplied_data_inputs_reach_the_script ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/identity.rs (target-p00/release/deps/identity-8605ccf15e9368e7)
+
+running 8 tests
+test malformed_and_unsupported_trees_never_match ... ok
+test inline_constants_resolve_by_occurrence ... ok
+test public_keys_and_boolean_literals_are_typed_holes ... ok
+test exact_substitution_and_operator_change ... ok
+test table_indices_are_storage_but_casts_and_versions_are_structure ... ok
+test selectors_types_bindings_and_order_are_structure ... ok
+test dexy_deployed_swap ... ok
+test phoenix_deployments_and_near_miss_siblings ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/ingest.rs (target-p00/release/deps/ingest-8a416a79fd626fb6)
+
+running 9 tests
+test override_json_does_not_turn_malformed_values_into_type_only_overrides ... ok
+test free_occurrence_is_not_hidden_by_a_same_named_local_in_another_scope ... ok
+test non_utf8_source_path_preserves_the_row_and_serializes ... ok
+test ambiguous_conflicting_and_unsupported_types_are_named ... ok
+test real_values_and_types_override_inference_and_feed_other_constants ... ok
+test version_gate_is_precise_even_when_version_three_requested ... ok
+test usage_fixtures_compile_parse_and_lift_with_expected_bindings ... ok
+test mixed_batch_keeps_read_errors_and_cli_overrides_work ... ok
+test batch_and_cli_keep_failure_rows_and_exit_status ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/map.rs (target-p00/release/deps/map-b8258513c413307b)
+
+running 13 tests
+test script_hash_lookups_are_unsupported_not_empty ... ok
+test a_fixture_gap_is_loud ... ok
+test the_gallery_amm_pair_maps_clean ... ok
+test dexy_gold_raises_the_same_finding ... ok
+test every_use_edge_is_typed ... ok
+test the_use_set_is_rebuilt_from_the_lp_nft_alone ... ok
+test the_use_roles_are_the_labelling_the_hunt_needs ... ok
+test extract_pins_the_pool_by_nft ... ok
+test the_pool_swap_asymmetry_is_found_unaided ... ok
+test every_array_is_canonically_sorted ... ok
+test unknown_is_emitted_not_defaulted ... ok
+test truncation_and_unresolved_references_are_reported ... ok
+test the_canonical_json_is_byte_identical_across_runs_and_orderings ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/mapping_actions.rs (target-p00/release/deps/mapping_actions-d4c631e4ccd76807)
+
+running 3 tests
+test data_outputs_and_unrelated_inputs_cannot_satisfy_spend ... ok
+test alternative_action_sets_are_checked_separately ... ok
+test accepted_omission_refutes_only_matching_claim_and_premises ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/mapping_artifacts.rs (target-p00/release/deps/mapping_artifacts-647446a052056895)
+
+running 3 tests
+test discovery_cannot_import_as_required_execution ... ok
+test premise_changes_invalidate_imported_proofs ... ok
+test raw_provenance_and_legacy_map_bytes_survive ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/mapping_context_boundary.rs (target-p00/release/deps/mapping_context_boundary-feee5578baa8039d)
+
+running 1 test
+test mandatory_local_execution_does_not_authenticate_exact_code ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/mapping_discovery.rs (target-p00/release/deps/mapping_discovery-44416d36c3b81853)
+
+running 3 tests
+test caps_missing_pages_and_computed_identities_stay_unresolved ... ok
+test false_hints_never_become_required_relations ... ok
+test supported_reference_recall_and_all_site_accounting ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/mapping_inventory.rs (target-p00/release/deps/mapping_inventory-e5694b08056aaf41)
+
+running 4 tests
+test inventory_has_32_pinned_cases_and_independent_answers ... ok
+test legacy_metrics_are_measured_without_baseline_changes ... ok
+test fixture_constructs_execute_and_unsupported_members_remain ... ok
+test protected_policy_rejects_unauthorized_additions_and_mutations ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/mapping_necessity.rs (target-p00/release/deps/mapping_necessity-8fbdda2c02d174fb)
+
+running 4 tests
+test unsupported_anchors_and_cyclic_proofs_are_rejected ... ok
+test alternatives_dead_checks_and_self_do_not_prove_cospend ... ok
+test exact_guarded_necessity_matches_pinned_answers ... ok
+test satisfying_omission_and_relaxed_controls_use_full_validator ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/method_sweep.rs (target-p00/release/deps/method_sweep-41a415beb1a8f052)
+
+running 1 test
+test every_method_evaluates_as_expected ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/more_lints.rs (target-p00/release/deps/more_lints-2b5fa55770f7ef01)
+
+running 10 tests
+test basic_height_lock_is_an_intentional_permissionless_release ... ok
+test crystalpool_deposit_height_selects_the_same_seller_key ... ok
+test identical_height_branches_are_local_and_do_not_imply_success ... ok
+test branch_specific_and_negated_identity_comparisons_are_not_decided ... ok
+test trust_findings_are_per_box_and_reads_outside_scope_are_undecided ... ok
+test height_release_only_follows_result_alternatives ... ok
+test provenance_requires_an_identity_anchor_not_presence_or_spender_data ... ok
+test chaincash_note_authenticates_a_key_without_pinning_reserve_identity ... ok
+test real_oracles_and_rosen_token_search_bind_data_provenance ... ok
+test real_authorised_locks_and_distinct_crystalpool_branches_are_not_flagged ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/mutation_corpus.rs (target-p00/release/deps/mutation_corpus-ce56335c25dfb620)
+
+running 3 tests
+test bank_template_registers_reach_both_consumers ... ok
+test m4_recorded_seller_only_receipts_score_zero_on_mutant_and_original ... ok
+test the_corpus_is_measured_and_does_not_regress has been running for over 60 seconds
+test the_corpus_is_measured_and_does_not_regress ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 161.31s
+
+     Running tests/node_validation.rs (target-p00/release/deps/node_validation-52dbb06bc4e10517)
+
+running 3 tests
+test accepted_execution_cannot_be_deserialized_or_fabricated ... ok
+test incomplete_context_is_not_node_acceptance ... ok
+test full_pipeline_matches_pinned_node_vectors ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/obligation_reports.rs (target-p00/release/deps/obligation_reports-6b4f7fa02d2524f3)
+
+running 4 tests
+test duplicate_observations_keep_all_anchors_in_one_obligation ... ok
+test conditional_discharge_exports_the_full_premise_set ... ok
+test suppression_invalidates_on_premise_change ... ok
+test curated_precision_has_positive_and_negative_controls ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/payment_reserves.rs (target-p00/release/deps/payment_reserves-930fc823a4c65263)
+
+running 3 tests
+test incomplete_payment_evidence_and_pool_math_keep_original_high_finding ... ok
+test fixed_script_and_required_value_reclassify_but_retain_payment_findings ... ok
+test confirmed_corpus_payments_are_retained_as_low ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/play.rs (target-p00/release/deps/play-4dd9fe63443cf445)
+
+running 6 tests
+test duplicate_inputs_malformed_outputs_and_fake_mints_are_refused ... ok
+test data_inputs_and_missing_boxes_are_handled ... ok
+test data_inputs_are_part_of_the_transaction_id ... ok
+test a_time_lock_refuses_early_and_passes_late_and_outputs_get_ids ... ok
+test erg_and_tokens_must_balance_except_a_mint_named_after_the_first_input ... ok
+test a_key_box_needs_its_secret ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/proofs.rs (target-p00/release/deps/proofs-1f528bbf3041e04b)
+
+running 13 tests
+test an_avl_operation_the_tree_refuses_is_reported_not_faked ... ok
+test a_ceremony_has_a_bounded_number_of_parties ... ok
+test headers_size_is_answered_after_the_pin_bump ... ok
+test a_requested_tree_version_is_on_the_header_and_unlocks_v6_methods ... ok
+test a_synthetic_box_has_real_bytes_and_its_id_is_their_hash ... ok
+test an_avl_lookup_proof_answers_a_membership_script ... ok
+test a_scenario_can_carry_the_last_headers ... ok
+test an_avl_insert_proof_from_the_prover_satisfies_a_registry_script ... ok
+test three_parties_sign_an_and_of_three_in_sequence ... ok
+test a_diffie_hellman_tuple_is_proven_with_the_shared_secret ... ok
+test two_of_three_keys_prove_and_verify_from_secrets ... ok
+test the_proof_a_run_made_or_used_is_returned ... ok
+test two_parties_sign_a_two_of_three_without_sharing_secrets ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/property_evaluation.rs (target-p00/release/deps/property_evaluation-00db901c0d282f77)
+
+running 4 tests
+test property_evaluation_requires_fresh_node_acceptance ... ok
+test four_property_families_match_independent_operands ... ok
+test guards_missing_fields_and_overflow_preserve_unknowns ... ok
+test bounded_response_requires_a_complete_accepted_linked_trace ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/property_inventory.rs (target-p00/release/deps/property_inventory-7fee29ff5c100e18)
+
+running 3 tests
+test property_inventory_pins_24_cases_and_independent_answers ... ok
+test transfer_registration_and_exposure_are_accounted ... ok
+test reference_executions_and_legacy_results_are_reproduced ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/property_schema.rs (target-p00/release/deps/property_schema-3830d479331af546)
+
+running 3 tests
+test bindings_never_infer_missing_roles_or_authority ... ok
+test declaration_identity_binds_all_semantic_premises ... ok
+test property_versions_units_and_limits_fail_closed ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/recognize.rs (target-p00/release/deps/recognize-0f55a7ff1c572335)
+
+running 8 tests
+test a_raw_public_key_is_shortened_like_an_address ... ok
+test inheritance_reads_as_owner_any_time_or_heir_after_the_date ... ok
+test unknown_shapes_are_quoted_not_invented ... ok
+test two_of_three_reads_as_a_threshold ... ok
+test bounty_reads_the_secret_and_the_deadline ... ok
+test price_gate_reads_the_oracle_box ... ok
+test subscription_reads_outputs_registers_and_this_box ... ok
+test every_recipe_is_put_into_words_completely ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/rent.rs (target-p00/release/deps/rent-39bf3e66db13142d)
+
+running 3 tests
+test a_minimal_box_costs_about_a_tenth_of_an_erg_per_period ... ok
+test the_next_collection_is_one_period_after_creation ... ok
+test tokens_and_registers_make_the_box_bigger_and_the_fee_higher ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/sandbox_eval.rs (target-p00/release/deps/sandbox_eval-97287865aa5a6e13)
+
+running 20 tests
+test a_raw_serialized_constant_parses_to_its_typed_value ... ok
+test cost_limit_is_enforced_and_reported ... ok
+test cost_is_nonzero_and_bounded_below_the_limit ... ok
+test opcode_name_covers_the_parser_supported_set_exactly ... ok
+test a_scenario_box_accepts_raw_registers ... ok
+test height_guard_passes_and_fails_on_scenario_height ... ok
+test malformed_scenarios_fail_at_the_boundary ... ok
+test another_inputs_extension_is_visible_through_get_var_from_input ... ok
+test needs_proof_reports_the_sigma_proposition ... ok
+test self_box_defaults_to_the_evaluated_tree ... ok
+test tree_report_renders_and_roundtrips_the_seed_tree ... ok
+test trivial_p2pk_tree_reports_the_signature_proposition ... ok
+test unparseable_tree_bytes_are_a_boundary_error ... ok
+test runtime_exception_is_an_error_verdict_not_a_panic ... ok
+test self_index_out_of_range_or_with_self_box_is_an_error ... ok
+test decompile_recompile_byte_identity_over_the_compile_corpus ... ok
+test outputs_registers_and_tokens_are_visible_to_the_script ... ok
+test self_index_makes_the_named_input_self_and_keeps_input_order ... ok
+test tree_hex_mode_matches_source_mode ... ok
+test zero_token_amounts_are_rejected_in_every_scenario_box_position ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/testsuite.rs (target-p00/release/deps/testsuite-66705f2a09d36255)
+
+running 11 tests
+test a_contract_that_does_not_compile_fails_the_suite ... ok
+test an_unknown_expectation_is_rejected_at_parse_time ... ok
+test a_scenario_may_not_name_its_own_contract ... ok
+test a_bad_scenario_fails_its_case_without_aborting_the_suite ... ok
+test a_suite_accepts_a_tree_instead_of_source ... ok
+test a_suite_runs_every_scenario_against_the_compiled_contract ... ok
+test an_unknown_network_name_is_rejected ... ok
+test a_thrown_script_is_an_error_verdict_the_case_can_expect ... ok
+test context_vars_with_string_keys_parse_inside_a_suite_case ... ok
+test self_placeholder_in_a_box_tree_means_the_contract_under_test ... ok
+test residual_expectations_distinguish_who_may_spend ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/transaction_proofs.rs (target-p00/release/deps/transaction_proofs-c5cac73341b99015)
+
+running 4 tests
+test declared_public_key_without_proof_is_not_acceptance ... ok
+test owned_p2pk_funding_signs_actual_transaction ... ok
+test replay_bundle_contains_no_secret ... ok
+test changed_transaction_invalidates_proof ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/tree.rs (target-p00/release/deps/tree-288362863c14fa6a)
+
+running 6 tests
+test fixture_box_preserves_all_data_and_addresses_never_query_source ... ok
+test findings_equal_existing_audit ... ok
+test rejects_corruption_networks_types_lengths_and_malformed_trees ... ok
+test published_vectors_and_exact_roundtrips_both_networks ... ok
+test cli_explorer_fetches_box_and_preserves_registers ... ok
+test cli_json_is_stable_and_network_is_explicit ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/triage.rs (target-p00/release/deps/triage-11dc5e04ce31f57e)
+
+running 5 tests
+test fixed_request_uses_the_committed_fixed_source ... ok
+test a_truncated_miss_keeps_its_budget_and_warning ... ok
+test static_and_unusable_hunts_cannot_claim_confirmation ... ok
+test cli_emits_a_recorded_finding ... ok
+test incident_pair_records_scenario_reproduction_and_bounded_miss ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running tests/txcheck.rs (target-p00/release/deps/txcheck-ce5cc839dd422e59)
+
+running 9 tests
+test a_missing_input_box_is_a_problem_not_a_panic ... ok
+test an_input_needing_a_signature_is_reported_and_does_not_invalidate ... ok
+test a_failing_script_invalidates_and_names_the_input ... ok
+test a_transaction_whose_scripts_pass_and_balances_is_valid ... ok
+test minting_one_new_token_with_the_first_input_id_is_allowed ... ok
+test the_extension_reaches_the_script_as_context_variables ... ok
+test value_and_token_conservation_are_checked ... ok
+test zero_token_outputs_are_rejected_even_without_resolved_inputs ... ok
+test zero_token_input_and_data_input_boxes_are_rejected ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/vault_corpus.rs (target-p00/release/deps/vault_corpus-bfbf11f17ca7417f)
+
+running 5 tests
+test the_corpus_carries_the_authorizer_boxes ... ok
+test the_deployed_tree_re_serializes_byte_identical ... ok
+test the_whitelist_is_input_side_index_zero_with_a_continuation_guard ... ok
+test the_recorded_lint_verdict_matches_a_live_run ... ok
+test the_corpus_vault_is_the_mapped_vault ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target-p00/release/deps/ergo_web-e66fee511e4ca6aa)
+
+running 10 tests
+test input::tests::a_known_mainnet_address_resolves_to_the_same_tree ... ok
+test input::tests::garbage_is_invalid_input ... ok
+test input::tests::empty_is_invalid_input ... ok
+test input::tests::oversized_is_too_large ... ok
+test input::tests::valid_hex_resolves ... ok
+test ratelimit::tests::a_bucket_allows_a_burst_then_refuses_with_a_wait ... ok
+test routes::inspect::tests::absent_network_is_mainnet ... ok
+test routes::inspect::tests::only_exact_spellings_are_accepted ... ok
+test routes::compile::tests::write_failure_keeps_zero_without_claiming_a_source_position ... ok
+test engine::tests::a_permit_is_held_until_the_blocking_job_finishes ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.46s
+
+     Running unittests src/main.rs (target-p00/release/deps/ergo_web-8f445217523d668c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/evidence_replay.rs (target-p00/release/deps/evidence_replay-c846b79963e91f42)
+
+running 4 tests
+   Compiling ring v0.17.14
+test replay_request_never_fetches_or_broadcasts ... ok
+   Compiling rustls v0.23.43
+   Compiling rustls-webpki v0.103.15
+   Compiling ureq v3.4.1
+   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+    Finished `release` profile [optimized] target(s) in 21.41s
+test http_and_cli_replay_have_identical_semantic_results ... ok
+test legacy_preflight_does_not_use_node_claim_badge ... ok
+test historical_and_hypothetical_state_labels_are_visible ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 21.71s
+
+     Running tests/http.rs (target-p00/release/deps/http-57002c6c4394de0f)
+
+running 51 tests
+test an_unknown_example_is_a_404_in_the_error_envelope ... ok
+test compile_errors_carry_an_offset ... ok
+test compose_without_values_returns_no_suite_and_rejects_a_bad_spec ... ok
+test compile_findings_carry_source_offsets ... ok
+test compile_missing_params_is_a_structured_400 ... ok
+test config_reports_the_chain_height_when_an_explorer_is_configured ... ok
+test compile_with_params_fills_the_environment ... ok
+test eval_keeps_a_runtime_exception_as_an_error_verdict ... ok
+test a_fetched_box_feeds_the_hunt_as_self_box ... ok
+test eval_returns_the_trace_and_a_p2pk_residual ... ok
+test eval_runs_a_source_scenario_to_a_verdict ... ok
+test compile_returns_tree_addresses_roundtrip_and_findings ... ok
+test eval_compile_errors_are_invalid_input_with_the_reason ... ok
+test compile_accepts_an_eip5_template_with_params ... ok
+test garbage_input_is_a_400 ... ok
+test eval_reports_a_failing_scenario_as_a_verdict_not_an_error ... ok
+test eval_rejects_a_scenario_with_neither_tree_nor_source ... ok
+test examples_list_and_fetch ... ok
+test health_returns_ok ... ok
+test examples_serve_raw_es_files_and_recipe_docs ... ok
+test engine_requests_over_the_per_ip_budget_get_a_json_429 ... ok
+test hunt_rejects_a_bad_self_box_as_invalid_input ... ok
+test compile_does_not_claim_substituted_offsets_are_authored_positions ... ok
+test guarded_get_returns_no_findings ... ok
+test compose_returns_source_params_and_a_run_suite_when_values_are_given ... ok
+test hunt_accepts_a_self_box_and_a_height ... ok
+test inspect_fields_are_camel_case_like_the_other_endpoints ... ok
+test hunt_reports_a_trivially_true_tree_as_spendable_by_anyone ... ok
+test hunt_accepts_data_inputs ... ok
+test malformed_json_body_is_a_json_400 ... ok
+test lookup_by_box_id_returns_that_box ... ok
+test lookup_is_not_configured_by_default ... ok
+test lookup_by_address_returns_boxes_in_scenario_shape_with_raw_registers ... ok
+test point_derives_the_public_point_of_a_secret ... ok
+test eval_exposes_ranked_reduction_costs_for_success_failure_and_errors ... ok
+test test_endpoint_reports_a_non_compiling_contract_as_400 ... ok
+test test_endpoint_runs_a_suite_and_reports_each_case ... ok
+test hunt_rent_grows_with_a_typed_register_of_real_size ... ok
+test inspect_and_compile_put_the_contract_into_words ... ok
+test testnet_network_encodes_a_testnet_address ... ok
+test validate_tx_runs_every_input_script_and_reports_balances ... ok
+test legacy_http_envelopes_preserve_claim_labels ... ok
+test play_applies_a_transaction_and_returns_new_boxes ... ok
+test validate_tx_without_boxes_and_without_an_explorer_reports_missing ... ok
+test unguarded_get_returns_one_high_finding ... ok
+test unknown_network_is_a_400 ... ok
+test validate_tx_fetches_missing_boxes_from_the_explorer_when_configured ... ok
+test compile_phases_distinguish_source_zero_from_unpositioned_zero ... ok
+test oversized_body_413_is_json ... ok
+test rate_limit_is_off_by_default ... ok
+test a_deeply_nested_contract_does_not_kill_the_server ... ok
+
+test result: ok. 51 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/map.rs (target-p00/release/deps/map-cfca15dc86f38106)
+
+running 6 tests
+test live_map_requires_configuration_and_matching_network ... ok
+test caps_and_unresolved_references_are_not_silently_omitted ... ok
+test live_map_uses_configured_explorer_and_reports_missing_seed ... ok
+test offline_map_reaches_related_source_and_preserves_typed_edges ... ok
+test all_seed_kinds_and_exact_box_frontier ... ok
+test invalid_inputs_and_recording_gaps_are_json_errors ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests ergo_sandbox
+
+running 11 tests
+test ergo-sandbox/src/properties/evaluate.rs - properties::evaluate::Evaluation (line 16) - compile fail ... ok
+test ergo-sandbox/src/evidence/claim.rs - evidence::claim::ConfirmedViolation (line 31) - compile fail ... ok
+test ergo-sandbox/src/evidence/claim.rs - evidence::claim::ConfirmedViolation (line 27) - compile fail ... ok
+test ergo-sandbox/src/evidence/validate.rs - evidence::validate::AcceptedExecution (line 172) - compile fail ... ok
+test ergo-sandbox/src/map/discovery.rs - map::discovery::DiscoveryMap (line 35) - compile fail ... ok
+test ergo-sandbox/src/prove.rs - prove::OwnedDlogSecret (line 275) - compile fail ... ok
+test ergo-sandbox/src/properties/evaluate.rs - properties::evaluate::Evaluation (line 12) - compile fail ... ok
+test ergo-sandbox/src/evidence/validate.rs - evidence::validate::AcceptedExecution (line 168) - compile fail ... ok
+test ergo-sandbox/src/prove.rs - prove::OwnedDlogSecret (line 280) - compile fail ... ok
+test ergo-sandbox/src/map/discovery.rs - map::discovery::DiscoveryMap (line 40) - compile fail ... ok
+test ergo-sandbox/src/lib.rs - (line 31) ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+   Doc-tests ergo_web
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+exit: 0
