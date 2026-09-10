@@ -13,13 +13,20 @@ on:
 env:
   CARGO_TERM_COLOR: always
   RUSTFLAGS: -D warnings
+  CARGO_TARGET_DIR: ./target-p00
+  # Optimize the test hot paths without losing debug assertions or overflow
+  # checks (including in dependencies). Tests inherit dev; the CLI replay
+  # helper's `cargo build` must use the same settings. Keep release gates too.
+  CARGO_PROFILE_DEV_OPT_LEVEL: '3'
+  CARGO_PROFILE_DEV_DEBUG_ASSERTIONS: 'true'
+  CARGO_PROFILE_DEV_OVERFLOW_CHECKS: 'true'
 
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ergo-forge
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           # The scoreboard verifies baseline artifacts at the plan's baseline
           # revision, so that commit must be in the runner's history.
@@ -37,22 +44,24 @@ jobs:
       # The corpus tests look for `../../ergo` relative to ergo-sandbox, i.e. a
       # sibling of this repo. Same rev as the crates, so the corpora match.
       - name: Checkout the node as a sibling (test corpora)
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           repository: arkadianet/ergo
           ref: ${{ steps.pin.outputs.rev }}
           path: ergo
 
-      - uses: dtolnay/rust-toolchain@stable
+      # Resolved from upstream refs/heads/stable; this action has no stable tag.
+      - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable (2026-09-03)
         with:
           components: rustfmt, clippy
 
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
-          workspaces: ergo-forge
+          # Cache both debug and release dependencies in the actual target dir.
+          workspaces: ergo-forge -> target-p00
 
       # Workspace Rust tests invoke Node DOM tests; install before verification.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '22'
           cache: npm
@@ -84,8 +93,6 @@ jobs:
 
       - name: Governing roadmap completed prefix
         working-directory: ergo-forge
-        env:
-          CARGO_TARGET_DIR: ./target-p00
         run: |
           python3 scripts/roadmap_gate.py --through-completed
           # Final governing unit and the complete finite plan.
