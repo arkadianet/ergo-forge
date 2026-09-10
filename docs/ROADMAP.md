@@ -190,7 +190,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
 {
   "schemaVersion": 1,
   "baselineRev": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
-  "completedThrough": "P08",
+  "completedThrough": "M04",
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,
   "units": [
@@ -363,6 +363,98 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "replay_request_never_fetches_or_broadcasts"
       ],
       "implemented": true
+    },
+    {
+      "id": "M00",
+      "depends": [
+        "P08"
+      ],
+      "days": 3,
+      "package": "ergo-sandbox",
+      "target": "mapping_inventory",
+      "tests": [
+        "inventory_has_32_pinned_cases_and_independent_answers",
+        "legacy_metrics_are_measured_without_baseline_changes",
+        "fixture_constructs_execute_and_unsupported_members_remain"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "M01",
+      "depends": [
+        "M00"
+      ],
+      "days": 2,
+      "package": "ergo-sandbox",
+      "target": "mapping_artifacts",
+      "tests": [
+        "discovery_cannot_import_as_required_execution",
+        "premise_changes_invalidate_imported_proofs",
+        "raw_provenance_and_legacy_map_bytes_survive"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "M02",
+      "depends": [
+        "M01"
+      ],
+      "days": 3,
+      "package": "ergo-sandbox",
+      "target": "mapping_discovery",
+      "tests": [
+        "supported_reference_recall_and_all_site_accounting",
+        "false_hints_never_become_required_relations",
+        "caps_missing_pages_and_computed_identities_stay_unresolved"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "M03",
+      "depends": [
+        "M02"
+      ],
+      "days": 4,
+      "package": "ergo-sandbox",
+      "target": "mapping_necessity",
+      "tests": [
+        "exact_guarded_necessity_matches_pinned_answers",
+        "alternatives_dead_checks_and_self_do_not_prove_cospend",
+        "satisfying_omission_and_relaxed_controls_use_full_validator",
+        "unsupported_anchors_and_cyclic_proofs_are_rejected"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "M04",
+      "depends": [
+        "M03"
+      ],
+      "days": 3,
+      "package": "ergo-sandbox",
+      "target": "mapping_actions",
+      "tests": [
+        "alternative_action_sets_are_checked_separately",
+        "data_outputs_and_unrelated_inputs_cannot_satisfy_spend",
+        "accepted_omission_refutes_only_matching_claim_and_premises"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "M05",
+      "depends": [
+        "M04"
+      ],
+      "days": 4,
+      "package": "ergo-sandbox",
+      "target": "mapping_context_code",
+      "tests": [
+        "authenticated_config_code_requires_same_input_execution",
+        "optional_wrong_scope_and_mutable_config_do_not_promote",
+        "all_four_omission_families_replay_and_refute",
+        "final_metrics_preserve_all_members_and_unsupported_ceiling"
+      ],
+      "implemented": false
     }
   ],
   "thresholds": {
@@ -417,9 +509,14 @@ P00 implementation amendment: result provenance is descriptive legacy metadata, 
 
 The runner's gate command is `python3 scripts/roadmap_gate.py --require P05` (substitute the unit ID). It runs each registered target via `cargo test --release -p <package> --test <target> -- --show-output`, after checking the required test names through `--list`. Whole targets run, not filters that might silently select nothing. Install the pinned DOM-test dependency with `npm ci --prefix ui`. P00 additionally runs `python3 -m unittest discover -s scripts -p 'test_roadmap_gate.py'` and `node --test ui/tests/claim-labels.test.js`; P08 runs `node --test ui/tests/evidence-replay.test.js`. Those extra commands are fixed runner requirements with self-tests, not optional notes.
 
-`python3 scripts/roadmap_gate.py --all-goals` runs the full goal set and returns nonzero while anything is missing or failing. **It is expected to fail today**, first because the runner/new tests do not exist, then because the product obligations are not met. An infrastructure failure is reported as `missing-gate`, never as experimental evidence that a contract is unsafe. The runner writes a machine report distinguishing `missing-gate` (required infrastructure/evidence absent), `failed` (executed product gate failed), `passed`, `stopped`, and `unimplemented` (a registered unit explicitly marked `implemented: false`); none of missing-gate/failed/stopped/unimplemented counts as completion. P00 registers P01–P08 as unimplemented, so the full-goal check fails for unfinished product work rather than misclassifying planned files as broken infrastructure.
+`python3 scripts/roadmap_gate.py --all-goals` is the strict completion report: it prints every goal and exits nonzero for anything other than `passed`, including a recorded stop. With M05 stopped, its exit code is expected to be 1. Reports distinguish `missing-gate` (required infrastructure/evidence absent), `failed` (executed gate failed), `passed`, `stopped` (a validated open stop record), `blocked` (a dependency did not pass), and `unimplemented` (unfinished work without a recorded stop). Only `passed` counts as completion.
 
-To keep every release shippable, repository CI runs `--through-completed` plus the next PR's `--require` gate. `completedThrough` advances only in the PR whose gates pass, with all predecessors rerun. The status report remains separate from the green CI prefix: unimplemented goals cannot disappear behind a green release. A stopped unit blocks downstream dependent units until a governing-plan amendment removes them or changes the dependency with a new acceptance gate, or a policy-pinned governing decision resolves that exact stop with recovered evidence and reopens the original gate. Reopening does not award a pass: the original unit and predecessor tests must execute successfully. The stop record and its original evidence remain history.
+**CI governance decision (PR #98):** CI runs the completed prefix and required landing gate, plus a separate, always-visible `--ci` full-goal evaluation. This mode runs the same complete selection, evidence validation and tests as `--all-goals`, but accepts only `passed` and validated `stopped` results. It records `ciAccepted` separately from `passed`; a stopped goal is never a completed goal. Any `unimplemented`, `missing-gate`, `failed`, or `blocked` result makes CI red. A valid recorded stop takes precedence over an unimplemented flag: explicitly governed stopped work is distinct from silently unfinished work. Removing M05's stop would expose its unchanged unimplemented flag and fail CI, so deleting a stop cannot buy a green build. Malformed or missing stop evidence fails closed. The full status list remains in CI output even if an earlier step fails; no blanket `continue-on-error` or exit-code suppression is used.
+
+`completedThrough` advances only in the PR whose gates pass, with all predecessors rerun. A stopped unit blocks downstream dependent units until a governing-plan amendment removes them or changes the dependency with a new acceptance gate, or a policy-pinned governing decision resolves that exact stop with recovered evidence and reopens the original gate. Reopening does not award a pass: the original unit and predecessor tests must execute successfully. The stop record and its original evidence remain history.
+
+Gate command output is normalized to `<repo>`, `<home>`, and `<tmp>` before printing, recording and computing transcript hashes. For standalone Cargo transcripts, use `python3 scripts/capture_gate.py --output PATH -- COMMAND ...`, which applies the same normalization and preserves the command's exit code. Historical transcript sanitization changes transcript hashes only; fixture and measurement hashes remain unchanged.
+
 
 P00 also adds a record-only scoreboard check that reads committed JSON, verifies corpus membership/thresholds and links, and exits nonzero if this document's baseline claims disagree. P01 adds origin validation of the 28 ingestion rows. P03–P08 register `tests/fixtures/evidence/manifest.json` (P04 uses the separately policy-registered `proof-manifest.json`, as amended below) with case ID, family, source kind, exact file hashes, node revision, property version, expected acceptance/claim status, and publication eligibility. P07's `precision.json` supplies the eight frozen labels and references those case IDs. No harness may accept a hand-set `confirmed: true` as evidence: replay derives that result.
 
@@ -605,3 +702,60 @@ required premises; no existing fixture or manifest row changes. The policy chang
 only P08's implementation flag and `completedThrough`. Earlier “today” and
 “unimplemented” statements above describe their recorded implementation stages.
 The finite queue ends at P08; further work requires a new governing decision.
+
+
+M00–M05 registration (author-authorized following PR #97): the [mapping design](superpowers/specs/2026-09-10-comprehensive-mapping-design.md), sections 5–7, supplies the bounded post-P08 queue and replaces the parked mapping question. Only M00 implementation is authorized in this change. Section 2 freezes remain in force; registration grants no discovery edge proof authority. The six units are appended unchanged, initially unimplemented. Completion requires their own executable gates. See [M00 record](mapping/M00.md).
+
+M00 gate completion: P00–P08 and all three registered M00 tests pass under
+`--require M00`. Only M00 is implemented among the appended mapping units;
+`completedThrough` is M00. The [M00 report](mapping/M00.md) records the fixed
+32-case inventory, legacy measurements and full verification output. M01–M05
+remain unimplemented. Registration does not authorize their implementation here.
+
+M01 author-authorized implementation: the separate discovery and unresolved-relation
+artifacts and all three registered gates are implemented. `--require M01` passed
+through P00–P08 and M00 before advancing `completedThrough` to M01. See the
+[M01 report](mapping/M01.md) for the import authority boundary and real gate output.
+M02–M05 remain unimplemented. All section 2 freezes and pinned M00 data remain unchanged.
+
+M02 author-authorized implementation: bounded literal and existential discovery
+over supplied canonical material passes its three registered gates. Only M02's
+implementation flag and the completed prefix advance; see the [M02 report](mapping/M02.md)
+for exact supported/all-case recall, false hints, unresolved boundaries and real
+verification output. M03–M05 remain unimplemented. M00/M01 and all section 2
+freezes remain unchanged.
+
+### M03 implementation record — 2026-09-10
+
+The author authorized M03 after PR #97. The direct exact-tree checker and its
+four original `mapping_necessity` tests retain the registered M02 dependency,
+`ergo-sandbox` package and four-day ceiling. M03 alone advances the completed
+prefix. The [M03 report](mapping/M03.md) records checked guarded co-spends,
+authentication, distinctness, canonical accepted/omission controls and actual
+gates. A narrow design amendment represents the already pinned `HEIGHT >= 100`
+guard. A versioned supplemental metadata correction retains its original fixture
+and results; all M00–M02 data, thresholds and execution verdicts are unchanged. M04–M05 remain
+unimplemented. Discovery, execution acceptance and proof authority stay separate;
+no discharge, drain, request generation, detector or UI integration is included.
+
+
+### M04 implementation record — 2026-09-10
+
+The author authorized M04 after PR #97. Explicit action alternatives and supplied
+omission replay are implemented under the unchanged M03 dependency, three-day
+ceiling, `ergo-sandbox` package, `mapping_actions` target and three registered test
+names. Only M04's implementation flag and the completed prefix advance. See the
+[M04 report](mapping/M04.md) for exact inventory accounting, the supplemental
+metadata clarification and real gates. M05 remains unimplemented; its four
+positive Execute action expectations remain visible and deferred. No pinned
+membership, expected facts, established claims, numeric baselines or freezes change.
+
+M05 author-authorized attempt stopped on 2026-09-10 under the mapping design's
+`coverage-gate` rule. The registered `context_scope-positive` code requires
+local execution but does not authenticate a fixed code digest; full validation
+accepts two different extension programs under identical premises. See the
+[M05 report](mapping/M05.md), [design amendment](superpowers/specs/2026-09-10-comprehensive-mapping-design.md#m05-attempted-implementation-amendment--2026-09-10-stopped)
+and [stop record](roadmap-stops.json). M05 remains unimplemented and
+`completedThrough` remains M04. No policy registration, pinned answer, historical
+claim, action disposition, numeric threshold or frozen capability changes.
+The separate counterexample diagnostic grants no M05 capability authority.

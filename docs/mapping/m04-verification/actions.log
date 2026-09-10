@@ -1,0 +1,29 @@
+    Finished `release` profile [optimized] target(s) in 0.12s
+     Running tests/mapping_actions.rs (target-p00/release/deps/mapping_actions-1df0a003987e3a7a)
+
+running 3 tests
+test data_outputs_and_unrelated_inputs_cannot_satisfy_spend ... ok
+test alternative_action_sets_are_checked_separately ... ok
+test accepted_omission_refutes_only_matching_claim_and_premises ... ok
+
+successes:
+
+---- data_outputs_and_unrelated_inputs_cannot_satisfy_spend stdout ----
+data/output/unrelated inputs cannot satisfy Spend; missing/duplicate subject, stale proof, unknown bindings and versions fail closed
+
+---- alternative_action_sets_are_checked_separately stdout ----
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m04-action-results.json sha256=da66d2037ae2516bae05fdb1ffbf5eb270941b989badea5dacf24d06256e3b80
+63/63 M04-eligible action dispositions; all 67 retained; 4 Execute expectations deferred to M05; alternatives never unioned
+
+---- accepted_omission_refutes_only_matching_claim_and_premises stdout ----
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m04-omission-results.json sha256=2bb08be500b8c2b0209a5990ca65100695cb52f16fdf31ed3b153d49148f62fe
+27/27 digest-matched accepted omissions refuted; 52 accepted / 21 script rejections; altered bindings and accepted satisfying spends cannot refute
+
+
+successes:
+    accepted_omission_refutes_only_matching_claim_and_premises
+    alternative_action_sets_are_checked_separately
+    data_outputs_and_unrelated_inputs_cannot_satisfy_spend
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+

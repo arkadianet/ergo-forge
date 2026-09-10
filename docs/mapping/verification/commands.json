@@ -1,0 +1,197 @@
+{
+  "version": "m00-verification:v1",
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "./target-p00"
+      },
+      "exitCode": 0,
+      "outputPath": "docs/mapping/verification/fmt.log",
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "./target-p00"
+      },
+      "exitCode": 0,
+      "outputPath": "docs/mapping/verification/clippy.log",
+      "outputSha256": "083599af7cda77c5032cd41e3e2fac031f31a46ddc834b0622e2484a6af3013d"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "mapping_inventory",
+        "--",
+        "--show-output"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "./target-p00"
+      },
+      "exitCode": 0,
+      "outputPath": "docs/mapping/verification/inventory.log",
+      "outputSha256": "1b28ff5899f13f0955e50468b5a74f2366e98a48c0211f0ced7913c0081785e6"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--release"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "./target-p00"
+      },
+      "exitCode": 0,
+      "outputPath": "docs/mapping/verification/workspace.log",
+      "outputSha256": "a1f578429490c9c71aa289491b0a1ce7d6ad4f6253ce00e189ade23098fe7249"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/roadmap_gate.py",
+        "--require",
+        "M00"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "./target-p00"
+      },
+      "exitCode": 0,
+      "outputPath": "docs/mapping/verification/require-M00.log",
+      "outputSha256": "144e79789101d24bc4f28a2ed41c375a54ca20e2c1fdbdab2e86d359be367ce6"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/roadmap_gate.py",
+        "--through-completed"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "./target-p00"
+      },
+      "exitCode": 0,
+      "outputPath": "docs/mapping/verification/through-completed.log",
+      "outputSha256": "d3f6fa8a5c0fa59143a55ae38d29b0ac2d5a69b3e267174f15b492b258f8255e"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/roadmap_gate.py",
+        "--all-goals"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "./target-p00"
+      },
+      "exitCode": 1,
+      "outputPath": "docs/mapping/verification/all-goals.log",
+      "outputSha256": "baa8f6fbc7542f0b617211745b51b5d2e7edb741b7b1903eb91f7debdfcdf3c2"
+    }
+  ],
+  "workspaceTotals": {
+    "passed": 463,
+    "failed": 0,
+    "ignored": 1,
+    "summaries": 50
+  },
+  "allGoals": [
+    {
+      "unit": "scoreboard",
+      "status": "passed"
+    },
+    {
+      "unit": "P00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P01",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P02",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P03",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P04",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P05",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P06",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P07",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P08",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M01",
+      "status": "unimplemented",
+      "detail": "registered product unit is not implemented"
+    },
+    {
+      "unit": "M02",
+      "status": "unimplemented",
+      "detail": "registered product unit is not implemented"
+    },
+    {
+      "unit": "M03",
+      "status": "unimplemented",
+      "detail": "registered product unit is not implemented"
+    },
+    {
+      "unit": "M04",
+      "status": "unimplemented",
+      "detail": "registered product unit is not implemented"
+    },
+    {
+      "unit": "M05",
+      "status": "unimplemented",
+      "detail": "registered product unit is not implemented"
+    }
+  ]
+}

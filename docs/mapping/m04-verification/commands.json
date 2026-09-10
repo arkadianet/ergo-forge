@@ -1,0 +1,91 @@
+{
+  "environment": {
+    "CARGO_TARGET_DIR": "./target-p00"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/m04-verification/fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/m04-verification/clippy.log",
+      "sha256": "d650c83045cd6dfb6a1341e34bc3a51973584e9ee39cc05cb4e8868069059c80"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "mapping_actions",
+        "--release",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/m04-verification/actions.log",
+      "sha256": "aaa546d60bd50fa8b6a39cfcbf771f14652587631ee37b80702a6719d97acf41"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--release"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/m04-verification/workspace.log",
+      "sha256": "597065c6dec32e684e1bc5b617d2385ed72d6c94a36cac88194b736af9d66d52"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/roadmap_gate.py",
+        "--require",
+        "M04"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/m04-verification/require-M04.log",
+      "sha256": "9b2dd682bf185ce07b17172bb5f0fa7f3c46f47e8d815f09f7218c851f3567eb"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/roadmap_gate.py",
+        "--through-completed"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/m04-verification/through-completed.log",
+      "sha256": "e7dcf00d632020d2319b0fee46833d91df850369e40b48f30f86a7979266b9a9"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/roadmap_gate.py",
+        "--all-goals"
+      ],
+      "exitCode": 1,
+      "outputPath": "docs/mapping/m04-verification/all-goals.log",
+      "sha256": "35fc7d518bc712f2965576529cb0c4306f6fe20c8776d093e198274c9083a3ef"
+    }
+  ]
+}

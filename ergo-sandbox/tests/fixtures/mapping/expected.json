@@ -1,0 +1,2492 @@
+{
+  "version": "mapping-expected:v1",
+  "authority": "independently authored semantic expectations; not checked proofs or node acceptance",
+  "authorship": "Synthetic code and answers authored before legacy measurement; no extractor exists; no confidential materials",
+  "cases": [
+    {
+      "id": "literal_spend-positive",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "true",
+      "supported": true,
+      "unsupportedReason": null,
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": false,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "satisfies-declared-requirements"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "violates-declared-requirement"
+        }
+      ],
+      "rationale": "literal_spend: positive distinction: INPUTS(1).id == fromBase16(\"@B.id@\") && INPUTS(1).id != SELF.id",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "literal_spend-positive/site/0",
+        "literal_spend-positive/site/1"
+      ]
+    },
+    {
+      "id": "literal_spend-control",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "false",
+      "supported": false,
+      "unsupportedReason": "optional-branch",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ],
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "dynamic": false,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "literal_spend: optional-branch; HEIGHT < 100 || (INPUTS(1).id == fromBase16(\"@B.id@\") && INPUTS(1).id != SELF.id)",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "literal_spend-control/site/0",
+        "literal_spend-control/site/1"
+      ]
+    },
+    {
+      "id": "self_alias-positive",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "true",
+      "supported": true,
+      "unsupportedReason": null,
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": true,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "satisfies-declared-requirements"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "violates-declared-requirement"
+        }
+      ],
+      "rationale": "self_alias: positive distinction: INPUTS.exists({ (b: Box) => b.id == fromBase16(\"@B.id@\") && b.id != SELF.id })",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "self_alias-positive/site/0"
+      ]
+    },
+    {
+      "id": "self_alias-control",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "false",
+      "supported": false,
+      "unsupportedReason": "self-is-not-companion",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ],
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "dynamic": true,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "self_alias: self-is-not-companion; INPUTS.exists({ (b: Box) => b.id == SELF.id })",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [],
+        "trueTuples": [],
+        "falseTuples": [
+          [
+            "A",
+            "B"
+          ],
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "self_alias-control/site/0"
+      ]
+    },
+    {
+      "id": "action_alternatives-positive",
+      "relation": {
+        "subject": "A",
+        "guard": "HEIGHT >= 100",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "true",
+      "supported": true,
+      "unsupportedReason": null,
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: HEIGHT >= 100"
+      ],
+      "trueEdges": [
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": false,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "satisfies-declared-requirements"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "violates-declared-requirement"
+        }
+      ],
+      "rationale": "action_alternatives: positive distinction: if (HEIGHT >= 100) { INPUTS(1).id == fromBase16(\"@B.id@\") && INPUTS(1).id != SELF.id } else { INPUTS(1).id == fromBase16(\"@C.id@\") }",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B",
+          "C"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ],
+          [
+            "A",
+            "C"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "action_alternatives-positive/site/0",
+        "action_alternatives-positive/site/1",
+        "action_alternatives-positive/site/2"
+      ]
+    },
+    {
+      "id": "action_alternatives-control",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "false",
+      "supported": false,
+      "unsupportedReason": "guarded-alternative",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ],
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "dynamic": false,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "action_alternatives: guarded-alternative; if (HEIGHT >= 100) { INPUTS(1).id == fromBase16(\"@B.id@\") && INPUTS(1).id != SELF.id } else { INPUTS(1).id == fromBase16(\"@C.id@\") }; the false claim is unconditional B, while the C branch has HEIGHT < 100",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B",
+          "C"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ],
+          [
+            "A",
+            "C"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "action_alternatives-control/site/0",
+        "action_alternatives-control/site/1",
+        "action_alternatives-control/site/2"
+      ]
+    },
+    {
+      "id": "data_only-positive",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "true",
+      "supported": true,
+      "unsupportedReason": null,
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": false,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "satisfies-declared-requirements"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "violates-declared-requirement"
+        }
+      ],
+      "rationale": "data_only: positive distinction: INPUTS(1).id == fromBase16(\"@B.id@\") && INPUTS(1).id != SELF.id",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "data_only-positive/site/0",
+        "data_only-positive/site/1"
+      ]
+    },
+    {
+      "id": "data_only-control",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "false",
+      "supported": false,
+      "unsupportedReason": "data-is-not-spend",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ],
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "dynamic": false,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "data_only: data-is-not-spend; CONTEXT.dataInputs(0).id == fromBase16(\"@B.id@\")",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "data_only-control/site/0"
+      ]
+    },
+    {
+      "id": "output_only-positive",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "true",
+      "supported": true,
+      "unsupportedReason": null,
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": false,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "satisfies-declared-requirements"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "violates-declared-requirement"
+        }
+      ],
+      "rationale": "output_only: positive distinction: INPUTS(1).id == fromBase16(\"@B.id@\") && INPUTS(1).id != SELF.id",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "output_only-positive/site/0",
+        "output_only-positive/site/1"
+      ]
+    },
+    {
+      "id": "output_only-control",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "false",
+      "supported": false,
+      "unsupportedReason": "output-is-not-spend",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ],
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "dynamic": false,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "output_only: output-is-not-spend; OUTPUTS(0).propositionBytes == fromBase16(\"@B.tree@\")",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "output_only-control/site/0"
+      ]
+    },
+    {
+      "id": "dead_check-positive",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "true",
+      "supported": true,
+      "unsupportedReason": null,
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": false,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "satisfies-declared-requirements"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "violates-declared-requirement"
+        }
+      ],
+      "rationale": "dead_check: positive distinction: INPUTS(1).id == fromBase16(\"@B.id@\") && INPUTS(1).id != SELF.id",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "dead_check-positive/site/0",
+        "dead_check-positive/site/1"
+      ]
+    },
+    {
+      "id": "dead_check-control",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "false",
+      "supported": false,
+      "unsupportedReason": "negated-check",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ],
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "dynamic": false,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "dead_check: negated-check; !(INPUTS.exists({ (b: Box) => b.id == fromBase16(\"@B.id@\") && b.id != SELF.id }))",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "dead_check-control/site/0"
+      ]
+    },
+    {
+      "id": "script_identity-positive",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-proposition-bytes",
+          "universeName": "B"
+        }
+      },
+      "truth": "true",
+      "supported": true,
+      "unsupportedReason": null,
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": false,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "satisfies-declared-requirements"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "violates-declared-requirement"
+        }
+      ],
+      "rationale": "script_identity: positive distinction: INPUTS(1).propositionBytes == fromBase16(\"@B.tree@\")",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "script_identity-positive/site/0"
+      ]
+    },
+    {
+      "id": "script_identity-control",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "false",
+      "supported": false,
+      "unsupportedReason": "different-exact-code",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ],
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "dynamic": false,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "script_identity: different-exact-code; INPUTS(1).propositionBytes == fromBase16(\"@C.tree@\")",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "C"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "C"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "B"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "script_identity-control/site/0"
+      ]
+    },
+    {
+      "id": "token_identity-positive",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "token-at-position-1",
+        "kind": "Spend",
+        "selector": {
+          "kind": "token-at-literal-position",
+          "position": 1,
+          "id": "2222222222222222222222222222222222222222222222222222222222222222",
+          "minimumAmount": 1
+        }
+      },
+      "truth": "true",
+      "supported": true,
+      "unsupportedReason": null,
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          "A",
+          "C"
+        ]
+      ],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": true,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "satisfies-declared-requirements"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "violates-declared-requirement"
+        }
+      ],
+      "rationale": "token_identity: positive distinction: INPUTS(1).tokens(1)._1 == fromBase16(\"2222222222222222222222222222222222222222222222222222222222222222\")",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B",
+          "C"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ],
+          [
+            "A",
+            "C"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "token_identity-positive/site/0"
+      ]
+    },
+    {
+      "id": "token_identity-control",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "false",
+      "supported": false,
+      "unsupportedReason": "fungible-not-unique",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ],
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "dynamic": true,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "token_identity: fungible-not-unique; INPUTS.exists({ (b: Box) => b.tokens.exists({ (t: (Coll[Byte], Long)) => t._1 == fromBase16(\"2222222222222222222222222222222222222222222222222222222222222222\") }) })",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B",
+          "C"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ],
+          [
+            "A",
+            "C"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "token_identity-control/site/0"
+      ]
+    },
+    {
+      "id": "tokenless-positive",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "true",
+      "supported": true,
+      "unsupportedReason": null,
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": false,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "satisfies-declared-requirements"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "violates-declared-requirement"
+        }
+      ],
+      "rationale": "tokenless: positive distinction: INPUTS(1).id == fromBase16(\"@B.id@\") && INPUTS(1).id != SELF.id",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "tokenless-positive/site/0",
+        "tokenless-positive/site/1"
+      ]
+    },
+    {
+      "id": "tokenless-control",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "false",
+      "supported": false,
+      "unsupportedReason": "value-is-not-identity",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ],
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "dynamic": false,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "tokenless: value-is-not-identity; INPUTS(1).value == 2000000L",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [],
+        "trueTuples": [],
+        "falseTuples": [
+          [
+            "A",
+            "B"
+          ],
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "tokenless-control/site/0"
+      ]
+    },
+    {
+      "id": "exists_literal-positive",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "true",
+      "supported": true,
+      "unsupportedReason": null,
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": true,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "satisfies-declared-requirements"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "violates-declared-requirement"
+        }
+      ],
+      "rationale": "exists_literal: positive distinction: INPUTS.exists({ (b: Box) => b.id == fromBase16(\"@B.id@\") && b.id != SELF.id })",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "exists_literal-positive/site/0"
+      ]
+    },
+    {
+      "id": "exists_literal-control",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "false",
+      "supported": false,
+      "unsupportedReason": "optional-search",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ],
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "dynamic": true,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "exists_literal: optional-search; HEIGHT < 100 || (INPUTS.exists({ (b: Box) => b.id == fromBase16(\"@B.id@\") && b.id != SELF.id }))",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "exists_literal-control/site/0"
+      ]
+    },
+    {
+      "id": "computed_index-positive",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "unresolved",
+      "supported": false,
+      "unsupportedReason": "computed-index-static-unsupported",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": true,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "computed_index: positive distinction: INPUTS(getVar[Int](0).get).id == fromBase16(\"@B.id@\")",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": false
+      },
+      "referenceSiteIds": [
+        "computed_index-positive/site/0"
+      ]
+    },
+    {
+      "id": "computed_index-control",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "unresolved",
+      "supported": false,
+      "unsupportedReason": "computed-index-static-unsupported",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ],
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "dynamic": true,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "computed_index: computed-index-static-unsupported; INPUTS(getVar[Int](0).get).id == fromBase16(\"@B.id@\")",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": false
+      },
+      "referenceSiteIds": [
+        "computed_index-control/site/0"
+      ]
+    },
+    {
+      "id": "register_identity-positive",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "C",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "C"
+        }
+      },
+      "truth": "true",
+      "supported": true,
+      "unsupportedReason": null,
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [
+        [
+          "A",
+          "C"
+        ]
+      ],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": true,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "satisfies-declared-requirements"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "violates-declared-requirement"
+        }
+      ],
+      "rationale": "register_identity: positive distinction: CONTEXT.dataInputs(0).id == fromBase16(\"@B.id@\") && INPUTS(1).id == CONTEXT.dataInputs(0).R4[Coll[Byte]].get",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B",
+          "C"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ],
+          [
+            "A",
+            "C"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": false
+      },
+      "referenceSiteIds": [
+        "register_identity-positive/site/0",
+        "register_identity-positive/site/1",
+        "register_identity-positive/site/2"
+      ]
+    },
+    {
+      "id": "register_identity-control",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "C",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "C"
+        }
+      },
+      "truth": "false",
+      "supported": false,
+      "unsupportedReason": "mutable-register-unconstrained",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "config may be B or F; R4 is not fixed",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ],
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "dynamic": true,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "mutable-config-omits-C",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "register_identity: mutable-register-unconstrained; INPUTS(1).id == CONTEXT.dataInputs(0).R4[Coll[Byte]].get",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "C",
+          "U"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "B"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": false
+      },
+      "referenceSiteIds": [
+        "register_identity-control/site/0",
+        "register_identity-control/site/1"
+      ]
+    },
+    {
+      "id": "context_code-positive",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "input:0/var:1",
+        "kind": "Execute",
+        "selector": {
+          "kind": "extension",
+          "input": 0,
+          "variable": 1
+        }
+      },
+      "truth": "true",
+      "supported": true,
+      "unsupportedReason": null,
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true",
+        "config B bytes and register fixed; extension hash equality must be checked separately from execution"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": true,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "satisfies-declared-requirements"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "violates-declared-requirement"
+        }
+      ],
+      "rationale": "context_code: positive distinction: CONTEXT.dataInputs(0).id == fromBase16(\"@B.id@\") && blake2b256(getVar[Coll[Byte]](1).get) == CONTEXT.dataInputs(0).R4[Coll[Byte]].get && executeFromVar[Boolean](1)",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": false
+      },
+      "referenceSiteIds": [
+        "context_code-positive/site/0",
+        "context_code-positive/site/1",
+        "context_code-positive/site/2"
+      ]
+    },
+    {
+      "id": "context_code-control",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "input:0/var:1",
+        "kind": "Execute",
+        "selector": {
+          "kind": "extension",
+          "input": 0,
+          "variable": 1
+        }
+      },
+      "truth": "false",
+      "supported": false,
+      "unsupportedReason": "optional-execution",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true",
+        "config B bytes and register fixed; extension hash equality must be checked separately from execution"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": true,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "wrong-config-id",
+          "engineVerdict": "fail",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "mandatory-branch-false-extension",
+          "engineVerdict": "fail",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "context_code: optional-execution; CONTEXT.dataInputs(0).id == fromBase16(\"@B.id@\") && blake2b256(getVar[Coll[Byte]](1).get) == CONTEXT.dataInputs(0).R4[Coll[Byte]].get && (HEIGHT < 100 || executeFromVar[Boolean](1))",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": false
+      },
+      "referenceSiteIds": [
+        "context_code-control/site/0",
+        "context_code-control/site/1",
+        "context_code-control/site/2"
+      ]
+    },
+    {
+      "id": "context_scope-positive",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "input:0/var:1",
+        "kind": "Execute",
+        "selector": {
+          "kind": "extension",
+          "input": 0,
+          "variable": 1
+        }
+      },
+      "truth": "true",
+      "supported": true,
+      "unsupportedReason": null,
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true",
+        "named variable belongs to input 0; variable on input 1 does not authenticate it"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": true,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "satisfies-declared-requirements"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "violates-declared-requirement"
+        }
+      ],
+      "rationale": "context_scope: positive distinction: CONTEXT.getVarFromInput[Coll[Byte]](0, 1).get == getVar[Coll[Byte]](1).get && executeFromVar[Boolean](1)",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [],
+        "trueTuples": [],
+        "falseTuples": [
+          [
+            "A",
+            "B"
+          ],
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": false
+      },
+      "referenceSiteIds": [
+        "context_scope-positive/site/0",
+        "context_scope-positive/site/1"
+      ]
+    },
+    {
+      "id": "context_scope-control",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "input:0/var:1",
+        "kind": "Execute",
+        "selector": {
+          "kind": "extension",
+          "input": 0,
+          "variable": 1
+        }
+      },
+      "truth": "false",
+      "supported": false,
+      "unsupportedReason": "wrong-input-variable",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true",
+        "named variable belongs to input 0; variable on input 1 does not authenticate it"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": true,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "context_scope: wrong-input-variable; CONTEXT.getVarFromInput[Coll[Byte]](1, 1).get == fromBase16(\"7f\") && (HEIGHT < 100 || executeFromVar[Boolean](1))",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [],
+        "trueTuples": [],
+        "falseTuples": [
+          [
+            "A",
+            "B"
+          ],
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": false
+      },
+      "referenceSiteIds": [
+        "context_scope-control/site/0",
+        "context_scope-control/site/1"
+      ]
+    },
+    {
+      "id": "avl_identity-positive",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "avl-membership",
+        "kind": "Authenticates",
+        "selector": {
+          "kind": "avl-membership",
+          "input": 0,
+          "variable": 1
+        }
+      },
+      "truth": "unresolved",
+      "supported": false,
+      "unsupportedReason": "avl-static-unsupported",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": true,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "avl_identity: positive distinction: SELF.R4[AvlTree].get.get(getVar[Coll[Byte]](1).get, getVar[Coll[Byte]](0).get).isDefined",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [],
+        "trueTuples": [],
+        "falseTuples": [
+          [
+            "A",
+            "B"
+          ],
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": false
+      },
+      "referenceSiteIds": [
+        "avl_identity-positive/site/0"
+      ]
+    },
+    {
+      "id": "avl_identity-control",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "avl-membership",
+        "kind": "Authenticates",
+        "selector": {
+          "kind": "avl-membership",
+          "input": 0,
+          "variable": 1
+        }
+      },
+      "truth": "unresolved",
+      "supported": false,
+      "unsupportedReason": "avl-static-unsupported",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": true,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "avl_identity: avl-static-unsupported; SELF.R4[AvlTree].get.get(getVar[Coll[Byte]](1).get, getVar[Coll[Byte]](0).get).isDefined",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [],
+        "trueTuples": [],
+        "falseTuples": [
+          [
+            "A",
+            "B"
+          ],
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": false
+      },
+      "referenceSiteIds": [
+        "avl_identity-control/site/0"
+      ]
+    },
+    {
+      "id": "snapshot_collision-positive",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "true",
+      "supported": true,
+      "unsupportedReason": null,
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ]
+      ],
+      "dynamic": false,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "satisfies-declared-requirements"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "fail",
+          "necessityDisposition": "violates-declared-requirement"
+        }
+      ],
+      "rationale": "snapshot_collision: positive distinction: INPUTS(1).id == fromBase16(\"@B.id@\") && INPUTS(1).id != SELF.id",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [
+          "B"
+        ],
+        "trueTuples": [
+          [
+            "A",
+            "B"
+          ]
+        ],
+        "falseTuples": [
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "snapshot_collision-positive/site/0",
+        "snapshot_collision-positive/site/1"
+      ]
+    },
+    {
+      "id": "snapshot_collision-control",
+      "relation": {
+        "subject": "A",
+        "guard": "true",
+        "target": "B",
+        "kind": "Spend",
+        "selector": {
+          "kind": "exact-box-id",
+          "universeName": "B"
+        }
+      },
+      "truth": "false",
+      "supported": false,
+      "unsupportedReason": "coincidental-constant-incomplete-source",
+      "permittedPremises": [
+        "exact root and SELF bytes",
+        "hypothetical fixed finite universe",
+        "mainnet activation 3",
+        "guard: true"
+      ],
+      "trueEdges": [],
+      "falseEdges": [
+        [
+          "A",
+          "U"
+        ],
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "dynamic": false,
+      "actions": [
+        {
+          "id": "satisfying",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        },
+        {
+          "id": "omission",
+          "engineVerdict": "pass",
+          "necessityDisposition": "unresolved"
+        }
+      ],
+      "rationale": "snapshot_collision: coincidental-constant-incomplete-source; SELF.R4[Coll[Byte]].get == fromBase16(\"2222222222222222222222222222222222222222222222222222222222222222\")",
+      "discovery": {
+        "meaning": "exact identity matches in the declared finite universe, regardless of optionality or execution authority",
+        "members": [],
+        "trueTuples": [],
+        "falseTuples": [
+          [
+            "A",
+            "B"
+          ],
+          [
+            "A",
+            "C"
+          ],
+          [
+            "A",
+            "U"
+          ],
+          [
+            "A",
+            "F"
+          ]
+        ],
+        "supportedByM02": true
+      },
+      "referenceSiteIds": [
+        "snapshot_collision-control/site/0"
+      ]
+    }
+  ]
+}

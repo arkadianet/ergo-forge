@@ -30,11 +30,15 @@
 //!
 //! A map is a description, not a verdict.
 
+pub mod action;
+pub mod discover_refs;
+pub mod discovery;
 #[cfg(feature = "explorer")]
 pub mod explorer;
 pub mod fixture;
 pub mod json;
 pub mod refs;
+pub mod relations;
 pub mod source;
 
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
@@ -1075,3 +1079,6 @@ fn set_findings(nodes: &BTreeMap<String, MapNode>, edges: &[Edge]) -> Vec<SetFin
     }
     out
 }
+
+pub mod check_relation;
+pub mod necessity;

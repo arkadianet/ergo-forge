@@ -231,3 +231,107 @@ This pass changes only this design file. Proposed adoption would narrowly unfree
 There is **no unfinished numbered P-unit to displace**. The proposal replaces the post-P08 stop with one bounded 19-day mapping allocation; it consumes the next implementation/review capacity that would otherwise remain unallocated or go to maintenance. It explicitly postpones every competing appendix proposal: compiler/version support, search axes, solver/steering, keyed insiders, chains, historical-state verification, real-protocol precision campaign, new recipes and UI work. Each M-unit consumes its stated share of that allocation; no second workstream is opened. If maintenance must consume it, reduce or stop this queue through the same governing process.
 
 The historical Phase B promises of automatic private false-positive discharge and a new proven mutation operator are displaced by public-independent relationship and omission experiments. Automatic finding discharge and mutation-corpus expansion remain frozen. M05 is the ceiling, not a bridge to unrestricted composition. The next decision after its report may be to retain explicit unresolved boundaries permanently.
+
+
+## M03 implementation amendment — 2026-09-10
+
+The author explicitly authorized M03 implementation after PR #97. The original
+proposal-only status above records the design pass, not the later authorization.
+
+Section 3.1's initial equality-only guard vocabulary could not express the
+already pinned `action_alternatives-positive` guard `HEIGHT >= 100`. Add the narrow
+typed guard `HeightAtLeast(Int)` over context HEIGHT, alongside literal equalities
+and Boolean combinations. This preserves that exact guard instead of replacing it
+with `true`, an equality at one sampled height, or a changed corpus answer. All
+pinned facts, membership, thresholds, unit tests, package, target and days remain
+unchanged. Unsupported fields or expressions still require refusal.
+
+For the supplied-state M03 checker, P includes the full fixed validator context,
+parameters, network rules, headers, prior cost and local policy. Its state domain
+requires positive input token amounts and excludes storage-rent eligibility for
+fixed SELF by checking height/creation height against the supplied storage period.
+The full validator can otherwise accept without successful root evaluation.
+These are explicit conditional state restrictions, not co-spend premises or a
+change to `Accepted(P,T)`. Replays check those restrictions on the accepted
+execution; a late-height claim is refused. No all-future-states claim is made.
+
+During M03 gate review, the new supplemental v1 fixture was found to retain
+unused `truth`, rationale and lexical-site annotations from its M00 construction
+template. Its explicitly authored supported dispositions and execution verdicts
+were correct, but the test did not check the inherited truth field. Preserve
+that fixture and its measured result as v1 history; use a separately hash-pinned
+supplemental v2 with explicit truth for its own ten claims and no inherited
+rationale/sites. The gate now checks that truth as well. This is a versioned
+supplemental metadata correction under section 5.1, not a change to the M00
+32-case denominator or any case, target, guard, supported disposition, verdict or
+threshold. All previous supplemental execution request bytes and hashes remain
+identical. The v2 gate retains five supported positives and five controls.
+
+
+## M04 implementation clarification — 2026-09-10
+
+The author authorized M04 after PR #97. Its action gate checks the original M00
+32-case, 67-action inventory without changing any expected disposition. Four
+positive Execute dispositions require M05 and are retained as deferred/unresolved
+at M04, separately from the 63 eligible action dispositions. This is the same
+M03/M05 capability split used by M03's report; M04 does not implement Execute.
+The final all-action accuracy target remains 67/67, not 63/63.
+
+An extra M04 test initially treated M03 supplemental v2 control action labels as
+additional action-gate answers. Those labels conflict with the same fixtures'
+unsupported claim flags and were not checked by M03; accepting them would grant
+an unresolved proposal requirement authority. That extra test was incorrect.
+M04 uses M00's independently pinned action answer key as section 5.1 specifies,
+retains all supplemental bytes and prior results unchanged, and uses supplemental
+positive vectors only for additional action guard/distinctness checks. All 27
+M03 recorded accepted omissions, including supplemental controls, are freshly
+replayed and assessed by the product refutation API. No label is corrected or
+scored differently in the registered action denominator. The supplemental control
+action-label inconsistency remains documented, not silently repaired.
+
+No section 6 unit name, acceptance test, dependency, package, target, days,
+threshold or frozen capability is amended.
+
+## M05 attempted implementation amendment — 2026-09-10: stopped
+
+Author authorization supersedes the historical proposal-only status for this
+attempt. The section 6 M05 acceptance requirement is unimplementable against
+one unchanged registered supported case under the exact relation in section 3.2.
+`context_scope-positive` says:
+
+```text
+sigmaProp(CONTEXT.getVarFromInput[Coll[Byte]](0, 1).get ==
+          getVar[Coll[Byte]](1).get && executeFromVar[Boolean](1))
+```
+
+This requires successful local Boolean execution, but has no authenticated
+config or code-hash equality. The new [stop evidence](../../mapping/m05-stop-results.json)
+replays `7f` (true) and `93a3a3` (`HEIGHT == HEIGHT`) through the full pinned
+validator: both are accepted with different hashes, identical exact root/SELF,
+state, guard and all transaction fields except that extension. `80` (false)
+is rejected at input 0's script. The diagnostic binds these assertions to the
+original M00 fixture and M03 premises; the old unresolved proposal is preserved.
+Neither accepted program establishes that one fixed digest must execute in every
+accepted transaction. Input-local equality is not code authentication.
+
+Apply section 7's **coverage-gate** stop: retain M00–M04. This amendment records
+the demonstrated acceptance conflict and stopped status; it does **not** relax
+Execute, add a variable-code relation, assume a fixed extension as a new premise,
+change a supported label, or amend a test name/target/package/dependency/day limit.
+All pinned facts and the full 67-action target remain intact. A governing,
+versioned resolution is required before M05 can reopen; adding an authenticated
+replacement fixture without preserving this registered member cannot satisfy
+the existing gate. See [M05 report](../../mapping/M05.md) and the full
+[stop record](../../roadmap-stops.json). The diagnostic is not a substitute for
+`mapping_context_code` or any of its four capability tests.
+
+The first stopped-prefix verification also exposed an existing harness assumption:
+`test_resolution_requires_exact_policy_record_and_decision` asserted that the
+live repository had zero open stop records. That contradicts section 7's required
+stop workflow. Its expectation now excludes only exact policy-resolved record
+hashes and retains every pending record, including when another stop is appended.
+The missing-record, altered-record-hash and altered-decision-hash checks remain.
+This explicitly amends the anticipated no-old-test-edits implementation surface
+for the stop harness only; the runner, P00–P08 unit registrations, implementation
+flags, thresholds and product gates are unchanged. Failed initial verification
+logs are retained alongside the rerun logs.

@@ -1,0 +1,115 @@
+{
+  "environment": {
+    "CARGO_TARGET_DIR": "./target-p00"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/pr98-verification/fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/pr98-verification/clippy.log",
+      "sha256": "134d7664072831c0aa904c22e0aef8ccbe739db13c37222ea8950a27b81c36ad"
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_roadmap_gate.py"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/pr98-verification/python.log",
+      "sha256": "6b7809a1258e6a27802212a7f3a1f2a63d913514793d792cb971dc00899115bd"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "ergo-sandbox",
+        "--release",
+        "--test",
+        "mapping_inventory",
+        "--test",
+        "mapping_artifacts",
+        "--test",
+        "mapping_discovery",
+        "--test",
+        "mapping_necessity",
+        "--test",
+        "mapping_actions",
+        "--test",
+        "mapping_context_boundary",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/pr98-verification/mapping.log",
+      "sha256": "a35ad0e3bd6e2eee12c9b918be392cfbbb86815e2f7214c591bb7336bb00a678"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--release"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/pr98-verification/workspace.log",
+      "sha256": "166b7747ad52d115387c6c2867000f54f1dff3faa3f54670dcbd381d0d4a20ba"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/roadmap_gate.py",
+        "--through-completed"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/pr98-verification/through.log",
+      "sha256": "8c415ff8108e35a2e6d2fe9e333fa2ffbbd153990c87ffac89e20596bbf9c1f7"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/roadmap_gate.py",
+        "--all-goals"
+      ],
+      "exitCode": 1,
+      "outputPath": "docs/mapping/pr98-verification/all.log",
+      "sha256": "b413d82dc87f73f7556aa3989ec290f4661e26278c813f766edf51680c7854be"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/roadmap_gate.py",
+        "--ci"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/pr98-verification/ci.log",
+      "sha256": "abcec97d31d8c2caf2a2e5463af2ce5bd98168eeaa103f1d7690348c28c4e1c0"
+    }
+  ]
+}

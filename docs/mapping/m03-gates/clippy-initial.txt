@@ -1,0 +1,32 @@
+    Checking ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
+error: casting to the same type is unnecessary (`u8` -> `u8`)
+   --> ergo-sandbox/src/map/check_relation.rs:127:39
+    |
+127 |                 Some(b.iter().map(|x| *x as u8).collect())
+    |                                       ^^^^^^^^ help: try: `*x`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#unnecessary_cast
+    = note: `-D clippy::unnecessary-cast` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::unnecessary_cast)]`
+
+error: redundant pattern matching, consider using `is_some()`
+   --> ergo-sandbox/src/map/check_relation.rs:316:62
+    |
+316 | ...                   if !local.contains_key(used) && !matches!(op(rhs, 0xD9), Some(_)) {
+    |                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `op(rhs, 0xD9).is_some()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#redundant_pattern_matching
+    = note: `-D clippy::redundant-pattern-matching` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::redundant_pattern_matching)]`
+
+error: casting to the same type is unnecessary (`u8` -> `u8`)
+   --> ergo-sandbox/src/map/check_relation.rs:696:61
+    |
+696 | ...                   bytes: bytes.iter().map(|x| *x as u8).collect(),
+    |                                                   ^^^^^^^^ help: try: `*x`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#unnecessary_cast
+
+error: could not compile `ergo-sandbox` (lib) due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `ergo-sandbox` (lib test) due to 3 previous errors

@@ -1,0 +1,36 @@
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
+    Finished `release` profile [optimized] target(s) in 13.77s
+     Running tests/mapping_necessity.rs (target-p00/release/deps/mapping_necessity-eb4404bdfe49ad14)
+
+running 4 tests
+test unsupported_anchors_and_cyclic_proofs_are_rejected ... ok
+test alternatives_dead_checks_and_self_do_not_prove_cospend ... ok
+test exact_guarded_necessity_matches_pinned_answers ... ok
+test satisfying_omission_and_relaxed_controls_use_full_validator ... ok
+
+successes:
+
+---- unsupported_anchors_and_cyclic_proofs_are_rejected stdout ----
+altered/missing/reordered anchors, claim/guard changes, cycles, caps, wrong subject and storage-rent acceptance domain rejected
+
+---- alternatives_dead_checks_and_self_do_not_prove_cospend stdout ----
+18 pinned adversarial/unsupported members refused; unconditional alternative and wrong authentication scope refused
+
+---- exact_guarded_necessity_matches_pinned_answers stdout ----
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m03-mapping-results.json sha256=7c64e6d0a26c05720128d2dc4891e408d76bdbd6a7d5ff226e0bf4d9b9087ba6; supported 12/12; established 12; incorrect 0/12; unresolved 20/32
+
+---- satisfying_omission_and_relaxed_controls_use_full_validator stdout ----
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m03-omission-results.json sha256=2b4dd32bcdc5d41c0974e3718383744e0f6c903eae4ce5e4048695ad40c42ae1
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/m03/supplemental-v2.fixture sha256=25b20fb46cdd45ee199e3847321419fef765505a0db8d61b0bbc0499c40adfda
+27 accepted premise-matching omission assessments refute their own exact claims
+full validator: 52 accepted, 21 script rejections; 73 canonical vectors; evidence <repo>/ergo-sandbox/tests/fixtures/mapping/m03/manifest.json sha256=cdf73504cc3d5f98141bac9e44b46621a76baf8ac5219826d03367d171383853
+
+
+successes:
+    alternatives_dead_checks_and_self_do_not_prove_cospend
+    exact_guarded_necessity_matches_pinned_answers
+    satisfying_omission_and_relaxed_controls_use_full_validator
+    unsupported_anchors_and_cyclic_proofs_are_rejected
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

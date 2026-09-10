@@ -1,0 +1,142 @@
+{
+  "formatVersion": 1,
+  "case": {
+    "formatVersion": 1,
+    "deploymentIdentity": "unknown",
+    "nodeValidated": false,
+    "premises": {
+      "engineRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "targetBytes": {
+        "status": "present",
+        "value": "100204020e20d4c0e3c2dd77463946051c1292bc6adccc9721c0df97973577df745ab85c75e0d193cbc2b2a47300007301",
+        "origin": "hypothetical"
+      },
+      "source": {
+        "status": "missing",
+        "reason": "source identity not supplied"
+      },
+      "constants": {
+        "status": "missing",
+        "reason": "binding origins not supplied"
+      },
+      "boxes": {
+        "status": "present",
+        "value": [
+          {
+            "document": {
+              "boxId": "f8b6fd4eb40a7c3f525e732a949e5a9d3d8fdc20e9f5553a4c96bf0d41c24c52",
+              "bytes": "80897a100204020e20d4c0e3c2dd77463946051c1292bc6adccc9721c0df97973577df745ab85c75e0d193cbc2b2a47300007301010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100204020e20d4c0e3c2dd77463946051c1292bc6adccc9721c0df97973577df745ab85c75e0d193cbc2b2a47300007301"
+            },
+            "origin": "hypothetical",
+            "record": null
+          },
+          {
+            "document": {
+              "boxId": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+              "bytes": "80897a10010402d192a37300010000000000000000000000000000000000000000000000000000000000000000000003",
+              "ergoTree": "10010402d192a37300"
+            },
+            "origin": "hypothetical",
+            "record": null
+          },
+          {
+            "document": {
+              "boxId": "23a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092c",
+              "bytes": "80897a10010404d192a37300010000000000000000000000000000000000000000000000000000000000000000000000",
+              "ergoTree": "10010404d192a37300"
+            },
+            "origin": "hypothetical",
+            "record": null
+          },
+          {
+            "document": {
+              "boxId": "1b884c7e4a716c013558723ab80f09f4adaab2426ee67013aefbd4e02f2d346a",
+              "bytes": "80897a10010408d192a37300010000000000000000000000000000000000000000000000000000000000000000000002",
+              "ergoTree": "10010408d192a37300"
+            },
+            "origin": "hypothetical",
+            "record": null
+          },
+          {
+            "document": {
+              "boxId": "b114673b71df5f8934d4ce5398034945e619b319186f9bdaeb7fcb859209d83e",
+              "bytes": "80897a10010406d192a37300010000000000000000000000000000000000000000000000000000000000000000000001",
+              "ergoTree": "10010406d192a37300"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        ],
+        "origin": "hypothetical"
+      },
+      "context": {
+        "status": "missing",
+        "reason": "execution context not supplied"
+      },
+      "assumptions": {}
+    }
+  },
+  "transactionBytes": "02f8b6fd4eb40a7c3f525e732a949e5a9d3d8fdc20e9f5553a4c96bf0d41c24c520000b114673b71df5f8934d4ce5398034945e619b319186f9bdaeb7fcb859209d83e00000000018092f40110010101d17300640000",
+  "parameters": {
+    "status": "present",
+    "value": {
+      "minValuePerByte": 360,
+      "maxBlockCost": 8001091,
+      "maxBlockSize": 524288,
+      "maxBoxSize": 4096,
+      "maxTokensPerBox": 122,
+      "inputCost": 2000,
+      "dataInputCost": 100,
+      "outputCost": 100,
+      "tokenAccessCost": 100,
+      "storageFeeFactor": 1250000,
+      "storagePeriod": 1051200
+    },
+    "origin": "hypothetical"
+  },
+  "networkRules": {
+    "status": "present",
+    "value": {
+      "mode": "disabled",
+      "description": "authored keyless/rent vector",
+      "reason": "explicit hypothetical network without EIP-27"
+    },
+    "origin": "hypothetical"
+  },
+  "blockContext": {
+    "status": "present",
+    "value": {
+      "height": 100,
+      "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+      "preHeaderTimestamp": 1700000000000,
+      "activatedScriptVersion": 3,
+      "preHeaderVersion": 4,
+      "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+      "preHeaderNBits": 117586360,
+      "preHeaderVotes": [
+        0,
+        0,
+        0
+      ]
+    },
+    "origin": "hypothetical"
+  },
+  "headers": {
+    "status": "present",
+    "value": [],
+    "origin": "hypothetical"
+  },
+  "localPolicy": {
+    "status": "present",
+    "value": {
+      "maxTransactionSize": 524288
+    },
+    "origin": "hypothetical"
+  },
+  "priorBlockCost": {
+    "status": "present",
+    "value": 0,
+    "origin": "hypothetical"
+  }
+}

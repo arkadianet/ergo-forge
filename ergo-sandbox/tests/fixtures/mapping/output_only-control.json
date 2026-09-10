@@ -1,0 +1,194 @@
+{
+  "family": "output_only",
+  "id": "output_only-control",
+  "publication": "public",
+  "sites": [
+    {
+      "authority": "lexical inventory anchor; no proof correspondence",
+      "end": 20,
+      "id": "output_only-control/site/0",
+      "start": 10,
+      "text": "OUTPUTS(0)"
+    }
+  ],
+  "snapshot": {
+    "allBoxNames": [
+      "A",
+      "B",
+      "C",
+      "U",
+      "F"
+    ],
+    "kind": "closed synthetic inventory",
+    "simultaneousAvailability": "hypothetical",
+    "unrelated": [
+      "U",
+      "F"
+    ]
+  },
+  "source": "sigmaProp(OUTPUTS(0).propositionBytes == fromBase16(\"10010402d192a37300\"))",
+  "sourceProvenance": "independently authored synthetic; no external/private code",
+  "subjectId": "9dbe05e5b43786a449a5223a2b44b28a94191d75b1c4b9ee2b38cd6fcbb9d870",
+  "treeHex": "100204000e0910010402d192a37300d193c2b2a57300007301",
+  "universe": [
+    {
+      "boxId": "23a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092c",
+      "bytes": "80897a10010404d192a37300010000000000000000000000000000000000000000000000000000000000000000000000",
+      "name": "C",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 0,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "23a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092c",
+        "creationHeight": 1,
+        "propositionHex": "10010404d192a37300",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(HEIGHT >= 2)",
+      "spec": {
+        "creationHeight": 1,
+        "propositionHex": "10010404d192a37300",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    },
+    {
+      "boxId": "b114673b71df5f8934d4ce5398034945e619b319186f9bdaeb7fcb859209d83e",
+      "bytes": "80897a10010406d192a37300010000000000000000000000000000000000000000000000000000000000000000000001",
+      "name": "U",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 1,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "b114673b71df5f8934d4ce5398034945e619b319186f9bdaeb7fcb859209d83e",
+        "creationHeight": 1,
+        "propositionHex": "10010406d192a37300",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(HEIGHT >= 3)",
+      "spec": {
+        "creationHeight": 1,
+        "propositionHex": "10010406d192a37300",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    },
+    {
+      "boxId": "1b884c7e4a716c013558723ab80f09f4adaab2426ee67013aefbd4e02f2d346a",
+      "bytes": "80897a10010408d192a37300010000000000000000000000000000000000000000000000000000000000000000000002",
+      "name": "F",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 2,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "1b884c7e4a716c013558723ab80f09f4adaab2426ee67013aefbd4e02f2d346a",
+        "creationHeight": 1,
+        "propositionHex": "10010408d192a37300",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(HEIGHT >= 4)",
+      "spec": {
+        "creationHeight": 1,
+        "propositionHex": "10010408d192a37300",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    },
+    {
+      "boxId": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+      "bytes": "80897a10010402d192a37300010000000000000000000000000000000000000000000000000000000000000000000003",
+      "name": "B",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 3,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+        "creationHeight": 1,
+        "propositionHex": "10010402d192a37300",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(HEIGHT >= 1)",
+      "spec": {
+        "creationHeight": 1,
+        "propositionHex": "10010402d192a37300",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    },
+    {
+      "boxId": "9dbe05e5b43786a449a5223a2b44b28a94191d75b1c4b9ee2b38cd6fcbb9d870",
+      "bytes": "80897a100204000e0910010402d192a37300d193c2b2a57300007301010000000000000000000000000000000000000000000000000000000000000000000004",
+      "name": "A",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 4,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "9dbe05e5b43786a449a5223a2b44b28a94191d75b1c4b9ee2b38cd6fcbb9d870",
+        "creationHeight": 1,
+        "propositionHex": "100204000e0910010402d192a37300d193c2b2a57300007301",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(OUTPUTS(0).propositionBytes == fromBase16(\"10010402d192a37300\"))",
+      "spec": {
+        "creationHeight": 1,
+        "propositionHex": "100204000e0910010402d192a37300d193c2b2a57300007301",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    }
+  ],
+  "vectors": [
+    {
+      "contextVars": {},
+      "dataInputs": [],
+      "height": 50,
+      "id": "satisfying",
+      "inputs": [
+        "A",
+        "U"
+      ],
+      "outputs": [
+        "B"
+      ]
+    },
+    {
+      "contextVars": {},
+      "dataInputs": [],
+      "height": 50,
+      "id": "omission",
+      "inputs": [
+        "A",
+        "U"
+      ],
+      "outputs": [
+        "B"
+      ]
+    }
+  ],
+  "version": "mapping-fixture:v1"
+}
