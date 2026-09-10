@@ -1,5 +1,9 @@
 # ergo-forge — governing roadmap
 
+**Date convention:** Historical dates below are local (Australia/Brisbane, UTC+10).
+The discovery date 2026-09-11 corresponds to authoring on 2026-09-10 UTC.
+See the [repository record date convention](DATE-CONVENTION.md); new records use UTC.
+
 **This document replaces `docs/superpowers/specs/2026-09-08-drain-hunt-roadmap.md` as the governing plan.** That document and the per-phase specifications are historical design and measurement records. They do not authorize additional work. Where they conflict with this plan, this plan wins. The architecture rationale is in [ARCHITECTURE-REVIEW-CODEX.md, sections 1–7](ARCHITECTURE-REVIEW-CODEX.md); this document defines the executable queue, not another review.
 
 Baseline: main `ee4ac6a874531872c27828d94e21e4fe7a1d7f7c`, inspected 2026-09-09. No benchmarks were rerun to write this plan. The committed artifacts, not remembered headlines or uncommitted reports, supply the scoreboard below.

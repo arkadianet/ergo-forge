@@ -4,6 +4,10 @@ The strongest argument against building this arc is that authoring trustworthy p
 
 Status at initial design: **design only**, inspected at `dd8dab6af8c494b86e626ea29a274b08372854c1`. The subsequent [D00 governing decision](../../discovery/D00-DECISION.md) authorizes only incremental D00 registration and its inventory; all later units and capabilities remain proposed. Proposed filenames, tests, budgets and numeric targets below are future deliverables, not measured results. [ROADMAP](../../ROADMAP.md), its frozen measurements and its section 6 stops remain authoritative. M05 remains stopped. No product benchmark was rerun for this record.
 
+**Date convention:** Historical dates below are local (Australia/Brisbane, UTC+10).
+The discovery date 2026-09-11 corresponds to authoring on 2026-09-10 UTC.
+See the [repository record date convention](../../DATE-CONVENTION.md); new records use UTC.
+
 ## 1. End-state and the dependency between capabilities
 
 The concrete workflow is:
