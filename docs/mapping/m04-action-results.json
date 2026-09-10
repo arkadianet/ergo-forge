@@ -1,0 +1,1313 @@
+{
+  "actions": [
+    {
+      "deferredToM05": false,
+      "expected": "satisfies-declared-requirements",
+      "id": "literal_spend-positive/satisfying",
+      "result": {
+        "actionDigest": "70adcf485962a426b41a6b913187d4e3722dd3662df6de0db1b01e302e0c4eaf",
+        "actionId": "literal_spend-positive/satisfying",
+        "disposition": "satisfies-declared-requirements",
+        "requirements": [
+          {
+            "claimDigest": "b6cb4c5b6f1a303cda442636eef9e2832e4b258571fa6e2d0e2c2f74af03cf23",
+            "guard": true,
+            "premiseDigest": "737c2c7888aa08243df78bac5641dc68f8e9c082baa3831b7f6a28e056bca7ab",
+            "status": "satisfies-declared-requirements"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "violates-declared-requirement",
+      "id": "literal_spend-positive/omission",
+      "result": {
+        "actionDigest": "ca4b88fdff1c1c846c5fe3f38fdec2f7f8556ec98674a841c759a12c5208f438",
+        "actionId": "literal_spend-positive/omission",
+        "disposition": "violates-declared-requirement",
+        "requirements": [
+          {
+            "claimDigest": "b6cb4c5b6f1a303cda442636eef9e2832e4b258571fa6e2d0e2c2f74af03cf23",
+            "guard": true,
+            "premiseDigest": "737c2c7888aa08243df78bac5641dc68f8e9c082baa3831b7f6a28e056bca7ab",
+            "status": "violates-declared-requirement"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "literal_spend-control/satisfying",
+      "result": {
+        "actionDigest": "bd8f446038c2e8609accc43d65bef4a696b7446c54a4da18ef5c33c2b4c47485",
+        "actionId": "literal_spend-control/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "86d585c2a6a7007d88db4a55530df9e93fc6edb6fd259565ffec45322b4312c0",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "literal_spend-control/omission",
+      "result": {
+        "actionDigest": "ba3adde25c6bc7ed358a04b85232c1a723db26762ed9909461e068ce39fb269e",
+        "actionId": "literal_spend-control/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "86d585c2a6a7007d88db4a55530df9e93fc6edb6fd259565ffec45322b4312c0",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "satisfies-declared-requirements",
+      "id": "self_alias-positive/satisfying",
+      "result": {
+        "actionDigest": "6ab83f2b8fcadd3a64a18aab37bb8bc469b3a6ccf426440bb33c305b3799f52a",
+        "actionId": "self_alias-positive/satisfying",
+        "disposition": "satisfies-declared-requirements",
+        "requirements": [
+          {
+            "claimDigest": "571e63fa34ad82ec8d7cee1e53464a3d09fb2633253aeaf76599cfe288df43e2",
+            "guard": true,
+            "premiseDigest": "f388afeb236557cf096d826d490ff3177665fc991452a5e039ec5a8a5ff084dd",
+            "status": "satisfies-declared-requirements"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "violates-declared-requirement",
+      "id": "self_alias-positive/omission",
+      "result": {
+        "actionDigest": "dbe8b25de67ff7794e5d8fa4ee39d5b8ee252fde1526e2376f0a861fc97641ef",
+        "actionId": "self_alias-positive/omission",
+        "disposition": "violates-declared-requirement",
+        "requirements": [
+          {
+            "claimDigest": "571e63fa34ad82ec8d7cee1e53464a3d09fb2633253aeaf76599cfe288df43e2",
+            "guard": true,
+            "premiseDigest": "f388afeb236557cf096d826d490ff3177665fc991452a5e039ec5a8a5ff084dd",
+            "status": "violates-declared-requirement"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "self_alias-control/satisfying",
+      "result": {
+        "actionDigest": "0a72414dc71e49f927f8b85879315a00d2cd33eab11a0136a11bb6641d7ef80d",
+        "actionId": "self_alias-control/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "246494092da61688d3a8779bf816c469a4e5cf7914a41703c08dda6d1a738f18",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "self_alias-control/omission",
+      "result": {
+        "actionDigest": "58e16ddb830dfa85cc90e82d93d045cd92b281cd5c879afab8631f538647fc39",
+        "actionId": "self_alias-control/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "246494092da61688d3a8779bf816c469a4e5cf7914a41703c08dda6d1a738f18",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "satisfies-declared-requirements",
+      "id": "action_alternatives-positive/satisfying",
+      "result": {
+        "actionDigest": "72976681c9bd883badb7511282e75c1914de64cebf6bf00d19e69e571381f13a",
+        "actionId": "action_alternatives-positive/satisfying",
+        "disposition": "satisfies-declared-requirements",
+        "requirements": [
+          {
+            "claimDigest": "22105d445a6713a04b90e418cc63cc38080b4efc7bed55bf0532cad7ad0b30b1",
+            "guard": true,
+            "premiseDigest": "7ca7f45eed5135a680c8b40b8aba8a11f4015680fd88ec2b43abb23aa930a852",
+            "status": "satisfies-declared-requirements"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "violates-declared-requirement",
+      "id": "action_alternatives-positive/omission",
+      "result": {
+        "actionDigest": "3dc32cc9822788774d66b66b58fd48492265c1fbec2606f80cc4b5c89b0adbd3",
+        "actionId": "action_alternatives-positive/omission",
+        "disposition": "violates-declared-requirement",
+        "requirements": [
+          {
+            "claimDigest": "22105d445a6713a04b90e418cc63cc38080b4efc7bed55bf0532cad7ad0b30b1",
+            "guard": true,
+            "premiseDigest": "7ca7f45eed5135a680c8b40b8aba8a11f4015680fd88ec2b43abb23aa930a852",
+            "status": "violates-declared-requirement"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "action_alternatives-control/satisfying",
+      "result": {
+        "actionDigest": "06a8db342489ca091dcd852a5619a9fe1f3aaac7400d2fa13bd1f1d925baba13",
+        "actionId": "action_alternatives-control/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "1801497b8be0620c5c257b87e1f810adc6899a371e4bb82be45484e5134c51d0",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "action_alternatives-control/omission",
+      "result": {
+        "actionDigest": "d4398ec9f9b55d047669ea95682c98a58fde9baa3d8a47f7c151c7bb834598ee",
+        "actionId": "action_alternatives-control/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "1801497b8be0620c5c257b87e1f810adc6899a371e4bb82be45484e5134c51d0",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "satisfies-declared-requirements",
+      "id": "data_only-positive/satisfying",
+      "result": {
+        "actionDigest": "8cc00899d0d3a9495f4b69b1fbff3b9dc1a4be5502a205dcef6a84fc7fbe4378",
+        "actionId": "data_only-positive/satisfying",
+        "disposition": "satisfies-declared-requirements",
+        "requirements": [
+          {
+            "claimDigest": "b6cb4c5b6f1a303cda442636eef9e2832e4b258571fa6e2d0e2c2f74af03cf23",
+            "guard": true,
+            "premiseDigest": "737c2c7888aa08243df78bac5641dc68f8e9c082baa3831b7f6a28e056bca7ab",
+            "status": "satisfies-declared-requirements"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "violates-declared-requirement",
+      "id": "data_only-positive/omission",
+      "result": {
+        "actionDigest": "c05a3dd24c61fa3dafd3d080ec14a692889b30dd3b5be855155e2d89f862a7a0",
+        "actionId": "data_only-positive/omission",
+        "disposition": "violates-declared-requirement",
+        "requirements": [
+          {
+            "claimDigest": "b6cb4c5b6f1a303cda442636eef9e2832e4b258571fa6e2d0e2c2f74af03cf23",
+            "guard": true,
+            "premiseDigest": "737c2c7888aa08243df78bac5641dc68f8e9c082baa3831b7f6a28e056bca7ab",
+            "status": "violates-declared-requirement"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "data_only-control/satisfying",
+      "result": {
+        "actionDigest": "7a30b5494cdacdafc0ec814750f6ba02800f496c469710a619980a84c6f4eb08",
+        "actionId": "data_only-control/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "cccaf738236d16c6cf98ffab52cb6bfbb315fb18f69fa941e79cf780ee76c6dd",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "data_only-control/omission",
+      "result": {
+        "actionDigest": "004940151bc92d0482965ee91f6c52ff4f57c89897d658823b8023255e73e3e2",
+        "actionId": "data_only-control/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "cccaf738236d16c6cf98ffab52cb6bfbb315fb18f69fa941e79cf780ee76c6dd",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "satisfies-declared-requirements",
+      "id": "output_only-positive/satisfying",
+      "result": {
+        "actionDigest": "09a679e46b6bdcd81de9cd45a99b8076148dd46315833ea59c9cbcd7c2f39102",
+        "actionId": "output_only-positive/satisfying",
+        "disposition": "satisfies-declared-requirements",
+        "requirements": [
+          {
+            "claimDigest": "b6cb4c5b6f1a303cda442636eef9e2832e4b258571fa6e2d0e2c2f74af03cf23",
+            "guard": true,
+            "premiseDigest": "737c2c7888aa08243df78bac5641dc68f8e9c082baa3831b7f6a28e056bca7ab",
+            "status": "satisfies-declared-requirements"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "violates-declared-requirement",
+      "id": "output_only-positive/omission",
+      "result": {
+        "actionDigest": "dd408b92469dcccbb12fd7be57737d51e7e4da5dd1a84379070e1800705ac79f",
+        "actionId": "output_only-positive/omission",
+        "disposition": "violates-declared-requirement",
+        "requirements": [
+          {
+            "claimDigest": "b6cb4c5b6f1a303cda442636eef9e2832e4b258571fa6e2d0e2c2f74af03cf23",
+            "guard": true,
+            "premiseDigest": "737c2c7888aa08243df78bac5641dc68f8e9c082baa3831b7f6a28e056bca7ab",
+            "status": "violates-declared-requirement"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "output_only-control/satisfying",
+      "result": {
+        "actionDigest": "765a0445d97e56f79eb0c5e229144bbbb9f7dd5bfbeb092a02bf3a30e0650517",
+        "actionId": "output_only-control/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "93aca52b9834b5df7b4f8db36d132b29f30345c8f0d0ad54f81e1986709b848e",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "output_only-control/omission",
+      "result": {
+        "actionDigest": "f7556a14454c7e89201cd8fe254e3c2b8c46f56bd818c008a6b3458ea3e82f3e",
+        "actionId": "output_only-control/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "93aca52b9834b5df7b4f8db36d132b29f30345c8f0d0ad54f81e1986709b848e",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "satisfies-declared-requirements",
+      "id": "dead_check-positive/satisfying",
+      "result": {
+        "actionDigest": "0f5e6bcd98d4d49e4557e9b2a9b96336e7916f6ffd03ef4fd547bcef006322e0",
+        "actionId": "dead_check-positive/satisfying",
+        "disposition": "satisfies-declared-requirements",
+        "requirements": [
+          {
+            "claimDigest": "b6cb4c5b6f1a303cda442636eef9e2832e4b258571fa6e2d0e2c2f74af03cf23",
+            "guard": true,
+            "premiseDigest": "737c2c7888aa08243df78bac5641dc68f8e9c082baa3831b7f6a28e056bca7ab",
+            "status": "satisfies-declared-requirements"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "violates-declared-requirement",
+      "id": "dead_check-positive/omission",
+      "result": {
+        "actionDigest": "975b6d0043e034f9ce48697ee67e6b865e074539977eb9d667d66a3f3ed2faa1",
+        "actionId": "dead_check-positive/omission",
+        "disposition": "violates-declared-requirement",
+        "requirements": [
+          {
+            "claimDigest": "b6cb4c5b6f1a303cda442636eef9e2832e4b258571fa6e2d0e2c2f74af03cf23",
+            "guard": true,
+            "premiseDigest": "737c2c7888aa08243df78bac5641dc68f8e9c082baa3831b7f6a28e056bca7ab",
+            "status": "violates-declared-requirement"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "dead_check-control/satisfying",
+      "result": {
+        "actionDigest": "044fbd21e2ea4a34ef9e1d51dc57296120bb154f439582fb6d4a12dafe612147",
+        "actionId": "dead_check-control/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "65986fc4f93591bd025cd4a66de44cdf743dfce9f6b7efca82592a59f2a28707",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "dead_check-control/omission",
+      "result": {
+        "actionDigest": "6b745a79c939c13571147e4fa5e3721c243c4e6772c1bd0f4f572f9702289a27",
+        "actionId": "dead_check-control/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "65986fc4f93591bd025cd4a66de44cdf743dfce9f6b7efca82592a59f2a28707",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "satisfies-declared-requirements",
+      "id": "script_identity-positive/satisfying",
+      "result": {
+        "actionDigest": "a4d4a28ea0b62f37072445988ba75d3ed9eca2d7bbf3fe11add56f6882c21a53",
+        "actionId": "script_identity-positive/satisfying",
+        "disposition": "satisfies-declared-requirements",
+        "requirements": [
+          {
+            "claimDigest": "10900df1ff223247059bfb231fefb870c3d81c423e8b9d9751c1156652c20447",
+            "guard": true,
+            "premiseDigest": "5c16906d9fb8048b17dc83056423c708cc682ee7766305a25f190e5ec9bff27e",
+            "status": "satisfies-declared-requirements"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "violates-declared-requirement",
+      "id": "script_identity-positive/omission",
+      "result": {
+        "actionDigest": "e084bee1d855dabf401eb265e7bfea2ddc913211980bd9efe05bba7177fdd0db",
+        "actionId": "script_identity-positive/omission",
+        "disposition": "violates-declared-requirement",
+        "requirements": [
+          {
+            "claimDigest": "10900df1ff223247059bfb231fefb870c3d81c423e8b9d9751c1156652c20447",
+            "guard": true,
+            "premiseDigest": "5c16906d9fb8048b17dc83056423c708cc682ee7766305a25f190e5ec9bff27e",
+            "status": "violates-declared-requirement"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "script_identity-control/satisfying",
+      "result": {
+        "actionDigest": "3653f60930d3a1280fef5a06fdf9465662a2ce3b67886ad0a9c34923cb618df0",
+        "actionId": "script_identity-control/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "7966bd4838ca40abad90c80bbc2b624a717b6300c81f7da65b48bb4804ce2f42",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "script_identity-control/omission",
+      "result": {
+        "actionDigest": "38be960b262a7c3ac89e677518c8ead808832b71e64ad22fd2fbb095ba74f26c",
+        "actionId": "script_identity-control/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "7966bd4838ca40abad90c80bbc2b624a717b6300c81f7da65b48bb4804ce2f42",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "satisfies-declared-requirements",
+      "id": "token_identity-positive/satisfying",
+      "result": {
+        "actionDigest": "ed0b5af31a38530d2970041d0eaecefc7cc54483240de5759c622aad3a38f19c",
+        "actionId": "token_identity-positive/satisfying",
+        "disposition": "satisfies-declared-requirements",
+        "requirements": [
+          {
+            "claimDigest": "66ac429b6abd4141cf059711029a6d17661daffef73d3ed4694d455936002abc",
+            "guard": true,
+            "premiseDigest": "5953c2b42c0c4fd49c9249e33ccdc0fa1a54e48145fb41f9d8179bca6315de49",
+            "status": "satisfies-declared-requirements"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "violates-declared-requirement",
+      "id": "token_identity-positive/omission",
+      "result": {
+        "actionDigest": "3916e0d8191bec1b88fafff71e7ef5800fce016bb86efe03f0e7714f3343398e",
+        "actionId": "token_identity-positive/omission",
+        "disposition": "violates-declared-requirement",
+        "requirements": [
+          {
+            "claimDigest": "66ac429b6abd4141cf059711029a6d17661daffef73d3ed4694d455936002abc",
+            "guard": true,
+            "premiseDigest": "5953c2b42c0c4fd49c9249e33ccdc0fa1a54e48145fb41f9d8179bca6315de49",
+            "status": "violates-declared-requirement"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "token_identity-control/satisfying",
+      "result": {
+        "actionDigest": "de5048f601f4e94ca07d4d1ea4f797d79f8538ccdb3ddf02cdd3ed95642f58fb",
+        "actionId": "token_identity-control/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "38bcfe5ed996419a94ef52744fc5bf34f98da3443a0ea33f783e3101214e0c76",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "token_identity-control/omission",
+      "result": {
+        "actionDigest": "02c4c48de6b7a5e7258f1cfb7242408e1c7419917cd4a9c7f1a2749a3f6b8041",
+        "actionId": "token_identity-control/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "38bcfe5ed996419a94ef52744fc5bf34f98da3443a0ea33f783e3101214e0c76",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "satisfies-declared-requirements",
+      "id": "tokenless-positive/satisfying",
+      "result": {
+        "actionDigest": "c3d5f4b0257110e1c69d4c3c4194050cbca11d0df354d43677ff01f14514a89c",
+        "actionId": "tokenless-positive/satisfying",
+        "disposition": "satisfies-declared-requirements",
+        "requirements": [
+          {
+            "claimDigest": "b6cb4c5b6f1a303cda442636eef9e2832e4b258571fa6e2d0e2c2f74af03cf23",
+            "guard": true,
+            "premiseDigest": "737c2c7888aa08243df78bac5641dc68f8e9c082baa3831b7f6a28e056bca7ab",
+            "status": "satisfies-declared-requirements"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "violates-declared-requirement",
+      "id": "tokenless-positive/omission",
+      "result": {
+        "actionDigest": "65e6670576e204932d35d41fd9ce2a72a816e59b276d524ea070ecf26587beac",
+        "actionId": "tokenless-positive/omission",
+        "disposition": "violates-declared-requirement",
+        "requirements": [
+          {
+            "claimDigest": "b6cb4c5b6f1a303cda442636eef9e2832e4b258571fa6e2d0e2c2f74af03cf23",
+            "guard": true,
+            "premiseDigest": "737c2c7888aa08243df78bac5641dc68f8e9c082baa3831b7f6a28e056bca7ab",
+            "status": "violates-declared-requirement"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "tokenless-control/satisfying",
+      "result": {
+        "actionDigest": "17b1f2e57fc9edc1f50fb4f8907300edb1e0ba19c8afc048a180511544ce3226",
+        "actionId": "tokenless-control/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "fbd44e2dfefe459034ed5c0f8ddbbd461c496a6367102630d81d6ecaae726309",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "tokenless-control/omission",
+      "result": {
+        "actionDigest": "c98fe2c484fe42927fdec0eb6e820a0711ce7787312ed4587747ca016607e939",
+        "actionId": "tokenless-control/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "fbd44e2dfefe459034ed5c0f8ddbbd461c496a6367102630d81d6ecaae726309",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "satisfies-declared-requirements",
+      "id": "exists_literal-positive/satisfying",
+      "result": {
+        "actionDigest": "55a99929998a8a3fb42e56a6118d7c0564b4cf144b8d0dd7d21d75db396b9bba",
+        "actionId": "exists_literal-positive/satisfying",
+        "disposition": "satisfies-declared-requirements",
+        "requirements": [
+          {
+            "claimDigest": "571e63fa34ad82ec8d7cee1e53464a3d09fb2633253aeaf76599cfe288df43e2",
+            "guard": true,
+            "premiseDigest": "f388afeb236557cf096d826d490ff3177665fc991452a5e039ec5a8a5ff084dd",
+            "status": "satisfies-declared-requirements"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "violates-declared-requirement",
+      "id": "exists_literal-positive/omission",
+      "result": {
+        "actionDigest": "7f5d4c4654adb7956f45da6e78bc57b886fb986b545dae844feaeec0e21bdf31",
+        "actionId": "exists_literal-positive/omission",
+        "disposition": "violates-declared-requirement",
+        "requirements": [
+          {
+            "claimDigest": "571e63fa34ad82ec8d7cee1e53464a3d09fb2633253aeaf76599cfe288df43e2",
+            "guard": true,
+            "premiseDigest": "f388afeb236557cf096d826d490ff3177665fc991452a5e039ec5a8a5ff084dd",
+            "status": "violates-declared-requirement"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "exists_literal-control/satisfying",
+      "result": {
+        "actionDigest": "c21eeb5e813fbdde56038bd2fed0357510c19ade7273f99df679340e6dcf28ed",
+        "actionId": "exists_literal-control/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "e4d58d69a428b3ba76ae2381cb518a40db42bdc650492da92bdd72368a1cd59f",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "exists_literal-control/omission",
+      "result": {
+        "actionDigest": "db2dccb1116bdbe200c2f45fd6ce2f4e7070d5da6093ecc9df77e266ac552f35",
+        "actionId": "exists_literal-control/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "e4d58d69a428b3ba76ae2381cb518a40db42bdc650492da92bdd72368a1cd59f",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "computed_index-positive/satisfying",
+      "result": {
+        "actionDigest": "936318c42e527f231de04eddf112e4750d6bda8906bcb24a567250f4034e287b",
+        "actionId": "computed_index-positive/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "346b8364beaa012e920ce9b2fcf43d142410f81f92627298c0bd796d71f1abd4",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "computed_index-positive/omission",
+      "result": {
+        "actionDigest": "2ae29af0073c90918d24d10651e3a1773877c99a8e712cf4415c80e865e014c6",
+        "actionId": "computed_index-positive/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "346b8364beaa012e920ce9b2fcf43d142410f81f92627298c0bd796d71f1abd4",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "computed_index-control/satisfying",
+      "result": {
+        "actionDigest": "acb7bf137a4a9142d8a78d0a63ba93207858dd61dc5ffa4b7f647781465f4515",
+        "actionId": "computed_index-control/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "e703691aa216b5ec1b7f95af6aa738481592a2e576b9173f65f7b492d820ca82",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "computed_index-control/omission",
+      "result": {
+        "actionDigest": "b40e81ed62556baa28dec7d43adf5c445e9884a4143ecf75eba0ade2cfc3b4f5",
+        "actionId": "computed_index-control/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "e703691aa216b5ec1b7f95af6aa738481592a2e576b9173f65f7b492d820ca82",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "satisfies-declared-requirements",
+      "id": "register_identity-positive/satisfying",
+      "result": {
+        "actionDigest": "d5e465729bbac55357fa7b9e04f3d63e893868eeb09450a0bebe57b38924804c",
+        "actionId": "register_identity-positive/satisfying",
+        "disposition": "satisfies-declared-requirements",
+        "requirements": [
+          {
+            "claimDigest": "122eb8e4ee6785a91c98d66b147cc71b4b3b055774ea64cd9897c8f4ee2a978b",
+            "guard": true,
+            "premiseDigest": "10c25f52a201bcf188067a0f56f55e05f4a2f7702517880a255c33f0047e96f8",
+            "status": "satisfies-declared-requirements"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "violates-declared-requirement",
+      "id": "register_identity-positive/omission",
+      "result": {
+        "actionDigest": "8906d6b60ec12f6dcb919e2685d5fac9f6ef74852fcfbb9dd4ca7bd1ed5ec3e0",
+        "actionId": "register_identity-positive/omission",
+        "disposition": "violates-declared-requirement",
+        "requirements": [
+          {
+            "claimDigest": "122eb8e4ee6785a91c98d66b147cc71b4b3b055774ea64cd9897c8f4ee2a978b",
+            "guard": true,
+            "premiseDigest": "10c25f52a201bcf188067a0f56f55e05f4a2f7702517880a255c33f0047e96f8",
+            "status": "violates-declared-requirement"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "register_identity-control/satisfying",
+      "result": {
+        "actionDigest": "2e0fbb0d261ce199f2dfb05ddd34cc137feedbbf445e4d6e0aabeb2165ca4c7a",
+        "actionId": "register_identity-control/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "3fc821696fe433b70913cc6f24c3b075b6d950224d319c812a0f3681c2324cad",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "register_identity-control/omission",
+      "result": {
+        "actionDigest": "1dd8e2ef5aecaa62a920dcb038a3df062cfe39c65c366791f9836abc57864ce4",
+        "actionId": "register_identity-control/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "3fc821696fe433b70913cc6f24c3b075b6d950224d319c812a0f3681c2324cad",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "register_identity-control/mutable-config-omits-C",
+      "result": {
+        "actionDigest": "e264abe47a77149d964a05a286e126f9e9eab57b4fa2cf06e1748eaa4243ed44",
+        "actionId": "register_identity-control/mutable-config-omits-C",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "3fc821696fe433b70913cc6f24c3b075b6d950224d319c812a0f3681c2324cad",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": true,
+      "expected": "satisfies-declared-requirements",
+      "id": "context_code-positive/satisfying",
+      "result": {
+        "actionDigest": "1f86f2c5105c6d6bc80c91574213c4862520a35f71d4d087b4ac2252de0af980",
+        "actionId": "context_code-positive/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "1a5cb92ddfcaf0658e12233d71acf6de9c41cd5ba1ee85c1979ee448b71a8fc4",
+            "reason": "unsupported relation; extension execution belongs to M05",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": true,
+      "expected": "violates-declared-requirement",
+      "id": "context_code-positive/omission",
+      "result": {
+        "actionDigest": "d8267804104b109fbc5455ea43c9eb77b08deddfde028c4ae0931523ed818ce2",
+        "actionId": "context_code-positive/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "1a5cb92ddfcaf0658e12233d71acf6de9c41cd5ba1ee85c1979ee448b71a8fc4",
+            "reason": "unsupported relation; extension execution belongs to M05",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "context_code-control/satisfying",
+      "result": {
+        "actionDigest": "75a9b186b0dfa9c531b66a608bcd44ad890b5940bb33f01c3e8883ba7202e2cb",
+        "actionId": "context_code-control/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "6f50d860f8073fdae7574a1c2b4909b8141acddae69bdc0c10d676462e78264c",
+            "reason": "unsupported relation; extension execution belongs to M05",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "context_code-control/omission",
+      "result": {
+        "actionDigest": "8c78387bc6763dc2ad034a2e6cf5dad7f9851567d9d10c3ec9096919b14af54c",
+        "actionId": "context_code-control/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "6f50d860f8073fdae7574a1c2b4909b8141acddae69bdc0c10d676462e78264c",
+            "reason": "unsupported relation; extension execution belongs to M05",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "context_code-control/wrong-config-id",
+      "result": {
+        "actionDigest": "302c8d8aff46f9f3bcf3e8d2836e712ba4035e57cc1f01adf32622658e94b449",
+        "actionId": "context_code-control/wrong-config-id",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "6f50d860f8073fdae7574a1c2b4909b8141acddae69bdc0c10d676462e78264c",
+            "reason": "unsupported relation; extension execution belongs to M05",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "context_code-control/mandatory-branch-false-extension",
+      "result": {
+        "actionDigest": "663670ad3ea78b7323fd4ad71d82a15e9f00c39abc26de7e8ce3edc3b45d9dc0",
+        "actionId": "context_code-control/mandatory-branch-false-extension",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "6f50d860f8073fdae7574a1c2b4909b8141acddae69bdc0c10d676462e78264c",
+            "reason": "unsupported relation; extension execution belongs to M05",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": true,
+      "expected": "satisfies-declared-requirements",
+      "id": "context_scope-positive/satisfying",
+      "result": {
+        "actionDigest": "e2c32122facdb81a44c99b863652580bb0fa57ac5377f6661af0eea326bf4358",
+        "actionId": "context_scope-positive/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "5edec6363cfde2956764cac751aa39c7319262ccfe7fcebdc848d8b4f24a0560",
+            "reason": "unsupported relation; extension execution belongs to M05",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": true,
+      "expected": "violates-declared-requirement",
+      "id": "context_scope-positive/omission",
+      "result": {
+        "actionDigest": "4622b0b5299c096f96b96322a639ce706cfefa46118796603857c8763140960b",
+        "actionId": "context_scope-positive/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "5edec6363cfde2956764cac751aa39c7319262ccfe7fcebdc848d8b4f24a0560",
+            "reason": "unsupported relation; extension execution belongs to M05",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "context_scope-control/satisfying",
+      "result": {
+        "actionDigest": "292ec85600e69eb937f451f560d5861a2350774c3fb141c75f8cf671fde8c40f",
+        "actionId": "context_scope-control/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "e9b42d803179938cfad2b38af9bb62256c56ff0fffa14d41ea7433e1742a80e7",
+            "reason": "unsupported relation; extension execution belongs to M05",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "context_scope-control/omission",
+      "result": {
+        "actionDigest": "d7d270fb68c80604e4f23c0ad6e83dc8f68b61a7c886cf3cd245d9f28e6f6dcf",
+        "actionId": "context_scope-control/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "e9b42d803179938cfad2b38af9bb62256c56ff0fffa14d41ea7433e1742a80e7",
+            "reason": "unsupported relation; extension execution belongs to M05",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "avl_identity-positive/satisfying",
+      "result": {
+        "actionDigest": "508efba1eb922577c85a91cfd87675396a8cf5f2a2c9ed5a72fa19d402b601cb",
+        "actionId": "avl_identity-positive/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "4d79db9a8600a7cb827d9a968127134a967fa03fbfef0c9fde7098e2936dc259",
+            "reason": "field is not mandatorily authenticated to exact bytes",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "avl_identity-positive/omission",
+      "result": {
+        "actionDigest": "99e91419d6c595a2630472fd58a6b47241a341be739bc5a78380548511655691",
+        "actionId": "avl_identity-positive/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "4d79db9a8600a7cb827d9a968127134a967fa03fbfef0c9fde7098e2936dc259",
+            "reason": "field is not mandatorily authenticated to exact bytes",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "avl_identity-control/satisfying",
+      "result": {
+        "actionDigest": "a48e2381b59af6f21056251fb336c87f3e66a43a7c7059d806911fb94be66c71",
+        "actionId": "avl_identity-control/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "84492503cccea8e73c0d318d878a7af149d1f6b6986fa2e26c92dcf5b58eec48",
+            "reason": "field is not mandatorily authenticated to exact bytes",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "avl_identity-control/omission",
+      "result": {
+        "actionDigest": "601296ca06e4782cfb7d04adeb2c8b271153ab08d8a065b58a35997eee4f950a",
+        "actionId": "avl_identity-control/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "84492503cccea8e73c0d318d878a7af149d1f6b6986fa2e26c92dcf5b58eec48",
+            "reason": "field is not mandatorily authenticated to exact bytes",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "satisfies-declared-requirements",
+      "id": "snapshot_collision-positive/satisfying",
+      "result": {
+        "actionDigest": "a8f42eaf0b1d02b8b592420fbff2e3bfb3252df3302c701a83bc0de3540d3454",
+        "actionId": "snapshot_collision-positive/satisfying",
+        "disposition": "satisfies-declared-requirements",
+        "requirements": [
+          {
+            "claimDigest": "b6cb4c5b6f1a303cda442636eef9e2832e4b258571fa6e2d0e2c2f74af03cf23",
+            "guard": true,
+            "premiseDigest": "737c2c7888aa08243df78bac5641dc68f8e9c082baa3831b7f6a28e056bca7ab",
+            "status": "satisfies-declared-requirements"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "violates-declared-requirement",
+      "id": "snapshot_collision-positive/omission",
+      "result": {
+        "actionDigest": "0fd506c4bff269f3b911844f812110df3192766104e42d523aab2119b040cc81",
+        "actionId": "snapshot_collision-positive/omission",
+        "disposition": "violates-declared-requirement",
+        "requirements": [
+          {
+            "claimDigest": "b6cb4c5b6f1a303cda442636eef9e2832e4b258571fa6e2d0e2c2f74af03cf23",
+            "guard": true,
+            "premiseDigest": "737c2c7888aa08243df78bac5641dc68f8e9c082baa3831b7f6a28e056bca7ab",
+            "status": "violates-declared-requirement"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "snapshot_collision-control/satisfying",
+      "result": {
+        "actionDigest": "64e90a60f4d79c44769254cf2b4bd42071c50acf92b2eda322d8206c606bdaf3",
+        "actionId": "snapshot_collision-control/satisfying",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "d7fc3df0e8fbfec79e39fba9065f5077b999ff277150eb37ae28e54add4d201d",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    },
+    {
+      "deferredToM05": false,
+      "expected": "unresolved",
+      "id": "snapshot_collision-control/omission",
+      "result": {
+        "actionDigest": "e56722b07736901abb0e50b76c7d71ef107b215722c06e494c221eab1d984793",
+        "actionId": "snapshot_collision-control/omission",
+        "disposition": "unresolved",
+        "requirements": [
+          {
+            "claimDigest": "d7fc3df0e8fbfec79e39fba9065f5077b999ff277150eb37ae28e54add4d201d",
+            "reason": "no mandatory distinct spending identity for target",
+            "status": "unresolved"
+          }
+        ],
+        "scope": "conditional on declared premises; not transaction acceptance, proof, exhaustive or minimal actions",
+        "version": "action-check:v1"
+      }
+    }
+  ],
+  "cases": 32,
+  "expectedSha256": "291923d76f2de8a69deec82cc049d233d87d91f816295312ed89f9291e13405e",
+  "implementationBase": "3f349fc6b970889346be20775db255ba74c9381a",
+  "manifestSha256": "7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f",
+  "metrics": {
+    "correctThroughM04": 63,
+    "deferredToM05": 4,
+    "eligibleThroughM04": 63,
+    "registered": 67
+  },
+  "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+  "version": "m04-action-results:v1"
+}

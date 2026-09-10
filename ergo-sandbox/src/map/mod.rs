@@ -30,6 +30,7 @@
 //!
 //! A map is a description, not a verdict.
 
+pub mod action;
 pub mod discover_refs;
 pub mod discovery;
 #[cfg(feature = "explorer")]

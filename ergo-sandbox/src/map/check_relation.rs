@@ -395,7 +395,7 @@ impl<'a> Walk<'a> {
         }
     }
 }
-fn selector_matches(s: &Selector, b: &WireBox) -> Result<bool, String> {
+pub(crate) fn selector_matches(s: &Selector, b: &WireBox) -> Result<bool, String> {
     let c = &b.node().candidate;
     Ok(match s {
         Selector::BoxId { hex } => b.id()? == *hex,
@@ -709,7 +709,7 @@ fn resolve_register_equalities<'a>(
     Ok(())
 }
 
-fn valid_guard(g: &Guard, depth: usize) -> bool {
+pub(crate) fn valid_guard(g: &Guard, depth: usize) -> bool {
     if depth > 32 {
         return false;
     }
@@ -750,7 +750,7 @@ fn checked_rule(e: &Expr) -> &'static str {
     }
 }
 
-fn canonical_selector(s: &Selector, depth: usize) -> bool {
+pub(crate) fn canonical_selector(s: &Selector, depth: usize) -> bool {
     if depth > 32 {
         return false;
     }

@@ -266,3 +266,28 @@ supplemental metadata correction under section 5.1, not a change to the M00
 32-case denominator or any case, target, guard, supported disposition, verdict or
 threshold. All previous supplemental execution request bytes and hashes remain
 identical. The v2 gate retains five supported positives and five controls.
+
+
+## M04 implementation clarification — 2026-09-10
+
+The author authorized M04 after PR #97. Its action gate checks the original M00
+32-case, 67-action inventory without changing any expected disposition. Four
+positive Execute dispositions require M05 and are retained as deferred/unresolved
+at M04, separately from the 63 eligible action dispositions. This is the same
+M03/M05 capability split used by M03's report; M04 does not implement Execute.
+The final all-action accuracy target remains 67/67, not 63/63.
+
+An extra M04 test initially treated M03 supplemental v2 control action labels as
+additional action-gate answers. Those labels conflict with the same fixtures'
+unsupported claim flags and were not checked by M03; accepting them would grant
+an unresolved proposal requirement authority. That extra test was incorrect.
+M04 uses M00's independently pinned action answer key as section 5.1 specifies,
+retains all supplemental bytes and prior results unchanged, and uses supplemental
+positive vectors only for additional action guard/distinctness checks. All 27
+M03 recorded accepted omissions, including supplemental controls, are freshly
+replayed and assessed by the product refutation API. No label is corrected or
+scored differently in the registered action denominator. The supplemental control
+action-label inconsistency remains documented, not silently repaired.
+
+No section 6 unit name, acceptance test, dependency, package, target, days,
+threshold or frozen capability is amended.

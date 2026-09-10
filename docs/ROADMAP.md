@@ -190,7 +190,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
 {
   "schemaVersion": 1,
   "baselineRev": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
-  "completedThrough": "M03",
+  "completedThrough": "M04",
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,
   "units": [
@@ -438,7 +438,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "data_outputs_and_unrelated_inputs_cannot_satisfy_spend",
         "accepted_omission_refutes_only_matching_claim_and_premises"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "M05",
@@ -732,3 +732,15 @@ guard. A versioned supplemental metadata correction retains its original fixture
 and results; all M00–M02 data, thresholds and execution verdicts are unchanged. M04–M05 remain
 unimplemented. Discovery, execution acceptance and proof authority stay separate;
 no discharge, drain, request generation, detector or UI integration is included.
+
+
+### M04 implementation record — 2026-09-10
+
+The author authorized M04 after PR #97. Explicit action alternatives and supplied
+omission replay are implemented under the unchanged M03 dependency, three-day
+ceiling, `ergo-sandbox` package, `mapping_actions` target and three registered test
+names. Only M04's implementation flag and the completed prefix advance. See the
+[M04 report](mapping/M04.md) for exact inventory accounting, the supplemental
+metadata clarification and real gates. M05 remains unimplemented; its four
+positive Execute action expectations remain visible and deferred. No pinned
+membership, expected facts, established claims, numeric baselines or freezes change.
