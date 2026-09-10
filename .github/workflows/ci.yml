@@ -84,5 +84,6 @@ jobs:
           CARGO_TARGET_DIR: ./target-p00
         run: |
           python3 scripts/roadmap_gate.py --through-completed
-          # The implementation PR's unit; update with the next governing unit.
-          python3 scripts/roadmap_gate.py --require P05
+          # Final governing unit and the complete finite plan.
+          python3 scripts/roadmap_gate.py --require P08
+          python3 scripts/roadmap_gate.py --all-goals

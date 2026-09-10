@@ -236,6 +236,15 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
     </section>
 
     <section id="read" class="pane">
+    <section id="evidence-replay">
+      <h2>Replay saved evidence</h2>
+      <p>Import a replay bundle or saved replay report. Checks the supplied transaction and declared property locally; no chain lookup or broadcast.</p>
+      <label for="replay-file">Evidence JSON file</label>
+      <input id="replay-file" type="file" accept=".json,.fixture,application/json">
+      <button id="replay-go" type="button">Replay evidence</button>
+      <p id="replay-message" role="status"></p>
+      <div id="replay-result" hidden></div>
+    </section>
     <div class="reader-intro">
       <h2>Read a contract</h2>
       <p>Paste an address, box ID, or ErgoTree hex to recover readable ErgoScript from the compiled contract.</p>
@@ -492,6 +501,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
   <script src="vendor/blake2b.js"></script>
   <script src="vendor/sha256.js"></script>
   <script src="claim-labels.js"></script>
+  <script src="evidence-replay.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

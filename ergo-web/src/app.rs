@@ -91,6 +91,7 @@ pub fn router_with(cfg: AppConfig) -> Router {
     // Engine routes: everything that runs the compiler or the reducer, or
     // calls out. Rate-limited when configured; health and the UI are not.
     let engine = Router::new()
+        .route("/api/v2/replay", post(crate::routes::replay::replay_route))
         .route("/api/v1/inspect", post(crate::routes::inspect::inspect))
         .route("/api/v1/hunt", post(crate::routes::hunt::hunt_route))
         .route("/api/v1/eval", post(crate::routes::eval::eval_route))

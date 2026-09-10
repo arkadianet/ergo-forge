@@ -190,7 +190,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
 {
   "schemaVersion": 1,
   "baselineRev": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
-  "completedThrough": "P07",
+  "completedThrough": "P08",
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,
   "units": [
@@ -362,7 +362,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "legacy_preflight_does_not_use_node_claim_badge",
         "replay_request_never_fetches_or_broadcasts"
       ],
-      "implemented": false
+      "implemented": true
     }
   ],
   "thresholds": {
@@ -595,3 +595,13 @@ property revisions, expected acceptance/claim status, and publication eligibilit
 the duplicate fixture is separately hash-pinned there. The P07 tests derive
 results from execution/replay and compare the frozen labels. This changes no
 acceptance case, threshold, baseline row or required test.
+
+
+P08 completion record: see [P08-REPORT.md](P08-REPORT.md). Read now replays saved
+P05 evidence through `/api/v2/replay`, returning the unchanged CLI report inside
+an API-version-2 envelope. Its tests reuse the policy-pinned P05 `use-incident`
+and `sale-fixed-paid` bundles and derive an explicitly incomplete copy by removing
+required premises; no existing fixture or manifest row changes. The policy changes
+only P08's implementation flag and `completedThrough`. Earlier “today” and
+“unimplemented” statements above describe their recorded implementation stages.
+The finite queue ends at P08; further work requires a new governing decision.

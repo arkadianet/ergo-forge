@@ -47,7 +47,27 @@ Pushing a `v*` tag builds and publishes the image to
 
 ## API
 
-Versioned under `/api/v1/`. All responses and errors are JSON; every field is camelCase.
+Legacy operations are under `/api/v1/`; strict evidence replay is under `/api/v2/`.
+All responses and errors are JSON; fields use camelCase.
+
+### `POST /api/v2/replay`
+
+Submit a P05 `ReplayBundle` (the same file accepted by `ergo-es replay`). The
+response is `{ "apiVersion": 2, "result": <unchanged CLI replay report> }`.
+The nested report retains its own `formatVersion: 1`. HTTP 200 means replay
+completed, including `incomplete-or-invalid-premises`, `node-rejected`, and
+`unsupported-property` outcomes; inspect `result.status` and its scopes.
+Malformed bundles use the existing JSON 400 error envelope and oversized
+requests use 413. The shared engine budget, rate limiter and 1 MiB body cap apply.
+
+Read's **Replay saved evidence** panel accepts a bundle, a saved CLI report, or
+this API envelope. Saved verdicts are discarded and only the bundle is replayed.
+The panel displays exact claim/execution scopes, per-premise origins and all
+recorded missing premises, including residual gaps on accepted results. Source
+recordings do not authenticate historical unspentness; hypothetical state stays
+labelled. Replay never fetches boxes, signs, or broadcasts, even with an explorer
+configured. There is no server-side evidence storage.
+
 
 ### `GET /api/v1/health`
 

@@ -2610,3 +2610,6 @@ function appendTriage(li, finding) {
   ClaimLabels.renderTriage(finding.triage, note);
   li.appendChild(note);
 }
+
+// Saved evidence uses its own strict, offline replay route.
+EvidenceReplay.bind(document);
