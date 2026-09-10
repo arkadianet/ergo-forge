@@ -1,0 +1,33 @@
+   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+    Finished `release` profile [optimized] target(s) in 13.72s
+     Running tests/mapping_necessity.rs (target-p00/release/deps/mapping_necessity-eb4404bdfe49ad14)
+
+running 4 tests
+test unsupported_anchors_and_cyclic_proofs_are_rejected ... ok
+test exact_guarded_necessity_matches_pinned_answers ... ok
+test alternatives_dead_checks_and_self_do_not_prove_cospend ... ok
+test satisfying_omission_and_relaxed_controls_use_full_validator ... ok
+
+successes:
+
+---- unsupported_anchors_and_cyclic_proofs_are_rejected stdout ----
+altered/missing/reordered anchors, claim/guard changes, cycles, caps, wrong subject and storage-rent acceptance domain rejected
+
+---- exact_guarded_necessity_matches_pinned_answers stdout ----
+evidence /home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m03-mapping-results.json sha256=6d0d37e3f29d4c3a4b816fb7157688ad8105cf1ebd571c3b63f9a51d5283aaab; supported 12/12; established 12; incorrect 0/12; unresolved 20/32
+
+---- alternatives_dead_checks_and_self_do_not_prove_cospend stdout ----
+18 pinned adversarial/unsupported members refused; unconditional alternative and wrong authentication scope refused
+
+---- satisfying_omission_and_relaxed_controls_use_full_validator stdout ----
+full validator: 37 accepted, 16 script rejections; 53 canonical vectors; evidence /home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/m03/manifest.json sha256=cdf73504cc3d5f98141bac9e44b46621a76baf8ac5219826d03367d171383853
+
+
+successes:
+    alternatives_dead_checks_and_self_do_not_prove_cospend
+    exact_guarded_necessity_matches_pinned_answers
+    satisfying_omission_and_relaxed_controls_use_full_validator
+    unsupported_anchors_and_cyclic_proofs_are_rejected
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

@@ -231,3 +231,38 @@ This pass changes only this design file. Proposed adoption would narrowly unfree
 There is **no unfinished numbered P-unit to displace**. The proposal replaces the post-P08 stop with one bounded 19-day mapping allocation; it consumes the next implementation/review capacity that would otherwise remain unallocated or go to maintenance. It explicitly postpones every competing appendix proposal: compiler/version support, search axes, solver/steering, keyed insiders, chains, historical-state verification, real-protocol precision campaign, new recipes and UI work. Each M-unit consumes its stated share of that allocation; no second workstream is opened. If maintenance must consume it, reduce or stop this queue through the same governing process.
 
 The historical Phase B promises of automatic private false-positive discharge and a new proven mutation operator are displaced by public-independent relationship and omission experiments. Automatic finding discharge and mutation-corpus expansion remain frozen. M05 is the ceiling, not a bridge to unrestricted composition. The next decision after its report may be to retain explicit unresolved boundaries permanently.
+
+
+## M03 implementation amendment — 2026-09-10
+
+The author explicitly authorized M03 implementation after PR #97. The original
+proposal-only status above records the design pass, not the later authorization.
+
+Section 3.1's initial equality-only guard vocabulary could not express the
+already pinned `action_alternatives-positive` guard `HEIGHT >= 100`. Add the narrow
+typed guard `HeightAtLeast(Int)` over context HEIGHT, alongside literal equalities
+and Boolean combinations. This preserves that exact guard instead of replacing it
+with `true`, an equality at one sampled height, or a changed corpus answer. All
+pinned facts, membership, thresholds, unit tests, package, target and days remain
+unchanged. Unsupported fields or expressions still require refusal.
+
+For the supplied-state M03 checker, P includes the full fixed validator context,
+parameters, network rules, headers, prior cost and local policy. Its state domain
+requires positive input token amounts and excludes storage-rent eligibility for
+fixed SELF by checking height/creation height against the supplied storage period.
+The full validator can otherwise accept without successful root evaluation.
+These are explicit conditional state restrictions, not co-spend premises or a
+change to `Accepted(P,T)`. Replays check those restrictions on the accepted
+execution; a late-height claim is refused. No all-future-states claim is made.
+
+During M03 gate review, the new supplemental v1 fixture was found to retain
+unused `truth`, rationale and lexical-site annotations from its M00 construction
+template. Its explicitly authored supported dispositions and execution verdicts
+were correct, but the test did not check the inherited truth field. Preserve
+that fixture and its measured result as v1 history; use a separately hash-pinned
+supplemental v2 with explicit truth for its own ten claims and no inherited
+rationale/sites. The gate now checks that truth as well. This is a versioned
+supplemental metadata correction under section 5.1, not a change to the M00
+32-case denominator or any case, target, guard, supported disposition, verdict or
+threshold. All previous supplemental execution request bytes and hashes remain
+identical. The v2 gate retains five supported positives and five controls.

@@ -1,0 +1,56 @@
+   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+    Finished `release` profile [optimized] target(s) in 1.90s
+     Running `target-p00/release/examples/m03_fixture_author`
+literal_spend-positive/satisfying: node-accepted
+literal_spend-positive/omission: node-validation ProofFailed { index: 0 }: input 0: spending proof verification failed
+literal_spend-control/satisfying: node-accepted
+literal_spend-control/omission: node-accepted
+self_alias-positive/satisfying: node-accepted
+self_alias-positive/omission: node-validation ProofFailed { index: 0 }: input 0: spending proof verification failed
+self_alias-control/satisfying: node-accepted
+self_alias-control/omission: node-accepted
+action_alternatives-positive/satisfying: node-accepted
+action_alternatives-positive/omission: node-validation ProofFailed { index: 0 }: input 0: spending proof verification failed
+action_alternatives-control/satisfying: node-accepted
+action_alternatives-control/omission: node-accepted
+data_only-positive/satisfying: node-accepted
+data_only-positive/omission: node-validation ProofFailed { index: 0 }: input 0: spending proof verification failed
+data_only-control/satisfying: node-accepted
+data_only-control/omission: node-accepted
+output_only-positive/satisfying: node-accepted
+output_only-positive/omission: node-validation ProofFailed { index: 0 }: input 0: spending proof verification failed
+output_only-control/satisfying: node-accepted
+output_only-control/omission: node-accepted
+dead_check-positive/satisfying: node-accepted
+dead_check-positive/omission: node-validation ProofFailed { index: 0 }: input 0: spending proof verification failed
+dead_check-control/satisfying: node-accepted
+dead_check-control/omission: node-accepted
+script_identity-positive/satisfying: node-accepted
+script_identity-positive/omission: node-validation ProofFailed { index: 0 }: input 0: spending proof verification failed
+script_identity-control/satisfying: node-accepted
+script_identity-control/omission: node-validation ProofFailed { index: 0 }: input 0: spending proof verification failed
+token_identity-positive/satisfying: node-accepted
+token_identity-positive/omission: node-validation ProofFailed { index: 0 }: input 0: spending proof verification failed
+token_identity-control/satisfying: node-accepted
+token_identity-control/omission: node-accepted
+tokenless-positive/satisfying: node-accepted
+tokenless-positive/omission: node-validation ProofFailed { index: 0 }: input 0: spending proof verification failed
+tokenless-control/satisfying: node-accepted
+tokenless-control/omission: node-accepted
+exists_literal-positive/satisfying: node-accepted
+exists_literal-positive/omission: node-validation ProofFailed { index: 0 }: input 0: spending proof verification failed
+exists_literal-control/satisfying: node-accepted
+exists_literal-control/omission: node-accepted
+computed_index-positive/satisfying: node-accepted
+computed_index-positive/omission: node-validation ProofFailed { index: 0 }: input 0: spending proof verification failed
+computed_index-control/satisfying: node-accepted
+computed_index-control/omission: node-validation ProofFailed { index: 0 }: input 0: spending proof verification failed
+register_identity-positive/satisfying: node-accepted
+register_identity-positive/omission: node-validation ProofFailed { index: 0 }: input 0: spending proof verification failed
+register_identity-control/satisfying: node-accepted
+register_identity-control/omission: node-validation ProofFailed { index: 0 }: input 0: spending proof verification failed
+register_identity-control/mutable-config-omits-C: node-accepted
+snapshot_collision-positive/satisfying: node-accepted
+snapshot_collision-positive/omission: node-validation ProofFailed { index: 0 }: input 0: spending proof verification failed
+snapshot_collision-control/satisfying: node-accepted
+snapshot_collision-control/omission: node-accepted

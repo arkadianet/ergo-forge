@@ -1,0 +1,377 @@
+{
+  "authority": "independent authored transactions; expected acceptance from unchanged M00 answer key; no extractor output",
+  "vectors": [
+    {
+      "id": "literal_spend-positive/satisfying",
+      "path": "literal_spend-positive-satisfying.fixture",
+      "sha256": "5317bb1e8e41c2f0c9b355e14332113e6690dc10c25f46c232feb0059b64e1ea",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "literal_spend-positive/omission",
+      "path": "literal_spend-positive-omission.fixture",
+      "sha256": "ed1cf480b5cee4429f1bd3f89802111d7951e43b095add3bd8f54884da639b37",
+      "stage": "node-validation",
+      "status": "node-rejected"
+    },
+    {
+      "id": "literal_spend-control/satisfying",
+      "path": "literal_spend-control-satisfying.fixture",
+      "sha256": "9173d5964d918ef89ee0bd0bfcb37e379b26058cfd5f67206a55ed740016be5f",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "literal_spend-control/omission",
+      "path": "literal_spend-control-omission.fixture",
+      "sha256": "9173d5964d918ef89ee0bd0bfcb37e379b26058cfd5f67206a55ed740016be5f",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "self_alias-positive/satisfying",
+      "path": "self_alias-positive-satisfying.fixture",
+      "sha256": "0a6c6d98b0b5deb19d0b2ce6589b931d277634d80826fd84dce2e6f3415ee266",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "self_alias-positive/omission",
+      "path": "self_alias-positive-omission.fixture",
+      "sha256": "e7cf1c6a6245d8c8d4382d05742e44953c161235506d7917f6992175275aa9a6",
+      "stage": "node-validation",
+      "status": "node-rejected"
+    },
+    {
+      "id": "self_alias-control/satisfying",
+      "path": "self_alias-control-satisfying.fixture",
+      "sha256": "634ffa6c8a558f71c940503f79dc99234a54d11210976ca75f97e5cdaf2fa796",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "self_alias-control/omission",
+      "path": "self_alias-control-omission.fixture",
+      "sha256": "634ffa6c8a558f71c940503f79dc99234a54d11210976ca75f97e5cdaf2fa796",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "action_alternatives-positive/satisfying",
+      "path": "action_alternatives-positive-satisfying.fixture",
+      "sha256": "ad4fd914d82d025d892561f140c0cfc62fdc63e044d53811b61f0945c5db2f61",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "action_alternatives-positive/omission",
+      "path": "action_alternatives-positive-omission.fixture",
+      "sha256": "8078288fa1f22baf612c3f3e8607da4fb605e133d576bd8f1aaa31ab7275acfc",
+      "stage": "node-validation",
+      "status": "node-rejected"
+    },
+    {
+      "id": "action_alternatives-control/satisfying",
+      "path": "action_alternatives-control-satisfying.fixture",
+      "sha256": "172da884925de25fc9702dff6c79b75751ffe5ae31eed6d6f620f95bbcec0922",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "action_alternatives-control/omission",
+      "path": "action_alternatives-control-omission.fixture",
+      "sha256": "172da884925de25fc9702dff6c79b75751ffe5ae31eed6d6f620f95bbcec0922",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "data_only-positive/satisfying",
+      "path": "data_only-positive-satisfying.fixture",
+      "sha256": "5317bb1e8e41c2f0c9b355e14332113e6690dc10c25f46c232feb0059b64e1ea",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "data_only-positive/omission",
+      "path": "data_only-positive-omission.fixture",
+      "sha256": "ed1cf480b5cee4429f1bd3f89802111d7951e43b095add3bd8f54884da639b37",
+      "stage": "node-validation",
+      "status": "node-rejected"
+    },
+    {
+      "id": "data_only-control/satisfying",
+      "path": "data_only-control-satisfying.fixture",
+      "sha256": "6806178e8b30c266b99151cfed6f6f732629f883bcf86a203488902882db081e",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "data_only-control/omission",
+      "path": "data_only-control-omission.fixture",
+      "sha256": "6806178e8b30c266b99151cfed6f6f732629f883bcf86a203488902882db081e",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "output_only-positive/satisfying",
+      "path": "output_only-positive-satisfying.fixture",
+      "sha256": "5317bb1e8e41c2f0c9b355e14332113e6690dc10c25f46c232feb0059b64e1ea",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "output_only-positive/omission",
+      "path": "output_only-positive-omission.fixture",
+      "sha256": "ed1cf480b5cee4429f1bd3f89802111d7951e43b095add3bd8f54884da639b37",
+      "stage": "node-validation",
+      "status": "node-rejected"
+    },
+    {
+      "id": "output_only-control/satisfying",
+      "path": "output_only-control-satisfying.fixture",
+      "sha256": "64e213611dc9d9da894c4d8e462b0e400f39679451cdaf4861d63b4539ad2559",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "output_only-control/omission",
+      "path": "output_only-control-omission.fixture",
+      "sha256": "64e213611dc9d9da894c4d8e462b0e400f39679451cdaf4861d63b4539ad2559",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "dead_check-positive/satisfying",
+      "path": "dead_check-positive-satisfying.fixture",
+      "sha256": "5317bb1e8e41c2f0c9b355e14332113e6690dc10c25f46c232feb0059b64e1ea",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "dead_check-positive/omission",
+      "path": "dead_check-positive-omission.fixture",
+      "sha256": "ed1cf480b5cee4429f1bd3f89802111d7951e43b095add3bd8f54884da639b37",
+      "stage": "node-validation",
+      "status": "node-rejected"
+    },
+    {
+      "id": "dead_check-control/satisfying",
+      "path": "dead_check-control-satisfying.fixture",
+      "sha256": "3ec47de9362d90f41779812d67bf0be9965a6891687fc79cf79adb4328fa64f7",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "dead_check-control/omission",
+      "path": "dead_check-control-omission.fixture",
+      "sha256": "3ec47de9362d90f41779812d67bf0be9965a6891687fc79cf79adb4328fa64f7",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "script_identity-positive/satisfying",
+      "path": "script_identity-positive-satisfying.fixture",
+      "sha256": "d93b01ad996e3ad14547f345488e11035e3d16df888093f2cd2877b3e74b47de",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "script_identity-positive/omission",
+      "path": "script_identity-positive-omission.fixture",
+      "sha256": "082732cb1c49bd5350e3501551ed2eb8ead01aeeb9d39f479f4c5d9d6457b453",
+      "stage": "node-validation",
+      "status": "node-rejected"
+    },
+    {
+      "id": "script_identity-control/satisfying",
+      "path": "script_identity-control-satisfying.fixture",
+      "sha256": "a63a34a4e3247a5dda3718f53128b4846ca92bb49a1e01a2f441fa4c9d8b13d2",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "script_identity-control/omission",
+      "path": "script_identity-control-omission.fixture",
+      "sha256": "69af71e780828a9aac86a4f62b8bc4d055b9e8d0289c72ec32e7bcb23c9c1068",
+      "stage": "node-validation",
+      "status": "node-rejected"
+    },
+    {
+      "id": "token_identity-positive/satisfying",
+      "path": "token_identity-positive-satisfying.fixture",
+      "sha256": "ac550eeaddba23d5243ede890afe16fd38480e8340e7b5a88e2f6ecf2fec9245",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "token_identity-positive/omission",
+      "path": "token_identity-positive-omission.fixture",
+      "sha256": "dcb30dbbfd6cd4d77739c35764c3009e2303df71bd818dbbaa4441da978acffd",
+      "stage": "node-validation",
+      "status": "node-rejected"
+    },
+    {
+      "id": "token_identity-control/satisfying",
+      "path": "token_identity-control-satisfying.fixture",
+      "sha256": "f3c011123447202e5ca8bc942e1266ac7d5f35f2999c4311c80ec845af0815a9",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "token_identity-control/omission",
+      "path": "token_identity-control-omission.fixture",
+      "sha256": "f3c011123447202e5ca8bc942e1266ac7d5f35f2999c4311c80ec845af0815a9",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "tokenless-positive/satisfying",
+      "path": "tokenless-positive-satisfying.fixture",
+      "sha256": "5317bb1e8e41c2f0c9b355e14332113e6690dc10c25f46c232feb0059b64e1ea",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "tokenless-positive/omission",
+      "path": "tokenless-positive-omission.fixture",
+      "sha256": "ed1cf480b5cee4429f1bd3f89802111d7951e43b095add3bd8f54884da639b37",
+      "stage": "node-validation",
+      "status": "node-rejected"
+    },
+    {
+      "id": "tokenless-control/satisfying",
+      "path": "tokenless-control-satisfying.fixture",
+      "sha256": "a99bd8bbdd98cf0d824fc4b46a3958df24eb89f54f70ccbae8a9f314508c0bd0",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "tokenless-control/omission",
+      "path": "tokenless-control-omission.fixture",
+      "sha256": "a99bd8bbdd98cf0d824fc4b46a3958df24eb89f54f70ccbae8a9f314508c0bd0",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "exists_literal-positive/satisfying",
+      "path": "exists_literal-positive-satisfying.fixture",
+      "sha256": "0a6c6d98b0b5deb19d0b2ce6589b931d277634d80826fd84dce2e6f3415ee266",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "exists_literal-positive/omission",
+      "path": "exists_literal-positive-omission.fixture",
+      "sha256": "e7cf1c6a6245d8c8d4382d05742e44953c161235506d7917f6992175275aa9a6",
+      "stage": "node-validation",
+      "status": "node-rejected"
+    },
+    {
+      "id": "exists_literal-control/satisfying",
+      "path": "exists_literal-control-satisfying.fixture",
+      "sha256": "e9f420033795004e7508364805e88f46ee6ecb35de75fb6c96026734f9470689",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "exists_literal-control/omission",
+      "path": "exists_literal-control-omission.fixture",
+      "sha256": "e9f420033795004e7508364805e88f46ee6ecb35de75fb6c96026734f9470689",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "computed_index-positive/satisfying",
+      "path": "computed_index-positive-satisfying.fixture",
+      "sha256": "4f8029baff536cd8ee48eb1b365db921d132e82ebc6a34c0c3004ee75d113537",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "computed_index-positive/omission",
+      "path": "computed_index-positive-omission.fixture",
+      "sha256": "c0076c0c003c6d755a9242e2d418965e3f2ead1f506717092ef0b51754766fd0",
+      "stage": "node-validation",
+      "status": "node-rejected"
+    },
+    {
+      "id": "computed_index-control/satisfying",
+      "path": "computed_index-control-satisfying.fixture",
+      "sha256": "044918582a36d0e08a11be0af7580bcfc623d54257d4f1ff9e9a715b10eeab1c",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "computed_index-control/omission",
+      "path": "computed_index-control-omission.fixture",
+      "sha256": "18eaff9997359c673d64f09ac386bf4bbe03f21255d683f52b191e85f0743510",
+      "stage": "node-validation",
+      "status": "node-rejected"
+    },
+    {
+      "id": "register_identity-positive/satisfying",
+      "path": "register_identity-positive-satisfying.fixture",
+      "sha256": "9aa886068a8f3c85207d7cfc0baefdf349d1f07650824f6d71b20a27aa5d60f2",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "register_identity-positive/omission",
+      "path": "register_identity-positive-omission.fixture",
+      "sha256": "cd10ffcf32f2d34255adae63518cca7b669accfdb9516fb7299dd53a74e69528",
+      "stage": "node-validation",
+      "status": "node-rejected"
+    },
+    {
+      "id": "register_identity-control/satisfying",
+      "path": "register_identity-control-satisfying.fixture",
+      "sha256": "d6f62ad07ed796e1ae83ed266e6ae7a09765e8546092a7dbb72eb2a150dbfacd",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "register_identity-control/omission",
+      "path": "register_identity-control-omission.fixture",
+      "sha256": "c8d837e124206b72743b5f8241e80e2a2d5a5c0aebb27ffda6a16ee1432c0b2a",
+      "stage": "node-validation",
+      "status": "node-rejected"
+    },
+    {
+      "id": "register_identity-control/mutable-config-omits-C",
+      "path": "register_identity-control-mutable-config-omits-C.fixture",
+      "sha256": "eafa87dc3a996070c172f07c2935e533dba184afaadb148976166f6b7e82e1a2",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "snapshot_collision-positive/satisfying",
+      "path": "snapshot_collision-positive-satisfying.fixture",
+      "sha256": "5317bb1e8e41c2f0c9b355e14332113e6690dc10c25f46c232feb0059b64e1ea",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "snapshot_collision-positive/omission",
+      "path": "snapshot_collision-positive-omission.fixture",
+      "sha256": "ed1cf480b5cee4429f1bd3f89802111d7951e43b095add3bd8f54884da639b37",
+      "stage": "node-validation",
+      "status": "node-rejected"
+    },
+    {
+      "id": "snapshot_collision-control/satisfying",
+      "path": "snapshot_collision-control-satisfying.fixture",
+      "sha256": "40aa2191431a959001a7138caaf99ffa9f4ea047b65a0b54a69f2840521b2d24",
+      "stage": "complete",
+      "status": "node-accepted"
+    },
+    {
+      "id": "snapshot_collision-control/omission",
+      "path": "snapshot_collision-control-omission.fixture",
+      "sha256": "40aa2191431a959001a7138caaf99ffa9f4ea047b65a0b54a69f2840521b2d24",
+      "stage": "complete",
+      "status": "node-accepted"
+    }
+  ],
+  "version": "m03-canonical-vectors:v1"
+}

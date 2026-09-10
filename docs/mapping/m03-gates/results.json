@@ -1,0 +1,203 @@
+{
+  "environment": {
+    "CARGO_TARGET_DIR": "./target-p00"
+  },
+  "workspaceTotals": {
+    "passed": 475,
+    "failed": 0,
+    "ignored": 1
+  },
+  "workspaceTargetSummaries": 53,
+  "implementationFiles": {
+    "ergo-sandbox/src/map/necessity.rs": "66da26609c30371a0421c06b4acd41750a5fcd26e66d15b261fb9de12bbf6c27",
+    "ergo-sandbox/src/map/check_relation.rs": "0760895a162bd3b9032183614af4c5dd837b0c2e9717e7f87e0f1d93969937b6",
+    "ergo-sandbox/src/map/relations.rs": "5e12c477ae547d761e2ec73b0f3794eab68cefebc1c7d55bf6b814843955e346",
+    "ergo-sandbox/src/map/mod.rs": "5af1fc81cfd3b1b16f2ff90d8d793147cd55865e86b366d893eb21a65c35e2c4",
+    "ergo-sandbox/tests/mapping_necessity.rs": "8427fcb0e2821abe473de70dababe9b222096ba7262e5b4b407b87504250d2cb"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exitCode": 0,
+      "evidencePath": "docs/mapping/m03-gates/fmt.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "seconds": 0.31,
+      "statuses": []
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exitCode": 0,
+      "evidencePath": "docs/mapping/m03-gates/clippy.txt",
+      "sha256": "3d500b602ce579023358d2e7b6bb17b1941c1e32a3356088bf9cec7533635adb",
+      "seconds": 3.23,
+      "statuses": []
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "ergo-sandbox",
+        "--release",
+        "--test",
+        "mapping_necessity",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "evidencePath": "docs/mapping/m03-gates/unit.txt",
+      "sha256": "f1ee39099e6151380a0f19aab0358b30e0d7d9e1f8f7a6ba228cd766d98759d8",
+      "seconds": 13.82,
+      "statuses": []
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--release"
+      ],
+      "exitCode": 0,
+      "evidencePath": "docs/mapping/m03-gates/workspace.txt",
+      "sha256": "00a64dddb2b084b40a866e2886021ff7b91cd4271b2ffd90efe56ff508e68708",
+      "seconds": 238.16,
+      "statuses": []
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/roadmap_gate.py",
+        "--require",
+        "M03"
+      ],
+      "exitCode": 0,
+      "evidencePath": "docs/mapping/m03-gates/require.txt",
+      "sha256": "b9430f4844c82a739d3231db227ed7bfbfb11196305ee85cbd403cd2eef6e72a",
+      "seconds": 101.76,
+      "statuses": [
+        "P00: passed: required tests executed",
+        "P01: passed: required tests executed",
+        "P02: passed: required tests executed",
+        "P03: passed: required tests executed",
+        "P04: passed: required tests executed",
+        "P05: passed: required tests executed",
+        "P06: passed: required tests executed",
+        "P07: passed: required tests executed",
+        "P08: passed: required tests executed",
+        "M00: passed: required tests executed",
+        "M01: passed: required tests executed",
+        "M02: passed: required tests executed",
+        "M03: passed: required tests executed",
+        "P00: passed: required tests executed",
+        "P01: passed: required tests executed",
+        "P02: passed: required tests executed",
+        "P03: passed: required tests executed",
+        "P04: passed: required tests executed",
+        "P05: passed: required tests executed",
+        "P06: passed: required tests executed",
+        "P07: passed: required tests executed",
+        "P08: passed: required tests executed",
+        "M00: passed: required tests executed",
+        "M01: passed: required tests executed",
+        "M02: passed: required tests executed",
+        "M03: passed: required tests executed"
+      ]
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/roadmap_gate.py",
+        "--through-completed"
+      ],
+      "exitCode": 0,
+      "evidencePath": "docs/mapping/m03-gates/through-completed.txt",
+      "sha256": "be8f8f80b1ab05e457386ffa512c928940987e7ac7693f02eddb13779bd4e5e7",
+      "seconds": 79.96,
+      "statuses": [
+        "P00: passed: required tests executed",
+        "P01: passed: required tests executed",
+        "P02: passed: required tests executed",
+        "P03: passed: required tests executed",
+        "P04: passed: required tests executed",
+        "P05: passed: required tests executed",
+        "P06: passed: required tests executed",
+        "P07: passed: required tests executed",
+        "P08: passed: required tests executed",
+        "M00: passed: required tests executed",
+        "M01: passed: required tests executed",
+        "M02: passed: required tests executed",
+        "M03: passed: required tests executed",
+        "P00: passed: required tests executed",
+        "P01: passed: required tests executed",
+        "P02: passed: required tests executed",
+        "P03: passed: required tests executed",
+        "P04: passed: required tests executed",
+        "P05: passed: required tests executed",
+        "P06: passed: required tests executed",
+        "P07: passed: required tests executed",
+        "P08: passed: required tests executed",
+        "M00: passed: required tests executed",
+        "M01: passed: required tests executed",
+        "M02: passed: required tests executed",
+        "M03: passed: required tests executed"
+      ]
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/roadmap_gate.py",
+        "--all-goals"
+      ],
+      "exitCode": 1,
+      "evidencePath": "docs/mapping/m03-gates/all-goals.txt",
+      "sha256": "2e21d8c770bfbf8f99e77b74280ab9a946b073fa7fed36b267b20e22462ba064",
+      "seconds": 81.37,
+      "statuses": [
+        "P00: passed: required tests executed",
+        "P01: passed: required tests executed",
+        "P02: passed: required tests executed",
+        "P03: passed: required tests executed",
+        "P04: passed: required tests executed",
+        "P05: passed: required tests executed",
+        "P06: passed: required tests executed",
+        "P07: passed: required tests executed",
+        "P08: passed: required tests executed",
+        "M00: passed: required tests executed",
+        "M01: passed: required tests executed",
+        "M02: passed: required tests executed",
+        "M03: passed: required tests executed",
+        "M04: unimplemented: registered product unit is not implemented",
+        "M05: unimplemented: registered product unit is not implemented",
+        "P00: passed: required tests executed",
+        "P01: passed: required tests executed",
+        "P02: passed: required tests executed",
+        "P03: passed: required tests executed",
+        "P04: passed: required tests executed",
+        "P05: passed: required tests executed",
+        "P06: passed: required tests executed",
+        "P07: passed: required tests executed",
+        "P08: passed: required tests executed",
+        "M00: passed: required tests executed",
+        "M01: passed: required tests executed",
+        "M02: passed: required tests executed",
+        "M03: passed: required tests executed",
+        "M04: unimplemented: registered product unit is not implemented",
+        "M05: unimplemented: registered product unit is not implemented"
+      ]
+    }
+  ]
+}

@@ -190,7 +190,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
 {
   "schemaVersion": 1,
   "baselineRev": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
-  "completedThrough": "M02",
+  "completedThrough": "M03",
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,
   "units": [
@@ -423,7 +423,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "satisfying_omission_and_relaxed_controls_use_full_validator",
         "unsupported_anchors_and_cyclic_proofs_are_rejected"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "M04",
@@ -719,3 +719,16 @@ implementation flag and the completed prefix advance; see the [M02 report](mappi
 for exact supported/all-case recall, false hints, unresolved boundaries and real
 verification output. M03–M05 remain unimplemented. M00/M01 and all section 2
 freezes remain unchanged.
+
+### M03 implementation record — 2026-09-10
+
+The author authorized M03 after PR #97. The direct exact-tree checker and its
+four original `mapping_necessity` tests retain the registered M02 dependency,
+`ergo-sandbox` package and four-day ceiling. M03 alone advances the completed
+prefix. The [M03 report](mapping/M03.md) records checked guarded co-spends,
+authentication, distinctness, canonical accepted/omission controls and actual
+gates. A narrow design amendment represents the already pinned `HEIGHT >= 100`
+guard. A versioned supplemental metadata correction retains its original fixture
+and results; all M00–M02 data, thresholds and execution verdicts are unchanged. M04–M05 remain
+unimplemented. Discovery, execution acceptance and proof authority stay separate;
+no discharge, drain, request generation, detector or UI integration is included.

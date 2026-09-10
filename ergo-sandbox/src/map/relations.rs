@@ -1,6 +1,6 @@
 //! Unresolved relationship proposals, deliberately without proof or execution authority.
-//! M01 rejects imported proof states. Establishment requires the future exact-tree
-//! checker; no constructor here can certify a relation or construct an action.
+//! Imports here reject proof states. M03 establishment requires a fresh call to
+//! `check_relation::check`; no proposal constructor certifies a relation or action.
 use crate::evidence::case::{json_digest, Premise, RecordedBox};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -9,12 +9,28 @@ use std::collections::BTreeMap;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum Selector {
-    BoxId { hex: String },
-    PropositionBytes { hex: String },
-    PropositionHash { hex: String },
-    TokenAt { index: u32, id: String, amount: u64 },
-    TokenMember { id: String, amount: u64 },
-    And { predicates: Vec<Selector> },
+    BoxId {
+        hex: String,
+    },
+    PropositionBytes {
+        hex: String,
+    },
+    PropositionHash {
+        hex: String,
+    },
+    /// Amount is a minimum. M03 proves minimum 1 under positive-input-token state.
+    TokenAt {
+        index: u32,
+        id: String,
+        amount: u64,
+    },
+    TokenMember {
+        id: String,
+        amount: u64,
+    },
+    And {
+        predicates: Vec<Selector>,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -29,10 +45,23 @@ pub enum Subject {
 #[serde(tag = "kind", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum Guard {
     True,
-    Equals { field: GuardField, literal: Literal },
-    And { guards: Vec<Guard> },
-    Or { guards: Vec<Guard> },
-    Not { guard: Box<Guard> },
+    /// Narrow ordered guard required by the pinned action_alternatives family.
+    HeightAtLeast {
+        value: i32,
+    },
+    Equals {
+        field: GuardField,
+        literal: Literal,
+    },
+    And {
+        guards: Vec<Guard>,
+    },
+    Or {
+        guards: Vec<Guard>,
+    },
+    Not {
+        guard: Box<Guard>,
+    },
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "scope", rename_all = "kebab-case", deny_unknown_fields)]
@@ -102,7 +131,8 @@ pub struct RelationProposal {
     pub target: Relation,
     pub status: ProposalStatus,
     pub reason: String,
-    /// Unchecked material retained verbatim for a future checker, never a certificate.
+    /// Unchecked legacy proposal material, never a certificate. M03 takes its own
+    /// typed Derivation and rechecks it against the exact root.
     pub proposed_derivation: Value,
     pub dependency_ids: Vec<String>,
     pub exact_anchors: Vec<String>,

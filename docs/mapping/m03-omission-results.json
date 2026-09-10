@@ -1,0 +1,3506 @@
+[
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "100304c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1ec8fa37300d801d601c5b2a4730100ed9372017302947201c5a7"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "3c8d0008bfccb2ea0207bf34d79732252bf13be0bc25117ba9731c49d4194986",
+              "bytes": "80897a100304c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1ec8fa37300d801d601c5b2a4730100ed9372017302947201c5a7010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100304c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1ec8fa37300d801d601c5b2a4730100ed9372017302947201c5a7"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "3c8d0008bfccb2ea0207bf34d79732252bf13be0bc25117ba9731c49d4194986",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "86d585c2a6a7007d88db4a55530df9e93fc6edb6fd259565ffec45322b4312c0",
+    "executionFingerprint": "719253d2f1ffe2db7fbd4ee8c03973555516ac0a77f552bd26f97cc396747e78",
+    "premiseDigest": "319f1fb7038a1b29e57ba08e30da213dfb495229ba033a992fe4698170bcd209",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "literal_spend-control/satisfying"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "100304c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1ec8fa37300d801d601c5b2a4730100ed9372017302947201c5a7"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "3c8d0008bfccb2ea0207bf34d79732252bf13be0bc25117ba9731c49d4194986",
+              "bytes": "80897a100304c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1ec8fa37300d801d601c5b2a4730100ed9372017302947201c5a7010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100304c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1ec8fa37300d801d601c5b2a4730100ed9372017302947201c5a7"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "3c8d0008bfccb2ea0207bf34d79732252bf13be0bc25117ba9731c49d4194986",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "86d585c2a6a7007d88db4a55530df9e93fc6edb6fd259565ffec45322b4312c0",
+    "executionFingerprint": "719253d2f1ffe2db7fbd4ee8c03973555516ac0a77f552bd26f97cc396747e78",
+    "premiseDigest": "319f1fb7038a1b29e57ba08e30da213dfb495229ba033a992fe4698170bcd209",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "literal_spend-control/omission"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "1000d1aea4d901016393c57201c5a7"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "af8db48cf247d9ef03532eca7ee81dd8d2ffbc98be0e444a24e6ca9a56725d17",
+              "bytes": "80897a1000d1aea4d901016393c57201c5a7010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "1000d1aea4d901016393c57201c5a7"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "af8db48cf247d9ef03532eca7ee81dd8d2ffbc98be0e444a24e6ca9a56725d17",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "246494092da61688d3a8779bf816c469a4e5cf7914a41703c08dda6d1a738f18",
+    "executionFingerprint": "c0dfede167de49fec406536b24bb9b5556754976ddae5d30ffd32cb90dade479",
+    "premiseDigest": "6fc91e08de9fd456c8eb995bb28717eea1299f221fe98d7b5d9fd8aba9e24e76",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "self_alias-control/satisfying"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "1000d1aea4d901016393c57201c5a7"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "af8db48cf247d9ef03532eca7ee81dd8d2ffbc98be0e444a24e6ca9a56725d17",
+              "bytes": "80897a1000d1aea4d901016393c57201c5a7010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "1000d1aea4d901016393c57201c5a7"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "af8db48cf247d9ef03532eca7ee81dd8d2ffbc98be0e444a24e6ca9a56725d17",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "246494092da61688d3a8779bf816c469a4e5cf7914a41703c08dda6d1a738f18",
+    "executionFingerprint": "c0dfede167de49fec406536b24bb9b5556754976ddae5d30ffd32cb90dade479",
+    "premiseDigest": "6fc91e08de9fd456c8eb995bb28717eea1299f221fe98d7b5d9fd8aba9e24e76",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "self_alias-control/omission"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "100504c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a837764004020e2023a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092cd19592a37300d801d601c5b2a4730100ed9372017302947201c5a793c5b2a47303007304"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4",
+              "bytes": "80897a100504c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a837764004020e2023a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092cd19592a37300d801d601c5b2a4730100ed9372017302947201c5a793c5b2a47303007304010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100504c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a837764004020e2023a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092cd19592a37300d801d601c5b2a4730100ed9372017302947201c5a793c5b2a47303007304"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "1801497b8be0620c5c257b87e1f810adc6899a371e4bb82be45484e5134c51d0",
+    "executionFingerprint": "d1e33c8313ee9fae171f075f8d7b23de08a84df7ba1f2d857c8a46fc21aa4ccc",
+    "premiseDigest": "26211280ad24b83554310e25149ae79c89a604b4978dfebf30287c2b217f446b",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "action_alternatives-control/satisfying"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "100504c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a837764004020e2023a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092cd19592a37300d801d601c5b2a4730100ed9372017302947201c5a793c5b2a47303007304"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4",
+              "bytes": "80897a100504c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a837764004020e2023a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092cd19592a37300d801d601c5b2a4730100ed9372017302947201c5a793c5b2a47303007304010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100504c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a837764004020e2023a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092cd19592a37300d801d601c5b2a4730100ed9372017302947201c5a793c5b2a47303007304"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "1801497b8be0620c5c257b87e1f810adc6899a371e4bb82be45484e5134c51d0",
+    "executionFingerprint": "d1e33c8313ee9fae171f075f8d7b23de08a84df7ba1f2d857c8a46fc21aa4ccc",
+    "premiseDigest": "26211280ad24b83554310e25149ae79c89a604b4978dfebf30287c2b217f446b",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "action_alternatives-control/omission"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "100204000e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d193c5b2db6501fe7300007301"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "2ddff834dd3c35b850e7a936b39c58713c7501990a616787d0824861bf286c9e",
+              "bytes": "80897a100204000e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d193c5b2db6501fe7300007301010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100204000e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d193c5b2db6501fe7300007301"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "2ddff834dd3c35b850e7a936b39c58713c7501990a616787d0824861bf286c9e",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "cccaf738236d16c6cf98ffab52cb6bfbb315fb18f69fa941e79cf780ee76c6dd",
+    "executionFingerprint": "697e896c338132f353eaee5ba1a67fd63741f660b2f466407c3e5f3fa2184fb0",
+    "premiseDigest": "0be109db5acf4ea9f5969ac11ac190279109e20521b76fb167e3e49b06ac04df",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "data_only-control/satisfying"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "100204000e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d193c5b2db6501fe7300007301"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "2ddff834dd3c35b850e7a936b39c58713c7501990a616787d0824861bf286c9e",
+              "bytes": "80897a100204000e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d193c5b2db6501fe7300007301010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100204000e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d193c5b2db6501fe7300007301"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "2ddff834dd3c35b850e7a936b39c58713c7501990a616787d0824861bf286c9e",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "cccaf738236d16c6cf98ffab52cb6bfbb315fb18f69fa941e79cf780ee76c6dd",
+    "executionFingerprint": "697e896c338132f353eaee5ba1a67fd63741f660b2f466407c3e5f3fa2184fb0",
+    "premiseDigest": "0be109db5acf4ea9f5969ac11ac190279109e20521b76fb167e3e49b06ac04df",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "data_only-control/omission"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "100204000e0910010402d192a37300d193c2b2a57300007301"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "9dbe05e5b43786a449a5223a2b44b28a94191d75b1c4b9ee2b38cd6fcbb9d870",
+              "bytes": "80897a100204000e0910010402d192a37300d193c2b2a57300007301010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100204000e0910010402d192a37300d193c2b2a57300007301"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "9dbe05e5b43786a449a5223a2b44b28a94191d75b1c4b9ee2b38cd6fcbb9d870",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "93aca52b9834b5df7b4f8db36d132b29f30345c8f0d0ad54f81e1986709b848e",
+    "executionFingerprint": "1dac970c6c5bd749ee13202f8b66c565404c712e77bea5ea58ba31c1889a4147",
+    "premiseDigest": "a84ee75f5a6390a6998fe36a29151a91c090a8f8a4b23cf7782b522b4a9c1962",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "output_only-control/satisfying"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "100204000e0910010402d192a37300d193c2b2a57300007301"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "9dbe05e5b43786a449a5223a2b44b28a94191d75b1c4b9ee2b38cd6fcbb9d870",
+              "bytes": "80897a100204000e0910010402d192a37300d193c2b2a57300007301010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100204000e0910010402d192a37300d193c2b2a57300007301"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "9dbe05e5b43786a449a5223a2b44b28a94191d75b1c4b9ee2b38cd6fcbb9d870",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "93aca52b9834b5df7b4f8db36d132b29f30345c8f0d0ad54f81e1986709b848e",
+    "executionFingerprint": "1dac970c6c5bd749ee13202f8b66c565404c712e77bea5ea58ba31c1889a4147",
+    "premiseDigest": "a84ee75f5a6390a6998fe36a29151a91c090a8f8a4b23cf7782b522b4a9c1962",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "output_only-control/omission"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "10010e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1efaea4d9010163d801d603c57201ed9372037300947203c5a7"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "a2d74007ec59679a0e3d62fff05dcbf4c34327de1af24114c1f1218dc177c589",
+              "bytes": "80897a10010e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1efaea4d9010163d801d603c57201ed9372037300947203c5a7010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "10010e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1efaea4d9010163d801d603c57201ed9372037300947203c5a7"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "a2d74007ec59679a0e3d62fff05dcbf4c34327de1af24114c1f1218dc177c589",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "65986fc4f93591bd025cd4a66de44cdf743dfce9f6b7efca82592a59f2a28707",
+    "executionFingerprint": "31c165094f4b51ec7fb49130801db912c064a0978285611561e1b83632aca784",
+    "premiseDigest": "20c28f96c3f59cb024aab5d037a9b1d915b173d143b2429671498fbb427bdd7f",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "dead_check-control/satisfying"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "10010e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1efaea4d9010163d801d603c57201ed9372037300947203c5a7"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "a2d74007ec59679a0e3d62fff05dcbf4c34327de1af24114c1f1218dc177c589",
+              "bytes": "80897a10010e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1efaea4d9010163d801d603c57201ed9372037300947203c5a7010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "10010e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1efaea4d9010163d801d603c57201ed9372037300947203c5a7"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "a2d74007ec59679a0e3d62fff05dcbf4c34327de1af24114c1f1218dc177c589",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "65986fc4f93591bd025cd4a66de44cdf743dfce9f6b7efca82592a59f2a28707",
+    "executionFingerprint": "31c165094f4b51ec7fb49130801db912c064a0978285611561e1b83632aca784",
+    "premiseDigest": "20c28f96c3f59cb024aab5d037a9b1d915b173d143b2429671498fbb427bdd7f",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "dead_check-control/omission"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "100204020e0910010404d192a37300d193c2b2a47300007301"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "ef971bec31181025b3c12a505a67c12f484f078ea2e4008a18882d8a6ef3b9e7",
+              "bytes": "80897a100204020e0910010404d192a37300d193c2b2a47300007301010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100204020e0910010404d192a37300d193c2b2a47300007301"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "ef971bec31181025b3c12a505a67c12f484f078ea2e4008a18882d8a6ef3b9e7",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "7966bd4838ca40abad90c80bbc2b624a717b6300c81f7da65b48bb4804ce2f42",
+    "executionFingerprint": "780184a0972258a5e85a01010089e31aab8cbf435d6409b77875271201bfcf5d",
+    "premiseDigest": "a3e854111fa0fa652c55c1053f8b9e0b29d38f99ee6b0002e28119b9394caf52",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "script_identity-control/satisfying"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "10010e202222222222222222222222222222222222222222222222222222222222222222d1aea4d9010163aedb63087201d901034d0e938c7203017300"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "652ce0ee6908274f54715bff0ecc0b3bd2e6966f6e845cdd4a0946eafdff3773",
+              "bytes": "80897a10010e202222222222222222222222222222222222222222222222222222222222222222d1aea4d9010163aedb63087201d901034d0e938c7203017300010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "10010e202222222222222222222222222222222222222222222222222222222222222222d1aea4d9010163aedb63087201d901034d0e938c7203017300"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "652ce0ee6908274f54715bff0ecc0b3bd2e6966f6e845cdd4a0946eafdff3773",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "27cd81bc0becca69cf1c6db0bbeaa657ff5b14acb86947e8bbd320080ffa2841",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "38bcfe5ed996419a94ef52744fc5bf34f98da3443a0ea33f783e3101214e0c76",
+    "executionFingerprint": "d40cfd2aed740ebff84e675eb83d27bf456afe4a98811a75e53c9fc647a0a6d2",
+    "premiseDigest": "d9cda8937b8d320380700fd411db4464f91d447cf4e592c99d17a72d99f87c6d",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "token_identity-control/satisfying"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "10010e202222222222222222222222222222222222222222222222222222222222222222d1aea4d9010163aedb63087201d901034d0e938c7203017300"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "652ce0ee6908274f54715bff0ecc0b3bd2e6966f6e845cdd4a0946eafdff3773",
+              "bytes": "80897a10010e202222222222222222222222222222222222222222222222222222222222222222d1aea4d9010163aedb63087201d901034d0e938c7203017300010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "10010e202222222222222222222222222222222222222222222222222222222222222222d1aea4d9010163aedb63087201d901034d0e938c7203017300"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "652ce0ee6908274f54715bff0ecc0b3bd2e6966f6e845cdd4a0946eafdff3773",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "27cd81bc0becca69cf1c6db0bbeaa657ff5b14acb86947e8bbd320080ffa2841",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "38bcfe5ed996419a94ef52744fc5bf34f98da3443a0ea33f783e3101214e0c76",
+    "executionFingerprint": "d40cfd2aed740ebff84e675eb83d27bf456afe4a98811a75e53c9fc647a0a6d2",
+    "premiseDigest": "d9cda8937b8d320380700fd411db4464f91d447cf4e592c99d17a72d99f87c6d",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "token_identity-control/omission"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "10020402058092f401d193c1b2a47300007301"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "7e8d463a6134c4fc579cc25373b305c4501f2cd4ff3a497773e3cc5702f789f0",
+              "bytes": "80897a10020402058092f401d193c1b2a47300007301010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "10020402058092f401d193c1b2a47300007301"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "7e8d463a6134c4fc579cc25373b305c4501f2cd4ff3a497773e3cc5702f789f0",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "fbd44e2dfefe459034ed5c0f8ddbbd461c496a6367102630d81d6ecaae726309",
+    "executionFingerprint": "a8f64ab2b25141acd7c4baf6eb0c6e7499c6f8ef895ff44f9c9203eeb96163d6",
+    "premiseDigest": "f94f314d209af93005f367502b5f694028d4d8615dece455fbabdd36975bfb34",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "tokenless-control/satisfying"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "10020402058092f401d193c1b2a47300007301"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "7e8d463a6134c4fc579cc25373b305c4501f2cd4ff3a497773e3cc5702f789f0",
+              "bytes": "80897a10020402058092f401d193c1b2a47300007301010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "10020402058092f401d193c1b2a47300007301"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "7e8d463a6134c4fc579cc25373b305c4501f2cd4ff3a497773e3cc5702f789f0",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "fbd44e2dfefe459034ed5c0f8ddbbd461c496a6367102630d81d6ecaae726309",
+    "executionFingerprint": "a8f64ab2b25141acd7c4baf6eb0c6e7499c6f8ef895ff44f9c9203eeb96163d6",
+    "premiseDigest": "f94f314d209af93005f367502b5f694028d4d8615dece455fbabdd36975bfb34",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "tokenless-control/omission"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "100204c8010e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1ec8fa37300aea4d9010163d801d603c57201ed9372037301947203c5a7"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "94b248456afa410e9b53f87e4ae088fae39ba016429c127bb2eced4434e1e504",
+              "bytes": "80897a100204c8010e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1ec8fa37300aea4d9010163d801d603c57201ed9372037301947203c5a7010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100204c8010e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1ec8fa37300aea4d9010163d801d603c57201ed9372037301947203c5a7"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "94b248456afa410e9b53f87e4ae088fae39ba016429c127bb2eced4434e1e504",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "e4d58d69a428b3ba76ae2381cb518a40db42bdc650492da92bdd72368a1cd59f",
+    "executionFingerprint": "0d60b36b620c3a8c6ecae1f8250a81c590cf80e9bae754db0478fce503fba442",
+    "premiseDigest": "2ad4aa4a2093e44d096486fe8bdcda1582b648671012a5033e28f758060dfd1d",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "exists_literal-control/satisfying"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "100204c8010e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1ec8fa37300aea4d9010163d801d603c57201ed9372037301947203c5a7"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "94b248456afa410e9b53f87e4ae088fae39ba016429c127bb2eced4434e1e504",
+              "bytes": "80897a100204c8010e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1ec8fa37300aea4d9010163d801d603c57201ed9372037301947203c5a7010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100204c8010e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640d1ec8fa37300aea4d9010163d801d603c57201ed9372037301947203c5a7"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "94b248456afa410e9b53f87e4ae088fae39ba016429c127bb2eced4434e1e504",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "e4d58d69a428b3ba76ae2381cb518a40db42bdc650492da92bdd72368a1cd59f",
+    "executionFingerprint": "0d60b36b620c3a8c6ecae1f8250a81c590cf80e9bae754db0478fce503fba442",
+    "premiseDigest": "2ad4aa4a2093e44d096486fe8bdcda1582b648671012a5033e28f758060dfd1d",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "exists_literal-control/omission"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [
+          {
+            "document": {
+              "boxId": "dad7aabf5ae4aa682de851a9a7ce981548a7104f30d0f063ba082640a9fd0de0",
+              "bytes": "80897a100204020400d193c5b2a4730000e4c6b2db6501fe730100040e010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100204020400d193c5b2a4730000e4c6b2db6501fe730100040e"
+            },
+            "origin": "hypothetical",
+            "record": null
+          },
+          {
+            "document": {
+              "boxId": "b2cb5aca4b4dbac8ad53620775e85b7c066d2007107cac9295aca5597315b1f0",
+              "bytes": "80897a10010402d192a373000100010e2023a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092c000000000000000000000000000000000000000000000000000000000000000003",
+              "ergoTree": "10010402d192a37300"
+            },
+            "origin": "hypothetical",
+            "record": null
+          },
+          {
+            "document": {
+              "boxId": "23a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092c",
+              "bytes": "80897a10010404d192a37300010000000000000000000000000000000000000000000000000000000000000000000000",
+              "ergoTree": "10010404d192a37300"
+            },
+            "origin": "hypothetical",
+            "record": null
+          },
+          {
+            "document": {
+              "boxId": "eaded55f79a6ea98e69c5708e67bf3b807013c9fd0c8be838c942bc7f22d505e",
+              "bytes": "80897a10010408d192a373000100010e20b114673b71df5f8934d4ce5398034945e619b319186f9bdaeb7fcb859209d83e000000000000000000000000000000000000000000000000000000000000000002",
+              "ergoTree": "10010408d192a37300"
+            },
+            "origin": "hypothetical",
+            "record": null
+          },
+          {
+            "document": {
+              "boxId": "b114673b71df5f8934d4ce5398034945e619b319186f9bdaeb7fcb859209d83e",
+              "bytes": "80897a10010406d192a37300010000000000000000000000000000000000000000000000000000000000000000000001",
+              "ergoTree": "10010406d192a37300"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        ],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "100204020400d193c5b2a4730000e4c6b2db6501fe730100040e"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "dad7aabf5ae4aa682de851a9a7ce981548a7104f30d0f063ba082640a9fd0de0",
+              "bytes": "80897a100204020400d193c5b2a4730000e4c6b2db6501fe730100040e010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100204020400d193c5b2a4730000e4c6b2db6501fe730100040e"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 100,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "dad7aabf5ae4aa682de851a9a7ce981548a7104f30d0f063ba082640a9fd0de0",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "23a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092c",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "0c6623c6c6834ec0af5c6bb9c5aa362cb84077fb6331d2e91331e7a6b9ed0b74",
+    "executionFingerprint": "1701f86c0d71191807367f7ec6e8c28fe0d62c1b98b61126dfeb553e9861ebab",
+    "premiseDigest": "553c1c9fd36b5d0f5caa2571956b53819c0a32e16d2308e05392bbe817a81062",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "register_identity-control/mutable-config-omits-C"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "10010e202222222222222222222222222222222222222222222222222222222222222222d193e4c6a7040e7300"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "452e000a4fc9e06284bb509e7b96ce4a90abebaa2b489d700715528311b2fc4a",
+              "bytes": "80897a10010e202222222222222222222222222222222222222222222222222222222222222222d193e4c6a7040e73000100010e202222222222222222222222222222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "10010e202222222222222222222222222222222222222222222222222222222222222222d193e4c6a7040e7300"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "452e000a4fc9e06284bb509e7b96ce4a90abebaa2b489d700715528311b2fc4a",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "d7fc3df0e8fbfec79e39fba9065f5077b999ff277150eb37ae28e54add4d201d",
+    "executionFingerprint": "cff39dc042bcecbf17c20a77026b1d5483073d2ce9adaec390f84c47ee6a7ce3",
+    "premiseDigest": "4b2dce6a5ed2d4ea3d08ce88933d186e1216af3b1cc98ca6a3fe900f2ed17aef",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "snapshot_collision-control/satisfying"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "10010e202222222222222222222222222222222222222222222222222222222222222222d193e4c6a7040e7300"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "452e000a4fc9e06284bb509e7b96ce4a90abebaa2b489d700715528311b2fc4a",
+              "bytes": "80897a10010e202222222222222222222222222222222222222222222222222222222222222222d193e4c6a7040e73000100010e202222222222222222222222222222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "10010e202222222222222222222222222222222222222222222222222222222222222222d193e4c6a7040e7300"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "452e000a4fc9e06284bb509e7b96ce4a90abebaa2b489d700715528311b2fc4a",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "d7fc3df0e8fbfec79e39fba9065f5077b999ff277150eb37ae28e54add4d201d",
+    "executionFingerprint": "cff39dc042bcecbf17c20a77026b1d5483073d2ce9adaec390f84c47ee6a7ce3",
+    "premiseDigest": "4b2dce6a5ed2d4ea3d08ce88933d186e1216af3b1cc98ca6a3fe900f2ed17aef",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "snapshot_collision-control/omission"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "100404c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a83776400464d1eced93a3730093c5b2a4730100730293a37303"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "53eb1665b6a3d0778d51ceabb856759c2a29ffe2cbeb33e25a6046c2646cf730",
+              "bytes": "80897a100404c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a83776400464d1eced93a3730093c5b2a4730100730293a37303010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100404c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a83776400464d1eced93a3730093c5b2a4730100730293a37303"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "53eb1665b6a3d0778d51ceabb856759c2a29ffe2cbeb33e25a6046c2646cf730",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "5e86bd43648d107e5ce3c4b425e1f5596be7f748cd6bd6a26380efd54baf4a55",
+    "executionFingerprint": "179f868ebdc5cafd45becca9126f398375556291893de332bdceba8f751664b9",
+    "premiseDigest": "25bbc6fed17c2bbd704222f543012807a05c87c7b4dcc3f1f7e5ed197a630a99",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "m03-common-alternatives-control/omission"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "100404c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a83776400101d19593a3730093c5b2a473010073027303"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "2e9def90da345933056aa54a5bad733792f3e24ab858ea34a2cd892e8132d8d2",
+              "bytes": "80897a100404c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a83776400101d19593a3730093c5b2a473010073027303010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100404c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a83776400101d19593a3730093c5b2a473010073027303"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "2e9def90da345933056aa54a5bad733792f3e24ab858ea34a2cd892e8132d8d2",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "56f7d221097f4a9271b1c39a4ca6b06d4dc5539044a64228cd810bb07de713a5",
+    "executionFingerprint": "fb7cf6e824773d8ee02edbf17de9e0a8d625cf28bd8d0c46038d08d61e6f3d49",
+    "premiseDigest": "047e962817e625da9b882962639ee551cd7e6a17b795785e419d5323ca69523d",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "m03-literal-guard-control/omission"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "100504c801058092f40104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a83776400101d195ed93a3730093c1a7730193c5b2a473020073037304"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "0a96ce8eb9f00a18dd37834c7f57aca24484bc488c611cba37127b69abd417f0",
+              "bytes": "80897a100504c801058092f40104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a83776400101d195ed93a3730093c1a7730193c5b2a473020073037304010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100504c801058092f40104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a83776400101d195ed93a3730093c1a7730193c5b2a473020073037304"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "0a96ce8eb9f00a18dd37834c7f57aca24484bc488c611cba37127b69abd417f0",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+          "kind": "box-id"
+        }
+      }
+    },
+    "claimDigest": "d00494f62ecd6d1f71f79f3f5052a625ae458b194348baa39eb32c68cb68bc95",
+    "executionFingerprint": "6e5981a5268c358aec5aaae658fe296af3c0c9d821b564921050ced16082a3c1",
+    "premiseDigest": "c625860d6de91cf03c100610453a389190ccaa0db5e08827deb71d98756e1c01",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "m03-boolean-guard-control/omission"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "100204000e202222222222222222222222222222222222222222222222222222222222222222d1aea4d9010163938cb2db63087201730000017301"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "761156c89301dfbf85b85c42c617ba66a2f49840cb869f9c68e9d382b4641549",
+              "bytes": "80897a100204000e202222222222222222222222222222222222222222222222222222222222222222d1aea4d9010163938cb2db63087201730000017301010122222222222222222222222222222222222222222222222222222222222222220100000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100204000e202222222222222222222222222222222222222222222222222222222222222222d1aea4d9010163938cb2db63087201730000017301"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "761156c89301dfbf85b85c42c617ba66a2f49840cb869f9c68e9d382b4641549",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "amount": 1,
+          "id": "2222222222222222222222222222222222222222222222222222222222222222",
+          "index": 0,
+          "kind": "token-at"
+        }
+      }
+    },
+    "claimDigest": "5e5b9b6d5ff813e9aeb56c7ee7339a66b2afa66fd11b070e8b7182387656adb3",
+    "executionFingerprint": "8fa34f4a9e3dde6c19094fb41c8c509a480196292d120ea2f7a09de351fd08f8",
+    "premiseDigest": "7b62a49c2819de99a2479deeeb518528f29adf9446307120b499700c93fee1cd",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "m03-explicit-distinctness-control/omission"
+  },
+  {
+    "assessment": "refuted-by-accepted-omission",
+    "claim": {
+      "authenticatedBytes": [],
+      "dependencyIds": [],
+      "exactAnchors": [],
+      "premises": {
+        "activationRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 3,
+            "rootEvaluation": "required-before-storage-rent"
+          }
+        },
+        "analysisCaps": {
+          "nodes": 10000
+        },
+        "authenticationRoots": [],
+        "compilerRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "guard": {
+          "kind": "true"
+        },
+        "network": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "hypothetical-mainnet-activation-3"
+        },
+        "nodeRevision": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "9468043396e5daa2828211bcff4234bc70fae4f0"
+        },
+        "provenance": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "source": "M00 independently authored synthetic; full-node M03 state conditional"
+          }
+        },
+        "rootBytes": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": "100304c80104020e20d4c0e3c2dd77463946051c1292bc6adccc9721c0df97973577df745ab85c75e0d1ec8fa3730093cbc2b2a47301007302"
+        },
+        "selfBox": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "document": {
+              "boxId": "94ed6e59b37542ecd25fb37f896c52a75ccbe9015683f92eae4052c959151562",
+              "bytes": "80897a100304c80104020e20d4c0e3c2dd77463946051c1292bc6adccc9721c0df97973577df745ab85c75e0d1ec8fa3730093cbc2b2a47301007302010000000000000000000000000000000000000000000000000000000000000000000004",
+              "ergoTree": "100304c80104020e20d4c0e3c2dd77463946051c1292bc6adccc9721c0df97973577df745ab85c75e0d1ec8fa3730093cbc2b2a47301007302"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        },
+        "stateConstraints": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "blockContext": {
+              "activatedScriptVersion": 3,
+              "height": 50,
+              "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+              "preHeaderNBits": 117586360,
+              "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+              "preHeaderTimestamp": 1700000000000,
+              "preHeaderVersion": 4,
+              "preHeaderVotes": [
+                0,
+                0,
+                0
+              ]
+            },
+            "headers": [],
+            "localPolicy": {
+              "maxTransactionSize": 524288
+            },
+            "networkRules": {
+              "description": "authored keyless/rent vector",
+              "mode": "disabled",
+              "reason": "explicit hypothetical network without EIP-27"
+            },
+            "parameters": {
+              "dataInputCost": 100,
+              "inputCost": 2000,
+              "maxBlockCost": 8001091,
+              "maxBlockSize": 524288,
+              "maxBoxSize": 4096,
+              "maxTokensPerBox": 122,
+              "minValuePerByte": 360,
+              "outputCost": 100,
+              "storageFeeFactor": 1250000,
+              "storagePeriod": 1051200,
+              "tokenAccessCost": 100
+            },
+            "positiveInputTokens": true,
+            "priorBlockCost": 0
+          }
+        }
+      },
+      "proposedDerivation": null,
+      "reason": "independently nominated exact-code claim",
+      "status": "unresolved",
+      "subject": {
+        "hex": "94ed6e59b37542ecd25fb37f896c52a75ccbe9015683f92eae4052c959151562",
+        "kind": "box-id"
+      },
+      "target": {
+        "kind": "spend",
+        "selector": {
+          "hex": "d4c0e3c2dd77463946051c1292bc6adccc9721c0df97973577df745ab85c75e0",
+          "kind": "proposition-hash"
+        }
+      }
+    },
+    "claimDigest": "a628344e5d42c89ca603c6e9e96f2102074214670443db85f5b8f057d606e37a",
+    "executionFingerprint": "605687081402bb262a83d151acce9a5f7ad581a969ac1d100c0094f86107ffae",
+    "premiseDigest": "a28a09f166fab1bdf11e102917f6dc9c92822b7a6cdb46bc3e436b690c9e6041",
+    "scope": "M03 test assessment; M04 product refutation import not implemented",
+    "vector": "m03-script-hash-control/omission"
+  }
+]
