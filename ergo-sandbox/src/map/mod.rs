@@ -30,11 +30,13 @@
 //!
 //! A map is a description, not a verdict.
 
+pub mod discovery;
 #[cfg(feature = "explorer")]
 pub mod explorer;
 pub mod fixture;
 pub mod json;
 pub mod refs;
+pub mod relations;
 pub mod source;
 
 use std::collections::{BTreeMap, BTreeSet, VecDeque};

@@ -190,7 +190,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
 {
   "schemaVersion": 1,
   "baselineRev": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
-  "completedThrough": "M00",
+  "completedThrough": "M01",
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,
   "units": [
@@ -392,7 +392,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "premise_changes_invalidate_imported_proofs",
         "raw_provenance_and_legacy_map_bytes_survive"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "M02",
@@ -706,3 +706,9 @@ M00 gate completion: P00–P08 and all three registered M00 tests pass under
 `completedThrough` is M00. The [M00 report](mapping/M00.md) records the fixed
 32-case inventory, legacy measurements and full verification output. M01–M05
 remain unimplemented. Registration does not authorize their implementation here.
+
+M01 author-authorized implementation: the separate discovery and unresolved-relation
+artifacts and all three registered gates are implemented. `--require M01` passed
+through P00–P08 and M00 before advancing `completedThrough` to M01. See the
+[M01 report](mapping/M01.md) for the import authority boundary and real gate output.
+M02–M05 remain unimplemented. All section 2 freezes and pinned M00 data remain unchanged.

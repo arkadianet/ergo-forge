@@ -1,0 +1,95 @@
+{
+  "version": "required-relations:v1",
+  "proposals": [
+    {
+      "claimDigest": "b2379ef3eb029791c79e2d3835b6615638b9681d001ab0283515bd11798c3597",
+      "premiseDigest": "02879726793e35efa4de5ec9d9e83efdb76c0143a97bb3cbfb2a1ba20c0f53fd",
+      "proposal": {
+        "subject": {
+          "kind": "box-id",
+          "hex": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "premises": {
+          "rootBytes": {
+            "status": "present",
+            "value": "10010101d17300",
+            "origin": "caller-supplied"
+          },
+          "selfBox": {
+            "status": "present",
+            "value": {
+              "document": {
+                "boxId": "raw-id"
+              },
+              "origin": "source-recorded",
+              "record": {
+                "locator": "authored:m01",
+                "revision": "1",
+                "sha256": "0ce1cf8e32968d16f15a860f7931f5293017574530fb80f840a8e2c2cc10f00a"
+              }
+            },
+            "origin": "caller-supplied"
+          },
+          "nodeRevision": {
+            "status": "present",
+            "value": "9468043",
+            "origin": "caller-supplied"
+          },
+          "compilerRevision": {
+            "status": "present",
+            "value": "9468043",
+            "origin": "caller-supplied"
+          },
+          "network": {
+            "status": "present",
+            "value": "mainnet",
+            "origin": "caller-supplied"
+          },
+          "activationRules": {
+            "status": "present",
+            "value": {
+              "version": 3
+            },
+            "origin": "caller-supplied"
+          },
+          "stateConstraints": {
+            "status": "present",
+            "value": {
+              "availability": "unknown"
+            },
+            "origin": "caller-supplied"
+          },
+          "guard": {
+            "kind": "true"
+          },
+          "authenticationRoots": [],
+          "provenance": {
+            "status": "present",
+            "value": {
+              "scope": "authored schema example"
+            },
+            "origin": "caller-supplied"
+          },
+          "analysisCaps": {
+            "nodes": 1
+          }
+        },
+        "target": {
+          "kind": "spend",
+          "selector": {
+            "kind": "box-id",
+            "hex": "1111111111111111111111111111111111111111111111111111111111111111"
+          }
+        },
+        "status": "unresolved",
+        "reason": "exact-tree checker unavailable in M01; SELF bytes not canonical",
+        "proposedDerivation": {
+          "raw": "unchecked material retained"
+        },
+        "dependencyIds": [],
+        "exactAnchors": [],
+        "authenticatedBytes": []
+      }
+    }
+  ]
+}

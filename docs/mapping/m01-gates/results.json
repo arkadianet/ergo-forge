@@ -1,0 +1,49 @@
+{
+  "environment": {
+    "CARGO_TARGET_DIR": "./target-p00"
+  },
+  "commands": [
+    {
+      "command": "cargo fmt --all -- --check",
+      "exitCode": 0,
+      "outputPath": "fmt.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "exitCode": 0,
+      "outputPath": "clippy.txt",
+      "sha256": "cdf886ea367b0c1ba16e8a8858f17ee7b508577415cb5994190acbdc8651946a"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --release --test mapping_artifacts -- --show-output",
+      "exitCode": 0,
+      "outputPath": "unit.txt",
+      "sha256": "0c9dcd2d7d6ea2bdb3b53cd1eb8af61d569d57a84ffe2e124a6a1eada62455cc"
+    },
+    {
+      "command": "cargo test --workspace --release",
+      "exitCode": 0,
+      "outputPath": "workspace.txt",
+      "sha256": "3618585fa1b09ec3afd40af3f0fc57476d97b364ead9213492b09048a8fad7fc"
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require M01",
+      "exitCode": 0,
+      "outputPath": "require.txt",
+      "sha256": "314dcca367cc6567cd54eeb37c1aab50a46fc142a4a99df9475fd0293b86a7dc"
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --through-completed",
+      "exitCode": 0,
+      "outputPath": "through-completed.txt",
+      "sha256": "296362cf2592fb3fed1f57bb0725e4966f9e1d2f434f25d24fd8c753c7a650cc"
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --all-goals",
+      "exitCode": 1,
+      "outputPath": "all-goals.txt",
+      "sha256": "7f7aee26515e843fcf32b938c545acb36a706af0f0147f2394e7b0f6c1a9b897"
+    }
+  ]
+}

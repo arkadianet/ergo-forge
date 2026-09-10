@@ -1,0 +1,91 @@
+{
+  "version": "discovery-map:v2",
+  "seeds": [
+    {
+      "kind": "address",
+      "value": "authored"
+    }
+  ],
+  "recordedBoxes": [
+    {
+      "document": {
+        "boxId": "raw-id"
+      },
+      "origin": "source-recorded",
+      "record": {
+        "locator": "authored:m01",
+        "revision": "1",
+        "sha256": "0ce1cf8e32968d16f15a860f7931f5293017574530fb80f840a8e2c2cc10f00a"
+      }
+    },
+    {
+      "document": {
+        "boxId": "raw-id",
+        "additionalRegisters": {}
+      },
+      "origin": "source-recorded",
+      "record": {
+        "locator": "authored:m01",
+        "revision": "1",
+        "sha256": "0eafa79f429f275fd11afbc1499880949e8d291a5acf76f248f1ca73a39aba7e"
+      }
+    },
+    {
+      "document": {
+        "additionalRegisters": {
+          "R4": {
+            "serializedValue": "0402",
+            "renderedValue": "retained"
+          }
+        },
+        "creationTransactionId": "raw-ref"
+      },
+      "origin": "source-recorded",
+      "record": {
+        "locator": "authored:m01",
+        "revision": "1",
+        "sha256": "ff68f5c3b3bae2f3214df6bdd9fdd54ffcff906232d55dac3b90b09d0dd7cef9"
+      }
+    }
+  ],
+  "canonicalReferences": {},
+  "observedCode": {},
+  "observations": [
+    {
+      "id": "candidate/0",
+      "sourceBox": "raw-id",
+      "site": "INPUTS(1)",
+      "reference": {
+        "kind": "box-id",
+        "hex": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "proposedTargets": [
+        "candidate-box"
+      ],
+      "proposedRoles": [
+        "companion"
+      ],
+      "status": "hint",
+      "reason": "candidate only; missing canonical bytes"
+    }
+  ],
+  "sourceQueries": [
+    {
+      "query": "authored",
+      "page": null,
+      "rawResponse": {
+        "extra": "preserved"
+      }
+    }
+  ],
+  "snapshotScope": {
+    "status": "missing",
+    "reason": "simultaneous availability unknown"
+  },
+  "caps": {
+    "nodes": 1
+  },
+  "unresolvedReasons": [
+    "missing canonical bytes"
+  ]
+}
