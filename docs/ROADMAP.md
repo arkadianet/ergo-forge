@@ -190,7 +190,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
 {
   "schemaVersion": 1,
   "baselineRev": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
-  "completedThrough": "P06",
+  "completedThrough": "P07",
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,
   "units": [
@@ -346,7 +346,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "conditional_discharge_exports_the_full_premise_set",
         "curated_precision_has_positive_and_negative_controls"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "P08",
@@ -586,3 +586,12 @@ advancement. `completedThrough` is now P05. The final through-P05 and full-suite
 passed; actual output is recorded in [P05-RECOVERY-REPORT.md](P05-RECOVERY-REPORT.md).
 The boundary is source-recorded context plus declared-property validation, not
 authenticated historical UTXO membership or canonical-chain certification.
+
+P07 manifest clarification: `tests/fixtures/evidence/precision.json` is the
+separate P07 fixture manifest and frozen label registry. Like P04/P05, it does
+not append rows to P03's exact node-vector inventory in `manifest.json`. Its
+eight entries retain case IDs, families, source kinds, file hashes, node and
+property revisions, expected acceptance/claim status, and publication eligibility;
+the duplicate fixture is separately hash-pinned there. The P07 tests derive
+results from execution/replay and compare the frozen labels. This changes no
+acceptance case, threshold, baseline row or required test.

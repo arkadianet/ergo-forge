@@ -12,7 +12,7 @@ pub const SNIPPET_MAX: usize = 120;
 /// Ordering matters: variants are declared most-severe first so `as u8`
 /// sorts findings correctly.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize)]
-pub enum Severity {
+pub enum ReviewPriority {
     /// Review first; failure/locking has not been established.
     High,
     /// Suspicious or fragile; may be intentional.
@@ -21,7 +21,10 @@ pub enum Severity {
     Low,
 }
 
-impl Severity {
+/// Compatibility name for the original static ranking; never property impact.
+pub type Severity = ReviewPriority;
+
+impl ReviewPriority {
     /// Uppercase label for CLI output.
     #[must_use]
     pub fn label(self) -> &'static str {
@@ -40,6 +43,7 @@ pub struct Finding {
     pub triage: super::triage::Triage,
     /// Stable machine-readable lint id, e.g. `"unchecked-get"`.
     pub lint: &'static str,
+    /// Legacy compatibility field: static review priority, never claim impact.
     pub severity: Severity,
     /// `Node::id` of the offending node. Lift-local — see `ast::Node::id`.
     pub node_id: u64,
@@ -69,6 +73,7 @@ impl Serialize for Finding {
         record.serialize_entry("triage", &self.triage)?;
         record.serialize_entry("lint", self.lint)?;
         record.serialize_entry("severity", &self.severity)?;
+        record.serialize_entry("reviewPriority", &self.severity)?;
         record.serialize_entry("node_id", &self.node_id)?;
         record.serialize_entry("ir_id", &self.ir_id)?;
         record.serialize_entry("message", &self.message)?;

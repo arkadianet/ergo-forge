@@ -859,15 +859,21 @@ fn cmd_audit(args: &[String]) -> Result<(), String> {
                     );
                 }
             }
-            for f in &report.findings {
+            println!(
+                "{} unresolved review obligation(s)",
+                report.obligations.len()
+            );
+            for obligation in &report.obligations {
                 println!(
-                    "\n{} review priority  {}  node {}",
-                    f.severity.label(),
-                    f.lint,
-                    f.node_id
+                    "\n{} review priority  {}  [{} anchors]",
+                    obligation.review_priority.label(),
+                    obligation.key,
+                    obligation.anchors.len()
                 );
-                println!("  {}", f.message);
-                println!("  {}", f.snippet);
+                for f in &obligation.anchors {
+                    println!("  node {}: {}", f.node_id, f.message);
+                    println!("  {}", f.snippet);
+                }
             }
             Ok(())
         }

@@ -1,0 +1,13 @@
+{
+  "source": "sigmaProp(OUTPUTS(0).R4[Int].get == 7)",
+  "scenario": {
+    "outputs": [
+      {
+        "ergoTree": "10010101d17300",
+        "value": 1000000
+      }
+    ]
+  },
+  "expectedVerdict": "Error",
+  "reason": "A candidate output without the required register intentionally rejects."
+}

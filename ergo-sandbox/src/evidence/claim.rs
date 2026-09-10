@@ -39,7 +39,7 @@ pub struct ConfirmedViolation {
 }
 impl ConfirmedViolation {
     pub fn report(&self) -> Value {
-        json!({"status":"confirmed-violation","bundleFingerprint":self.fingerprint,"accounting":self.accounting,"propertyVersion":PROPERTY_VERSION,"scope":"node-accepted under supplied premises and violates the declared property; not a historical exploit or inclusion claim"})
+        json!({"status":"confirmed-violation","bundleFingerprint":self.fingerprint,"accounting":self.accounting,"impact":{"severity":null,"reason":"impact beyond the declared extraction accounting has not been assessed"},"propertyVersion":PROPERTY_VERSION,"scope":"node-accepted under supplied premises and violates the declared property; not a historical exploit or inclusion claim"})
     }
 }
 pub enum PropertyResult {
@@ -137,4 +137,62 @@ pub(crate) fn evaluate(
     } else {
         Ok(PropertyResult::Nonviolating(accounting))
     }
+}
+
+/// A review decision is a caller assertion, never execution evidence. A saved
+/// decision remains visible even after its dependencies invalidate it.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct ReviewDecision {
+    pub obligation_key: String,
+    pub premise_fingerprint: String,
+    pub reason: String,
+}
+
+/// Assemble the obligation queue and freshly replayed property results in
+/// separate fields. No stored claim/status is accepted as authority.
+pub fn obligation_report(
+    case: &super::EvidenceCase,
+    context: &crate::audit::ContextAudit,
+    decisions: &[ReviewDecision],
+    bundles: &[super::replay::ReplayBundle],
+) -> Result<Value, String> {
+    let bytes = case.target_bytes()?;
+    let tree = crate::inspect::parse_tree(&bytes).map_err(|e| e.to_string())?;
+    // Address rendering depends on the caller's display network, not semantics.
+    let recovery_matches = [false, true].into_iter().any(|testnet| {
+        crate::decompile::print(&crate::lift_tree(&tree, testnet).node)
+            == context.target_recovered_code
+    });
+    if !recovery_matches {
+        return Err("context audit does not match case target recovery".into());
+    }
+    let premises = json!({"case":case,"conditionalContext":context.premises,
+        "targetRecovery":context.target_recovered_code,"completeness":context.completeness,
+        "propertyBundles":bundles});
+    let fingerprint = super::case::json_digest(&json!({"reportVersion":1,"premises":premises,
+        "observations":context.findings,"obligations":context.obligations}));
+    let obligations = context.obligations.iter().map(|g| {
+        let discharges = &g.discharges;
+        let matching = decisions.iter().filter(|d| d.obligation_key == g.key).collect::<Vec<_>>();
+        let suppressed = matching.iter().any(|d| d.premise_fingerprint == fingerprint && !d.reason.trim().is_empty());
+        json!({"key":g.key,"category":g.category,"reviewPriority":g.review_priority,
+            "anchors":g.anchors,"status":if suppressed {"suppressed-under-premises"}
+                else if discharges.len() == g.anchors.len() {"conditionally-discharged"} else {"unresolved"},
+            "discharges":discharges,"premiseFingerprint":fingerprint})
+    }).collect::<Vec<_>>();
+    let decision_records = decisions
+        .iter()
+        .map(|d| {
+            json!({"decision":d,
+        "valid":d.premise_fingerprint == fingerprint && !d.reason.trim().is_empty()
+            && context.obligations.iter().any(|g|g.key == d.obligation_key)})
+        })
+        .collect::<Vec<_>>();
+    Ok(
+        json!({"formatVersion":1,"method":"obligation-report","premises":premises,
+        "premiseFingerprint":fingerprint,"obligations":obligations,"reviewDecisions":decision_records,
+        "propertyResults":bundles.iter().map(super::replay::replay).collect::<Vec<_>>(),
+        "completeness":context.completeness}),
+    )
 }

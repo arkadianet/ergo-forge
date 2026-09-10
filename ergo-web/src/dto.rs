@@ -22,6 +22,7 @@ pub struct FindingDto {
     /// Static review priority, not a demonstrated vulnerability severity.
     pub severity_meaning: &'static str,
     pub severity: &'static str,
+    pub review_priority: ergo_sandbox::audit::ReviewPriority,
     pub node_id: u64,
     pub message: String,
     pub snippet: String,
@@ -53,6 +54,7 @@ pub struct InspectResponse {
     pub raw_placeholders: usize,
     pub truncated: bool,
     pub findings: Vec<FindingDto>,
+    pub obligations: Vec<ergo_sandbox::audit::obligation::Obligation>,
 }
 
 impl FindingDto {
@@ -62,6 +64,7 @@ impl FindingDto {
             severity_meaning: "review-priority",
             lint: f.lint,
             triage: f.triage.clone(),
+            review_priority: f.severity,
             severity: match f.severity {
                 ergo_sandbox::Severity::High => "high",
                 ergo_sandbox::Severity::Medium => "medium",
@@ -330,6 +333,7 @@ pub struct CompileResponse {
     pub raw_placeholders: usize,
     pub truncated: bool,
     pub findings: Vec<FindingDto>,
+    pub obligations: Vec<ergo_sandbox::audit::obligation::Obligation>,
     pub params: Vec<ParamStatus>,
     /// True when the source was an EIP-5 `@contract def` template,
     /// instantiated with the given parameters.

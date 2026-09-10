@@ -1,0 +1,10 @@
+{
+  "source": "sigmaProp(INPUTS(0).value > SELF.value)",
+  "scenario": {},
+  "expectedVerdict": null,
+  "reason": "Conditional binding under explicitly supplied required co-execution only.",
+  "companionSource": "sigmaProp(INPUTS(0).tokens(0)._1 == fromBase16(\"1111111111111111111111111111111111111111111111111111111111111111\"))",
+  "singletonTokens": {
+    "1111111111111111111111111111111111111111111111111111111111111111": "Authored hypothetical singleton emission premise; not authenticated chain history"
+  }
+}

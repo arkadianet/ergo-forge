@@ -1,0 +1,7 @@
+{
+  "formatVersion": 1,
+  "kind": "authored-lifted-tree",
+  "source": "sigmaProp(getVar[Int](0).get > 0)",
+  "occurrences": 12,
+  "construction": "Conjoin twelve separately anchored copies of the lifted source predicate; no claimed IR mapping. Source compilation alone CSEs these reads."
+}

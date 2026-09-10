@@ -1,0 +1,8 @@
+{
+  "source": "sigmaProp(HEIGHT > 100)",
+  "scenario": {
+    "height": 200
+  },
+  "expectedVerdict": "Pass",
+  "reason": "The author intentionally permits release after height 100."
+}

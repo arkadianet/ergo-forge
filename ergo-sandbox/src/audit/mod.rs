@@ -12,10 +12,11 @@ pub use context::{
 };
 pub mod finding;
 pub mod lints;
+pub mod obligation;
 pub mod triage;
 pub mod visit;
 
-pub use finding::{snippet, Finding, Severity, SNIPPET_MAX};
+pub use finding::{snippet, Finding, ReviewPriority, Severity, SNIPPET_MAX};
 pub use visit::children;
 
 use crate::{Lifted, Node};
@@ -45,6 +46,7 @@ pub enum Completeness {
 /// The result of auditing one lifted tree.
 #[derive(Debug, Clone)]
 pub struct Audit {
+    pub obligations: Vec<obligation::Obligation>,
     /// Sorted most-severe first, then by node id — deterministic output.
     pub findings: Vec<Finding>,
     pub completeness: Completeness,
@@ -61,6 +63,7 @@ pub fn audit(lifted: &Lifted) -> Audit {
     }
     findings.sort_by_key(|f| (f.severity, f.node_id));
     Audit {
+        obligations: obligation::group(lifted, &findings),
         findings,
         completeness: if lifted.raw_placeholders == 0 && !lifted.truncated {
             Completeness::Complete

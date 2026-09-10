@@ -129,6 +129,7 @@ pub async fn compile_route(
         raw_placeholders,
         truncated,
         findings,
+        obligations: report.obligations,
         params: statuses,
         template,
         positioned,

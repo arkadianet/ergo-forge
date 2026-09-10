@@ -311,6 +311,7 @@ impl EvidenceCase {
             self,
             &[],
             StaticAnalysis {
+                obligations: audit.obligations,
                 source: crate::decompile::print(&lifted.node),
                 completeness: audit.completeness,
                 findings: audit.findings,
@@ -326,6 +327,7 @@ impl EvidenceCase {
 
 #[derive(Debug, Serialize)]
 pub struct StaticAnalysis {
+    pub obligations: Vec<crate::audit::obligation::Obligation>,
     pub source: String,
     pub completeness: crate::audit::Completeness,
     pub findings: Vec<crate::Finding>,

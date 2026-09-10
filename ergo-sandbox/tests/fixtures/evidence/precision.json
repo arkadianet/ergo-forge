@@ -1,0 +1,122 @@
+{
+  "formatVersion": 1,
+  "scope": "curated report precision; real-audit precision remains unknown",
+  "cases": [
+    {
+      "id": "malformed-optional-witness-rejection",
+      "family": "malformed-optional-witness-rejection",
+      "label": "benign",
+      "sourceKind": "authored",
+      "publicationEligibility": "public-authored-or-public-incident",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": null,
+      "path": "precision-vectors/malformed-optional-witness-rejection.fixture",
+      "sha256": "272ced799d77618b83d7f74a0d15854d09835e15cb0aa0f2f1f70c0895460fa6",
+      "reason": "An absent optional witness intentionally rejects this attempt.",
+      "expectedAcceptance": "synthetic-error",
+      "expectedClaimStatus": "no-property-claim"
+    },
+    {
+      "id": "missing-candidate-output-register-rejection",
+      "family": "missing-candidate-output-register-rejection",
+      "label": "benign",
+      "sourceKind": "authored",
+      "publicationEligibility": "public-authored-or-public-incident",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": null,
+      "path": "precision-vectors/missing-candidate-output-register-rejection.fixture",
+      "sha256": "83eba53db34a867785b02f1b402257fb6482740682101cdf80e095a89f0a498a",
+      "reason": "A candidate output without the required register intentionally rejects.",
+      "expectedAcceptance": "synthetic-error",
+      "expectedClaimStatus": "no-property-claim"
+    },
+    {
+      "id": "well-formed-self-register",
+      "family": "well-formed-self-register",
+      "label": "benign",
+      "sourceKind": "authored",
+      "publicationEligibility": "public-authored-or-public-incident",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": null,
+      "path": "precision-vectors/well-formed-self-register.fixture",
+      "sha256": "75d623599e09f3c3a07174eb9426abbb603af971aced1e6ec2291e9f26f8e1b8",
+      "reason": "The supplied SELF has the required register; lifecycle reachability is not proved.",
+      "expectedAcceptance": "synthetic-pass",
+      "expectedClaimStatus": "no-property-claim"
+    },
+    {
+      "id": "fixed-recipient-paid-output",
+      "family": "fixed-recipient-paid-output",
+      "label": "benign",
+      "sourceKind": "authored",
+      "publicationEligibility": "public-authored-or-public-incident",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": "recognized-attacker-receipts-v1",
+      "path": "claim-vectors/sale-fixed-paid.fixture",
+      "sha256": "268ed7c3d1e80caea9c60672fb3c6ea441fd6d6567de1b25cd99722e6f37d0d8",
+      "reason": "The P05 fixed sale paid control is accepted and nonviolating.",
+      "expectedAcceptance": "node-accepted",
+      "expectedClaimStatus": "accepted-nonviolating"
+    },
+    {
+      "id": "required-companion-identity-binding",
+      "family": "required-companion-identity-binding",
+      "label": "benign",
+      "sourceKind": "authored",
+      "publicationEligibility": "public-authored-or-public-incident",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": null,
+      "path": "precision-vectors/required-companion-identity-binding.fixture",
+      "sha256": "8b1bf62b70f4adc8917b6bdca1106f7426d850ebfb982a8e3297072db413ab2e",
+      "reason": "Conditional binding under explicitly supplied required co-execution only.",
+      "expectedAcceptance": "conditional-only",
+      "expectedClaimStatus": "no-property-claim"
+    },
+    {
+      "id": "intended-permissionless-height-release",
+      "family": "intended-permissionless-height-release",
+      "label": "benign",
+      "sourceKind": "authored",
+      "publicationEligibility": "public-authored-or-public-incident",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": null,
+      "path": "precision-vectors/intended-permissionless-height-release.fixture",
+      "sha256": "eaf436a35973b13c46415687559d9f99e0dc5553e91117c1a9f99ac8b70360ad",
+      "reason": "The author intentionally permits release after height 100.",
+      "expectedAcceptance": "synthetic-pass",
+      "expectedClaimStatus": "no-property-claim"
+    },
+    {
+      "id": "use-incident",
+      "family": "public-use-incident",
+      "label": "positive",
+      "sourceKind": "source-recorded-inputs",
+      "publicationEligibility": "public-authored-or-public-incident",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": "recognized-attacker-receipts-v1",
+      "path": "claim-vectors/use-incident.fixture",
+      "sha256": "838815a0165e9816e3da0461bfcd3d17898ac2f891886a1f3f0729bca2d51c5c",
+      "reason": "Retained P05 claim, freshly replayed.",
+      "expectedAcceptance": "node-accepted",
+      "expectedClaimStatus": "confirmed-violation"
+    },
+    {
+      "id": "sale-mutant-unpaid",
+      "family": "authored-fixed-rate-sale",
+      "label": "positive",
+      "sourceKind": "hypothetical-or-mixed-inputs",
+      "publicationEligibility": "public-authored-or-public-incident",
+      "nodeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+      "propertyVersion": "recognized-attacker-receipts-v1",
+      "path": "claim-vectors/sale-mutant-unpaid.fixture",
+      "sha256": "2bd640988148dfadc3b59810d56b937f49be8a491ce47d1f945dd85f835e21dc",
+      "reason": "Retained P05 claim, freshly replayed.",
+      "expectedAcceptance": "node-accepted",
+      "expectedClaimStatus": "confirmed-violation"
+    }
+  ],
+  "duplicateFixture": {
+    "path": "precision-vectors/duplicate-observations.fixture",
+    "sha256": "643bdd20fc73547075a0a6076bf301e114e5c03c6ab15ad1ac82d4a9164ecde8"
+  }
+}

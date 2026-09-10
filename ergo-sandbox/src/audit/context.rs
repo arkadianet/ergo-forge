@@ -46,6 +46,7 @@ pub struct ContractSet<'a> {
 /// A required identity check, attributed to the companion that enforces it.
 #[derive(Debug, Clone, Serialize)]
 pub struct DischargeEvidence {
+    pub reason: &'static str,
     pub companion: String,
     pub companion_execution: Execution,
     pub singleton_evidence: Option<String>,
@@ -76,6 +77,10 @@ pub struct ContextFinding {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct ContextAudit {
+    pub target_recovered_code: String,
+    pub obligations: Vec<super::obligation::Obligation>,
+    /// Entire supplied co-execution premise, including unresolved exact identity.
+    pub premises: serde_json::Value,
     #[serde(flatten)]
     pub claim: crate::claim::ClaimMetadata,
     pub findings: Vec<ContextFinding>,
@@ -124,7 +129,7 @@ pub fn audit_with_contracts(lifted: &Lifted, set: &ContractSet<'_>) -> ContextAu
         .collect();
     let mut vals = Vals::new();
     collect_vals(&lifted.node, &mut vals);
-    let findings = local
+    let findings: Vec<ContextFinding> = local
         .findings
         .into_iter()
         .map(|finding| {
@@ -146,6 +151,7 @@ pub fn audit_with_contracts(lifted: &Lifted, set: &ContractSet<'_>) -> ContextAu
                                         .is_some_and(|e| !e.is_empty()))
                         }) {
                             status = FindingStatus::Discharged(DischargeEvidence {
+                                reason: "required companion binds this literal slot under supplied co-execution",
                                 companion: companion.name.into(),
                                 companion_execution: companion.execution,
                                 singleton_evidence: set
@@ -171,7 +177,44 @@ pub fn audit_with_contracts(lifted: &Lifted, set: &ContractSet<'_>) -> ContextAu
             ContextFinding { finding, status }
         })
         .collect();
+    let mut obligations = local.obligations;
+    for obligation in &mut obligations {
+        for anchor in &obligation.anchors {
+            if let Some(ContextFinding {
+                status: FindingStatus::Discharged(evidence),
+                ..
+            }) = findings
+                .iter()
+                .find(|f| f.finding.node_id == anchor.node_id && f.finding.lint == anchor.lint)
+            {
+                obligation
+                    .discharges
+                    .push(super::obligation::AnchorDischarge {
+                        node_id: anchor.node_id,
+                        evidence: evidence.clone(),
+                    });
+            }
+        }
+        if obligation.discharges.len() == obligation.anchors.len() {
+            obligation.status = "conditionally-discharged";
+        }
+    }
+    let mut premise_inputs: Vec<_> = set.inputs.iter().collect();
+    premise_inputs.sort_by_key(|c| (c.execution, c.name));
     ContextAudit {
+        target_recovered_code: crate::decompile::print(&lifted.node),
+        obligations,
+        premises: serde_json::json!({
+            "complete": set.complete,
+            "scope": "conditional on caller-supplied required co-execution; not global safety",
+            "exactDeploymentIdentity": "unknown; lifted code is not exact deployment evidence",
+            "contracts": premise_inputs.iter().map(|c| serde_json::json!({
+                "name": c.name, "execution": c.execution,
+                "recoveredCode": crate::decompile::print(&c.lifted.node),
+                "rawPlaceholders": c.lifted.raw_placeholders, "truncated": c.lifted.truncated,
+            })).collect::<Vec<_>>(),
+            "singletonTokens": set.singleton_tokens,
+        }),
         claim: crate::claim::ClaimMetadata::STATIC,
         findings,
         completeness: local.completeness,

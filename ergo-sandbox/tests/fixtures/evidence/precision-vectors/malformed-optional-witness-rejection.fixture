@@ -1,0 +1,6 @@
+{
+  "source": "sigmaProp(getVar[Int](0).get == 7)",
+  "scenario": {},
+  "expectedVerdict": "Error",
+  "reason": "An absent optional witness intentionally rejects this attempt."
+}

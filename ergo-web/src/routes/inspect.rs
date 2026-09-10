@@ -64,6 +64,7 @@ pub async fn inspect(
         completeness,
         raw_placeholders,
         truncated,
+        obligations: report.obligations.clone(),
         findings: report
             .findings
             .iter()
