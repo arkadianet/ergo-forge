@@ -318,7 +318,7 @@ fn fixture_constructs_execute_and_unsupported_members_remain() {
     diagnostic("expected.json");
 }
 
-// D00/D01/D02/D03 explicitly governed additions are authenticated BEFORE projection.
+// D00/D01/D02 explicitly governed additions are authenticated BEFORE projection.
 // Never regenerate the original M00 manifest or anchor from today's policy.
 fn authenticate_policy(policy: &Value, anchor: &str) -> Result<(), String> {
     let original_bytes = include_bytes!("../../docs/discovery/original-policy.json");
@@ -350,7 +350,7 @@ fn authenticate_policy(policy: &Value, anchor: &str) -> Result<(), String> {
         "guards_missing_fields_and_overflow_preserve_unknowns","bounded_response_requires_a_complete_accepted_linked_trace",
         "property_evaluation_requires_fresh_node_acceptance"],"implemented":true
     }));
-    allowed["units"].as_array_mut().unwrap().push(json!({"id": "D03", "depends": ["D02"], "days": 3, "package": "ergo-sandbox", "target": "property_replay", "tests": ["all_registered_property_dispositions_match", "property_replay_rejects_tampered_claims_and_premises", "legacy_replay_bytes_and_semantics_remain_unchanged", "registered_author_cases_show_usefulness_beyond_extraction"], "implemented": false}));
+    allowed["units"].as_array_mut().unwrap().push(json!({"id": "D03", "depends": ["D02"], "days": 3, "package": "ergo-sandbox", "target": "property_replay", "tests": ["all_registered_property_dispositions_match", "property_replay_rejects_tampered_claims_and_premises", "legacy_replay_bytes_and_semantics_remain_unchanged", "registered_author_cases_show_usefulness_beyond_extraction"], "implemented": true}));
     allowed["completedThrough"] = json!("D02");
     allowed["resolvedStopRecords"]
         .as_array_mut()
@@ -390,7 +390,7 @@ fn protected_policy_rejects_unauthorized_additions_and_mutations() {
     let p: Value = serde_json::from_str(block).unwrap();
     let anchor = "41729240759244bd3edc833e31359bfe50d8430f0b5a2e27ebc727706363cd10";
     authenticate_policy(&p, anchor).unwrap();
-    // Exact stopped D03 registration: neither its flag nor completion may advance.
+    // D03 has executable gates but no utility pass: completion stays D02.
     let reject = |bad: Value| assert!(authenticate_policy(&bad, anchor).is_err());
     // Type-preserving mutations reach valid-looking numeric thresholds, flags,
     // IDs, dependencies, exact test names and resolution hashes, recursively.
@@ -500,15 +500,6 @@ fn protected_policy_rejects_unauthorized_additions_and_mutations() {
         .unwrap()["implemented"] = json!(false);
     rollback["completedThrough"] = json!("D00");
     reject(rollback);
-    let mut rollback = p.clone();
-    rollback["units"]
-        .as_array_mut()
-        .unwrap()
-        .iter_mut()
-        .find(|u| u["id"] == "D02")
-        .unwrap()["implemented"] = json!(false);
-    rollback["completedThrough"] = json!("D01");
-    reject(rollback);
     // Keep the exact D01-shaped append rejections, and add D02-shaped probes.
     for source in ["D01", "D02", "D03"] {
         for id in ["D02", "D03", "D04"] {
@@ -527,5 +518,5 @@ fn protected_policy_rejects_unauthorized_additions_and_mutations() {
         }
     }
     assert!(authenticate_policy(&p, &"0".repeat(64)).is_err());
-    println!("original P/M registrations, P05 resolution, exact D00/D01/D02/D03 additions, every protected field: tampering rejected by the real authentication function");
+    println!("original P/M registrations, P05 resolution, exact D00/D01/D02 additions, every protected field: tampering rejected by the real authentication function");
 }

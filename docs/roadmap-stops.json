@@ -110,5 +110,55 @@
       "governingDecision": "docs/discovery/D00-DECISION.md",
       "scope": "Reopen the unchanged D00 inventory gate only; preserve both historical blockers and all evidence. Completion requires fresh passing gates."
     }
+  },
+  {
+    "unitOrProposal": "D03",
+    "reasonCode": "coverage-gate",
+    "attemptCommit": "a996b4eacd9767b067d22a0eab82cbd0e529c9a3",
+    "daysSpent": 1,
+    "gateResults": [
+      {
+        "command": [
+          "python3",
+          "scripts/roadmap_gate.py",
+          "--require",
+          "D03",
+          "--report",
+          "docs/discovery/D03-command-report.json"
+        ],
+        "exitCode": 1,
+        "evidenceHashes": {
+          "docs/discovery/D03-results.json": "94c17a9d8859a25136db3dd9f56afb9e9d29cd95728e5dbd6920449b2dd270d1",
+          "docs/discovery/D03-results-raw.fixture": "9cfce540ff284d7458c889564b7171c6ce45bfb4279c2b414f38358465f98c04",
+          "docs/discovery/D03-command-report.json": "15761d5bd942ed2d3ce039d90d320d60389173d7570f852ad99d7a5618cbf3c7",
+          "docs/discovery/d03-verification/first-require.log": "527e075bedc380f6cd63fb725c2d1535f0bdacfc64fc82302fc320a7c13130ba",
+          "docs/discovery/d03-verification/attempt.json": "8ee341583470a0ec372c55377b189b97b1147c5085c24e9fc8205875ab2fd242",
+          "docs/discovery/d03-verification/property-replay.log": "f6d6be476c7a33ac69a6825fbe3019ae781f47ac4bb89706e746a7001fe71ddf",
+          "docs/discovery/d03-attempt/property_replay.rs": "08694e16bf0dadfb175b15605ba5a306c99cf2d72d735c02eb1b1c9e9888f53e",
+          "docs/discovery/d03-attempt/roadmap.fixture": "a885fbdb00871588c9beae6f4f55f183c39002b98936e4c33d71022681ebc98e",
+          "docs/discovery/d03-attempt/mapping_inventory.rs": "a49e88a57291d013d329a679b2c4ee8e9d0026cb3183ff1b1245b011c9250e56"
+        }
+      },
+      {
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "ergo-sandbox",
+          "--release",
+          "--test",
+          "property_replay",
+          "--",
+          "--show-output"
+        ],
+        "exitCode": 101,
+        "evidenceHashes": {
+          "docs/discovery/d03-verification/property-replay.log": "f6d6be476c7a33ac69a6825fbe3019ae781f47ac4bb89706e746a7001fe71ddf"
+        }
+      }
+    ],
+    "retainedCapability": "P00-P08, M00-M04 and D00-D02 unchanged; M05 remains stopped. Opt-in author-property:v1 supplied replay with fresh D02 node/linkage checking and output-only refutations is retained as a separately tested correctness prefix. The strict failed D03 target is archived, not weakened or ignored. completedThrough stays D02; D03 false. D04 is not registered or attempted. One working day touched, not ceiling exhaustion; replay wall times are not person-hours. CARGO_TARGET_DIR=./target-p00. Work uncommitted.",
+    "unsupportedClass": "Author usefulness beyond extraction: the frozen D00 transfer registration has null denominator, no grounded reference pairs, and no independent reviewer. 24/24 synthetic disposition agreement, eight refutations, eight controls and 16/16 supported true guards cannot substitute. Every original row remains in D03-results.json with first evidenced blockers and separate unadjudicated model/contract attribution. A refuted bad assertion is not a demonstrated contract defect. Supplied traces remain assumed-root, never globally reachable or unreachable.",
+    "reopenEvidenceRequired": "D04 must separately audit the preserved first required-command report and raw measurement and judge cancellation under the unchanged design; it is not authorized here. Reopening utility needs a separately authorized versioned registration with independent meaning review and defensible beyond-extraction violating/control transfer pairs, retaining the current null denominator and failure unchanged. No second cohort, lifecycle, solver, larger DSL, altered threshold or automatic continuation is authorized."
   }
 ]

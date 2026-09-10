@@ -4,3 +4,5 @@ pub mod schema;
 
 pub mod evaluate;
 pub mod trace;
+
+pub mod replay;

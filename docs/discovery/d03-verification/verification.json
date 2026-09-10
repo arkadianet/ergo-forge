@@ -1,0 +1,109 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 0.35573291778564453,
+    "log": "docs/discovery/d03-verification/fmt.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 5.308079242706299,
+    "log": "docs/discovery/d03-verification/clippy.log",
+    "sha256": "e862a44d0e97b225d30e77d4a9978f27950fc0a511f39a234ad590ba89d9433e"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "ergo-sandbox",
+      "--release",
+      "--test",
+      "property_replay_boundary",
+      "--",
+      "--show-output"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 2.0429210662841797,
+    "log": "docs/discovery/d03-verification/boundary.log",
+    "sha256": "134f571803350389dd3eab212f5deb70064b564f29dffd0cd60fb41d03cc42dd"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--workspace",
+      "--release"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 245.32901787757874,
+    "log": "docs/discovery/d03-verification/workspace.log",
+    "sha256": "0be72280f9393e7c34273b05e237350dcc52793f6fa5c6abbf63c8675b1b5800"
+  },
+  {
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "scripts",
+      "-p",
+      "test_roadmap_gate.py"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 0.12489867210388184,
+    "log": "docs/discovery/d03-verification/python.log",
+    "sha256": "1b7fe9aadd785ccaeb737ce5f92fc2ab9ff7e39419659fbfed617ea3a8696de8"
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/roadmap_gate.py",
+      "--require",
+      "D03"
+    ],
+    "exitCode": 1,
+    "elapsedSeconds": 129.22332215309143,
+    "log": "docs/discovery/d03-verification/require.log",
+    "sha256": "645b9fc4c87f919e17100273c5a10300fb1a1de3b049db1ae606f0a9c4746435"
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/roadmap_gate.py",
+      "--through-completed"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 119.97233963012695,
+    "log": "docs/discovery/d03-verification/through-completed.log",
+    "sha256": "a249232c9f8e8f23641269f38ffd69bd811fc456fc2f95963bd456d56489f93c"
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/roadmap_gate.py",
+      "--ci"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 99.18127870559692,
+    "log": "docs/discovery/d03-verification/ci.log",
+    "sha256": "5afe2dd912fbbbd5e000c7b577f620ebefa5f0111e7550b1c9a1b6e44489d2fc"
+  }
+]

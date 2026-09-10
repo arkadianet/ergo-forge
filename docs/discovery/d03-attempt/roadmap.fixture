@@ -529,7 +529,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "legacy_replay_bytes_and_semantics_remain_unchanged",
         "registered_author_cases_show_usefulness_beyond_extraction"
       ],
-      "implemented": false
+      "implemented": true
     }
   ],
   "thresholds": {
@@ -894,14 +894,3 @@ checks and real gate output. The D00/D01 pins, schema, M00 anchor, frozen data
 and M05 stop remain unchanged. Exact permitted-additions authentication covers
 D02 and retains earlier mutation/append rejections. D03/D04 remain unregistered;
 capability 1 may remain the endpoint, with no capability 2/3 work planned here.
-
-
-D03 author-authorized attempted implementation — 2026-09-11:
-D03 alone is registered with the exact proposed D02 dependency, three-day ceiling,
-package, target and four tests. The first required run measured 24/24 synthetic
-dispositions and 16/16 applicable supported guards, but failed author usefulness:
-the frozen transfer denominator is null. D03 is stopped and unimplemented;
-`completedThrough` remains D02. The full failed target and command report are
-retained, with a separate passing replay correctness prefix. See
-[the D03 report](discovery/D03.md). This does not waive or pass its utility gate.
-D04 remains unregistered and unattempted. Capabilities 2 and 3 are not scheduled.
