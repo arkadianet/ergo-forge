@@ -277,3 +277,32 @@ fn mixed_batch_keeps_read_errors_and_cli_overrides_work() {
     }
     std::fs::remove_dir_all(dir).unwrap();
 }
+
+#[cfg(unix)]
+#[test]
+fn non_utf8_source_path_preserves_the_row_and_serializes() {
+    use std::ffi::OsString;
+    use std::os::unix::ffi::OsStringExt;
+
+    let dir = std::env::temp_dir().join(format!("ergo-ingest-non-utf8-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let name = OsString::from_vec(b"source-\xff.ergo".to_vec());
+    std::fs::write(dir.join(&name), "sigmaProp(HEIGHT > 1)").unwrap();
+    let report = ingest_directory(&dir, &IngestOptions::default()).unwrap();
+    assert_eq!((report.compiled, report.not_compiled), (1, 0));
+    assert_eq!(report.contracts[0].path.as_os_str(), name);
+    let value = serde_json::to_value(&report).unwrap();
+    let contract = &value["contracts"][0];
+    let expected = name.to_string_lossy();
+    assert_eq!(contract["path"], expected.as_ref());
+    let premises = &contract["evidence_case"]["premises"];
+    assert_eq!(
+        premises["source"]["value"]["record"]["locator"],
+        expected.as_ref()
+    );
+    assert_eq!(
+        premises["assumptions"]["sourcePath"]["value"],
+        expected.as_ref()
+    );
+    std::fs::remove_dir_all(dir).unwrap();
+}

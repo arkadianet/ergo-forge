@@ -23,7 +23,7 @@ Baseline: main `ee4ac6a874531872c27828d94e21e4fe7a1d7f7c`, inspected 2026-09-09.
 
 **ergo-forge is an ErgoScript workbench for building contracts and inspecting deployed code through reproducible experiments on the Rust Ergo node's pinned compiler and execution engine.** Its authoring and audit views share contracts, scenarios, and evidence; every result states whether it is a static observation, a synthetic experiment, or a transaction checked against an explicitly supplied state. It helps people check specific contract claims and investigate counterexamples. It is not a general security certification service, an autonomous vulnerability scanner, a wallet, or a protocol-design generator. New work must improve the fidelity, reproducibility, or interpretation of those experiments; more recipes, detectors, graph features, and search breadth do not qualify by themselves.
 
-P03 now provides node-accepted execution against supplied premises through the library API. Node-validated property claims still have zero producers until P05; transaction acceptance alone is not a property claim.
+P03 now provides node-accepted execution against supplied premises through the library API. P05 replay now produces node-validated property claims from accepted bundles, and P06 promotes search candidates through that path. Claims remain conditional on supplied premises and supported property semantics; transaction acceptance alone is not a property claim.
 
 ## 2. Freeze / finish / rework / demote ledger
 
@@ -135,7 +135,7 @@ The queue is **P00 → P01 → P02 → P03 → P04 → P05 → P06 → P07 → P
 
 ### P05 — Create property claims and an offline replay command
 
-**Change:** add `ergo-es replay <case.json> --json`, which validates a canonical case, evaluates the existing versioned extraction property, and emits a claim bound to the complete evidence bundle.
+**Change:** add `ergo-es replay <bundle.json> --json`, which validates a canonical execution bundle, evaluates the existing versioned extraction property, and emits a claim bound to the complete evidence bundle.
 
 **Touch:** new `evidence/{claim,replay}.rs`, extract the existing accounting into `drain/accounting.rs` without semantic expansion, [drain.rs:2267](../ergo-sandbox/src/drain.rs#L2267), [bin/ergo-es.rs:21](../ergo-sandbox/src/bin/ergo-es.rs#L21), `tests/claim_replay.rs`, and the public/owned evidence fixture manifest.
 

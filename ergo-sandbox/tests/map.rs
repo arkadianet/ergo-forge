@@ -517,6 +517,12 @@ fn unknown_is_emitted_not_defaulted() {
         "the neighbourhood contains boxes the rules do not settle"
     );
     let doc = json::canonical(&m);
+    assert_eq!(doc["method"], "protocol-map");
+    assert_eq!(doc["nodeValidated"], false);
+    assert!(doc["provenance"]
+        .as_str()
+        .unwrap()
+        .contains("recorded fixture"));
     let roles: BTreeSet<&str> = doc["nodes"]
         .as_array()
         .unwrap()

@@ -316,7 +316,7 @@ def main(argv=None):
             states[unit['id']] = status
             report['results'].append(dict(unit=unit['id'], status=status, detail=detail))
             print(f"{unit['id']}: {status}: {detail}", flush=True)
-    except (GateError, KeyError, TypeError, ValueError, IndexError) as e:
+    except (GateError, KeyError, TypeError, ValueError, IndexError, AttributeError, ArithmeticError) as e:
         report['results'].append(dict(unit='policy/evidence', status=e.status if isinstance(e, GateError) else 'missing-gate', detail=str(e)))
     report['passed'] = bool(report['results']) and all(r['status'] == 'passed' for r in report['results'])
     output = args.report or ROOT / 'target-p00/roadmap-gates' / ((args.require or ('all-goals' if args.all_goals else 'scoreboard' if args.scoreboard_only else 'through-completed')) + '.json')

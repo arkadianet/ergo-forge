@@ -28,7 +28,7 @@ pub const FORMAT_VERSION: u32 = 1;
 pub fn canonical(m: &ProtocolMap) -> Value {
     let mut root = Map::new();
     root.extend(
-        serde_json::to_value(crate::claim::ClaimMetadata::STATIC)
+        serde_json::to_value(crate::claim::ClaimMetadata::MAP)
             .expect("static labels serialize")
             .as_object()
             .expect("labels are an object")

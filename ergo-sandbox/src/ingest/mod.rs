@@ -79,6 +79,7 @@ pub struct ContractReport {
     pub claim: crate::claim::ClaimMetadata,
     /// Provenance accompanies success and failure reports, including missing inputs.
     pub evidence_case: EvidenceCase,
+    #[serde(serialize_with = "serialize_source_path")]
     pub path: PathBuf,
     pub status: Status,
     /// Full error, including compiler position and source line when available.
@@ -89,6 +90,14 @@ pub struct ContractReport {
     pub actual_tree_version: Option<u8>,
     pub raw_lift_nodes: Option<usize>,
     pub lift_truncated: Option<bool>,
+}
+
+// Match the textual locator and sourcePath premise for non-UTF-8 filesystem paths.
+fn serialize_source_path<S: serde::Serializer>(
+    path: &Path,
+    serializer: S,
+) -> Result<S::Ok, S::Error> {
+    serializer.serialize_str(&path.to_string_lossy())
 }
 
 /// Synthetic artifacts deliberately omit deployment addresses.
@@ -370,7 +379,7 @@ pub fn ingest_directory(root: &Path, options: &IngestOptions) -> Result<BatchRep
         }
         premises.assumptions.insert(
             "sourcePath".into(),
-            Premise::supplied(serde_json::json!(report.path)),
+            Premise::supplied(serde_json::json!(report.path.to_string_lossy())),
         );
         report.evidence_case = EvidenceCase::new(premises).expect("ingestion case remains valid");
         contracts.push(report);

@@ -48,6 +48,17 @@ jobs:
         with:
           workspaces: ergo-forge
 
+      # Workspace Rust tests invoke Node DOM tests; install before verification.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: ergo-forge/ui/package-lock.json
+
+      - name: Install DOM test dependency
+        working-directory: ergo-forge
+        run: npm ci --prefix ui
+
       - name: fmt
         working-directory: ergo-forge
         run: cargo fmt --all -- --check
@@ -67,16 +78,6 @@ jobs:
       - name: test (cost-trace)
         working-directory: ergo-forge
         run: cargo test -p ergo-sandbox --features cost-trace
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: ergo-forge/ui/package-lock.json
-
-      - name: Install DOM test dependency
-        working-directory: ergo-forge
-        run: npm ci --prefix ui
 
       - name: Governing roadmap completed prefix
         working-directory: ergo-forge

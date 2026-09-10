@@ -1,4 +1,5 @@
 import copy
+import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -88,9 +89,36 @@ class RoadmapGateTests(unittest.TestCase):
             self.assert_status('failed', lambda: gate.scoreboard(self.policy))
 
     def test_future_units_fail_as_unimplemented_not_missing_gate(self):
-        for unit in self.policy['units']:
-            if not unit['implemented']:
-                self.assert_status('unimplemented', lambda: gate.run_unit(unit, []))
+        for unit in copy.deepcopy(self.policy['units']):
+            unit['implemented'] = False
+            with self.subTest(unit=unit['id']), patch.object(gate, 'command') as command:
+                self.assert_status('unimplemented', lambda unit=unit: gate.run_unit(unit, []))
+                command.assert_not_called()
+
+    def test_malformed_inputs_still_write_a_failing_report(self):
+        real_load = gate.load_json
+        malformed_policy = copy.deepcopy(self.policy)
+        malformed_policy['thresholds'] = []
+        malformed_doc = (gate.MARKER + '\n```json\n' + json.dumps(malformed_policy)
+                         + '\n```\n<!-- /roadmap-policy:v1 -->')
+        stop_path = gate.ROOT / self.policy['stopRecords']
+        for failure in ['policy', 'stop-record', 'arithmetic']:
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as tmp:
+                output = Path(tmp) / 'nested/report.json'
+                with patch.object(gate, 'load_policy', side_effect=(
+                    lambda: gate.policy_from(malformed_doc)
+                ) if failure == 'policy' else lambda: self.policy), patch.object(
+                    gate, 'scoreboard', side_effect=ZeroDivisionError('division by zero')
+                    if failure == 'arithmetic' else lambda policy: {}
+                ), patch.object(gate, 'load_json', side_effect=lambda path: (
+                    [None] if path == stop_path else real_load(path)
+                )):
+                    self.assertEqual(gate.main(['--scoreboard-only', '--report', str(output)]), 1)
+                report = json.loads(output.read_text())
+                self.assertFalse(report['passed'])
+                self.assertEqual(report['results'][-1]['unit'], 'policy/evidence')
+                self.assertEqual(report['results'][-1]['status'], 'missing-gate')
+                self.assertTrue(report['results'][-1]['detail'])
 
     def test_dependencies_are_in_policy_order(self):
         for unit in self.policy['units']:

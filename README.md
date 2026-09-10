@@ -306,7 +306,10 @@ small thread stacks.
 
 Use the exact pinned compiler/reducer; no second acceptance engine. A property
 claim requires full pinned node validation **and** a versioned violated property;
-today there are zero such producers. Premises must survive export before any
+P05 replay produces claims from accepted bundles and P06 promotes search
+candidates through that same path. These claims remain conditional on supplied
+state and supported property semantics; transaction acceptance alone is not a
+property claim. Premises must survive export before any
 promotion; unsupported semantics fail closed for promotion. A miss never means
 safe, truncation stays visible, and third-party audit material stays private.
 

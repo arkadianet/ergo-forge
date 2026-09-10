@@ -58,4 +58,5 @@ introduced.
 The [wire fixtures](../ergo-sandbox/tests/fixtures/evidence/README.md) pin two full
 boxes, one transaction's full/signing bytes and ID, and its resulting output box.
 These are authored codec vectors with a dummy proof, **not accepted transaction
-bundles**. P03's validator gate remains unimplemented.
+bundles**. The implemented [P03 validator](node-validation.md) is a separate
+validation step; these P02 codec fixtures do not establish transaction acceptance.

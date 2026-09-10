@@ -22,6 +22,10 @@ impl ClaimMetadata {
         "static-analysis",
         "supplied-code; deployment identity not established",
     );
+    pub const MAP: Self = Self::legacy(
+        "protocol-map",
+        "boxes from a configured chain source or recorded fixture; relationships inferred statically; chain membership not independently verified",
+    );
     pub const SIMULATION: Self = Self::legacy(
         "scenario-simulation",
         "caller-supplied/default context and box material; proofs use a supplied/default message",

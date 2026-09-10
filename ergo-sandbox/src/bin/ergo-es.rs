@@ -61,7 +61,7 @@ fn usage() {
         "ergo-es — ErgoScript workbench CLI
 
 USAGE:
-  ergo-es replay <case.json> [--json]
+  ergo-es replay <bundle.json> [--json]
       Offline full-node validation and declared-property replay; broadcasts nothing.
   ergo-es tree <address|boxId|treeHex> [--json] [--network mainnet|testnet]
                [--source fixture.json | --explorer URL]
@@ -108,7 +108,7 @@ USAGE:
       (default mainnet); -v prints every failure reason. Corpora paths
       resolve against the ergo node checkout (sibling of this repo).
   ergo-es audit <hex | --seed | --mainnet | --trees file.json>
-      Static lints over the lifted tree. Single trees print findings;
+      Static lints over the lifted tree. Single trees print review obligations;
       corpora print a summary tally.
   ergo-es hunt <hex | --mainnet [N] | --trees file.json> [--height H] [--self-box file.json]
                [--data-inputs file.json]
@@ -1677,7 +1677,7 @@ fn cmd_triage(args: &[String]) -> Result<(), String> {
 
 fn cmd_replay(args: &[String]) -> Result<(), String> {
     if args.is_empty() || args.len() > 2 || (args.len() == 2 && args[1] != "--json") {
-        return Err("usage: ergo-es replay <case.json> [--json]".into());
+        return Err("usage: ergo-es replay <bundle.json> [--json]".into());
     }
     let bytes = std::fs::read(&args[0]).map_err(|e| e.to_string())?;
     let bundle: ergo_sandbox::evidence::replay::ReplayBundle =

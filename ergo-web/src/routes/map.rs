@@ -186,7 +186,7 @@ pub async fn map_route(
                 e => ApiError::Upstream(e.to_string()),
             })?;
             Ok(Json(MapResponse {
-                claim: ergo_sandbox::claim::ClaimMetadata::STATIC,
+                claim: ergo_sandbox::claim::ClaimMetadata::MAP,
                 seed: SeedDto {
                     kind: req.kind,
                     input,
