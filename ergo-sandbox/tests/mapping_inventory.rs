@@ -318,7 +318,7 @@ fn fixture_constructs_execute_and_unsupported_members_remain() {
     diagnostic("expected.json");
 }
 
-// D00's explicitly governed extension authenticates additions BEFORE projection.
+// D00/D01 explicitly governed additions are authenticated BEFORE projection.
 // Never regenerate the original M00 manifest or anchor from today's policy.
 fn authenticate_policy(policy: &Value, anchor: &str) -> Result<(), String> {
     let original_bytes = include_bytes!("../../docs/discovery/original-policy.json");
@@ -344,9 +344,15 @@ fn authenticate_policy(policy: &Value, anchor: &str) -> Result<(), String> {
         "id":"D00","depends":["M04"],"days":2,"package":"ergo-sandbox",
         "target":"property_inventory","tests":["property_inventory_pins_24_cases_and_independent_answers",
         "reference_executions_and_legacy_results_are_reproduced","transfer_registration_and_exposure_are_accounted"],
+        "implemented":true
+    }));
+    allowed["units"].as_array_mut().unwrap().push(json!({
+        "id":"D01","depends":["D00"],"days":2,"package":"ergo-sandbox",
+        "target":"property_schema","tests":["property_versions_units_and_limits_fail_closed",
+        "bindings_never_infer_missing_roles_or_authority","declaration_identity_binds_all_semantic_premises"],
         "implemented":implemented
     }));
-    allowed["completedThrough"] = json!(if implemented { "D00" } else { "M04" });
+    allowed["completedThrough"] = json!(if implemented { "D01" } else { "D00" });
     allowed["resolvedStopRecords"]
         .as_array_mut()
         .unwrap()
@@ -390,7 +396,7 @@ fn protected_policy_rejects_unauthorized_additions_and_mutations() {
         let mut valid = p.clone();
         valid["units"].as_array_mut().unwrap().last_mut().unwrap()["implemented"] =
             json!(implemented);
-        valid["completedThrough"] = json!(if implemented { "D00" } else { "M04" });
+        valid["completedThrough"] = json!(if implemented { "D01" } else { "D00" });
         authenticate_policy(&valid, anchor).unwrap();
     }
     let reject = |bad: Value| assert!(authenticate_policy(&bad, anchor).is_err());
@@ -471,7 +477,7 @@ fn protected_policy_rejects_unauthorized_additions_and_mutations() {
     }
     let mut bad = p.clone();
     let mut d01 = p["units"].as_array().unwrap().last().unwrap().clone();
-    d01["id"] = json!("D01");
+    d01["id"] = json!("D02");
     bad["units"].as_array_mut().unwrap().push(d01);
     reject(bad);
     let mut bad = p.clone();
@@ -480,6 +486,21 @@ fn protected_policy_rejects_unauthorized_additions_and_mutations() {
         .unwrap()
         .push(json!({"unit":"M05"}));
     reject(bad);
+    // Even a coherent rollback of the previously permitted D00 scheduling
+    // pair is now a protected-field mutation, not another allowed addition.
+    let mut rollback = p.clone();
+    let units = rollback["units"].as_array_mut().unwrap();
+    units.iter_mut().find(|u| u["id"] == "D00").unwrap()["implemented"] = json!(false);
+    rollback["completedThrough"] = json!("M04");
+    reject(rollback);
+    for id in ["D02", "D03", "D04"] {
+        let mut bad = p.clone();
+        let mut unit = bad["units"].as_array().unwrap().last().unwrap().clone();
+        unit["id"] = json!(id);
+        unit["implemented"] = json!(false);
+        bad["units"].as_array_mut().unwrap().push(unit);
+        reject(bad);
+    }
     assert!(authenticate_policy(&p, &"0".repeat(64)).is_err());
-    println!("original P/M registrations, P05 resolution, exact D00 additions, every protected field: tampering rejected by the real authentication function");
+    println!("original P/M registrations, P05 resolution, exact D00/D01 additions, every protected field: tampering rejected by the real authentication function");
 }

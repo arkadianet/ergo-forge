@@ -203,7 +203,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
 {
   "schemaVersion": 1,
   "baselineRev": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
-  "completedThrough": "D00",
+  "completedThrough": "D01",
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,
   "units": [
@@ -481,6 +481,21 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "property_inventory_pins_24_cases_and_independent_answers",
         "reference_executions_and_legacy_results_are_reproduced",
         "transfer_registration_and_exposure_are_accounted"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "D01",
+      "depends": [
+        "D00"
+      ],
+      "days": 2,
+      "package": "ergo-sandbox",
+      "target": "property_schema",
+      "tests": [
+        "property_versions_units_and_limits_fail_closed",
+        "bindings_never_infer_missing_roles_or_authority",
+        "declaration_identity_binds_all_semantic_premises"
       ],
       "implemented": true
     }
@@ -820,3 +835,18 @@ projection extension. All original P/M registrations and P05 resolution are
 separately authenticated, and real mutation checks reject other protected changes.
 The synthetic inventory is complete; absent independent semantic review and a
 transfer pair mean incomplete semantic measurement and no utility claim.
+
+
+D01 author-authorized implementation record — 2026-09-11:
+D01 alone is added after the committed D00 inventory under section 4's
+incremental registration rule. Its exact proposed dependency, two-day ceiling,
+package, target and three test names are retained. The strict opt-in declaration
+schema, normalized immutable identity and explicit role binding checks confer no
+execution or property-result authority. Only D01's flag and `completedThrough`
+advance, after its direct tests and all predecessors passed. See the
+[D01 report](discovery/D01.md) for final gates and preservation evidence.
+D00's 24 rows, hashes and null transfer registration are unchanged. M00's original
+anchor remains unchanged; exact permitted-additions authentication now covers
+D01 while rejecting prior-field mutations and later-unit appends. M05 remains
+stopped. D02–D04 are unregistered; capability 1 can remain the endpoint and no
+capability 2/3 work is planned by this change.

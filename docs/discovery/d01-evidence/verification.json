@@ -1,0 +1,86 @@
+{
+  "attemptCommit": "1d038ec6796b3b37b85205471c86b69f559b7743",
+  "committed": false,
+  "environment": {
+    "CARGO_TARGET_DIR": "./target-p00"
+  },
+  "sourceSha256": {
+    "docs/ROADMAP.md": "a683c89e7656960c8b9001086ec42459aba4e68363f9cadebb4bc0a5fa628bbf",
+    "ergo-sandbox/src/lib.rs": "61888f05602a2ea582533d248e7093723346414964acd605f755b09ea26e2717",
+    "ergo-sandbox/src/properties/mod.rs": "8492482d242895f1076c886f60fc1d27c0100393b3142d1d6eeb12a7ead0024e",
+    "ergo-sandbox/src/properties/schema.rs": "495a208b7354263d75f47d0af1097ee10c51d81c51a8957aa8d381f6ea87f030",
+    "ergo-sandbox/tests/property_schema.rs": "b4f3e88b5dcb11a159c400ca335e4eff8f147b344a96a57398bd6c50a3f24982",
+    "ergo-sandbox/tests/mapping_inventory.rs": "349d2e0a7e98441b6c6f06828d07a99ad670ed5e3f5bc0177a3678d8ea8929d2"
+  },
+  "commands": [
+    {
+      "name": "fmt-final",
+      "command": "CARGO_TARGET_DIR=./target-p00 cargo fmt --all -- --check",
+      "exitCode": 0,
+      "elapsedSeconds": 0.372,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "clippy-final",
+      "command": "CARGO_TARGET_DIR=./target-p00 cargo clippy --workspace --all-targets -- -D warnings",
+      "exitCode": 0,
+      "elapsedSeconds": 0.389,
+      "outputSha256": "c8e72b7ef58dcc0de3d867423825f4c98b236382213f5d93e58cf4675aa80b33"
+    },
+    {
+      "name": "property-schema-final",
+      "command": "CARGO_TARGET_DIR=./target-p00 cargo test -p ergo-sandbox --release --test property_schema -- --show-output",
+      "exitCode": 0,
+      "elapsedSeconds": 16.42,
+      "outputSha256": "496abcf1cc1aaa449d1d1d5d4c475d53e41a2124ce22cb43ee0e6f68388d9c63"
+    },
+    {
+      "name": "workspace-final",
+      "command": "CARGO_TARGET_DIR=./target-p00 cargo test --workspace --release",
+      "exitCode": 0,
+      "elapsedSeconds": 260.309,
+      "outputSha256": "060ca549749ebb1292ce659e5baf4b7b8cb43b8085f558409c8956decef2eaa5"
+    },
+    {
+      "name": "python",
+      "command": "CARGO_TARGET_DIR=./target-p00 python3 -m unittest discover -s scripts -p test_roadmap_gate.py",
+      "exitCode": 0,
+      "elapsedSeconds": 0.1,
+      "outputSha256": "47559fd4f8659ba4368bc6970b50952f0d5ab34d7bedc960232aeca5f3f05a1b"
+    },
+    {
+      "name": "require",
+      "command": "CARGO_TARGET_DIR=./target-p00 python3 scripts/roadmap_gate.py --require D01",
+      "exitCode": 0,
+      "elapsedSeconds": 113.047,
+      "outputSha256": "edf471773656e2b446ef329dca93beb0a8328f507128089592fdb60a08f3f31c"
+    },
+    {
+      "name": "through-completed",
+      "command": "CARGO_TARGET_DIR=./target-p00 python3 scripts/roadmap_gate.py --through-completed",
+      "exitCode": 0,
+      "elapsedSeconds": 91.865,
+      "outputSha256": "73cc07dfbf9e7f76975e16f159e10ec752ef465347b1769a86812c36f35c2e8e"
+    },
+    {
+      "name": "ci",
+      "command": "CARGO_TARGET_DIR=./target-p00 python3 scripts/roadmap_gate.py --ci",
+      "exitCode": 0,
+      "elapsedSeconds": 135.449,
+      "outputSha256": "151df70f0a45796f3f86779770760dd4d4f7041cda1de291f3321ab04058503e"
+    },
+    {
+      "name": "all-goals",
+      "command": "CARGO_TARGET_DIR=./target-p00 python3 scripts/roadmap_gate.py --all-goals",
+      "exitCode": 1,
+      "elapsedSeconds": 95.834,
+      "outputSha256": "614f7eb5a0cd7c071dacb300701ce63d91c52bc3e455b58176f20b209d9558a1"
+    }
+  ],
+  "workspaceAggregate": {
+    "passed": 488,
+    "failed": 0,
+    "ignored": 1
+  },
+  "preservationAuditSha256": "a4eb451486bddbe9d2e9664f95d8758a2386011a6e6eda738c425b20cb9e40b7"
+}
