@@ -291,3 +291,47 @@ action-label inconsistency remains documented, not silently repaired.
 
 No section 6 unit name, acceptance test, dependency, package, target, days,
 threshold or frozen capability is amended.
+
+## M05 attempted implementation amendment — 2026-09-10: stopped
+
+Author authorization supersedes the historical proposal-only status for this
+attempt. The section 6 M05 acceptance requirement is unimplementable against
+one unchanged registered supported case under the exact relation in section 3.2.
+`context_scope-positive` says:
+
+```text
+sigmaProp(CONTEXT.getVarFromInput[Coll[Byte]](0, 1).get ==
+          getVar[Coll[Byte]](1).get && executeFromVar[Boolean](1))
+```
+
+This requires successful local Boolean execution, but has no authenticated
+config or code-hash equality. The new [stop evidence](../../mapping/m05-stop-results.json)
+replays `7f` (true) and `93a3a3` (`HEIGHT == HEIGHT`) through the full pinned
+validator: both are accepted with different hashes, identical exact root/SELF,
+state, guard and all transaction fields except that extension. `80` (false)
+is rejected at input 0's script. The diagnostic binds these assertions to the
+original M00 fixture and M03 premises; the old unresolved proposal is preserved.
+Neither accepted program establishes that one fixed digest must execute in every
+accepted transaction. Input-local equality is not code authentication.
+
+Apply section 7's **coverage-gate** stop: retain M00–M04. This amendment records
+the demonstrated acceptance conflict and stopped status; it does **not** relax
+Execute, add a variable-code relation, assume a fixed extension as a new premise,
+change a supported label, or amend a test name/target/package/dependency/day limit.
+All pinned facts and the full 67-action target remain intact. A governing,
+versioned resolution is required before M05 can reopen; adding an authenticated
+replacement fixture without preserving this registered member cannot satisfy
+the existing gate. See [M05 report](../../mapping/M05.md) and the full
+[stop record](../../roadmap-stops.json). The diagnostic is not a substitute for
+`mapping_context_code` or any of its four capability tests.
+
+The first stopped-prefix verification also exposed an existing harness assumption:
+`test_resolution_requires_exact_policy_record_and_decision` asserted that the
+live repository had zero open stop records. That contradicts section 7's required
+stop workflow. Its expectation now excludes only exact policy-resolved record
+hashes and retains every pending record, including when another stop is appended.
+The missing-record, altered-record-hash and altered-decision-hash checks remain.
+This explicitly amends the anticipated no-old-test-edits implementation surface
+for the stop harness only; the runner, P00–P08 unit registrations, implementation
+flags, thresholds and product gates are unchanged. Failed initial verification
+logs are retained alongside the rerun logs.

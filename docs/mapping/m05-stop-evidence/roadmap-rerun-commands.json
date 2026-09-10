@@ -1,0 +1,33 @@
+[
+  {
+    "name": "require-M05",
+    "command": [
+      "python3",
+      "scripts/roadmap_gate.py",
+      "--require",
+      "M05"
+    ],
+    "exitCode": 1,
+    "log": "docs/mapping/m05-stop-evidence/require-M05-rerun.log"
+  },
+  {
+    "name": "through-completed",
+    "command": [
+      "python3",
+      "scripts/roadmap_gate.py",
+      "--through-completed"
+    ],
+    "exitCode": 0,
+    "log": "docs/mapping/m05-stop-evidence/through-completed-rerun.log"
+  },
+  {
+    "name": "all-goals",
+    "command": [
+      "python3",
+      "scripts/roadmap_gate.py",
+      "--all-goals"
+    ],
+    "exitCode": 1,
+    "log": "docs/mapping/m05-stop-evidence/all-goals-rerun.log"
+  }
+]

@@ -744,3 +744,13 @@ names. Only M04's implementation flag and the completed prefix advance. See the
 metadata clarification and real gates. M05 remains unimplemented; its four
 positive Execute action expectations remain visible and deferred. No pinned
 membership, expected facts, established claims, numeric baselines or freezes change.
+
+M05 author-authorized attempt stopped on 2026-09-10 under the mapping design's
+`coverage-gate` rule. The registered `context_scope-positive` code requires
+local execution but does not authenticate a fixed code digest; full validation
+accepts two different extension programs under identical premises. See the
+[M05 report](mapping/M05.md), [design amendment](superpowers/specs/2026-09-10-comprehensive-mapping-design.md#m05-attempted-implementation-amendment--2026-09-10-stopped)
+and [stop record](roadmap-stops.json). M05 remains unimplemented and
+`completedThrough` remains M04. No policy registration, pinned answer, historical
+claim, action disposition, numeric threshold or frozen capability changes.
+The separate counterexample diagnostic grants no M05 capability authority.

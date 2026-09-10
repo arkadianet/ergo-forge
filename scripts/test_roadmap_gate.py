@@ -147,7 +147,12 @@ class RoadmapGateTests(unittest.TestCase):
             self.assert_status('missing-gate', lambda: gate.stop_records(self.policy, Path(tmp)))
 
     def test_resolution_requires_exact_policy_record_and_decision(self):
-        self.assertEqual(gate.stop_records(self.policy), [])
+        # Historical resolutions do not imply that every later goal has no stop.
+        original = gate.load_json(gate.ROOT / self.policy['stopRecords'])
+        resolved = {r['recordSha256'] for r in self.policy['resolvedStopRecords']}
+        pending = [r for r in original if gate.sha(
+            json.dumps(r, sort_keys=True, separators=(',', ':')).encode()) not in resolved]
+        self.assertEqual(gate.stop_records(self.policy), pending)
         with tempfile.TemporaryDirectory() as tmp:
             self.assert_status('missing-gate', lambda: gate.stop_records(self.policy, Path(tmp)))
         without = copy.deepcopy(self.policy)
@@ -170,7 +175,7 @@ class RoadmapGateTests(unittest.TestCase):
                 return original + [new_stop]
             return real_load(path)
         with patch.object(gate, 'load_json', side_effect=appended):
-            self.assertEqual(gate.stop_records(self.policy), [new_stop])
+            self.assertEqual(gate.stop_records(self.policy), pending + [new_stop])
 
 
 if __name__ == '__main__':
