@@ -21,6 +21,9 @@ jobs:
       - name: Checkout ergo-forge
         uses: actions/checkout@v4
         with:
+          # The scoreboard verifies baseline artifacts at the plan's baseline
+          # revision, so that commit must be in the runner's history.
+          fetch-depth: 0
           path: ergo-forge
 
       - name: Read the pinned engine rev
