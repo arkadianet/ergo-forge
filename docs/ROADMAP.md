@@ -190,7 +190,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
 {
   "schemaVersion": 1,
   "baselineRev": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
-  "completedThrough": "M01",
+  "completedThrough": "M02",
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,
   "units": [
@@ -407,7 +407,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "false_hints_never_become_required_relations",
         "caps_missing_pages_and_computed_identities_stay_unresolved"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "M03",
@@ -712,3 +712,10 @@ artifacts and all three registered gates are implemented. `--require M01` passed
 through P00–P08 and M00 before advancing `completedThrough` to M01. See the
 [M01 report](mapping/M01.md) for the import authority boundary and real gate output.
 M02–M05 remain unimplemented. All section 2 freezes and pinned M00 data remain unchanged.
+
+M02 author-authorized implementation: bounded literal and existential discovery
+over supplied canonical material passes its three registered gates. Only M02's
+implementation flag and the completed prefix advance; see the [M02 report](mapping/M02.md)
+for exact supported/all-case recall, false hints, unresolved boundaries and real
+verification output. M03–M05 remain unimplemented. M00/M01 and all section 2
+freezes remain unchanged.

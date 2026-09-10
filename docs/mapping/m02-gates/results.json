@@ -1,0 +1,310 @@
+{
+  "environment": {
+    "CARGO_TARGET_DIR": "./target-p00"
+  },
+  "workspaceTotals": {
+    "passed": 471,
+    "failed": 0,
+    "ignored": 1
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/m02-gates/fmt.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/m02-gates/clippy.txt",
+      "sha256": "81ed1a4b5841bfba80b50dd9493704b3347e1edeb2ba59367996af9600cff382"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "ergo-sandbox",
+        "--release",
+        "--test",
+        "mapping_discovery",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/m02-gates/unit.txt",
+      "sha256": "0911f2012bfc4f0c7765df83da9d38b4f3057a9ff7fd6d85fb1b063566821eb4"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--release"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/m02-gates/workspace.txt",
+      "sha256": "c790e8b543179936b2fff47b1c232291b2ed87e6c2f8984eaddd18523000a0a0"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/roadmap_gate.py",
+        "--require",
+        "M02"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/m02-gates/require.txt",
+      "sha256": "fa4e69d83e0d0a06c9355c36ca8673b6a9a1d18ab4ed93760875a99924ae9660"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/roadmap_gate.py",
+        "--through-completed"
+      ],
+      "exitCode": 0,
+      "outputPath": "docs/mapping/m02-gates/through-completed.txt",
+      "sha256": "0d4c706c60b3db812415365d986d749df069fd5b5da01fd1f9c00d7cd807e321"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/roadmap_gate.py",
+        "--all-goals"
+      ],
+      "exitCode": 1,
+      "outputPath": "docs/mapping/m02-gates/all-goals.txt",
+      "sha256": "2c4a6f9b2cc9eecf8dd031270a32d8c026a8b2cb58cdb9d71aae389a4261409e"
+    }
+  ],
+  "M02": [
+    {
+      "unit": "scoreboard",
+      "status": "passed"
+    },
+    {
+      "unit": "P00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P01",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P02",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P03",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P04",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P05",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P06",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P07",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P08",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M01",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M02",
+      "status": "passed",
+      "detail": "required tests executed"
+    }
+  ],
+  "through-completed": [
+    {
+      "unit": "scoreboard",
+      "status": "passed"
+    },
+    {
+      "unit": "P00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P01",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P02",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P03",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P04",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P05",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P06",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P07",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P08",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M01",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M02",
+      "status": "passed",
+      "detail": "required tests executed"
+    }
+  ],
+  "all-goals": [
+    {
+      "unit": "scoreboard",
+      "status": "passed"
+    },
+    {
+      "unit": "P00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P01",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P02",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P03",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P04",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P05",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P06",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P07",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P08",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M01",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M02",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M03",
+      "status": "unimplemented",
+      "detail": "registered product unit is not implemented"
+    },
+    {
+      "unit": "M04",
+      "status": "unimplemented",
+      "detail": "registered product unit is not implemented"
+    },
+    {
+      "unit": "M05",
+      "status": "unimplemented",
+      "detail": "registered product unit is not implemented"
+    }
+  ],
+  "mappingResultSha256": "788b40190b022009f4d2321331220fac6b25e467eac84d98049bada0a02fd4b3"
+}
