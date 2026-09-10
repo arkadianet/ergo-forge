@@ -1,0 +1,25 @@
+# CodeRabbit configuration.
+#
+# The exclusions below are recorded evidence, not source. Fixtures under
+# `docs/*-recovery/` and `tests/fixtures/` are byte-preserved HTTP responses,
+# node validation vectors and evidence bundles: their value is that they are
+# exactly what was retrieved or serialized, and a suggested edit to one is
+# always wrong. Baseline measurement artifacts are excluded for the same
+# reason — `answer-key.json` and `roadmap-metrics.json` are pinned records
+# that only their own harness may rewrite.
+#
+# Everything that can carry a defect is still reviewed: all Rust, JS, Python,
+# manifests, CI and the UI.
+reviews:
+  path_filters:
+    - "!**/*.fixture"
+    - "!**/tests/fixtures/**"
+    - "!docs/p05-recovery/**"
+    - "!docs/p06-recovery/**"
+    - "!docs/p05-stop-evidence/**"
+    - "!examples/mutants/answer-key*.json"
+    - "!docs/roadmap-metrics.json"
+    - "!docs/*-REPORT.md"
+    - "!docs/P0*-*.md"
+    - "!**/*.log"
+    - "!**/Cargo.lock"
