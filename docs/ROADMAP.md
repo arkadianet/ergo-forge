@@ -190,7 +190,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
 {
   "schemaVersion": 1,
   "baselineRev": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
-  "completedThrough": "P08",
+  "completedThrough": "M00",
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,
   "units": [
@@ -363,6 +363,98 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "replay_request_never_fetches_or_broadcasts"
       ],
       "implemented": true
+    },
+    {
+      "id": "M00",
+      "depends": [
+        "P08"
+      ],
+      "days": 3,
+      "package": "ergo-sandbox",
+      "target": "mapping_inventory",
+      "tests": [
+        "inventory_has_32_pinned_cases_and_independent_answers",
+        "legacy_metrics_are_measured_without_baseline_changes",
+        "fixture_constructs_execute_and_unsupported_members_remain"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "M01",
+      "depends": [
+        "M00"
+      ],
+      "days": 2,
+      "package": "ergo-sandbox",
+      "target": "mapping_artifacts",
+      "tests": [
+        "discovery_cannot_import_as_required_execution",
+        "premise_changes_invalidate_imported_proofs",
+        "raw_provenance_and_legacy_map_bytes_survive"
+      ],
+      "implemented": false
+    },
+    {
+      "id": "M02",
+      "depends": [
+        "M01"
+      ],
+      "days": 3,
+      "package": "ergo-sandbox",
+      "target": "mapping_discovery",
+      "tests": [
+        "supported_reference_recall_and_all_site_accounting",
+        "false_hints_never_become_required_relations",
+        "caps_missing_pages_and_computed_identities_stay_unresolved"
+      ],
+      "implemented": false
+    },
+    {
+      "id": "M03",
+      "depends": [
+        "M02"
+      ],
+      "days": 4,
+      "package": "ergo-sandbox",
+      "target": "mapping_necessity",
+      "tests": [
+        "exact_guarded_necessity_matches_pinned_answers",
+        "alternatives_dead_checks_and_self_do_not_prove_cospend",
+        "satisfying_omission_and_relaxed_controls_use_full_validator",
+        "unsupported_anchors_and_cyclic_proofs_are_rejected"
+      ],
+      "implemented": false
+    },
+    {
+      "id": "M04",
+      "depends": [
+        "M03"
+      ],
+      "days": 3,
+      "package": "ergo-sandbox",
+      "target": "mapping_actions",
+      "tests": [
+        "alternative_action_sets_are_checked_separately",
+        "data_outputs_and_unrelated_inputs_cannot_satisfy_spend",
+        "accepted_omission_refutes_only_matching_claim_and_premises"
+      ],
+      "implemented": false
+    },
+    {
+      "id": "M05",
+      "depends": [
+        "M04"
+      ],
+      "days": 4,
+      "package": "ergo-sandbox",
+      "target": "mapping_context_code",
+      "tests": [
+        "authenticated_config_code_requires_same_input_execution",
+        "optional_wrong_scope_and_mutable_config_do_not_promote",
+        "all_four_omission_families_replay_and_refute",
+        "final_metrics_preserve_all_members_and_unsupported_ceiling"
+      ],
+      "implemented": false
     }
   ],
   "thresholds": {
@@ -605,3 +697,12 @@ required premises; no existing fixture or manifest row changes. The policy chang
 only P08's implementation flag and `completedThrough`. Earlier “today” and
 “unimplemented” statements above describe their recorded implementation stages.
 The finite queue ends at P08; further work requires a new governing decision.
+
+
+M00–M05 registration (author-authorized following PR #97): the [mapping design](superpowers/specs/2026-09-10-comprehensive-mapping-design.md), sections 5–7, supplies the bounded post-P08 queue and replaces the parked mapping question. Only M00 implementation is authorized in this change. Section 2 freezes remain in force; registration grants no discovery edge proof authority. The six units are appended unchanged, initially unimplemented. Completion requires their own executable gates. See [M00 record](mapping/M00.md).
+
+M00 gate completion: P00–P08 and all three registered M00 tests pass under
+`--require M00`. Only M00 is implemented among the appended mapping units;
+`completedThrough` is M00. The [M00 report](mapping/M00.md) records the fixed
+32-case inventory, legacy measurements and full verification output. M01–M05
+remain unimplemented. Registration does not authorize their implementation here.

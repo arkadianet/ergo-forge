@@ -1,0 +1,226 @@
+{
+  "family": "token_identity",
+  "id": "token_identity-control",
+  "publication": "public",
+  "sites": [
+    {
+      "authority": "lexical inventory anchor; no proof correspondence",
+      "end": 23,
+      "id": "token_identity-control/site/0",
+      "start": 10,
+      "text": "INPUTS.exists"
+    }
+  ],
+  "snapshot": {
+    "allBoxNames": [
+      "A",
+      "B",
+      "C",
+      "U",
+      "F"
+    ],
+    "kind": "closed synthetic inventory",
+    "simultaneousAvailability": "hypothetical",
+    "unrelated": [
+      "U",
+      "F"
+    ]
+  },
+  "source": "sigmaProp(INPUTS.exists({ (b: Box) => b.tokens.exists({ (t: (Coll[Byte], Long)) => t._1 == fromBase16(\"2222222222222222222222222222222222222222222222222222222222222222\") }) }))",
+  "sourceProvenance": "independently authored synthetic; no external/private code",
+  "subjectId": "652ce0ee6908274f54715bff0ecc0b3bd2e6966f6e845cdd4a0946eafdff3773",
+  "tree": "10010e202222222222222222222222222222222222222222222222222222222222222222d1aea4d9010163aedb63087201d901034d0e938c7203017300",
+  "universe": [
+    {
+      "boxId": "bc8520656b4156950a484d2b36283d20856b83d5371e5c1c1fd31e297dbbd299",
+      "bytes": "80897a10010404d192a37300010211111111111111111111111111111111111111111111111111111111111111110122222222222222222222222222222222222222222222222222222222222222220200000000000000000000000000000000000000000000000000000000000000000000",
+      "name": "C",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 0,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "bc8520656b4156950a484d2b36283d20856b83d5371e5c1c1fd31e297dbbd299",
+        "creationHeight": 1,
+        "ergoTree": "10010404d192a37300",
+        "registers": {},
+        "tokens": [
+          {
+            "amount": 1,
+            "id": "1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          {
+            "amount": 2,
+            "id": "2222222222222222222222222222222222222222222222222222222222222222"
+          }
+        ],
+        "value": 2000000
+      },
+      "source": "sigmaProp(HEIGHT >= 2)",
+      "spec": {
+        "creationHeight": 1,
+        "ergoTree": "10010404d192a37300",
+        "registers": "00",
+        "tokens": [
+          {
+            "amount": 1,
+            "id": "1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          {
+            "amount": 2,
+            "id": "2222222222222222222222222222222222222222222222222222222222222222"
+          }
+        ],
+        "value": 2000000
+      }
+    },
+    {
+      "boxId": "b114673b71df5f8934d4ce5398034945e619b319186f9bdaeb7fcb859209d83e",
+      "bytes": "80897a10010406d192a37300010000000000000000000000000000000000000000000000000000000000000000000001",
+      "name": "U",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 1,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "b114673b71df5f8934d4ce5398034945e619b319186f9bdaeb7fcb859209d83e",
+        "creationHeight": 1,
+        "ergoTree": "10010406d192a37300",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(HEIGHT >= 3)",
+      "spec": {
+        "creationHeight": 1,
+        "ergoTree": "10010406d192a37300",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    },
+    {
+      "boxId": "1b884c7e4a716c013558723ab80f09f4adaab2426ee67013aefbd4e02f2d346a",
+      "bytes": "80897a10010408d192a37300010000000000000000000000000000000000000000000000000000000000000000000002",
+      "name": "F",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 2,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "1b884c7e4a716c013558723ab80f09f4adaab2426ee67013aefbd4e02f2d346a",
+        "creationHeight": 1,
+        "ergoTree": "10010408d192a37300",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(HEIGHT >= 4)",
+      "spec": {
+        "creationHeight": 1,
+        "ergoTree": "10010408d192a37300",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    },
+    {
+      "boxId": "27cd81bc0becca69cf1c6db0bbeaa657ff5b14acb86947e8bbd320080ffa2841",
+      "bytes": "80897a10010402d192a37300010211111111111111111111111111111111111111111111111111111111111111110122222222222222222222222222222222222222222222222222222222222222220200000000000000000000000000000000000000000000000000000000000000000003",
+      "name": "B",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 3,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "27cd81bc0becca69cf1c6db0bbeaa657ff5b14acb86947e8bbd320080ffa2841",
+        "creationHeight": 1,
+        "ergoTree": "10010402d192a37300",
+        "registers": {},
+        "tokens": [
+          {
+            "amount": 1,
+            "id": "1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          {
+            "amount": 2,
+            "id": "2222222222222222222222222222222222222222222222222222222222222222"
+          }
+        ],
+        "value": 2000000
+      },
+      "source": "sigmaProp(HEIGHT >= 1)",
+      "spec": {
+        "creationHeight": 1,
+        "ergoTree": "10010402d192a37300",
+        "registers": "00",
+        "tokens": [
+          {
+            "amount": 1,
+            "id": "1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          {
+            "amount": 2,
+            "id": "2222222222222222222222222222222222222222222222222222222222222222"
+          }
+        ],
+        "value": 2000000
+      }
+    },
+    {
+      "boxId": "652ce0ee6908274f54715bff0ecc0b3bd2e6966f6e845cdd4a0946eafdff3773",
+      "bytes": "80897a10010e202222222222222222222222222222222222222222222222222222222222222222d1aea4d9010163aedb63087201d901034d0e938c7203017300010000000000000000000000000000000000000000000000000000000000000000000004",
+      "name": "A",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 4,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "652ce0ee6908274f54715bff0ecc0b3bd2e6966f6e845cdd4a0946eafdff3773",
+        "creationHeight": 1,
+        "ergoTree": "10010e202222222222222222222222222222222222222222222222222222222222222222d1aea4d9010163aedb63087201d901034d0e938c7203017300",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(INPUTS.exists({ (b: Box) => b.tokens.exists({ (t: (Coll[Byte], Long)) => t._1 == fromBase16(\"2222222222222222222222222222222222222222222222222222222222222222\") }) }))",
+      "spec": {
+        "creationHeight": 1,
+        "ergoTree": "10010e202222222222222222222222222222222222222222222222222222222222222222d1aea4d9010163aedb63087201d901034d0e938c7203017300",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    }
+  ],
+  "vectors": [
+    {
+      "contextVars": {},
+      "dataInputs": [],
+      "height": 50,
+      "id": "satisfying",
+      "inputs": [
+        "A",
+        "C"
+      ],
+      "outputs": []
+    },
+    {
+      "contextVars": {},
+      "dataInputs": [],
+      "height": 50,
+      "id": "omission",
+      "inputs": [
+        "A",
+        "C"
+      ],
+      "outputs": []
+    }
+  ],
+  "version": "mapping-fixture:v1"
+}

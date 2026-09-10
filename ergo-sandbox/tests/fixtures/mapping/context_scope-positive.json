@@ -1,0 +1,207 @@
+{
+  "family": "context_scope",
+  "id": "context_scope-positive",
+  "publication": "public",
+  "sites": [
+    {
+      "authority": "lexical inventory anchor; no proof correspondence",
+      "end": 51,
+      "id": "context_scope-positive/site/0",
+      "start": 10,
+      "text": "CONTEXT.getVarFromInput[Coll[Byte]](0, 1)"
+    },
+    {
+      "authority": "lexical inventory anchor; no proof correspondence",
+      "end": 114,
+      "id": "context_scope-positive/site/1",
+      "start": 88,
+      "text": "executeFromVar[Boolean](1)"
+    }
+  ],
+  "snapshot": {
+    "allBoxNames": [
+      "A",
+      "B",
+      "C",
+      "U",
+      "F"
+    ],
+    "kind": "closed synthetic inventory",
+    "simultaneousAvailability": "hypothetical",
+    "unrelated": [
+      "U",
+      "F"
+    ]
+  },
+  "source": "sigmaProp(CONTEXT.getVarFromInput[Coll[Byte]](0, 1).get == getVar[Coll[Byte]](1).get && executeFromVar[Boolean](1))",
+  "sourceProvenance": "independently authored synthetic; no external/private code",
+  "subjectId": "e88f73c8a4970187edfeb9070216dd4a6dc7895eb07bb141f2b2cab01ee1a9ae",
+  "treeHex": "1b1a0203000201d1ed93e4dc650cfe02730073010ee4e3010ed40101",
+  "universe": [
+    {
+      "boxId": "23a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092c",
+      "bytes": "80897a10010404d192a37300010000000000000000000000000000000000000000000000000000000000000000000000",
+      "name": "C",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 0,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "23a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092c",
+        "creationHeight": 1,
+        "propositionHex": "10010404d192a37300",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(HEIGHT >= 2)",
+      "spec": {
+        "creationHeight": 1,
+        "propositionHex": "10010404d192a37300",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    },
+    {
+      "boxId": "b114673b71df5f8934d4ce5398034945e619b319186f9bdaeb7fcb859209d83e",
+      "bytes": "80897a10010406d192a37300010000000000000000000000000000000000000000000000000000000000000000000001",
+      "name": "U",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 1,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "b114673b71df5f8934d4ce5398034945e619b319186f9bdaeb7fcb859209d83e",
+        "creationHeight": 1,
+        "propositionHex": "10010406d192a37300",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(HEIGHT >= 3)",
+      "spec": {
+        "creationHeight": 1,
+        "propositionHex": "10010406d192a37300",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    },
+    {
+      "boxId": "1b884c7e4a716c013558723ab80f09f4adaab2426ee67013aefbd4e02f2d346a",
+      "bytes": "80897a10010408d192a37300010000000000000000000000000000000000000000000000000000000000000000000002",
+      "name": "F",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 2,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "1b884c7e4a716c013558723ab80f09f4adaab2426ee67013aefbd4e02f2d346a",
+        "creationHeight": 1,
+        "propositionHex": "10010408d192a37300",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(HEIGHT >= 4)",
+      "spec": {
+        "creationHeight": 1,
+        "propositionHex": "10010408d192a37300",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    },
+    {
+      "boxId": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+      "bytes": "80897a10010402d192a37300010000000000000000000000000000000000000000000000000000000000000000000003",
+      "name": "B",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 3,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+        "creationHeight": 1,
+        "propositionHex": "10010402d192a37300",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(HEIGHT >= 1)",
+      "spec": {
+        "creationHeight": 1,
+        "propositionHex": "10010402d192a37300",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    },
+    {
+      "boxId": "e88f73c8a4970187edfeb9070216dd4a6dc7895eb07bb141f2b2cab01ee1a9ae",
+      "bytes": "80897a1b1a0203000201d1ed93e4dc650cfe02730073010ee4e3010ed40101010000000000000000000000000000000000000000000000000000000000000000000004",
+      "name": "A",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 4,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "e88f73c8a4970187edfeb9070216dd4a6dc7895eb07bb141f2b2cab01ee1a9ae",
+        "creationHeight": 1,
+        "propositionHex": "1b1a0203000201d1ed93e4dc650cfe02730073010ee4e3010ed40101",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(CONTEXT.getVarFromInput[Coll[Byte]](0, 1).get == getVar[Coll[Byte]](1).get && executeFromVar[Boolean](1))",
+      "spec": {
+        "creationHeight": 1,
+        "propositionHex": "1b1a0203000201d1ed93e4dc650cfe02730073010ee4e3010ed40101",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    }
+  ],
+  "vectors": [
+    {
+      "contextVars": {
+        "1": {
+          "type": "Coll[Byte]",
+          "value": "7f"
+        }
+      },
+      "dataInputs": [],
+      "height": 100,
+      "id": "satisfying",
+      "inputs": [
+        "A",
+        "B"
+      ],
+      "outputs": []
+    },
+    {
+      "contextVars": {
+        "1": {
+          "type": "Coll[Byte]",
+          "value": "80"
+        }
+      },
+      "dataInputs": [],
+      "height": 100,
+      "id": "omission",
+      "inputs": [
+        "A",
+        "U"
+      ],
+      "outputs": []
+    }
+  ],
+  "version": "mapping-fixture:v1"
+}

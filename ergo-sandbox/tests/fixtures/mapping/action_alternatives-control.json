@@ -1,0 +1,204 @@
+{
+  "family": "action_alternatives",
+  "id": "action_alternatives-control",
+  "publication": "public",
+  "sites": [
+    {
+      "authority": "lexical inventory anchor; no proof correspondence",
+      "end": 40,
+      "id": "action_alternatives-control/site/0",
+      "start": 31,
+      "text": "INPUTS(1)"
+    },
+    {
+      "authority": "lexical inventory anchor; no proof correspondence",
+      "end": 138,
+      "id": "action_alternatives-control/site/1",
+      "start": 129,
+      "text": "INPUTS(1)"
+    },
+    {
+      "authority": "lexical inventory anchor; no proof correspondence",
+      "end": 171,
+      "id": "action_alternatives-control/site/2",
+      "start": 162,
+      "text": "INPUTS(1)"
+    }
+  ],
+  "snapshot": {
+    "allBoxNames": [
+      "A",
+      "B",
+      "C",
+      "U",
+      "F"
+    ],
+    "kind": "closed synthetic inventory",
+    "simultaneousAvailability": "hypothetical",
+    "unrelated": [
+      "U",
+      "F"
+    ]
+  },
+  "source": "sigmaProp(if (HEIGHT >= 100) { INPUTS(1).id == fromBase16(\"ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640\") && INPUTS(1).id != SELF.id } else { INPUTS(1).id == fromBase16(\"23a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092c\") })",
+  "sourceProvenance": "independently authored synthetic; no external/private code",
+  "subjectId": "47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4",
+  "treeHex": "100504c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a837764004020e2023a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092cd19592a37300d801d601c5b2a4730100ed9372017302947201c5a793c5b2a47303007304",
+  "universe": [
+    {
+      "boxId": "23a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092c",
+      "bytes": "80897a10010404d192a37300010000000000000000000000000000000000000000000000000000000000000000000000",
+      "name": "C",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 0,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "23a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092c",
+        "creationHeight": 1,
+        "propositionHex": "10010404d192a37300",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(HEIGHT >= 2)",
+      "spec": {
+        "creationHeight": 1,
+        "propositionHex": "10010404d192a37300",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    },
+    {
+      "boxId": "b114673b71df5f8934d4ce5398034945e619b319186f9bdaeb7fcb859209d83e",
+      "bytes": "80897a10010406d192a37300010000000000000000000000000000000000000000000000000000000000000000000001",
+      "name": "U",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 1,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "b114673b71df5f8934d4ce5398034945e619b319186f9bdaeb7fcb859209d83e",
+        "creationHeight": 1,
+        "propositionHex": "10010406d192a37300",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(HEIGHT >= 3)",
+      "spec": {
+        "creationHeight": 1,
+        "propositionHex": "10010406d192a37300",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    },
+    {
+      "boxId": "1b884c7e4a716c013558723ab80f09f4adaab2426ee67013aefbd4e02f2d346a",
+      "bytes": "80897a10010408d192a37300010000000000000000000000000000000000000000000000000000000000000000000002",
+      "name": "F",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 2,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "1b884c7e4a716c013558723ab80f09f4adaab2426ee67013aefbd4e02f2d346a",
+        "creationHeight": 1,
+        "propositionHex": "10010408d192a37300",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(HEIGHT >= 4)",
+      "spec": {
+        "creationHeight": 1,
+        "propositionHex": "10010408d192a37300",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    },
+    {
+      "boxId": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+      "bytes": "80897a10010402d192a37300010000000000000000000000000000000000000000000000000000000000000000000003",
+      "name": "B",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 3,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640",
+        "creationHeight": 1,
+        "propositionHex": "10010402d192a37300",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(HEIGHT >= 1)",
+      "spec": {
+        "creationHeight": 1,
+        "propositionHex": "10010402d192a37300",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    },
+    {
+      "boxId": "47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4",
+      "bytes": "80897a100504c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a837764004020e2023a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092cd19592a37300d801d601c5b2a4730100ed9372017302947201c5a793c5b2a47303007304010000000000000000000000000000000000000000000000000000000000000000000004",
+      "name": "A",
+      "provenance": "hypothetical authored canonical box; not observed UTXO",
+      "reference": {
+        "index": 4,
+        "transactionId": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "scenarioBox": {
+        "boxId": "47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4",
+        "creationHeight": 1,
+        "propositionHex": "100504c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a837764004020e2023a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092cd19592a37300d801d601c5b2a4730100ed9372017302947201c5a793c5b2a47303007304",
+        "registers": {},
+        "tokens": [],
+        "value": 2000000
+      },
+      "source": "sigmaProp(if (HEIGHT >= 100) { INPUTS(1).id == fromBase16(\"ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a8377640\") && INPUTS(1).id != SELF.id } else { INPUTS(1).id == fromBase16(\"23a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092c\") })",
+      "spec": {
+        "creationHeight": 1,
+        "propositionHex": "100504c80104020e20ab03a40cee82fdb0c10be129fa33dfde936724c3d1a7a022c9a9f2b4a837764004020e2023a88b1a637640cef35f109019f8f0e4240578fa756ac3ec5e2a2627d8f4092cd19592a37300d801d601c5b2a4730100ed9372017302947201c5a793c5b2a47303007304",
+        "registers": "00",
+        "tokens": [],
+        "value": 2000000
+      }
+    }
+  ],
+  "vectors": [
+    {
+      "contextVars": {},
+      "dataInputs": [],
+      "height": 50,
+      "id": "satisfying",
+      "inputs": [
+        "A",
+        "C"
+      ],
+      "outputs": []
+    },
+    {
+      "contextVars": {},
+      "dataInputs": [],
+      "height": 50,
+      "id": "omission",
+      "inputs": [
+        "A",
+        "C"
+      ],
+      "outputs": []
+    }
+  ],
+  "version": "mapping-fixture:v1"
+}
