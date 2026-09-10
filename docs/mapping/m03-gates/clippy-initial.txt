@@ -1,4 +1,4 @@
-    Checking ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+    Checking ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
 error: casting to the same type is unnecessary (`u8` -> `u8`)
    --> ergo-sandbox/src/map/check_relation.rs:127:39
     |

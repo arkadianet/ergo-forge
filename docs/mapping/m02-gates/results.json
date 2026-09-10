@@ -32,7 +32,7 @@
       ],
       "exitCode": 0,
       "outputPath": "docs/mapping/m02-gates/clippy.txt",
-      "sha256": "81ed1a4b5841bfba80b50dd9493704b3347e1edeb2ba59367996af9600cff382"
+      "sha256": "e013e014e7111596ccfb9a8de14dfa8aa471acce8dc4b0c969668c4c9136fc22"
     },
     {
       "command": [
@@ -48,7 +48,7 @@
       ],
       "exitCode": 0,
       "outputPath": "docs/mapping/m02-gates/unit.txt",
-      "sha256": "0911f2012bfc4f0c7765df83da9d38b4f3057a9ff7fd6d85fb1b063566821eb4"
+      "sha256": "a659fe3bf371047be8546f115c1c0d74a21d59cff30c405d583099bc59ff6753"
     },
     {
       "command": [
@@ -59,7 +59,7 @@
       ],
       "exitCode": 0,
       "outputPath": "docs/mapping/m02-gates/workspace.txt",
-      "sha256": "c790e8b543179936b2fff47b1c232291b2ed87e6c2f8984eaddd18523000a0a0"
+      "sha256": "7353f16b59c9d94cd25257298b5e8bd178305e2ef2d6a5bb31344ac3187cfce2"
     },
     {
       "command": [
@@ -70,7 +70,7 @@
       ],
       "exitCode": 0,
       "outputPath": "docs/mapping/m02-gates/require.txt",
-      "sha256": "fa4e69d83e0d0a06c9355c36ca8673b6a9a1d18ab4ed93760875a99924ae9660"
+      "sha256": "7172babbb0044076599f1914ceb586134a2a646eb8b9cdefd1773f5ca2e53203"
     },
     {
       "command": [
@@ -80,7 +80,7 @@
       ],
       "exitCode": 0,
       "outputPath": "docs/mapping/m02-gates/through-completed.txt",
-      "sha256": "0d4c706c60b3db812415365d986d749df069fd5b5da01fd1f9c00d7cd807e321"
+      "sha256": "544ca395798872de3994bd83b7fbaa248a1da75444b8ad496c892ade8eb901ec"
     },
     {
       "command": [
@@ -90,7 +90,7 @@
       ],
       "exitCode": 1,
       "outputPath": "docs/mapping/m02-gates/all-goals.txt",
-      "sha256": "2c4a6f9b2cc9eecf8dd031270a32d8c026a8b2cb58cdb9d71aae389a4261409e"
+      "sha256": "64f93907fcd8b8badf78a4f808405025adc5aa680c0ff1f0b713f5be35928ffc"
     }
   ],
   "M02": [

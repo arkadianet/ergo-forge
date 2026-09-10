@@ -9,6 +9,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 MARKER = '<!-- roadmap-policy:v1 -->'
@@ -244,12 +245,20 @@ def check_test_output(output, names, kind='rust'):
         require(re.search(r'^OK$', output, re.M) is not None, 'Python product failure')
 
 
+def portable_output(text, root=ROOT):
+    """Normalize workstation locations before printing, storing, and hashing."""
+    text = text.replace(str(root.resolve()), '<repo>')
+    text = text.replace(str(Path.home()), '<home>')
+    return text.replace(tempfile.gettempdir() + os.sep, '<tmp>/')
+
+
 def command(args, records, root=ROOT):
     try:
         result = subprocess.run(args, cwd=root, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env={**os.environ, 'CARGO_TARGET_DIR': os.environ.get('CARGO_TARGET_DIR', './target-p00'), 'CARGO_TERM_COLOR':'never'})
     except OSError as e:
         raise GateError('missing-gate', f'{args[0]} unavailable: {e}') from e
-    records.append(dict(command=args, exitCode=result.returncode, output=result.stdout, outputSha256=sha(result.stdout.encode())))
+    result.stdout = portable_output(result.stdout, root)
+    records.append(dict(command=[portable_output(str(arg), root) for arg in args], exitCode=result.returncode, output=result.stdout, outputSha256=sha(result.stdout.encode())))
     print(result.stdout, end='', flush=True)
     return result
 
@@ -291,6 +300,7 @@ def main(argv=None):
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--require')
     group.add_argument('--all-goals', action='store_true')
+    group.add_argument('--ci', action='store_true', help='all goals; validated recorded stops are acceptable, not complete')
     group.add_argument('--through-completed', action='store_true')
     group.add_argument('--scoreboard-only', action='store_true')
     parser.add_argument('--report', type=Path)
@@ -298,7 +308,7 @@ def main(argv=None):
     report = {'formatVersion':1, 'results':[], 'commands':[], 'evidenceHashes':{}}
     try:
         policy = load_policy()
-        selected = [] if args.scoreboard_only else select_units(policy, args.require if args.require else policy['completedThrough'], args.all_goals)
+        selected = [] if args.scoreboard_only else select_units(policy, args.require if args.require else policy['completedThrough'], args.all_goals or args.ci)
         report['policySha256'] = sha(json.dumps(policy, sort_keys=True).encode())
         report['evidenceHashes'] = scoreboard(policy)
         stops = stop_records(policy)
@@ -308,24 +318,28 @@ def main(argv=None):
             try:
                 require(not any(r['unitOrProposal'] == unit['id'] for r in stops), 'recorded stop blocks this unit', 'stopped')
                 require(unit['implemented'], 'registered product unit is not implemented', 'unimplemented')
-                require(all(states[d] == 'passed' for d in unit['depends']), 'dependency did not pass', 'stopped')
+                require(all(states[d] == 'passed' for d in unit['depends']), 'dependency did not pass', 'blocked')
                 run_unit(unit, report['commands'])
                 status, detail = 'passed', 'required tests executed'
             except GateError as e:
-                status, detail = e.status, str(e)
+                status, detail = e.status, portable_output(str(e))
             states[unit['id']] = status
             report['results'].append(dict(unit=unit['id'], status=status, detail=detail))
             print(f"{unit['id']}: {status}: {detail}", flush=True)
     except (GateError, KeyError, TypeError, ValueError, IndexError, AttributeError, ArithmeticError) as e:
         report['results'].append(dict(unit='policy/evidence', status=e.status if isinstance(e, GateError) else 'missing-gate', detail=str(e)))
+    report['ciAccepted'] = bool(report['results']) and all(r['status'] in {'passed', 'stopped'} for r in report['results'])
     report['passed'] = bool(report['results']) and all(r['status'] == 'passed' for r in report['results'])
-    output = args.report or ROOT / 'target-p00/roadmap-gates' / ((args.require or ('all-goals' if args.all_goals else 'scoreboard' if args.scoreboard_only else 'through-completed')) + '.json')
+    output = args.report or ROOT / 'target-p00/roadmap-gates' / ((args.require or ('ci' if args.ci else 'all-goals' if args.all_goals else 'scoreboard' if args.scoreboard_only else 'through-completed')) + '.json')
     output.parent.mkdir(parents=True, exist_ok=True)
+    for row in report['results']:
+        if 'detail' in row:
+            row['detail'] = portable_output(row['detail'])
     output.write_text(json.dumps(report, indent=2) + '\n')
     for result in report['results']:
         print(f"{result['unit']}: {result['status']}" + (f": {result['detail']}" if 'detail' in result else ''))
-    print(f'report: {output}')
-    return 0 if report['passed'] else 1
+    print(portable_output(f'report: {output}'))
+    return 0 if (report['ciAccepted'] if args.ci else report['passed']) else 1
 
 
 if __name__ == '__main__':

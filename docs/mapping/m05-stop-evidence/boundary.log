@@ -10,7 +10,7 @@ successes:
 original: extension=7f blake2b256=a0ff17711d7b5c50b84998e1d7c354a55ae91901ea48a24dbbb3d4c95af153d0 node-accepted
 different-true-expression: extension=93a3a3 blake2b256=f7834e1edc7f174a379a145ef2f30d6e13506937057892777e1d0571733fc933 node-accepted
 false-expression: extension=80 blake2b256=45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0 node-rejected: ProofFailed { index: 0 }
-evidence /home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m05-stop-results.json sha256=2ebb00ce2d46a258f45b36f40f0f8b7994698d0f5ad6f25aad4ad86984518497
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m05-stop-results.json sha256=2ebb00ce2d46a258f45b36f40f0f8b7994698d0f5ad6f25aad4ad86984518497
 M05 coverage stop: pinned supported context_scope-positive lacks exact-code authentication; M00-M04 claims and all 67 expected action dispositions preserved
 
 

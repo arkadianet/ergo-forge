@@ -4,8 +4,8 @@
    Compiling tokio-rustls v0.26.4
    Compiling hyper-rustls v0.27.9
    Compiling reqwest v0.12.28
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
-   Compiling ergo-web v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-web)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
+   Compiling ergo-web v0.3.0 (<repo>/ergo-web)
     Finished `release` profile [optimized] target(s) in 42.78s
      Running unittests src/lib.rs (target-p00/release/deps/ergo_sandbox-42b6b76a1e339ff9)
 
@@ -719,7 +719,7 @@ test replay_request_never_fetches_or_broadcasts ... ok
    Compiling rustls v0.23.43
    Compiling rustls-webpki v0.103.15
    Compiling ureq v3.4.1
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 19.88s
 test http_and_cli_replay_have_identical_semantic_results ... ok
 test legacy_preflight_does_not_use_node_claim_badge ... ok

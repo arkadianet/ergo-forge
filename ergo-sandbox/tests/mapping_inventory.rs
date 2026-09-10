@@ -37,6 +37,14 @@ fn check_inventory(
                 .into(),
         );
     }
+    check_structure(manifest, expected, load)
+}
+
+fn check_structure(
+    manifest: &[u8],
+    expected: &[u8],
+    load: impl Fn(&str) -> Result<Vec<u8>, String>,
+) -> Result<(Value, Value), String> {
     let manifest: Value = serde_json::from_slice(manifest).map_err(|e| e.to_string())?;
     let expected: Value = serde_json::from_slice(expected).map_err(|e| e.to_string())?;
     if manifest["version"] != "mapping-inventory:v1" || expected["version"] != "mapping-expected:v1"
@@ -53,8 +61,29 @@ fn check_inventory(
             .iter()
             .map(|r| r["id"].as_str().unwrap_or("").to_owned())
             .collect();
-        if rows.len() != 32 || ids != expected_ids {
-            return Err("missing/duplicate/unregistered member".into());
+        if rows.len() != 32 {
+            return Err("missing member: expected 32 cases".into());
+        }
+        if ids.len() != rows.len() {
+            return Err("duplicate member".into());
+        }
+        if ids != expected_ids {
+            return Err("unregistered member".into());
+        }
+    }
+    // Truth is independently authored, not inferable from JSON shape. Compare
+    // answer content to the pinned oracle separately from document digests.
+    let oracle: Value = serde_json::from_str(include_str!("fixtures/mapping/expected.json"))
+        .map_err(|e| e.to_string())?;
+    for answer in expected["cases"].as_array().unwrap() {
+        let original = oracle["cases"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["id"] == answer["id"])
+            .ok_or("unknown answer")?;
+        if answer != original {
+            return Err("independent answer content changed".into());
         }
     }
     for entry in manifest["cases"].as_array().unwrap() {
@@ -103,19 +132,38 @@ fn inventory_has_32_pinned_cases_and_independent_answers() {
     missing["cases"].as_array_mut().unwrap().pop();
     let mut duplicate = m.clone();
     duplicate["cases"][1] = duplicate["cases"][0].clone();
-    for invalid in [missing, duplicate] {
-        assert!(check_inventory(&serde_json::to_vec(&invalid).unwrap(), &eb, disk).is_err());
+    for (invalid, reason) in [
+        (missing, "missing member: expected 32 cases"),
+        (duplicate, "duplicate member"),
+    ] {
+        assert_eq!(
+            check_structure(&serde_json::to_vec(&invalid).unwrap(), &eb, disk).unwrap_err(),
+            reason
+        );
     }
     let mut wrong_answer = e.clone();
     wrong_answer["cases"][0]["truth"] = json!("false");
-    assert!(check_inventory(&mb, &serde_json::to_vec(&wrong_answer).unwrap(), disk).is_err());
-    assert!(check_inventory(&mb, &eb, |_| Err("fixture missing".into())).is_err());
+    assert_eq!(
+        check_structure(&mb, &serde_json::to_vec(&wrong_answer).unwrap(), disk).unwrap_err(),
+        "independent answer content changed"
+    );
+    // Equivalent reserialization passes structure but still fails the byte pin.
+    let serialized = serde_json::to_vec(&m).unwrap();
+    check_structure(&serialized, &eb, disk).unwrap();
+    assert!(check_inventory(&serialized, &eb, disk)
+        .unwrap_err()
+        .contains("digest changed"));
+    assert_eq!(
+        check_inventory(&mb, &eb, |_| Err("fixture missing".into())).unwrap_err(),
+        "fixture missing"
+    );
     assert!(check_inventory(&mb, &eb, |p| {
         let mut bytes = disk(p)?;
         bytes.push(b' ');
         Ok(bytes)
     })
-    .is_err());
+    .unwrap_err()
+    .starts_with("fixture digest changed:"));
     for entry in m["cases"].as_array().unwrap() {
         let c = read(entry["path"].as_str().unwrap());
         let a = e["cases"]

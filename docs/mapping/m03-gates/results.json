@@ -42,7 +42,7 @@
       ],
       "exitCode": 0,
       "evidencePath": "docs/mapping/m03-gates/clippy.txt",
-      "sha256": "3d500b602ce579023358d2e7b6bb17b1941c1e32a3356088bf9cec7533635adb",
+      "sha256": "ea4803eaa7360d0520ae4b4cdf07e3503384a4112ba6a9140ec98a499e2d5542",
       "seconds": 3.23,
       "statuses": []
     },
@@ -60,7 +60,7 @@
       ],
       "exitCode": 0,
       "evidencePath": "docs/mapping/m03-gates/unit.txt",
-      "sha256": "f1ee39099e6151380a0f19aab0358b30e0d7d9e1f8f7a6ba228cd766d98759d8",
+      "sha256": "63cf679116d63fd771b96588911c8e4eb9f5d0e2137e61a3419680e8743af8d3",
       "seconds": 13.82,
       "statuses": []
     },
@@ -73,7 +73,7 @@
       ],
       "exitCode": 0,
       "evidencePath": "docs/mapping/m03-gates/workspace.txt",
-      "sha256": "00a64dddb2b084b40a866e2886021ff7b91cd4271b2ffd90efe56ff508e68708",
+      "sha256": "d9374f9cba8c0d136b643e497ee4d1b746f28385170f5d434a57c4a6daaea23d",
       "seconds": 238.16,
       "statuses": []
     },
@@ -86,7 +86,7 @@
       ],
       "exitCode": 0,
       "evidencePath": "docs/mapping/m03-gates/require.txt",
-      "sha256": "b9430f4844c82a739d3231db227ed7bfbfb11196305ee85cbd403cd2eef6e72a",
+      "sha256": "9b9d1027799c9623261d11c285be7a4672da8a337c721795c79004327fa726d8",
       "seconds": 101.76,
       "statuses": [
         "P00: passed: required tests executed",
@@ -125,7 +125,7 @@
       ],
       "exitCode": 0,
       "evidencePath": "docs/mapping/m03-gates/through-completed.txt",
-      "sha256": "be8f8f80b1ab05e457386ffa512c928940987e7ac7693f02eddb13779bd4e5e7",
+      "sha256": "a7985249548675f16df39b6b70c07a90eefad17b27deae61e4472221d7160a28",
       "seconds": 79.96,
       "statuses": [
         "P00: passed: required tests executed",
@@ -164,7 +164,7 @@
       ],
       "exitCode": 1,
       "evidencePath": "docs/mapping/m03-gates/all-goals.txt",
-      "sha256": "2e21d8c770bfbf8f99e77b74280ab9a946b073fa7fed36b267b20e22462ba064",
+      "sha256": "1b028c3b269f02186f7d78f4e9e8150307af5d8b014a514c07aadb323fc8e9fd",
       "seconds": 81.37,
       "statuses": [
         "P00: passed: required tests executed",

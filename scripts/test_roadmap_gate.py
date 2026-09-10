@@ -178,5 +178,79 @@ class RoadmapGateTests(unittest.TestCase):
             self.assertEqual(gate.stop_records(self.policy), pending + [new_stop])
 
 
+class CiGovernanceTests(unittest.TestCase):
+    def run_report(self, mode, units, stops, failure=None):
+        policy = copy.deepcopy(gate.load_policy())
+        policy['units'] = units
+        policy['completedThrough'] = units[0]['id']
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / 'report.json'
+            with patch.object(gate, 'load_policy', return_value=policy), patch.object(
+                gate, 'scoreboard', return_value={}
+            ), patch.object(gate, 'stop_records', return_value=stops), patch.object(
+                gate, 'run_unit', side_effect=failure
+            ):
+                code = gate.main([mode, '--report', str(output)])
+            return code, json.loads(output.read_text())
+
+    def test_ci_accepts_only_validated_recorded_stops_not_completion(self):
+        unit = dict(id='A', depends=[], implemented=False)
+        stops = [dict(unitOrProposal='A')]
+        for mode, expected in [('--ci', 0), ('--all-goals', 1), ('--through-completed', 1)]:
+            code, report = self.run_report(mode, [unit], stops)
+            self.assertEqual(code, expected)
+            self.assertFalse(report['passed'])
+            self.assertEqual(report['results'][-1]['status'], 'stopped')
+        code, report = self.run_report('--ci', [unit], [])
+        self.assertEqual(code, 1)  # Deleting the stop cannot make CI green.
+        self.assertEqual(report['results'][-1]['status'], 'unimplemented')
+
+    def test_ci_rejects_failed_missing_unimplemented_and_blocked_units(self):
+        unit = dict(id='A', depends=[], implemented=True)
+        for status in ['failed', 'missing-gate']:
+            code, report = self.run_report('--ci', [unit], [], gate.GateError(status, 'test failure'))
+            self.assertEqual(code, 1)
+            self.assertEqual(report['results'][-1]['status'], status)
+        for implemented, status in [(False, 'unimplemented'), (True, 'blocked')]:
+            dependent = dict(id='B', depends=['A'], implemented=implemented)
+            code, report = self.run_report('--ci', [unit, dependent], [dict(unitOrProposal='A')])
+            self.assertEqual(code, 1)
+            self.assertEqual(report['results'][-1]['status'], status)
+        self.assertEqual(self.run_report('--ci', [unit], [])[0], 0)
+
+    def test_ci_rejects_corrupt_stop_evidence(self):
+        policy = gate.load_policy()
+        actual_read = gate.read
+        evidence = gate.ROOT / 'docs/mapping/m05-stop-evidence/boundary.log'
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / 'ci.json'
+            with patch.object(gate, 'scoreboard', return_value={}), patch.object(
+                gate, 'read', side_effect=lambda path: b'changed' if path == evidence else actual_read(path)
+            ), patch.object(gate, 'run_unit') as run:
+                self.assertEqual(gate.main(['--ci', '--report', str(output)]), 1)
+                run.assert_not_called()
+            report = json.loads(output.read_text())
+            self.assertFalse(report['ciAccepted'])
+            self.assertEqual(report['results'][-1]['status'], 'missing-gate')
+            self.assertEqual(report['results'][-1]['detail'], 'stop evidence hash mismatch')
+
+    def test_command_normalizes_before_printing_recording_and_hashing(self):
+        import contextlib
+        import io
+        import subprocess
+        raw = f'Checking ({gate.ROOT}/ergo-sandbox) {Path.home()}/.cargo/source\n'
+        records = []
+        out = io.StringIO()
+        with patch.object(gate.subprocess, 'run', return_value=subprocess.CompletedProcess(['cargo'], 7, raw)), contextlib.redirect_stdout(out):
+            result = gate.command(['cargo'], records)
+        self.assertEqual(result.returncode, 7)
+        self.assertEqual(out.getvalue(), result.stdout)
+        self.assertEqual(records[0]['output'], result.stdout)
+        self.assertEqual(records[0]['outputSha256'], gate.sha(result.stdout.encode()))
+        self.assertNotIn(str(gate.ROOT), result.stdout)
+        self.assertNotIn(str(Path.home()), result.stdout)
+        self.assertIn('<repo>/ergo-sandbox', result.stdout)
+
+
 if __name__ == '__main__':
     unittest.main()

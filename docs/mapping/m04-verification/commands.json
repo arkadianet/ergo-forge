@@ -27,7 +27,7 @@
       ],
       "exitCode": 0,
       "outputPath": "docs/mapping/m04-verification/clippy.log",
-      "sha256": "9f972e7ad0d88a8c7b1963ebd4ba3f477377a775538f891ee3e43cff15a40c61"
+      "sha256": "d650c83045cd6dfb6a1341e34bc3a51973584e9ee39cc05cb4e8868069059c80"
     },
     {
       "command": [
@@ -43,7 +43,7 @@
       ],
       "exitCode": 0,
       "outputPath": "docs/mapping/m04-verification/actions.log",
-      "sha256": "4708a0c754367b62f1f63205994dbc4ac43313dd974a48f10acce22b34bc95ea"
+      "sha256": "aaa546d60bd50fa8b6a39cfcbf771f14652587631ee37b80702a6719d97acf41"
     },
     {
       "command": [
@@ -54,7 +54,7 @@
       ],
       "exitCode": 0,
       "outputPath": "docs/mapping/m04-verification/workspace.log",
-      "sha256": "5133600da0998cf25426b03a9bf5e93f472faa415ad9d87329965dc3d4733a62"
+      "sha256": "597065c6dec32e684e1bc5b617d2385ed72d6c94a36cac88194b736af9d66d52"
     },
     {
       "command": [
@@ -65,7 +65,7 @@
       ],
       "exitCode": 0,
       "outputPath": "docs/mapping/m04-verification/require-M04.log",
-      "sha256": "b87946f686db50df588f211a202d739bac4d41ef2746f31a131b003dcc60fc00"
+      "sha256": "9b2dd682bf185ce07b17172bb5f0fa7f3c46f47e8d815f09f7218c851f3567eb"
     },
     {
       "command": [
@@ -75,7 +75,7 @@
       ],
       "exitCode": 0,
       "outputPath": "docs/mapping/m04-verification/through-completed.log",
-      "sha256": "517acf0729ffe19b505e2fb7fd062e8d2c3263ead9d9c0b3a610aa031e2b60b5"
+      "sha256": "e7dcf00d632020d2319b0fee46833d91df850369e40b48f30f86a7979266b9a9"
     },
     {
       "command": [
@@ -85,7 +85,7 @@
       ],
       "exitCode": 1,
       "outputPath": "docs/mapping/m04-verification/all-goals.log",
-      "sha256": "f9aaee537ace1b7418312e6eee880391c73a4d564f4cf08d05c39ab2d620a3c0"
+      "sha256": "35fc7d518bc712f2965576529cb0c4306f6fe20c8776d093e198274c9083a3ef"
     }
   ]
 }

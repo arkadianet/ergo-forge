@@ -2,7 +2,7 @@
    Compiling rustls v0.23.43
    Compiling rustls-webpki v0.103.15
    Compiling ureq v3.4.1
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 21.11s
      Running tests/claim_contract.rs (target-p00/release/deps/claim_contract-67314c4a30c78ca0)
 legacy_record_cannot_import_as_verified: test
@@ -101,7 +101,7 @@ ok 7 - production Read and Write handlers render both signs of synthetic hunt
 # todo 0
 # duration_ms 198.196423
 P00: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 1.19s
      Running tests/evidence_provenance.rs (target-p00/release/deps/evidence_provenance-83344e4e24342818)
 changing_any_premise_invalidates_cached_evidence: test
@@ -137,7 +137,7 @@ successes:
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
 
 P01: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 1.21s
      Running tests/evidence_wire.rs (target-p00/release/deps/evidence_wire-f372c6c7d4dbbdaa)
 invalid_tree_never_becomes_empty_bytes: test
@@ -173,7 +173,7 @@ successes:
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
 P02: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 1.69s
      Running tests/node_validation.rs (target-p00/release/deps/node_validation-71785e616645c29a)
 accepted_execution_cannot_be_deserialized_or_fabricated: test
@@ -199,7 +199,7 @@ successes:
 test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
 P03: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 1.71s
      Running tests/transaction_proofs.rs (target-p00/release/deps/transaction_proofs-fe647ec940042bb0)
 changed_transaction_invalidates_proof: test
@@ -228,7 +228,7 @@ successes:
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
 P04: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 1.92s
      Running tests/claim_replay.rs (target-p00/release/deps/claim_replay-d79525742826db59)
 claim_requires_accepted_execution_and_violated_property: test
@@ -270,7 +270,7 @@ successes:
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
 
 P05: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 1.98s
      Running tests/drain_promotion.rs (target-p00/release/deps/drain_promotion-86b4cb15231631ee)
 associated_lint_is_not_the_confirmed_claim: test
@@ -336,7 +336,7 @@ successes:
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
 
 P06: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 2.09s
      Running tests/obligation_reports.rs (target-p00/release/deps/obligation_reports-c0f2e7b0ec212eb3)
 conditional_discharge_exports_the_full_premise_set: test
@@ -392,8 +392,8 @@ P07: passed: required tests executed
    Compiling ureq v3.4.1
    Compiling hyper-rustls v0.27.9
    Compiling reqwest v0.12.28
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
-   Compiling ergo-web v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-web)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
+   Compiling ergo-web v0.3.0 (<repo>/ergo-web)
     Finished `release` profile [optimized] target(s) in 16.46s
      Running tests/evidence_replay.rs (target-p00/release/deps/evidence_replay-224d16615cf94622)
 historical_and_hypothetical_state_labels_are_visible: test
@@ -411,7 +411,7 @@ test replay_request_never_fetches_or_broadcasts ... ok
    Compiling rustls v0.23.43
    Compiling rustls-webpki v0.103.15
    Compiling ureq v3.4.1
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 21.35s
 test http_and_cli_replay_have_identical_semantic_results ... ok
 test legacy_preflight_does_not_use_node_claim_badge ... ok
@@ -456,7 +456,7 @@ ok 3 - saved verdicts are discarded and errors clear earlier claims
 # todo 0
 # duration_ms 20173.434262
 P08: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 1.24s
      Running tests/mapping_inventory.rs (target-p00/release/deps/mapping_inventory-5046a3df6ee52135)
 fixture_constructs_execute_and_unsupported_members_remain: test
@@ -475,18 +475,18 @@ test fixture_constructs_execute_and_unsupported_members_remain ... ok
 successes:
 
 ---- inventory_has_32_pinned_cases_and_independent_answers stdout ----
-evidence /home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/manifest.json sha256=7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f
-evidence /home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/expected.json sha256=291923d76f2de8a69deec82cc049d233d87d91f816295312ed89f9291e13405e
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/manifest.json sha256=7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/expected.json sha256=291923d76f2de8a69deec82cc049d233d87d91f816295312ed89f9291e13405e
 32 cases / 16 paired families; missing, duplicate, altered fixture and altered answer rejected
 
 ---- legacy_metrics_are_measured_without_baseline_changes stdout ----
-evidence /home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/legacy-results.json sha256=76f8c817944be882fbc4f726d7016ffd55d244c307a68b85729804d8a98f2150
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/legacy-results.json sha256=76f8c817944be882fbc4f726d7016ffd55d244c307a68b85729804d8a98f2150
 {"actionSetAccuracy":null,"caseAccounting":{"denominator":32,"meaning":"fixture harness accounting, not mapping completeness","numerator":32},"closedFixtureReachability":{"denominator":31,"denominatorIds":["literal_spend-positive/B","literal_spend-control/B","self_alias-positive/B","action_alternatives-positive/B","action_alternatives-positive/C","action_alternatives-control/B","action_alternatives-control/C","data_only-positive/B","data_only-control/B","output_only-positive/B","output_only-control/B","dead_check-positive/B","dead_check-control/B","script_identity-positive/B","script_identity-control/C","token_identity-positive/B","token_identity-positive/C","token_identity-control/B","token_identity-control/C","tokenless-positive/B","exists_literal-positive/B","exists_literal-control/B","computed_index-positive/B","computed_index-control/B","register_identity-positive/B","register_identity-positive/C","register_identity-control/C","register_identity-control/U","context_code-positive/B","context_code-control/B","snapshot_collision-positive/B"],"numerator":4,"numeratorIds":["token_identity-positive/B","token_identity-positive/C","token_identity-control/B","token_identity-control/C"],"rate":0.12903225806451613},"dynamicTupleRecovery":{"denominator":15,"denominatorIds":["self_alias-positive/[\"A\",\"B\"]","token_identity-positive/[\"A\",\"B\"]","token_identity-positive/[\"A\",\"C\"]","token_identity-control/[\"A\",\"B\"]","token_identity-control/[\"A\",\"C\"]","exists_literal-positive/[\"A\",\"B\"]","exists_literal-control/[\"A\",\"B\"]","computed_index-positive/[\"A\",\"B\"]","computed_index-control/[\"A\",\"B\"]","register_identity-positive/[\"A\",\"B\"]","register_identity-positive/[\"A\",\"C\"]","register_identity-control/[\"A\",\"C\"]","register_identity-control/[\"A\",\"U\"]","context_code-positive/[\"A\",\"B\"]","context_code-control/[\"A\",\"B\"]"],"numerator":0,"numeratorIds":[],"rate":0.0},"falseProposal":{"adjudicatedIds":[],"denominator":21,"falseIds":[],"meaning":"unresolved targets remain unadjudicated; never call this zero false proposals","numerator":0,"rate":null,"unadjudicatedIds":["literal_spend-positive/edge/0","literal_spend-control/edge/0","action_alternatives-positive/edge/0","action_alternatives-control/edge/0","data_only-positive/edge/0","data_only-control/edge/0","output_only-positive/edge/0","output_only-control/edge/0","dead_check-positive/edge/0","script_identity-positive/edge/0","script_identity-control/edge/0","token_identity-positive/edge/0","tokenless-positive/edge/0","tokenless-control/edge/0","register_identity-positive/edge/0","register_identity-positive/edge/1","register_identity-control/edge/0","register_identity-control/edge/1","context_code-positive/edge/0","context_code-control/edge/0","snapshot_collision-positive/edge/0"]},"legacySiteObservation":{"denominator":52,"denominatorIds":["literal_spend-positive/site/0","literal_spend-positive/site/1","literal_spend-control/site/0","literal_spend-control/site/1","self_alias-positive/site/0","self_alias-control/site/0","action_alternatives-positive/site/0","action_alternatives-positive/site/1","action_alternatives-positive/site/2","action_alternatives-control/site/0","action_alternatives-control/site/1","action_alternatives-control/site/2","data_only-positive/site/0","data_only-positive/site/1","data_only-control/site/0","output_only-positive/site/0","output_only-positive/site/1","output_only-control/site/0","dead_check-positive/site/0","dead_check-positive/site/1","dead_check-control/site/0","script_identity-positive/site/0","script_identity-control/site/0","token_identity-positive/site/0","token_identity-control/site/0","tokenless-positive/site/0","tokenless-positive/site/1","tokenless-control/site/0","exists_literal-positive/site/0","exists_literal-control/site/0","computed_index-positive/site/0","computed_index-control/site/0","register_identity-positive/site/0","register_identity-positive/site/1","register_identity-positive/site/2","register_identity-control/site/0","register_identity-control/site/1","context_code-positive/site/0","context_code-positive/site/1","context_code-positive/site/2","context_code-control/site/0","context_code-control/site/1","context_code-control/site/2","context_scope-positive/site/0","context_scope-positive/site/1","context_scope-control/site/0","context_scope-control/site/1","avl_identity-positive/site/0","avl_identity-control/site/0","snapshot_collision-positive/site/0","snapshot_collision-positive/site/1","snapshot_collision-control/site/0"],"numerator":35,"numeratorIds":["literal_spend-positive/site/0","literal_spend-positive/site/1","literal_spend-control/site/0","literal_spend-control/site/1","action_alternatives-positive/site/0","action_alternatives-positive/site/1","action_alternatives-positive/site/2","action_alternatives-control/site/0","action_alternatives-control/site/1","action_alternatives-control/site/2","data_only-positive/site/0","data_only-positive/site/1","data_only-control/site/0","output_only-positive/site/0","output_only-positive/site/1","output_only-control/site/0","dead_check-positive/site/0","dead_check-positive/site/1","script_identity-positive/site/0","script_identity-control/site/0","token_identity-positive/site/0","tokenless-positive/site/0","tokenless-positive/site/1","tokenless-control/site/0","register_identity-positive/site/0","register_identity-positive/site/1","register_identity-positive/site/2","register_identity-control/site/0","register_identity-control/site/1","context_code-positive/site/0","context_code-positive/site/1","context_code-control/site/0","context_code-control/site/1","snapshot_collision-positive/site/0","snapshot_collision-positive/site/1"],"rate":0.6730769230769231},"m02SupportedReachability":{"denominator":23,"denominatorIds":["literal_spend-positive/B","literal_spend-control/B","self_alias-positive/B","action_alternatives-positive/B","action_alternatives-positive/C","action_alternatives-control/B","action_alternatives-control/C","data_only-positive/B","data_only-control/B","output_only-positive/B","output_only-control/B","dead_check-positive/B","dead_check-control/B","script_identity-positive/B","script_identity-control/C","token_identity-positive/B","token_identity-positive/C","token_identity-control/B","token_identity-control/C","tokenless-positive/B","exists_literal-positive/B","exists_literal-control/B","snapshot_collision-positive/B"],"numerator":4,"numeratorIds":["token_identity-positive/B","token_identity-positive/C","token_identity-control/B","token_identity-control/C"],"rate":0.17391304347826086},"necessityRecall":null,"omissionRefutation":null,"promotedFalseRelation":{"denominator":0,"numerator":0,"rate":null,"reason":"no relation API exists"},"unavailableReason":"legacy API produces neither checked necessities, action checks nor node-accepted omission witnesses; whole-chain denominator unknown","wholeDeployedProtocolCompleteness":null}
 
 ---- fixture_constructs_execute_and_unsupported_members_remain stdout ----
 67 real engine vectors across 32 cases; 18 unsupported members retained: [String("literal_spend-control"), String("self_alias-control"), String("action_alternatives-control"), String("data_only-control"), String("output_only-control"), String("dead_check-control"), String("script_identity-control"), String("token_identity-control"), String("tokenless-control"), String("exists_literal-control"), String("computed_index-positive"), String("computed_index-control"), String("register_identity-control"), String("context_code-control"), String("context_scope-control"), String("avl_identity-positive"), String("avl_identity-control"), String("snapshot_collision-control")]; scenario reduction only, no node acceptance or necessity certification
-evidence /home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/manifest.json sha256=7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f
-evidence /home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/expected.json sha256=291923d76f2de8a69deec82cc049d233d87d91f816295312ed89f9291e13405e
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/manifest.json sha256=7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/expected.json sha256=291923d76f2de8a69deec82cc049d233d87d91f816295312ed89f9291e13405e
 
 
 successes:
@@ -497,7 +497,7 @@ successes:
 test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
 
 M00: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 1.88s
      Running tests/mapping_artifacts.rs (target-p00/release/deps/mapping_artifacts-f2978e8975cbeca2)
 discovery_cannot_import_as_required_execution: test
@@ -516,9 +516,9 @@ test raw_provenance_and_legacy_map_bytes_survive ... ok
 successes:
 
 ---- raw_provenance_and_legacy_map_bytes_survive stdout ----
-/home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/m01-discovery.json sha256=8b2062c899b4870e426e450c8d8f8c838863f50147156f2c949fd1d011d84051
-/home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/m01-relations.json sha256=82e14eee51b5f47d10887d737345c4310695b42a192f9131a5a3a95b9b1b7273
-/home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/m01-mapping-results.json sha256=df74b66f0056d44ad7ce935e420a3df91ac8ec0c0819c8c9d7019bfcba6c11ff
+<repo>/ergo-sandbox/tests/fixtures/mapping/m01-discovery.json sha256=8b2062c899b4870e426e450c8d8f8c838863f50147156f2c949fd1d011d84051
+<repo>/ergo-sandbox/tests/fixtures/mapping/m01-relations.json sha256=82e14eee51b5f47d10887d737345c4310695b42a192f9131a5a3a95b9b1b7273
+<repo>/ergo-sandbox/tests/fixtures/mapping/m01-mapping-results.json sha256=df74b66f0056d44ad7ce935e420a3df91ac8ec0c0819c8c9d7019bfcba6c11ff
 
 
 successes:
@@ -529,7 +529,7 @@ successes:
 test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
 
 M01: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 1.88s
      Running tests/mapping_discovery.rs (target-p00/release/deps/mapping_discovery-25ae5dac94359712)
 caps_missing_pages_and_computed_identities_stay_unresolved: test
@@ -555,7 +555,7 @@ false proposals retained: {"adjudicatedIds":["literal_spend-positive/227d545f590
 
 ---- supported_reference_recall_and_all_site_accounting stdout ----
 {"actionSetAccuracy":null,"allCaseRecall":{"denominator":31,"denominatorIds":["literal_spend-positive/B","literal_spend-control/B","self_alias-positive/B","action_alternatives-positive/B","action_alternatives-positive/C","action_alternatives-control/B","action_alternatives-control/C","data_only-positive/B","data_only-control/B","output_only-positive/B","output_only-control/B","dead_check-positive/B","dead_check-control/B","script_identity-positive/B","script_identity-control/C","token_identity-positive/B","token_identity-positive/C","token_identity-control/B","token_identity-control/C","tokenless-positive/B","exists_literal-positive/B","exists_literal-control/B","computed_index-positive/B","computed_index-control/B","register_identity-positive/B","register_identity-positive/C","register_identity-control/C","register_identity-control/U","context_code-positive/B","context_code-control/B","snapshot_collision-positive/B"],"numerator":26,"numeratorIds":["literal_spend-positive/B","literal_spend-control/B","self_alias-positive/B","action_alternatives-positive/B","action_alternatives-positive/C","action_alternatives-control/B","action_alternatives-control/C","data_only-positive/B","data_only-control/B","output_only-positive/B","output_only-control/B","dead_check-positive/B","dead_check-control/B","script_identity-positive/B","script_identity-control/C","token_identity-positive/B","token_identity-positive/C","token_identity-control/B","token_identity-control/C","tokenless-positive/B","exists_literal-positive/B","exists_literal-control/B","register_identity-positive/B","context_code-positive/B","context_code-control/B","snapshot_collision-positive/B"],"rate":0.8387096774193549},"caseAccounting":{"denominator":32,"numerator":32},"dynamicByFamilyAndSupport":[{"family":"self_alias","id":"self_alias-positive","recovery":{"denominator":1,"denominatorIds":["self_alias-positive/[\"A\",\"B\"]"],"numerator":1,"numeratorIds":["self_alias-positive/[\"A\",\"B\"]"],"rate":1.0},"supported":true},{"family":"self_alias","id":"self_alias-control","recovery":{"denominator":0,"denominatorIds":[],"numerator":0,"numeratorIds":[],"rate":null},"supported":true},{"family":"token_identity","id":"token_identity-positive","recovery":{"denominator":2,"denominatorIds":["token_identity-positive/[\"A\",\"B\"]","token_identity-positive/[\"A\",\"C\"]"],"numerator":2,"numeratorIds":["token_identity-positive/[\"A\",\"B\"]","token_identity-positive/[\"A\",\"C\"]"],"rate":1.0},"supported":true},{"family":"token_identity","id":"token_identity-control","recovery":{"denominator":2,"denominatorIds":["token_identity-control/[\"A\",\"B\"]","token_identity-control/[\"A\",\"C\"]"],"numerator":2,"numeratorIds":["token_identity-control/[\"A\",\"B\"]","token_identity-control/[\"A\",\"C\"]"],"rate":1.0},"supported":true},{"family":"exists_literal","id":"exists_literal-positive","recovery":{"denominator":1,"denominatorIds":["exists_literal-positive/[\"A\",\"B\"]"],"numerator":1,"numeratorIds":["exists_literal-positive/[\"A\",\"B\"]"],"rate":1.0},"supported":true},{"family":"exists_literal","id":"exists_literal-control","recovery":{"denominator":1,"denominatorIds":["exists_literal-control/[\"A\",\"B\"]"],"numerator":1,"numeratorIds":["exists_literal-control/[\"A\",\"B\"]"],"rate":1.0},"supported":true},{"family":"computed_index","id":"computed_index-positive","recovery":{"denominator":1,"denominatorIds":["computed_index-positive/[\"A\",\"B\"]"],"numerator":0,"numeratorIds":[],"rate":0.0},"supported":false},{"family":"computed_index","id":"computed_index-control","recovery":{"denominator":1,"denominatorIds":["computed_index-control/[\"A\",\"B\"]"],"numerator":0,"numeratorIds":[],"rate":0.0},"supported":false},{"family":"register_identity","id":"register_identity-positive","recovery":{"denominator":2,"denominatorIds":["register_identity-positive/[\"A\",\"B\"]","register_identity-positive/[\"A\",\"C\"]"],"numerator":1,"numeratorIds":["register_identity-positive/[\"A\",\"B\"]"],"rate":0.5},"supported":false},{"family":"register_identity","id":"register_identity-control","recovery":{"denominator":2,"denominatorIds":["register_identity-control/[\"A\",\"C\"]","register_identity-control/[\"A\",\"U\"]"],"numerator":0,"numeratorIds":[],"rate":0.0},"supported":false},{"family":"context_code","id":"context_code-positive","recovery":{"denominator":1,"denominatorIds":["context_code-positive/[\"A\",\"B\"]"],"numerator":1,"numeratorIds":["context_code-positive/[\"A\",\"B\"]"],"rate":1.0},"supported":false},{"family":"context_code","id":"context_code-control","recovery":{"denominator":1,"denominatorIds":["context_code-control/[\"A\",\"B\"]"],"numerator":1,"numeratorIds":["context_code-control/[\"A\",\"B\"]"],"rate":1.0},"supported":false},{"family":"context_scope","id":"context_scope-positive","recovery":{"denominator":0,"denominatorIds":[],"numerator":0,"numeratorIds":[],"rate":null},"supported":false},{"family":"context_scope","id":"context_scope-control","recovery":{"denominator":0,"denominatorIds":[],"numerator":0,"numeratorIds":[],"rate":null},"supported":false},{"family":"avl_identity","id":"avl_identity-positive","recovery":{"denominator":0,"denominatorIds":[],"numerator":0,"numeratorIds":[],"rate":null},"supported":false},{"family":"avl_identity","id":"avl_identity-control","recovery":{"denominator":0,"denominatorIds":[],"numerator":0,"numeratorIds":[],"rate":null},"supported":false}],"dynamicRecovery":{"denominator":15,"denominatorIds":["self_alias-positive/[\"A\",\"B\"]","token_identity-positive/[\"A\",\"B\"]","token_identity-positive/[\"A\",\"C\"]","token_identity-control/[\"A\",\"B\"]","token_identity-control/[\"A\",\"C\"]","exists_literal-positive/[\"A\",\"B\"]","exists_literal-control/[\"A\",\"B\"]","computed_index-positive/[\"A\",\"B\"]","computed_index-control/[\"A\",\"B\"]","register_identity-positive/[\"A\",\"B\"]","register_identity-positive/[\"A\",\"C\"]","register_identity-control/[\"A\",\"C\"]","register_identity-control/[\"A\",\"U\"]","context_code-positive/[\"A\",\"B\"]","context_code-control/[\"A\",\"B\"]"],"numerator":10,"numeratorIds":["self_alias-positive/[\"A\",\"B\"]","token_identity-positive/[\"A\",\"B\"]","token_identity-positive/[\"A\",\"C\"]","token_identity-control/[\"A\",\"B\"]","token_identity-control/[\"A\",\"C\"]","exists_literal-positive/[\"A\",\"B\"]","exists_literal-control/[\"A\",\"B\"]","register_identity-positive/[\"A\",\"B\"]","context_code-positive/[\"A\",\"B\"]","context_code-control/[\"A\",\"B\"]"],"rate":0.6666666666666666},"falseProposal":{"adjudicatedIds":["literal_spend-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0","literal_spend-control/3c8d0008bfccb2ea0207bf34d79732252bf13be0bc25117ba9731c49d4194986/candidate/0","self_alias-positive/beca2179b9c609bfc7affd1142bd600f7bbe501f58204b225f37872c000c7493/candidate/0","action_alternatives-positive/47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4/candidate/0","action_alternatives-positive/47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4/candidate/1","action_alternatives-control/47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4/candidate/0","action_alternatives-control/47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4/candidate/1","data_only-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0","data_only-control/2ddff834dd3c35b850e7a936b39c58713c7501990a616787d0824861bf286c9e/candidate/0","output_only-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0","output_only-control/9dbe05e5b43786a449a5223a2b44b28a94191d75b1c4b9ee2b38cd6fcbb9d870/candidate/0","dead_check-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0","dead_check-control/a2d74007ec59679a0e3d62fff05dcbf4c34327de1af24114c1f1218dc177c589/candidate/0","script_identity-positive/86929e1d9b506e70d75220b073ed3fafe4ba0bc6228fa5b013621651a6940570/candidate/0","script_identity-control/ef971bec31181025b3c12a505a67c12f484f078ea2e4008a18882d8a6ef3b9e7/candidate/0","token_identity-positive/c52a3277b56d747d8cdc5167cea2559ff888daecef4b8decaa2fa2b48d900ef8/candidate/0","token_identity-positive/c52a3277b56d747d8cdc5167cea2559ff888daecef4b8decaa2fa2b48d900ef8/candidate/1","token_identity-control/652ce0ee6908274f54715bff0ecc0b3bd2e6966f6e845cdd4a0946eafdff3773/candidate/0","token_identity-control/652ce0ee6908274f54715bff0ecc0b3bd2e6966f6e845cdd4a0946eafdff3773/candidate/1","tokenless-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0","exists_literal-positive/beca2179b9c609bfc7affd1142bd600f7bbe501f58204b225f37872c000c7493/candidate/0","exists_literal-control/94b248456afa410e9b53f87e4ae088fae39ba016429c127bb2eced4434e1e504/candidate/0","register_identity-positive/23fada8730f7e9a997ca8c4eecd34c57ed3e3302a51ab4a8f4b4d5cb2fd3f11e/candidate/0","context_code-positive/6157443719cfa5ad79bb4e6c82bca94752ec712286301b0079593fe9eee5a3fb/candidate/0","context_code-control/05eeca589a4488dc0ca4d38aceafc7a9e7a15fee71a4b580dfb553a96a1138dc/candidate/0","snapshot_collision-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0","snapshot_collision-control/452e000a4fc9e06284bb509e7b96ce4a90abebaa2b489d700715528311b2fc4a/candidate/0","snapshot_collision-control/452e000a4fc9e06284bb509e7b96ce4a90abebaa2b489d700715528311b2fc4a/candidate/1"],"denominator":28,"falseIds":["snapshot_collision-control/452e000a4fc9e06284bb509e7b96ce4a90abebaa2b489d700715528311b2fc4a/candidate/0","snapshot_collision-control/452e000a4fc9e06284bb509e7b96ce4a90abebaa2b489d700715528311b2fc4a/candidate/1"],"numerator":2,"rate":0.07142857142857142,"unadjudicatedIds":[]},"meaning":"finite supplied hypothetical material only; lexical site accounting is not exact-tree correspondence; neither observation nor hint confers necessity or simultaneous availability","necessityRecall":null,"omissionRefutation":null,"promotedFalseRelation":{"denominator":0,"numerator":0,"rate":null,"reason":"discovery has no establishment API; M03 not implemented"},"siteAccounting":{"denominator":52,"denominatorIds":["literal_spend-positive/site/0","literal_spend-positive/site/1","literal_spend-control/site/0","literal_spend-control/site/1","self_alias-positive/site/0","self_alias-control/site/0","action_alternatives-positive/site/0","action_alternatives-positive/site/1","action_alternatives-positive/site/2","action_alternatives-control/site/0","action_alternatives-control/site/1","action_alternatives-control/site/2","data_only-positive/site/0","data_only-positive/site/1","data_only-control/site/0","output_only-positive/site/0","output_only-positive/site/1","output_only-control/site/0","dead_check-positive/site/0","dead_check-positive/site/1","dead_check-control/site/0","script_identity-positive/site/0","script_identity-control/site/0","token_identity-positive/site/0","token_identity-control/site/0","tokenless-positive/site/0","tokenless-positive/site/1","tokenless-control/site/0","exists_literal-positive/site/0","exists_literal-control/site/0","computed_index-positive/site/0","computed_index-control/site/0","register_identity-positive/site/0","register_identity-positive/site/1","register_identity-positive/site/2","register_identity-control/site/0","register_identity-control/site/1","context_code-positive/site/0","context_code-positive/site/1","context_code-positive/site/2","context_code-control/site/0","context_code-control/site/1","context_code-control/site/2","context_scope-positive/site/0","context_scope-positive/site/1","context_scope-control/site/0","context_scope-control/site/1","avl_identity-positive/site/0","avl_identity-control/site/0","snapshot_collision-positive/site/0","snapshot_collision-positive/site/1","snapshot_collision-control/site/0"],"numerator":52,"numeratorIds":["literal_spend-positive/site/0","literal_spend-positive/site/1","literal_spend-control/site/0","literal_spend-control/site/1","self_alias-positive/site/0","self_alias-control/site/0","action_alternatives-positive/site/0","action_alternatives-positive/site/1","action_alternatives-positive/site/2","action_alternatives-control/site/0","action_alternatives-control/site/1","action_alternatives-control/site/2","data_only-positive/site/0","data_only-positive/site/1","data_only-control/site/0","output_only-positive/site/0","output_only-positive/site/1","output_only-control/site/0","dead_check-positive/site/0","dead_check-positive/site/1","dead_check-control/site/0","script_identity-positive/site/0","script_identity-control/site/0","token_identity-positive/site/0","token_identity-control/site/0","tokenless-positive/site/0","tokenless-positive/site/1","tokenless-control/site/0","exists_literal-positive/site/0","exists_literal-control/site/0","computed_index-positive/site/0","computed_index-control/site/0","register_identity-positive/site/0","register_identity-positive/site/1","register_identity-positive/site/2","register_identity-control/site/0","register_identity-control/site/1","context_code-positive/site/0","context_code-positive/site/1","context_code-positive/site/2","context_code-control/site/0","context_code-control/site/1","context_code-control/site/2","context_scope-positive/site/0","context_scope-positive/site/1","context_scope-control/site/0","context_scope-control/site/1","avl_identity-positive/site/0","avl_identity-control/site/0","snapshot_collision-positive/site/0","snapshot_collision-positive/site/1","snapshot_collision-control/site/0"],"rate":1.0},"supportedRecall":{"denominator":23,"denominatorIds":["literal_spend-positive/B","literal_spend-control/B","self_alias-positive/B","action_alternatives-positive/B","action_alternatives-positive/C","action_alternatives-control/B","action_alternatives-control/C","data_only-positive/B","data_only-control/B","output_only-positive/B","output_only-control/B","dead_check-positive/B","dead_check-control/B","script_identity-positive/B","script_identity-control/C","token_identity-positive/B","token_identity-positive/C","token_identity-control/B","token_identity-control/C","tokenless-positive/B","exists_literal-positive/B","exists_literal-control/B","snapshot_collision-positive/B"],"numerator":23,"numeratorIds":["literal_spend-positive/B","literal_spend-control/B","self_alias-positive/B","action_alternatives-positive/B","action_alternatives-positive/C","action_alternatives-control/B","action_alternatives-control/C","data_only-positive/B","data_only-control/B","output_only-positive/B","output_only-control/B","dead_check-positive/B","dead_check-control/B","script_identity-positive/B","script_identity-control/C","token_identity-positive/B","token_identity-positive/C","token_identity-control/B","token_identity-control/C","tokenless-positive/B","exists_literal-positive/B","exists_literal-control/B","snapshot_collision-positive/B"],"rate":1.0},"wholeDeployedProtocolCompleteness":null}
-/home/rkadias/coding/ergo-forge/docs/mapping/m02-mapping-results.json sha256=788b40190b022009f4d2321331220fac6b25e467eac84d98049bada0a02fd4b3
+<repo>/docs/mapping/m02-mapping-results.json sha256=788b40190b022009f4d2321331220fac6b25e467eac84d98049bada0a02fd4b3
 
 
 successes:
@@ -566,7 +566,7 @@ successes:
 test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
 
 M02: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 2.35s
      Running tests/mapping_necessity.rs (target-p00/release/deps/mapping_necessity-eb4404bdfe49ad14)
 alternatives_dead_checks_and_self_do_not_prove_cospend: test
@@ -593,13 +593,13 @@ altered/missing/reordered anchors, claim/guard changes, cycles, caps, wrong subj
 18 pinned adversarial/unsupported members refused; unconditional alternative and wrong authentication scope refused
 
 ---- exact_guarded_necessity_matches_pinned_answers stdout ----
-evidence /home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m03-mapping-results.json sha256=7c64e6d0a26c05720128d2dc4891e408d76bdbd6a7d5ff226e0bf4d9b9087ba6; supported 12/12; established 12; incorrect 0/12; unresolved 20/32
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m03-mapping-results.json sha256=7c64e6d0a26c05720128d2dc4891e408d76bdbd6a7d5ff226e0bf4d9b9087ba6; supported 12/12; established 12; incorrect 0/12; unresolved 20/32
 
 ---- satisfying_omission_and_relaxed_controls_use_full_validator stdout ----
-evidence /home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m03-omission-results.json sha256=2b4dd32bcdc5d41c0974e3718383744e0f6c903eae4ce5e4048695ad40c42ae1
-evidence /home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/m03/supplemental-v2.fixture sha256=25b20fb46cdd45ee199e3847321419fef765505a0db8d61b0bbc0499c40adfda
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m03-omission-results.json sha256=2b4dd32bcdc5d41c0974e3718383744e0f6c903eae4ce5e4048695ad40c42ae1
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/m03/supplemental-v2.fixture sha256=25b20fb46cdd45ee199e3847321419fef765505a0db8d61b0bbc0499c40adfda
 27 accepted premise-matching omission assessments refute their own exact claims
-full validator: 52 accepted, 21 script rejections; 73 canonical vectors; evidence /home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/m03/manifest.json sha256=cdf73504cc3d5f98141bac9e44b46621a76baf8ac5219826d03367d171383853
+full validator: 52 accepted, 21 script rejections; 73 canonical vectors; evidence <repo>/ergo-sandbox/tests/fixtures/mapping/m03/manifest.json sha256=cdf73504cc3d5f98141bac9e44b46621a76baf8ac5219826d03367d171383853
 
 
 successes:
@@ -611,7 +611,7 @@ successes:
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
 
 M03: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 2.92s
      Running tests/mapping_actions.rs (target-p00/release/deps/mapping_actions-1df0a003987e3a7a)
 accepted_omission_refutes_only_matching_claim_and_premises: test
@@ -633,11 +633,11 @@ successes:
 data/output/unrelated inputs cannot satisfy Spend; missing/duplicate subject, stale proof, unknown bindings and versions fail closed
 
 ---- alternative_action_sets_are_checked_separately stdout ----
-evidence /home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m04-action-results.json sha256=da66d2037ae2516bae05fdb1ffbf5eb270941b989badea5dacf24d06256e3b80
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m04-action-results.json sha256=da66d2037ae2516bae05fdb1ffbf5eb270941b989badea5dacf24d06256e3b80
 63/63 M04-eligible action dispositions; all 67 retained; 4 Execute expectations deferred to M05; alternatives never unioned
 
 ---- accepted_omission_refutes_only_matching_claim_and_premises stdout ----
-evidence /home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m04-omission-results.json sha256=2bb08be500b8c2b0209a5990ca65100695cb52f16fdf31ed3b153d49148f62fe
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m04-omission-results.json sha256=2bb08be500b8c2b0209a5990ca65100695cb52f16fdf31ed3b153d49148f62fe
 27/27 digest-matched accepted omissions refuted; 52 accepted / 21 script rejections; altered bindings and accepted satisfying spends cannot refute
 
 
@@ -664,4 +664,4 @@ M01: passed: required tests executed
 M02: passed: required tests executed
 M03: passed: required tests executed
 M04: passed: required tests executed
-report: /home/rkadias/coding/ergo-forge/target-p00/roadmap-gates/M04.json
+report: <repo>/target-p00/roadmap-gates/M04.json

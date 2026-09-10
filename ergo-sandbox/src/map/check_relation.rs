@@ -11,7 +11,7 @@ use crate::evidence::{
 };
 use ergo_ser::{
     ergo_tree::ErgoTree,
-    opcode::{node_opcode, preorder, Expr, Payload},
+    opcode::{children, node_opcode, preorder, Expr, Payload},
     sigma_type::SigmaType,
     sigma_value::{CollValue, SigmaValue},
 };
@@ -292,6 +292,51 @@ impl<'a> Walk<'a> {
             None
         }
     }
+    // Validate captures at the definition site, with lexical parameter and
+    // block scopes. A later environment must never repair a forward capture.
+    fn check_scope(&mut self, e: &Expr, available: &BTreeSet<u32>) -> Result<(), String> {
+        self.visits += 1;
+        if self.visits > self.cap {
+            return Err("analysis traversal cap".into());
+        }
+        if let Expr::Op(n) = e {
+            match &n.payload {
+                Payload::ValUse { id } => {
+                    if !available.contains(id) {
+                        return Err("forward alias".into());
+                    }
+                }
+                Payload::FuncValue { args, body } => {
+                    let mut local = available.clone();
+                    for (id, _) in args {
+                        if !local.insert(*id) {
+                            return Err("ambiguous wire binding".into());
+                        }
+                    }
+                    self.check_scope(body, &local)?;
+                }
+                Payload::BlockValue { items, result } => {
+                    let mut local = available.clone();
+                    for item in items {
+                        let Some(Payload::ValDef { id, rhs, .. }) = op(item, 0xD6) else {
+                            return Err("unsupported block definition".into());
+                        };
+                        self.check_scope(rhs, &local)?;
+                        if !local.insert(*id) {
+                            return Err("ambiguous wire binding".into());
+                        }
+                    }
+                    self.check_scope(result, &local)?;
+                }
+                _ => {
+                    for child in children(e) {
+                        self.check_scope(child, available)?;
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
     fn facts(&mut self, e: &'a Expr, env: &Env<'a>) -> Result<BTreeSet<Fact>, String> {
         self.visits += 1;
         if self.visits > self.cap {
@@ -311,13 +356,7 @@ impl<'a> Walk<'a> {
                     if local.contains_key(id) {
                         return Err("ambiguous wire binding".into());
                     }
-                    for (_, node) in preorder(rhs) {
-                        if let Some(Payload::ValUse { id: used }) = op(node, 0x72) {
-                            if !local.contains_key(used) && op(rhs, 0xD9).is_none() {
-                                return Err("forward alias".into());
-                            }
-                        }
-                    }
+                    self.check_scope(rhs, &local.keys().copied().collect())?;
                     local.insert(*id, Binding::Alias(rhs));
                 }
                 self.facts(result, &local)
@@ -769,6 +808,122 @@ pub(crate) fn canonical_selector(s: &Selector, depth: usize) -> bool {
             !predicates.is_empty()
                 && predicates.len() <= 32
                 && predicates.iter().all(|s| canonical_selector(s, depth + 1))
+        }
+    }
+}
+
+#[cfg(test)]
+mod scope_tests {
+    use super::*;
+    use ergo_ser::opcode::IrNode;
+
+    fn node(opcode: u8, payload: Payload) -> Expr {
+        Expr::Op(IrNode { opcode, payload })
+    }
+    fn used(id: u32) -> Expr {
+        node(0x72, Payload::ValUse { id })
+    }
+    fn definition(id: u32, rhs: Expr) -> Expr {
+        node(
+            0xD6,
+            Payload::ValDef {
+                id,
+                tpe: None,
+                rhs: Box::new(rhs),
+            },
+        )
+    }
+    fn lambda(body: Expr) -> Expr {
+        node(
+            0xD9,
+            Payload::FuncValue {
+                args: vec![(2, Some(SigmaType::SBox))],
+                body: Box::new(body),
+            },
+        )
+    }
+    fn block(items: Vec<Expr>, result: Expr) -> Expr {
+        node(
+            0xD8,
+            Payload::BlockValue {
+                items,
+                result: Box::new(result),
+            },
+        )
+    }
+    fn facts(body: Expr) -> Result<BTreeSet<Fact>, String> {
+        let tree = ErgoTree {
+            version: 3,
+            has_size: true,
+            constant_segregation: false,
+            constants: vec![],
+            body,
+        };
+        let mut walk = Walk {
+            tree: &tree,
+            guard: &Guard::True,
+            visits: 0,
+            cap: 10000,
+        };
+        walk.facts(&tree.body, &Env::new())
+    }
+
+    #[test]
+    fn existential_forward_capture_cannot_establish_mandatory_facts() {
+        let bytes = Expr::Const {
+            tpe: SigmaType::SColl(Box::new(SigmaType::SByte)),
+            val: SigmaValue::Coll(CollValue::Bytes(vec![7; 32])),
+        };
+        let equality = node(
+            0x93,
+            Payload::Two(
+                Box::new(node(0xC5, Payload::One(Box::new(used(2))))),
+                Box::new(used(1)),
+            ),
+        );
+        let predicate = definition(3, lambda(equality));
+        let capture = definition(1, bytes);
+        let exists = node(
+            0xAE,
+            Payload::Two(Box::new(node(0xA4, Payload::Zero)), Box::new(used(3))),
+        );
+        let valid = facts(block(
+            vec![capture.clone(), predicate.clone()],
+            exists.clone(),
+        ))
+        .unwrap();
+        assert_eq!(
+            valid.len(),
+            1,
+            "earlier capture and parameter must still establish a fact"
+        );
+        assert_eq!(
+            facts(block(vec![predicate, capture], exists)).unwrap_err(),
+            "forward alias"
+        );
+    }
+
+    #[test]
+    fn nested_lambda_bindings_do_not_leak_or_repair_forward_captures() {
+        let local = lambda(block(vec![definition(4, used(2))], used(4)));
+        assert!(facts(block(
+            vec![definition(3, local.clone())],
+            Expr::Const {
+                tpe: SigmaType::SBoolean,
+                val: SigmaValue::Boolean(true)
+            }
+        ))
+        .is_ok());
+        let forward = lambda(block(
+            vec![definition(4, used(5)), definition(5, used(2))],
+            used(4),
+        ));
+        for body in [
+            forward,
+            lambda(block(vec![definition(6, local)], used(4))),
+            lambda(lambda(used(2))),
+        ] {
+            assert!(facts(block(vec![definition(3, body)], used(3))).is_err());
         }
     }
 }

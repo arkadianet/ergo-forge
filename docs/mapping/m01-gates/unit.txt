@@ -3,7 +3,7 @@
    Compiling rustls v0.23.43
    Compiling rustls-webpki v0.103.15
    Compiling ureq v3.4.1
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 22.09s
      Running tests/mapping_artifacts.rs (target-p00/release/deps/mapping_artifacts-f2978e8975cbeca2)
 
@@ -15,9 +15,9 @@ test raw_provenance_and_legacy_map_bytes_survive ... ok
 successes:
 
 ---- raw_provenance_and_legacy_map_bytes_survive stdout ----
-/home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/m01-discovery.json sha256=8b2062c899b4870e426e450c8d8f8c838863f50147156f2c949fd1d011d84051
-/home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/m01-relations.json sha256=82e14eee51b5f47d10887d737345c4310695b42a192f9131a5a3a95b9b1b7273
-/home/rkadias/coding/ergo-forge/ergo-sandbox/tests/fixtures/mapping/m01-mapping-results.json sha256=df74b66f0056d44ad7ce935e420a3df91ac8ec0c0819c8c9d7019bfcba6c11ff
+<repo>/ergo-sandbox/tests/fixtures/mapping/m01-discovery.json sha256=8b2062c899b4870e426e450c8d8f8c838863f50147156f2c949fd1d011d84051
+<repo>/ergo-sandbox/tests/fixtures/mapping/m01-relations.json sha256=82e14eee51b5f47d10887d737345c4310695b42a192f9131a5a3a95b9b1b7273
+<repo>/ergo-sandbox/tests/fixtures/mapping/m01-mapping-results.json sha256=df74b66f0056d44ad7ce935e420a3df91ac8ec0c0819c8c9d7019bfcba6c11ff
 
 
 successes:

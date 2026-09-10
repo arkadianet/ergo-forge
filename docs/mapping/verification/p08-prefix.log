@@ -1,4 +1,4 @@
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 2.23s
      Running tests/claim_contract.rs (target-p00/release/deps/claim_contract-67314c4a30c78ca0)
 legacy_record_cannot_import_as_verified: test
@@ -97,7 +97,7 @@ ok 7 - production Read and Write handlers render both signs of synthetic hunt
 # todo 0
 # duration_ms 235.789355
 P00: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 1.24s
      Running tests/evidence_provenance.rs (target-p00/release/deps/evidence_provenance-83344e4e24342818)
 changing_any_premise_invalidates_cached_evidence: test
@@ -133,7 +133,7 @@ successes:
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
 
 P01: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 1.26s
      Running tests/evidence_wire.rs (target-p00/release/deps/evidence_wire-f372c6c7d4dbbdaa)
 invalid_tree_never_becomes_empty_bytes: test
@@ -169,7 +169,7 @@ successes:
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
 P02: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 1.73s
      Running tests/node_validation.rs (target-p00/release/deps/node_validation-71785e616645c29a)
 accepted_execution_cannot_be_deserialized_or_fabricated: test
@@ -195,7 +195,7 @@ successes:
 test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
 P03: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 1.84s
      Running tests/transaction_proofs.rs (target-p00/release/deps/transaction_proofs-fe647ec940042bb0)
 changed_transaction_invalidates_proof: test
@@ -224,7 +224,7 @@ successes:
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
 P04: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 1.97s
      Running tests/claim_replay.rs (target-p00/release/deps/claim_replay-d79525742826db59)
 claim_requires_accepted_execution_and_violated_property: test
@@ -264,7 +264,7 @@ successes:
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
 
 P05: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 2.22s
      Running tests/drain_promotion.rs (target-p00/release/deps/drain_promotion-86b4cb15231631ee)
 associated_lint_is_not_the_confirmed_claim: test
@@ -330,7 +330,7 @@ successes:
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
 
 P06: passed: required tests executed
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 1.86s
      Running tests/obligation_reports.rs (target-p00/release/deps/obligation_reports-c0f2e7b0ec212eb3)
 conditional_discharge_exports_the_full_premise_set: test
@@ -386,8 +386,8 @@ P07: passed: required tests executed
    Compiling ureq v3.4.1
    Compiling hyper-rustls v0.27.9
    Compiling reqwest v0.12.28
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
-   Compiling ergo-web v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-web)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
+   Compiling ergo-web v0.3.0 (<repo>/ergo-web)
     Finished `release` profile [optimized] target(s) in 14.90s
      Running tests/evidence_replay.rs (target-p00/release/deps/evidence_replay-224d16615cf94622)
 historical_and_hypothetical_state_labels_are_visible: test
@@ -405,7 +405,7 @@ test replay_request_never_fetches_or_broadcasts ... ok
    Compiling rustls v0.23.43
    Compiling rustls-webpki v0.103.15
    Compiling ureq v3.4.1
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 19.78s
 test http_and_cli_replay_have_identical_semantic_results ... ok
 test legacy_preflight_does_not_use_node_claim_badge ... ok
@@ -460,4 +460,4 @@ P05: passed: required tests executed
 P06: passed: required tests executed
 P07: passed: required tests executed
 P08: passed: required tests executed
-report: /home/rkadias/coding/ergo-forge/target-p00/roadmap-gates/through-completed.json
+report: <repo>/target-p00/roadmap-gates/through-completed.json

@@ -4,8 +4,8 @@
    Compiling tokio-rustls v0.26.4
    Compiling hyper-rustls v0.27.9
    Compiling reqwest v0.12.28
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
-   Compiling ergo-web v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-web)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
+   Compiling ergo-web v0.3.0 (<repo>/ergo-web)
     Finished `release` profile [optimized] target(s) in 38.15s
      Running unittests src/lib.rs (target-p00/release/deps/ergo_sandbox-42b6b76a1e339ff9)
 

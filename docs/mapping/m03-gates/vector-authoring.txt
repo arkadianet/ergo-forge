@@ -1,4 +1,4 @@
-   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
     Finished `release` profile [optimized] target(s) in 1.90s
      Running `target-p00/release/examples/m03_fixture_author`
 literal_spend-positive/satisfying: node-accepted

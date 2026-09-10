@@ -1,3 +1,3 @@
-    Checking ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
-    Checking ergo-web v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-web)
+    Checking ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
+    Checking ergo-web v0.3.0 (<repo>/ergo-web)
     Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.18s

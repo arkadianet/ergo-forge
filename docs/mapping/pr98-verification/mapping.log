@@ -1,6 +1,75 @@
-    Blocking waiting for file lock on build directory
    Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
-    Finished `release` profile [optimized] target(s) in 14.33s
+    Finished `release` profile [optimized] target(s) in 2.84s
+     Running tests/mapping_actions.rs (target-p00/release/deps/mapping_actions-1df0a003987e3a7a)
+
+running 3 tests
+test data_outputs_and_unrelated_inputs_cannot_satisfy_spend ... ok
+test alternative_action_sets_are_checked_separately ... ok
+test accepted_omission_refutes_only_matching_claim_and_premises ... ok
+
+successes:
+
+---- data_outputs_and_unrelated_inputs_cannot_satisfy_spend stdout ----
+data/output/unrelated inputs cannot satisfy Spend; missing/duplicate subject, stale proof, unknown bindings and versions fail closed
+
+---- alternative_action_sets_are_checked_separately stdout ----
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m04-action-results.json sha256=da66d2037ae2516bae05fdb1ffbf5eb270941b989badea5dacf24d06256e3b80
+63/63 M04-eligible action dispositions; all 67 retained; 4 Execute expectations deferred to M05; alternatives never unioned
+
+---- accepted_omission_refutes_only_matching_claim_and_premises stdout ----
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m04-omission-results.json sha256=2bb08be500b8c2b0209a5990ca65100695cb52f16fdf31ed3b153d49148f62fe
+27/27 digest-matched accepted omissions refuted; 52 accepted / 21 script rejections; altered bindings and accepted satisfying spends cannot refute
+
+
+successes:
+    accepted_omission_refutes_only_matching_claim_and_premises
+    alternative_action_sets_are_checked_separately
+    data_outputs_and_unrelated_inputs_cannot_satisfy_spend
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/mapping_artifacts.rs (target-p00/release/deps/mapping_artifacts-f2978e8975cbeca2)
+
+running 3 tests
+test discovery_cannot_import_as_required_execution ... ok
+test premise_changes_invalidate_imported_proofs ... ok
+test raw_provenance_and_legacy_map_bytes_survive ... ok
+
+successes:
+
+---- raw_provenance_and_legacy_map_bytes_survive stdout ----
+<repo>/ergo-sandbox/tests/fixtures/mapping/m01-discovery.json sha256=8b2062c899b4870e426e450c8d8f8c838863f50147156f2c949fd1d011d84051
+<repo>/ergo-sandbox/tests/fixtures/mapping/m01-relations.json sha256=82e14eee51b5f47d10887d737345c4310695b42a192f9131a5a3a95b9b1b7273
+<repo>/ergo-sandbox/tests/fixtures/mapping/m01-mapping-results.json sha256=df74b66f0056d44ad7ce935e420a3df91ac8ec0c0819c8c9d7019bfcba6c11ff
+
+
+successes:
+    discovery_cannot_import_as_required_execution
+    premise_changes_invalidate_imported_proofs
+    raw_provenance_and_legacy_map_bytes_survive
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/mapping_context_boundary.rs (target-p00/release/deps/mapping_context_boundary-876dda0c8e5b2845)
+
+running 1 test
+test mandatory_local_execution_does_not_authenticate_exact_code ... ok
+
+successes:
+
+---- mandatory_local_execution_does_not_authenticate_exact_code stdout ----
+original: extension=7f blake2b256=a0ff17711d7b5c50b84998e1d7c354a55ae91901ea48a24dbbb3d4c95af153d0 node-accepted
+different-true-expression: extension=93a3a3 blake2b256=f7834e1edc7f174a379a145ef2f30d6e13506937057892777e1d0571733fc933 node-accepted
+false-expression: extension=80 blake2b256=45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0 node-rejected: ProofFailed { index: 0 }
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m05-stop-results.json sha256=2ebb00ce2d46a258f45b36f40f0f8b7994698d0f5ad6f25aad4ad86984518497
+M05 coverage stop: pinned supported context_scope-positive lacks exact-code authentication; M00-M04 claims and all 67 expected action dispositions preserved
+
+
+successes:
+    mandatory_local_execution_does_not_authenticate_exact_code
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
      Running tests/mapping_discovery.rs (target-p00/release/deps/mapping_discovery-25ae5dac94359712)
 
 running 3 tests
@@ -27,4 +96,69 @@ successes:
     supported_reference_recall_and_all_site_accounting
 
 test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/mapping_inventory.rs (target-p00/release/deps/mapping_inventory-5046a3df6ee52135)
+
+running 3 tests
+test inventory_has_32_pinned_cases_and_independent_answers ... ok
+test legacy_metrics_are_measured_without_baseline_changes ... ok
+test fixture_constructs_execute_and_unsupported_members_remain ... ok
+
+successes:
+
+---- inventory_has_32_pinned_cases_and_independent_answers stdout ----
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/manifest.json sha256=7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/expected.json sha256=291923d76f2de8a69deec82cc049d233d87d91f816295312ed89f9291e13405e
+32 cases / 16 paired families; missing, duplicate, altered fixture and altered answer rejected
+
+---- legacy_metrics_are_measured_without_baseline_changes stdout ----
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/legacy-results.json sha256=76f8c817944be882fbc4f726d7016ffd55d244c307a68b85729804d8a98f2150
+{"actionSetAccuracy":null,"caseAccounting":{"denominator":32,"meaning":"fixture harness accounting, not mapping completeness","numerator":32},"closedFixtureReachability":{"denominator":31,"denominatorIds":["literal_spend-positive/B","literal_spend-control/B","self_alias-positive/B","action_alternatives-positive/B","action_alternatives-positive/C","action_alternatives-control/B","action_alternatives-control/C","data_only-positive/B","data_only-control/B","output_only-positive/B","output_only-control/B","dead_check-positive/B","dead_check-control/B","script_identity-positive/B","script_identity-control/C","token_identity-positive/B","token_identity-positive/C","token_identity-control/B","token_identity-control/C","tokenless-positive/B","exists_literal-positive/B","exists_literal-control/B","computed_index-positive/B","computed_index-control/B","register_identity-positive/B","register_identity-positive/C","register_identity-control/C","register_identity-control/U","context_code-positive/B","context_code-control/B","snapshot_collision-positive/B"],"numerator":4,"numeratorIds":["token_identity-positive/B","token_identity-positive/C","token_identity-control/B","token_identity-control/C"],"rate":0.12903225806451613},"dynamicTupleRecovery":{"denominator":15,"denominatorIds":["self_alias-positive/[\"A\",\"B\"]","token_identity-positive/[\"A\",\"B\"]","token_identity-positive/[\"A\",\"C\"]","token_identity-control/[\"A\",\"B\"]","token_identity-control/[\"A\",\"C\"]","exists_literal-positive/[\"A\",\"B\"]","exists_literal-control/[\"A\",\"B\"]","computed_index-positive/[\"A\",\"B\"]","computed_index-control/[\"A\",\"B\"]","register_identity-positive/[\"A\",\"B\"]","register_identity-positive/[\"A\",\"C\"]","register_identity-control/[\"A\",\"C\"]","register_identity-control/[\"A\",\"U\"]","context_code-positive/[\"A\",\"B\"]","context_code-control/[\"A\",\"B\"]"],"numerator":0,"numeratorIds":[],"rate":0.0},"falseProposal":{"adjudicatedIds":[],"denominator":21,"falseIds":[],"meaning":"unresolved targets remain unadjudicated; never call this zero false proposals","numerator":0,"rate":null,"unadjudicatedIds":["literal_spend-positive/edge/0","literal_spend-control/edge/0","action_alternatives-positive/edge/0","action_alternatives-control/edge/0","data_only-positive/edge/0","data_only-control/edge/0","output_only-positive/edge/0","output_only-control/edge/0","dead_check-positive/edge/0","script_identity-positive/edge/0","script_identity-control/edge/0","token_identity-positive/edge/0","tokenless-positive/edge/0","tokenless-control/edge/0","register_identity-positive/edge/0","register_identity-positive/edge/1","register_identity-control/edge/0","register_identity-control/edge/1","context_code-positive/edge/0","context_code-control/edge/0","snapshot_collision-positive/edge/0"]},"legacySiteObservation":{"denominator":52,"denominatorIds":["literal_spend-positive/site/0","literal_spend-positive/site/1","literal_spend-control/site/0","literal_spend-control/site/1","self_alias-positive/site/0","self_alias-control/site/0","action_alternatives-positive/site/0","action_alternatives-positive/site/1","action_alternatives-positive/site/2","action_alternatives-control/site/0","action_alternatives-control/site/1","action_alternatives-control/site/2","data_only-positive/site/0","data_only-positive/site/1","data_only-control/site/0","output_only-positive/site/0","output_only-positive/site/1","output_only-control/site/0","dead_check-positive/site/0","dead_check-positive/site/1","dead_check-control/site/0","script_identity-positive/site/0","script_identity-control/site/0","token_identity-positive/site/0","token_identity-control/site/0","tokenless-positive/site/0","tokenless-positive/site/1","tokenless-control/site/0","exists_literal-positive/site/0","exists_literal-control/site/0","computed_index-positive/site/0","computed_index-control/site/0","register_identity-positive/site/0","register_identity-positive/site/1","register_identity-positive/site/2","register_identity-control/site/0","register_identity-control/site/1","context_code-positive/site/0","context_code-positive/site/1","context_code-positive/site/2","context_code-control/site/0","context_code-control/site/1","context_code-control/site/2","context_scope-positive/site/0","context_scope-positive/site/1","context_scope-control/site/0","context_scope-control/site/1","avl_identity-positive/site/0","avl_identity-control/site/0","snapshot_collision-positive/site/0","snapshot_collision-positive/site/1","snapshot_collision-control/site/0"],"numerator":35,"numeratorIds":["literal_spend-positive/site/0","literal_spend-positive/site/1","literal_spend-control/site/0","literal_spend-control/site/1","action_alternatives-positive/site/0","action_alternatives-positive/site/1","action_alternatives-positive/site/2","action_alternatives-control/site/0","action_alternatives-control/site/1","action_alternatives-control/site/2","data_only-positive/site/0","data_only-positive/site/1","data_only-control/site/0","output_only-positive/site/0","output_only-positive/site/1","output_only-control/site/0","dead_check-positive/site/0","dead_check-positive/site/1","script_identity-positive/site/0","script_identity-control/site/0","token_identity-positive/site/0","tokenless-positive/site/0","tokenless-positive/site/1","tokenless-control/site/0","register_identity-positive/site/0","register_identity-positive/site/1","register_identity-positive/site/2","register_identity-control/site/0","register_identity-control/site/1","context_code-positive/site/0","context_code-positive/site/1","context_code-control/site/0","context_code-control/site/1","snapshot_collision-positive/site/0","snapshot_collision-positive/site/1"],"rate":0.6730769230769231},"m02SupportedReachability":{"denominator":23,"denominatorIds":["literal_spend-positive/B","literal_spend-control/B","self_alias-positive/B","action_alternatives-positive/B","action_alternatives-positive/C","action_alternatives-control/B","action_alternatives-control/C","data_only-positive/B","data_only-control/B","output_only-positive/B","output_only-control/B","dead_check-positive/B","dead_check-control/B","script_identity-positive/B","script_identity-control/C","token_identity-positive/B","token_identity-positive/C","token_identity-control/B","token_identity-control/C","tokenless-positive/B","exists_literal-positive/B","exists_literal-control/B","snapshot_collision-positive/B"],"numerator":4,"numeratorIds":["token_identity-positive/B","token_identity-positive/C","token_identity-control/B","token_identity-control/C"],"rate":0.17391304347826086},"necessityRecall":null,"omissionRefutation":null,"promotedFalseRelation":{"denominator":0,"numerator":0,"rate":null,"reason":"no relation API exists"},"unavailableReason":"legacy API produces neither checked necessities, action checks nor node-accepted omission witnesses; whole-chain denominator unknown","wholeDeployedProtocolCompleteness":null}
+
+---- fixture_constructs_execute_and_unsupported_members_remain stdout ----
+67 real engine vectors across 32 cases; 18 unsupported members retained: [String("literal_spend-control"), String("self_alias-control"), String("action_alternatives-control"), String("data_only-control"), String("output_only-control"), String("dead_check-control"), String("script_identity-control"), String("token_identity-control"), String("tokenless-control"), String("exists_literal-control"), String("computed_index-positive"), String("computed_index-control"), String("register_identity-control"), String("context_code-control"), String("context_scope-control"), String("avl_identity-positive"), String("avl_identity-control"), String("snapshot_collision-control")]; scenario reduction only, no node acceptance or necessity certification
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/manifest.json sha256=7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/expected.json sha256=291923d76f2de8a69deec82cc049d233d87d91f816295312ed89f9291e13405e
+
+
+successes:
+    fixture_constructs_execute_and_unsupported_members_remain
+    inventory_has_32_pinned_cases_and_independent_answers
+    legacy_metrics_are_measured_without_baseline_changes
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/mapping_necessity.rs (target-p00/release/deps/mapping_necessity-eb4404bdfe49ad14)
+
+running 4 tests
+test unsupported_anchors_and_cyclic_proofs_are_rejected ... ok
+test alternatives_dead_checks_and_self_do_not_prove_cospend ... ok
+test exact_guarded_necessity_matches_pinned_answers ... ok
+test satisfying_omission_and_relaxed_controls_use_full_validator ... ok
+
+successes:
+
+---- unsupported_anchors_and_cyclic_proofs_are_rejected stdout ----
+altered/missing/reordered anchors, claim/guard changes, cycles, caps, wrong subject and storage-rent acceptance domain rejected
+
+---- alternatives_dead_checks_and_self_do_not_prove_cospend stdout ----
+18 pinned adversarial/unsupported members refused; unconditional alternative and wrong authentication scope refused
+
+---- exact_guarded_necessity_matches_pinned_answers stdout ----
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m03-mapping-results.json sha256=7c64e6d0a26c05720128d2dc4891e408d76bdbd6a7d5ff226e0bf4d9b9087ba6; supported 12/12; established 12; incorrect 0/12; unresolved 20/32
+
+---- satisfying_omission_and_relaxed_controls_use_full_validator stdout ----
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m03-omission-results.json sha256=2b4dd32bcdc5d41c0974e3718383744e0f6c903eae4ce5e4048695ad40c42ae1
+evidence <repo>/ergo-sandbox/tests/fixtures/mapping/m03/supplemental-v2.fixture sha256=25b20fb46cdd45ee199e3847321419fef765505a0db8d61b0bbc0499c40adfda
+27 accepted premise-matching omission assessments refute their own exact claims
+full validator: 52 accepted, 21 script rejections; 73 canonical vectors; evidence <repo>/ergo-sandbox/tests/fixtures/mapping/m03/manifest.json sha256=cdf73504cc3d5f98141bac9e44b46621a76baf8ac5219826d03367d171383853
+
+
+successes:
+    alternatives_dead_checks_and_self_do_not_prove_cospend
+    exact_guarded_necessity_matches_pinned_answers
+    satisfying_omission_and_relaxed_controls_use_full_validator
+    unsupported_anchors_and_cyclic_proofs_are_rejected
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
 
