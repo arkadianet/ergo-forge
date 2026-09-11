@@ -277,3 +277,13 @@ Independent human review is absent, so semantic measurement is incomplete.
 There is no utility or discovery credit. With no defensible transfer pair, the
 unchanged checkpoint rule cancels capabilities 2 and 3 for this arc; D04 is not
 registered, run or claimed complete here. Capability 1 may remain the endpoint.
+
+### Consolidation and cancellation — 2026-09-10 UTC
+
+The [governing decision](../../discovery/CONSOLIDATION-DECISION.md) cancels
+lifecycle construction and numeric search for this arc and explicitly leaves
+D04 unregistered. The historical queue and first measurement remain unchanged;
+D03 is stopped, completedThrough is D02, and no utility or discovery credit is
+claimed. The separately authorized arithmetic entry assessment failed its frozen
+6-guarantee/3-family threshold. No arithmetic implementation follows. This
+records cancellation without claiming a D04 gate passed or resolving M05/D03.

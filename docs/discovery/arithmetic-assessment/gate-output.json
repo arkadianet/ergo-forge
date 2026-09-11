@@ -1,0 +1,18 @@
+{
+  "qualifyingIds": [
+    "A03",
+    "A04",
+    "V02"
+  ],
+  "qualifyingFamilies": [
+    "amm",
+    "vesting"
+  ],
+  "denominator": 20,
+  "threshold": {
+    "guarantees": 6,
+    "families": 3
+  },
+  "passed": false,
+  "exitMeaning": "1 = entry gate unmet; integrity assertions must also pass"
+}

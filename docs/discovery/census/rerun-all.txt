@@ -1,0 +1,32 @@
+export sha256: 84acc14d88d0612787f78df7bd71fc16450bf48b8911cec5f54284b12e139472
+=== OFFLINE DISTINCT-SCRIPT CENSUS ===
+distinct scripts:   350902
+  lifted:           350902  (100.00%)
+  no raw placeholders:         350898  (100.00% of lifted)
+  truncated:        0
+  parse/lift error: 0
+  boxes covered:    23333798
+
+=== UNADJUDICATED FINDINGS (lint percentages use findings denominator) ===
+total findings:     432994
+clean contracts:    109768  (31.3%)
+mean per contract:  1.2
+  delegated-reserves           1543  (0.4%)
+  height-guards                   1  (0.0%)
+  trust-assumptions             236  (0.1%)
+  unbound-box-reserves       232827  (53.8%)
+  unchecked-get              198387  (45.8%)
+
+=== PRINTED-TEXT PREVALENCE (not expressiveness) ===
+printed multiplication: 243564  (69.4%)
+printed dataInputs:     16974  (4.8%)
+either printed proxy:   258338  (73.6%)
+boxes under those:      10308464  (44.2%)
+
+=== SIZE DISTRIBUTION (bytes) ===
+    128-255   29426
+    256-383   57701
+    384-511   168314
+    512-639   78274
+    640-767   4194
+   1152-1279  10599

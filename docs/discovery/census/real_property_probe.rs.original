@@ -1,0 +1,81 @@
+//! Can the D01/D02 property vocabulary express a guarantee about a REAL deployed
+//! contract? Offline: declares properties against mainnet script bytes already
+//! decompiled by `ergo-es tree`. Nothing is fetched or broadcast.
+use ergo_sandbox::properties::schema::Declaration;
+use serde_json::{json, Value};
+
+fn role(collection: &str, sel: Value) -> Value {
+    json!({"collection": collection, "selector": sel, "cardinality": "exactly-one"})
+}
+
+fn probe(name: &str, script: &str, registers: Value, guard: Value, assertion: Value) {
+    let d = json!({
+        "schemaVersion": "author-property:v1",
+        "propertyId": name,
+        "revision": "1",
+        "contracts": {"state": {
+            "script": script,
+            "compilerRevision": ergo_sandbox::evidence::validate::node_revision()
+        }},
+        "scope": {"kind": "transition"},
+        "roles": {
+            "before": role("inputs", json!({"kind":"script","hex":script})),
+            "after":  role("outputs", json!({"kind":"script","hex":script})),
+        },
+        "registers": registers,
+        "guard": guard,
+        "assertion": assertion,
+        "authorizationPremises": [],
+        "sources": [{"origin":"source-recorded","reference":"mainnet deployed script via ergo-es tree","sha256":"00".repeat(32)}]
+    });
+    match Declaration::parse(&d.to_string()) {
+        Ok(_) => println!("  {name}: ACCEPTED — vocabulary expresses this"),
+        Err(e) => println!("  {name}: REFUSED — {e:?}"),
+    }
+}
+
+fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    let doc: Value =
+        serde_json::from_slice(&std::fs::read(&args[1]).expect("tree json")).unwrap();
+    let script = doc["treeHex"].as_str().expect("treeHex");
+    println!("target: {} ({} bytes)", args[2], script.len() / 2);
+
+    // R4 on the AgeUSD bank box is SigmaUSD in circulation.
+    let regs = json!({
+        "circBefore": {"role":"before","index":4,"valueType":"long","unit":{"kind":"named-amount","name":"sigusd"}},
+        "circAfter":  {"role":"after", "index":4,"valueType":"long","unit":{"kind":"named-amount","name":"sigusd"}},
+    });
+
+    // 1. Reserve accounting: if circulation does not change, the bank's ERG
+    //    reserve must not decrease.
+    probe(
+        "agesud-reserve-non-decreasing",
+        script,
+        regs.clone(),
+        json!({"op":"eq","left":{"op":"register","name":"circBefore"},"right":{"op":"register","name":"circAfter"}}),
+        json!({"op":"ge","left":{"op":"sum-erg","role":"after"},"right":{"op":"sum-erg","role":"before"}}),
+    );
+
+    // 2. Continuation preservation: spending the bank must yield exactly one
+    //    successor under the same script.
+    probe(
+        "agesud-continuation",
+        script,
+        json!({}),
+        json!({"op":"boolean","value":true}),
+        json!({"op":"eq","left":{"op":"count","role":"after"},"right":{"op":"integer","value":"1","unit":{"kind":"count"}}}),
+    );
+
+    // 3. A guarantee that needs the oracle rate — the thing AgeUSD actually
+    //    turns on.
+    probe(
+        "agesud-rate-bounded-mint",
+        script,
+        regs,
+        json!({"op":"ge","left":{"op":"register","name":"circAfter"},"right":{"op":"register","name":"circBefore"}}),
+        json!({"op":"ge",
+               "left":{"op":"sum-erg","role":"after"},
+               "right":{"op":"scale","arg":{"op":"register","name":"circAfter"},"factor":"400"}}),
+    );
+}

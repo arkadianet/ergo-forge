@@ -2,6 +2,12 @@
 
 ergo-forge is an ErgoScript workbench for building contracts and inspecting deployed code through reproducible experiments on the Rust Ergo node's pinned compiler and execution engine. Its authoring and audit views share contracts, scenarios, and evidence; every result states whether it is a static observation, a synthetic experiment, or a transaction checked against an explicitly supplied state. It helps people check specific contract claims and investigate counterexamples. It is not a general security certification service, an autonomous vulnerability scanner, a wallet, or a protocol-design generator. New work must improve the fidelity, reproducibility, or interpretation of those experiments; more recipes, detectors, graph features, and search breadth do not qualify by themselves.
 
+The retained analysis capability is: **An offline contract experiment and regression
+workbench. It checks supplied transactions and finite traces against declared
+properties using the pinned node validator, under explicit state assumptions.
+Independent semantic review, transfer usefulness, and new vulnerability discovery
+remain unestablished.** See the [governing consolidation decision](docs/discovery/CONSOLIDATION-DECISION.md).
+
 Four ways in, one engine:
 
 - **Build** — for people who don't write code: pick a recipe, answer its
@@ -145,6 +151,12 @@ to every release alongside the container image.
   (339 rows including 10 initial compile failures); see the
   [versioned scoreboard](docs/roadmap-metrics.json). Misses degrade to
   honest `<…>` placeholders and an audit over a partial tree says so.
+- **Separate structural coverage measurement.** A supplied local-index export
+  contained 350,902 distinct scripts covering 23,333,798 boxes: all lifted,
+  350,898 had no raw placeholders, none were truncated, and no parse/lift errors
+  were reported. This does not measure byte-exact recompilation or semantic
+  correctness and does not supersede 270/279. Snapshot/query provenance is
+  incomplete; see the [export digests, actual reruns and limits](docs/discovery/census/REPORT.md).
 - **Real contracts, not toys.** 61 of the 79 deployed contracts in the
   gallery compile with auto-filled parameters; the rest are EIP-5 templates
   with non-literal defaults or files the reference parser also rejects.

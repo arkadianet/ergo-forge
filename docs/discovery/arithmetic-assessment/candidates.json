@@ -1,0 +1,154 @@
+{
+  "frozenAt": "2026-09-10T23:42:58.140306+00:00",
+  "forgeRevision": "c717f82f6b5848761faec0b26a1e87ab7d479134",
+  "selectionRule": "Four AMM arithmetic clauses, four bank accounting/pricing clauses, and three promises each from vesting, auction, registry and mixer, in repository source order. Authored templates, not deployed transfer cases. Frozen before probe replacement or arithmetic implementation; no substitutions.",
+  "assessmentCapPersonDays": 2,
+  "threshold": {
+    "guarantees": 6,
+    "families": 3
+  },
+  "proposedOperations": "Runtime mul, truncating signed div, min and max over the existing checked i128 domain; dimensional product/quotient typing is part of the proposal, with cancellation back to existing units. No new reads, selectors, casts, wraparound, BigInt range, conditionals, binders or cap increases. This is an assessment envelope, not an implemented syntax.",
+  "assumptions": "Supplied finite transitions; explicit template constants, token identities and positional box roles. No global reachability, deployment identity, branch authorization or nonoverflow premise is silently inferred. Review full stated meaning and retain unknowns; parser success alone is insufficient.",
+  "candidates": [
+    {
+      "id": "A01",
+      "family": "amm",
+      "source": "examples/contracts/protocols/amm/pool.es",
+      "sourceSha256": "12af99b9bf21dc506c28c23dd5c56ece7eb4cfcfd872585c6fbffec8de111eec",
+      "guarantee": "Swap with positive ERG delta obeys the fee-adjusted reserve inequality."
+    },
+    {
+      "id": "A02",
+      "family": "amm",
+      "source": "examples/contracts/protocols/amm/pool.es",
+      "sourceSha256": "12af99b9bf21dc506c28c23dd5c56ece7eb4cfcfd872585c6fbffec8de111eec",
+      "guarantee": "Swap with nonpositive ERG delta obeys the reciprocal fee-adjusted inequality."
+    },
+    {
+      "id": "A03",
+      "family": "amm",
+      "source": "examples/contracts/protocols/amm/pool.es",
+      "sourceSha256": "12af99b9bf21dc506c28c23dd5c56ece7eb4cfcfd872585c6fbffec8de111eec",
+      "guarantee": "Deposit LP issuance is bounded by the ERG proportional share."
+    },
+    {
+      "id": "A04",
+      "family": "amm",
+      "source": "examples/contracts/protocols/amm/pool.es",
+      "sourceSha256": "12af99b9bf21dc506c28c23dd5c56ece7eb4cfcfd872585c6fbffec8de111eec",
+      "guarantee": "Deposit LP issuance is bounded by the token proportional share."
+    },
+    {
+      "id": "B01",
+      "family": "bank",
+      "source": "examples/contracts/protocols/bank/bank.es",
+      "sourceSha256": "ed3a7e24920c0efe571a998e27d02ad560981eb5150b7b0393471359a39967d0",
+      "guarantee": "Stablecoin circulation tracks the change in bank-held stablecoins."
+    },
+    {
+      "id": "B02",
+      "family": "bank",
+      "source": "examples/contracts/protocols/bank/bank.es",
+      "sourceSha256": "ed3a7e24920c0efe571a998e27d02ad560981eb5150b7b0393471359a39967d0",
+      "guarantee": "Stablecoin mint preserves the minimum oracle-valued reserve ratio."
+    },
+    {
+      "id": "B03",
+      "family": "bank",
+      "source": "examples/contracts/protocols/bank/bank.es",
+      "sourceSha256": "ed3a7e24920c0efe571a998e27d02ad560981eb5150b7b0393471359a39967d0",
+      "guarantee": "Stablecoin mint pays the capped nominal price plus the integer-rounded fee."
+    },
+    {
+      "id": "B04",
+      "family": "bank",
+      "source": "examples/contracts/protocols/bank/bank.es",
+      "sourceSha256": "ed3a7e24920c0efe571a998e27d02ad560981eb5150b7b0393471359a39967d0",
+      "guarantee": "Reserve-coin nominal price follows positive equity per circulating reserve coin, otherwise the default."
+    },
+    {
+      "id": "V01",
+      "family": "vesting",
+      "source": "examples/contracts/recipes/vesting.es",
+      "sourceSha256": "683a5d672f6215de9034a82434ed25e3900573a3ce563f7d3de9aec69c837bfb",
+      "guarantee": "Before the start, the continuation retains at least the current input value."
+    },
+    {
+      "id": "V02",
+      "family": "vesting",
+      "source": "examples/contracts/recipes/vesting.es",
+      "sourceSha256": "683a5d672f6215de9034a82434ed25e3900573a3ce563f7d3de9aec69c837bfb",
+      "guarantee": "Between start and end, continuation retains current input value minus the linear vested share."
+    },
+    {
+      "id": "V03",
+      "family": "vesting",
+      "source": "examples/contracts/recipes/vesting.es",
+      "sourceSha256": "683a5d672f6215de9034a82434ed25e3900573a3ce563f7d3de9aec69c837bfb",
+      "guarantee": "At or after the end, only the beneficiary can authorize release."
+    },
+    {
+      "id": "U01",
+      "family": "auction",
+      "source": "examples/contracts/recipes/auction.es",
+      "sourceSha256": "3356e0ecc4b2685a0cce24241f4dc29808898143687b64be6cb19e035da2a23f",
+      "guarantee": "An existing-bid continuation before the deadline increases value by at least minRaiseAmount."
+    },
+    {
+      "id": "U02",
+      "family": "auction",
+      "source": "examples/contracts/recipes/auction.es",
+      "sourceSha256": "3356e0ecc4b2685a0cce24241f4dc29808898143687b64be6cb19e035da2a23f",
+      "guarantee": "A new bid refunds the previous bidder at least the input value."
+    },
+    {
+      "id": "U03",
+      "family": "auction",
+      "source": "examples/contracts/recipes/auction.es",
+      "sourceSha256": "3356e0ecc4b2685a0cce24241f4dc29808898143687b64be6cb19e035da2a23f",
+      "guarantee": "Settlement delivers the auctioned token bundle to the recorded winning bidder."
+    },
+    {
+      "id": "R01",
+      "family": "registry",
+      "source": "examples/contracts/protocols/registry/registry.es",
+      "sourceSha256": "fee6f76b20241d5a5c809cdc531a673046fff818938c6ab2cb5d25f4cdc88876",
+      "guarantee": "On public registration, the registry continuation does not lose ERG."
+    },
+    {
+      "id": "R02",
+      "family": "registry",
+      "source": "examples/contracts/protocols/registry/registry.es",
+      "sourceSha256": "fee6f76b20241d5a5c809cdc531a673046fff818938c6ab2cb5d25f4cdc88876",
+      "guarantee": "On public registration, the registrar output receives at least the fixed fee."
+    },
+    {
+      "id": "R03",
+      "family": "registry",
+      "source": "examples/contracts/protocols/registry/registry.es",
+      "sourceSha256": "fee6f76b20241d5a5c809cdc531a673046fff818938c6ab2cb5d25f4cdc88876",
+      "guarantee": "Public registration inserts a previously absent name and commits the resulting AVL digest."
+    },
+    {
+      "id": "X01",
+      "family": "mixer",
+      "source": "examples/contracts/protocols/mixer/half-mix.es",
+      "sourceSha256": "81acaa28e67b3a549fea31f8beb5251bbe5e550d172c9a76fba60ffd3438e798",
+      "guarantee": "On the partner path, both full-mix outputs have the half-mix input value."
+    },
+    {
+      "id": "X02",
+      "family": "mixer",
+      "source": "examples/contracts/protocols/mixer/half-mix.es",
+      "sourceSha256": "81acaa28e67b3a549fea31f8beb5251bbe5e550d172c9a76fba60ffd3438e798",
+      "guarantee": "On the partner path, full-mix group-element registers are mirrored and distinct."
+    },
+    {
+      "id": "X03",
+      "family": "mixer",
+      "source": "examples/contracts/protocols/mixer/half-mix.es",
+      "sourceSha256": "81acaa28e67b3a549fea31f8beb5251bbe5e550d172c9a76fba60ffd3438e798",
+      "guarantee": "The partner proves the specified Diffie-Hellman relation."
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "revision": "c717f82f6b5848761faec0b26a1e87ab7d479134",
+  "uncommitted": true,
+  "startedAt": "2026-09-10T23:46:39.223519+00:00",
+  "commands": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exitCode": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exitCode": 0,
+      "outputSha256": "33c276591df124acce769d87366fdd60bb4f8b2a4fbafed62a047b49957e2a18"
+    },
+    {
+      "name": "python",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exitCode": 0,
+      "outputSha256": "e4276980a6712d7e00849f8e094f382bdc7825368ddb94fa28bace6eb6520fcf"
+    },
+    {
+      "name": "workspace",
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--release"
+      ],
+      "exitCode": 0,
+      "outputSha256": "c42f8886efae3aa099894df45783aa10626a7d78179e778dd68b5d166e137d19",
+      "totals": {
+        "passed": 499,
+        "failed": 0,
+        "ignored": 1
+      }
+    },
+    {
+      "name": "through-completed",
+      "command": [
+        "python3",
+        "scripts/roadmap_gate.py",
+        "--through-completed",
+        "--report",
+        "/home/rkadias/coding/ergo-forge/docs/discovery/consolidation-verification/through-completed.json"
+      ],
+      "exitCode": 0,
+      "outputSha256": "8fb874c68d7559310382cef55ba8509f838a7a8f7c0f35d8a4e517429d269799"
+    },
+    {
+      "name": "ci",
+      "command": [
+        "python3",
+        "scripts/roadmap_gate.py",
+        "--ci",
+        "--report",
+        "/home/rkadias/coding/ergo-forge/docs/discovery/consolidation-verification/ci.json"
+      ],
+      "exitCode": 0,
+      "outputSha256": "fe91d214af957a81703eea1969913d11d9984d2ecd44b2eb38c60655ad7eb9a6"
+    }
+  ]
+}
