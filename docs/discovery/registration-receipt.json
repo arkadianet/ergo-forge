@@ -1,0 +1,57 @@
+{
+  "version": "D00-registration-receipt:v1",
+  "recordedAtUtc": "2026-09-10T15:38:21.233787+00:00",
+  "attemptCommit": "a57df087df85813c7f90a6f6f9ad6aaf5b4597cd",
+  "dirtyTree": true,
+  "gitStatus": " M docs/ROADMAP.md\n M docs/roadmap-stops.json\n M docs/superpowers/specs/2026-09-11-discovery-capability-design.md\n M ergo-sandbox/tests/mapping_inventory.rs\n?? docs/discovery/\n?? ergo-sandbox/examples/author_d00_inventory.rs\n?? ergo-sandbox/examples/measure_d00_inventory.rs\n?? ergo-sandbox/tests/fixtures/properties/\n?? ergo-sandbox/tests/property_inventory.rs\n?? ergo-sandbox/tests/property_support/\n",
+  "files": {
+    "ergo-sandbox/tests/fixtures/properties/manifest.json": "72609b827694feca9fb78ae440afc69644abb29238d9fd48dd7fe3467658304f",
+    "ergo-sandbox/tests/fixtures/properties/expected.json": "311f160e08a8875de546263474fb10ec621e881b34afc28bb65323db32c7f319",
+    "ergo-sandbox/tests/fixtures/properties/authored-inputs.json": "ac4bbed03a2c944689489313938dfaa1ce5a4bb2baa5caec3d47f92cf4d98dfe",
+    "ergo-sandbox/tests/fixtures/properties/transfer-registration.json": "4b8a0ba4b393b155cb4324caa0698452dc601a3e849590a813536321a97f1ead",
+    "ergo-sandbox/tests/fixtures/properties/legacy-results.json": "726769c5c7baf12443a3d5ce287e29ee67d924fd600ffe156c217fe59518616a",
+    "docs/discovery/original-policy.json": "46f295bbcbc99324bea21000755259828d663cac68753cec80779d1d642249b0",
+    "docs/discovery/permitted-d00-resolution.json": "9657cd03e5639911635d460db685ed573f1f985c785ebb34a357f2ed8ef28286",
+    "docs/discovery/D00-DECISION.md": "9293e9a6f50a11fa9d5b07c89dc2b2b8bbba9a027e8657830882ec4bd4609f8e",
+    "ergo-sandbox/examples/author_d00_inventory.rs": "c919603d26e78c80d2577b6b5fb560a5a33966ccc9eff4c1091bc96f5fbe6c19",
+    "ergo-sandbox/examples/measure_d00_inventory.rs": "8aa5284a41f5e2ec28539cbe2be3e4dc3b18205a9dd11381bf0d3f745baf0cbb",
+    "ergo-sandbox/tests/property_support/mod.rs": "6fba5c1a1d6c30ff4e98a59aef199d777499f26238d6484f7d9e51d91936e775",
+    "ergo-sandbox/tests/property_inventory.rs": "52626924c4d44ac988c7e3217000f6a931dd8487860cc7bf6b67d63fde8a86a8",
+    "ergo-sandbox/tests/mapping_inventory.rs": "724ade3410c74418ebd185e13c4386ee533b3f43f67148e78e7667a6b16268af",
+    "ergo-sandbox/tests/fixtures/properties/legacy-results-raw.fixture": "9a2031b9324ab62b9bb91f7cf6960aa8a00209148b1b2eca0c1dfbd6323ea451"
+  },
+  "order": [
+    "Authored synthetic inputs and separate expected answers without a property evaluator.",
+    "Serialized draft v0 before any node or extraction measurement; retained under docs/discovery/d00-draft-v0.",
+    "Caught legacy DTO mismatch during API inspection: funding is not a DrainRole; objective must explicitly specify empty terms. Corrected to attacker funding and objective.terms=[] before accepted byte pins. Original draft retained, no measured row or verdict changed.",
+    "Serialized corrected references without validation or scoring. Locked manifest and answer constants in property_support/mod.rs before starting measure_d00_inventory.",
+    "Captured raw existing-node and extraction results; locked legacy-results digest in property_inventory.rs.",
+    "Ran whole M00 and D00 targets; all 7 tests passed. Registered D00 implemented and advanced completedThrough before final whole-prefix verification."
+  ],
+  "drafts": {
+    "v0": "docs/discovery/d00-draft-v0",
+    "acceptanceStatus": "pre-lock serialization draft, excluded from accepted score",
+    "measurementBeforeCorrection": false
+  },
+  "commands": {
+    "serialize": "CARGO_TARGET_DIR=./target-p00 cargo run -p ergo-sandbox --release --example author_d00_inventory",
+    "measure": "CARGO_TARGET_DIR=./target-p00 cargo run -p ergo-sandbox --release --example measure_d00_inventory"
+  },
+  "reviewer": null,
+  "transferDenominator": null,
+  "newPropertyEvaluatorExists": false,
+  "linkedTraceChecked": false,
+  "nodeReferenceTransactions": 35,
+  "measurementNodeCallsIncludingLegacyReplay": 70,
+  "publication": "public synthetic inputs only; no live acquisition or protocol contact",
+  "elapsedEffort": "One local working day touched; per-case person-hours not independently instrumented and not invented. Nomination was limited to local fixture review, below the four-person-hour ceiling.",
+  "packagingCorrection": {
+    "initialReceipt": "docs/discovery/registration-receipt-initial.json",
+    "initialWorkspaceExit": 101,
+    "cause": "Raw node ergoTree fields in JSON expanded recursive corpus discovery.",
+    "correction": "Move exact raw bytes to legacy-results-raw.fixture and reproduce legacy-results.json as status index plus raw path/hash.",
+    "rawSha256Unchanged": "9a2031b9324ab62b9bb91f7cf6960aa8a00209148b1b2eca0c1dfbd6323ea451",
+    "manifestAndAnswersUnchanged": true,
+    "baselineOrCorpusEdited": false
+  }
+}

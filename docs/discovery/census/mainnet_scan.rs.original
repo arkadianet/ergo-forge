@@ -1,0 +1,71 @@
+//! Offline scan of every distinct mainnet contract script supplied on stdin
+//! (`hash|ergoTree|boxCount|value`). Reads local data only; nothing is fetched
+//! or broadcast. Reports lift coverage, lint distribution, and how many real
+//! contracts use arithmetic/context the property vocabulary cannot state.
+use std::collections::BTreeMap;
+use std::io::BufRead;
+
+fn main() {
+    let (mut n, mut ok, mut complete, mut parse_err) = (0u64, 0u64, 0u64, 0u64);
+    let (mut findings, mut clean, mut truncated) = (0u64, 0u64, 0u64);
+    let (mut mul, mut ctx, mut either) = (0u64, 0u64, 0u64);
+    let (mut boxes_total, mut boxes_either) = (0u128, 0u128);
+    let mut by_lint = BTreeMap::<String, u64>::new();
+    let mut size_hist = BTreeMap::<u64, u64>::new();
+
+    for line in std::io::stdin().lock().lines().map_while(Result::ok) {
+        let f: Vec<&str> = line.split('|').collect();
+        if f.len() < 3 { continue; }
+        n += 1;
+        let count: u128 = f[2].trim().parse().unwrap_or(0);
+        boxes_total += count;
+        let Ok(bytes) = hex::decode(f[1]) else { parse_err += 1; continue };
+        *size_hist.entry(((bytes.len() as u64) / 128) * 128).or_default() += 1;
+        let Ok(tree) = ergo_sandbox::inspect::parse_tree(&bytes) else { parse_err += 1; continue };
+        let lifted = ergo_sandbox::decompile::with_large_stack(move || {
+            ergo_sandbox::lift_tree(&tree, false)
+        });
+        ok += 1;
+        if lifted.raw_placeholders == 0 { complete += 1; }
+        if lifted.truncated { truncated += 1; }
+
+        let audit = ergo_sandbox::audit::audit(&lifted);
+        if audit.findings.is_empty() { clean += 1; }
+        findings += audit.findings.len() as u64;
+        for a in &audit.findings { *by_lint.entry(a.lint.to_string()).or_default() += 1; }
+
+        // What the D01 property vocabulary cannot express: runtime
+        // multiplication, and context/data-input reads.
+        let ir = ergo_sandbox::decompile::print(&lifted.node);
+        let m = ir.contains(" * ");
+        let c = ir.contains("dataInputs");
+        if m { mul += 1; }
+        if c { ctx += 1; }
+        if m || c { either += 1; boxes_either += count; }
+
+        if n % 25000 == 0 { eprintln!("  ... {n} scanned"); }
+    }
+
+    println!("=== MAINNET CONTRACT SCAN ===");
+    println!("distinct scripts:   {n}");
+    println!("  lifted:           {ok}  ({:.2}%)", 100.0 * ok as f64 / n as f64);
+    println!("  complete:         {complete}  ({:.2}% of lifted)", 100.0 * complete as f64 / ok as f64);
+    println!("  truncated:        {truncated}");
+    println!("  parse/lift error: {parse_err}");
+    println!("  boxes covered:    {boxes_total}");
+    println!("\n=== FINDINGS ===");
+    println!("total findings:     {findings}");
+    println!("clean contracts:    {clean}  ({:.1}%)", 100.0 * clean as f64 / ok as f64);
+    println!("mean per contract:  {:.1}", findings as f64 / ok as f64);
+    for (k, v) in &by_lint {
+        println!("  {k:24} {v:8}  ({:.1}%)", 100.0 * *v as f64 / findings as f64);
+    }
+    println!("\n=== PROPERTY VOCABULARY GAP ===");
+    println!("runtime multiplication: {mul}  ({:.1}%)", 100.0 * mul as f64 / ok as f64);
+    println!("context/data-input:     {ctx}  ({:.1}%)", 100.0 * ctx as f64 / ok as f64);
+    println!("either (unstateable):   {either}  ({:.1}%)", 100.0 * either as f64 / ok as f64);
+    println!("boxes under those:      {boxes_either}  ({:.1}%)",
+        100.0 * boxes_either as f64 / boxes_total as f64);
+    println!("\n=== SIZE DISTRIBUTION (bytes) ===");
+    for (k, v) in &size_hist { if *v > n / 200 { println!("  {k:5}-{:<5} {v}", k + 127); } }
+}

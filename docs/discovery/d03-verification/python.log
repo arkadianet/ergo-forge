@@ -1,0 +1,53 @@
+A: stopped: recorded stop blocks this unit
+scoreboard: passed
+A: stopped: recorded stop blocks this unit
+report: <tmp>/tmpv3d_m4ov/report.json
+A: stopped: recorded stop blocks this unit
+scoreboard: passed
+A: stopped: recorded stop blocks this unit
+report: <tmp>/tmpll0_6aeh/report.json
+A: stopped: recorded stop blocks this unit
+scoreboard: passed
+A: stopped: recorded stop blocks this unit
+report: <tmp>/tmp7n3s7f2q/report.json
+A: unimplemented: registered product unit is not implemented
+..scoreboard: passed
+A: unimplemented: registered product unit is not implemented
+report: <tmp>/tmpwto6h8zt/report.json
+policy/evidence: missing-gate: stop evidence hash mismatch
+report: <tmp>/tmpiaigxnnz/ci.json
+A: failed: test failure
+scoreboard: passed
+A: failed: test failure
+report: <tmp>/tmp613er9_t/report.json
+A: missing-gate: test failure
+scoreboard: passed
+A: missing-gate: test failure
+report: <tmp>/tmpxj60a8bb/report.json
+A: stopped: recorded stop blocks this unit
+B: unimplemented: registered product unit is not implemented
+scoreboard: passed
+A: stopped: recorded stop blocks this unit
+B: unimplemented: registered product unit is not implemented
+report: <tmp>/tmpp_2iwlsd/report.json
+A: stopped: recorded stop blocks this unit
+B: blocked: dependency did not pass
+scoreboard: passed
+A: stopped: recorded stop blocks this unit
+B: blocked: dependency did not pass
+report: <tmp>/tmpilpihozi/report.json
+A: passed: required tests executed
+..................
+----------------------------------------------------------------------
+Ran 20 tests in 0.051s
+
+OK
+scoreboard: passed
+A: passed: required tests executed
+report: <tmp>/tmp3deyft9j/report.json
+policy/evidence: missing-gate: 'list' object has no attribute 'values'
+report: <tmp>/tmpd07yey9w/nested/report.json
+policy/evidence: missing-gate: 'NoneType' object has no attribute 'keys'
+report: <tmp>/tmpj6bma1aj/nested/report.json
+policy/evidence: missing-gate: division by zero
+report: <tmp>/tmpl7cz8hdw/nested/report.json

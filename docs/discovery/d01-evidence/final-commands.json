@@ -1,0 +1,44 @@
+[
+  {
+    "name": "workspace",
+    "command": "CARGO_TARGET_DIR=./target-p00 cargo test --workspace --release",
+    "exitCode": 0,
+    "elapsedSeconds": 241.778,
+    "outputSha256": "bd22d8d9d32c05e982fc02cb610f34f1c20a215b7eb09d691cd973d0a677fd65"
+  },
+  {
+    "name": "python",
+    "command": "CARGO_TARGET_DIR=./target-p00 python3 -m unittest discover -s scripts -p test_roadmap_gate.py",
+    "exitCode": 0,
+    "elapsedSeconds": 0.1,
+    "outputSha256": "47559fd4f8659ba4368bc6970b50952f0d5ab34d7bedc960232aeca5f3f05a1b"
+  },
+  {
+    "name": "require",
+    "command": "CARGO_TARGET_DIR=./target-p00 python3 scripts/roadmap_gate.py --require D01",
+    "exitCode": 0,
+    "elapsedSeconds": 113.047,
+    "outputSha256": "edf471773656e2b446ef329dca93beb0a8328f507128089592fdb60a08f3f31c"
+  },
+  {
+    "name": "through-completed",
+    "command": "CARGO_TARGET_DIR=./target-p00 python3 scripts/roadmap_gate.py --through-completed",
+    "exitCode": 0,
+    "elapsedSeconds": 91.865,
+    "outputSha256": "73cc07dfbf9e7f76975e16f159e10ec752ef465347b1769a86812c36f35c2e8e"
+  },
+  {
+    "name": "ci",
+    "command": "CARGO_TARGET_DIR=./target-p00 python3 scripts/roadmap_gate.py --ci",
+    "exitCode": 0,
+    "elapsedSeconds": 135.449,
+    "outputSha256": "151df70f0a45796f3f86779770760dd4d4f7041cda1de291f3321ab04058503e"
+  },
+  {
+    "name": "all-goals",
+    "command": "CARGO_TARGET_DIR=./target-p00 python3 scripts/roadmap_gate.py --all-goals",
+    "exitCode": 1,
+    "elapsedSeconds": 95.834,
+    "outputSha256": "614f7eb5a0cd7c071dacb300701ce63d91c52bc3e455b58176f20b209d9558a1"
+  }
+]

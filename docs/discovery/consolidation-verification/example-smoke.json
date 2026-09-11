@@ -1,0 +1,32 @@
+[
+  {
+    "name": "empty",
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "Error: \"empty export\"\n"
+  },
+  {
+    "name": "malformed-count",
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "Error: ParseIntError { kind: InvalidDigit }\n"
+  },
+  {
+    "name": "duplicate",
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "Error: \"row 2: empty or duplicate export hash\"\n"
+  },
+  {
+    "name": "missing-probe-argument",
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "Error: \"usage: real_property_probe <attempts.json>\"\n"
+  },
+  {
+    "name": "valid-one-row",
+    "exitCode": 0,
+    "stdout": "export sha256: 7e145a581021becc9f9b85eafa338b1d480d6fca9d4dd35817caa91e9a17e0db\n=== OFFLINE DISTINCT-SCRIPT CENSUS ===\ndistinct scripts:   1\n  lifted:           1  (100.00%)\n  no raw placeholders:         1  (100.00% of lifted)\n  truncated:        0\n  parse/lift error: 0\n  boxes covered:    1\n\n=== UNADJUDICATED FINDINGS (lint percentages use findings denominator) ===\ntotal findings:     0\nclean contracts:    1  (100.0%)\nmean per contract:  0.0\n\n=== PRINTED-TEXT PREVALENCE (not expressiveness) ===\nprinted multiplication: 1  (100.0%)\nprinted dataInputs:     0  (0.0%)\neither printed proxy:   1  (100.0%)\nboxes under those:      1  (100.0%)\n\n=== SIZE DISTRIBUTION (bytes) ===\n    384-511   1\n",
+    "stderr": ""
+  }
+]

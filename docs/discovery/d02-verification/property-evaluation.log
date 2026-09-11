@@ -1,0 +1,43 @@
+$ CARGO_TARGET_DIR=./target-p00 cargo test -p ergo-sandbox --test property_evaluation --release -- --show-output
+   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+    Finished `release` profile [optimized] target(s) in 15.62s
+     Running tests/property_evaluation.rs (target-p00/release/deps/property_evaluation-b56aaa75cd1c2b16)
+
+running 4 tests
+test property_evaluation_requires_fresh_node_acceptance ... ok
+test four_property_families_match_independent_operands ... ok
+test guards_missing_fields_and_overflow_preserve_unknowns ... ok
+test bounded_response_requires_a_complete_accepted_linked_trace ... ok
+
+successes:
+
+---- property_evaluation_requires_fresh_node_acceptance stdout ----
+trigger and every successor require fresh full node acceptance; exported JSON grants no authority
+
+---- four_property_families_match_independent_operands stdout ----
+reserve violation: "violated"
+reserve control: "holds-on-execution"
+issuance violation: "violated"
+issuance control: "holds-on-execution"
+continuation violation: "violated"
+continuation control: "holds-on-execution"
+bounded_response violation: "violated"
+bounded_response control: "holds-on-execution"
+
+---- guards_missing_fields_and_overflow_preserve_unknowns stdout ----
+false guard, missing guard/register/role, type mismatches, empty sets and checked overflow preserve dispositions
+
+---- bounded_response_requires_a_complete_accepted_linked_trace stdout ----
+complete linked response accepted; short horizon unresolved; reordered/reused spends, absent root, schedule tamper, trace cap and same-block cost reset rejected
+
+
+successes:
+    bounded_response_requires_a_complete_accepted_linked_trace
+    four_property_families_match_independent_operands
+    guards_missing_fields_and_overflow_preserve_unknowns
+    property_evaluation_requires_fresh_node_acceptance
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+exit: 0

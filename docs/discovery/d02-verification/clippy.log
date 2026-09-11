@@ -1,0 +1,5 @@
+$ CARGO_TARGET_DIR=./target-p00 cargo clippy --workspace --all-targets -- -D warnings
+    Checking ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.34s
+
+exit: 0

@@ -1,0 +1,2551 @@
+[
+  {
+    "id": "A01",
+    "source": "examples/contracts/protocols/amm/pool.es",
+    "sourceSha256": "12af99b9bf21dc506c28c23dd5c56ece7eb4cfcfd872585c6fbffec8de111eec",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "A01",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {},
+      "guard": {
+        "op": "and",
+        "args": [
+          {
+            "op": "eq",
+            "left": {
+              "op": "sub",
+              "left": {
+                "op": "sum-token",
+                "role": "before",
+                "token": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+              },
+              "right": {
+                "op": "sum-token",
+                "role": "after",
+                "token": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+              }
+            },
+            "right": {
+              "op": "integer",
+              "value": "0",
+              "unit": {
+                "kind": "token",
+                "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+              }
+            }
+          },
+          {
+            "op": "gt",
+            "left": {
+              "op": "sub",
+              "left": {
+                "op": "sum-erg",
+                "role": "after"
+              },
+              "right": {
+                "op": "sum-erg",
+                "role": "before"
+              }
+            },
+            "right": {
+              "op": "integer",
+              "value": "0",
+              "unit": {
+                "kind": "nano-erg"
+              }
+            }
+          }
+        ]
+      },
+      "assertion": {
+        "op": "ge",
+        "left": {
+          "op": "scale",
+          "arg": {
+            "op": "mul",
+            "left": {
+              "op": "sum-token",
+              "role": "before",
+              "token": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            },
+            "right": {
+              "op": "sub",
+              "left": {
+                "op": "sum-erg",
+                "role": "after"
+              },
+              "right": {
+                "op": "sum-erg",
+                "role": "before"
+              }
+            }
+          },
+          "factor": "997"
+        },
+        "right": {
+          "op": "mul",
+          "left": {
+            "op": "scale",
+            "arg": {
+              "op": "sub",
+              "left": {
+                "op": "sum-token",
+                "role": "after",
+                "token": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "right": {
+                "op": "sum-token",
+                "role": "before",
+                "token": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              }
+            },
+            "factor": "-1"
+          },
+          "right": {
+            "op": "add",
+            "left": {
+              "op": "scale",
+              "arg": {
+                "op": "sum-erg",
+                "role": "before"
+              },
+              "factor": "1000"
+            },
+            "right": {
+              "op": "scale",
+              "arg": {
+                "op": "sub",
+                "left": {
+                  "op": "sum-erg",
+                  "role": "after"
+                },
+                "right": {
+                  "op": "sum-erg",
+                  "role": "before"
+                }
+              },
+              "factor": "997"
+            }
+          }
+        }
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/protocols/amm/pool.es; not compiled identity or execution evidence",
+          "sha256": "12af99b9bf21dc506c28c23dd5c56ece7eb4cfcfd872585c6fbffec8de111eec"
+        }
+      ]
+    }
+  },
+  {
+    "id": "A02",
+    "source": "examples/contracts/protocols/amm/pool.es",
+    "sourceSha256": "12af99b9bf21dc506c28c23dd5c56ece7eb4cfcfd872585c6fbffec8de111eec",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "A02",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {},
+      "guard": {
+        "op": "and",
+        "args": [
+          {
+            "op": "eq",
+            "left": {
+              "op": "sub",
+              "left": {
+                "op": "sum-token",
+                "role": "before",
+                "token": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+              },
+              "right": {
+                "op": "sum-token",
+                "role": "after",
+                "token": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+              }
+            },
+            "right": {
+              "op": "integer",
+              "value": "0",
+              "unit": {
+                "kind": "token",
+                "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+              }
+            }
+          },
+          {
+            "op": "le",
+            "left": {
+              "op": "sub",
+              "left": {
+                "op": "sum-erg",
+                "role": "after"
+              },
+              "right": {
+                "op": "sum-erg",
+                "role": "before"
+              }
+            },
+            "right": {
+              "op": "integer",
+              "value": "0",
+              "unit": {
+                "kind": "nano-erg"
+              }
+            }
+          }
+        ]
+      },
+      "assertion": {
+        "op": "ge",
+        "left": {
+          "op": "scale",
+          "arg": {
+            "op": "mul",
+            "left": {
+              "op": "sum-erg",
+              "role": "before"
+            },
+            "right": {
+              "op": "sub",
+              "left": {
+                "op": "sum-token",
+                "role": "after",
+                "token": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "right": {
+                "op": "sum-token",
+                "role": "before",
+                "token": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              }
+            }
+          },
+          "factor": "997"
+        },
+        "right": {
+          "op": "mul",
+          "left": {
+            "op": "scale",
+            "arg": {
+              "op": "sub",
+              "left": {
+                "op": "sum-erg",
+                "role": "after"
+              },
+              "right": {
+                "op": "sum-erg",
+                "role": "before"
+              }
+            },
+            "factor": "-1"
+          },
+          "right": {
+            "op": "add",
+            "left": {
+              "op": "scale",
+              "arg": {
+                "op": "sum-token",
+                "role": "before",
+                "token": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "factor": "1000"
+            },
+            "right": {
+              "op": "scale",
+              "arg": {
+                "op": "sub",
+                "left": {
+                  "op": "sum-token",
+                  "role": "after",
+                  "token": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "right": {
+                  "op": "sum-token",
+                  "role": "before",
+                  "token": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              },
+              "factor": "997"
+            }
+          }
+        }
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/protocols/amm/pool.es; not compiled identity or execution evidence",
+          "sha256": "12af99b9bf21dc506c28c23dd5c56ece7eb4cfcfd872585c6fbffec8de111eec"
+        }
+      ]
+    }
+  },
+  {
+    "id": "A03",
+    "source": "examples/contracts/protocols/amm/pool.es",
+    "sourceSha256": "12af99b9bf21dc506c28c23dd5c56ece7eb4cfcfd872585c6fbffec8de111eec",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "A03",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {},
+      "guard": {
+        "op": "and",
+        "args": [
+          {
+            "op": "gt",
+            "left": {
+              "op": "sub",
+              "left": {
+                "op": "sum-token",
+                "role": "before",
+                "token": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+              },
+              "right": {
+                "op": "sum-token",
+                "role": "after",
+                "token": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+              }
+            },
+            "right": {
+              "op": "integer",
+              "value": "0",
+              "unit": {
+                "kind": "token",
+                "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+              }
+            }
+          },
+          {
+            "op": "gt",
+            "left": {
+              "op": "sub",
+              "left": {
+                "op": "sum-erg",
+                "role": "after"
+              },
+              "right": {
+                "op": "sum-erg",
+                "role": "before"
+              }
+            },
+            "right": {
+              "op": "integer",
+              "value": "0",
+              "unit": {
+                "kind": "nano-erg"
+              }
+            }
+          },
+          {
+            "op": "gt",
+            "left": {
+              "op": "sub",
+              "left": {
+                "op": "sum-token",
+                "role": "after",
+                "token": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "right": {
+                "op": "sum-token",
+                "role": "before",
+                "token": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              }
+            },
+            "right": {
+              "op": "integer",
+              "value": "0",
+              "unit": {
+                "kind": "token",
+                "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              }
+            }
+          }
+        ]
+      },
+      "assertion": {
+        "op": "le",
+        "left": {
+          "op": "mul",
+          "left": {
+            "op": "sub",
+            "left": {
+              "op": "sum-token",
+              "role": "before",
+              "token": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            },
+            "right": {
+              "op": "sum-token",
+              "role": "after",
+              "token": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            }
+          },
+          "right": {
+            "op": "sum-erg",
+            "role": "before"
+          }
+        },
+        "right": {
+          "op": "mul",
+          "left": {
+            "op": "sub",
+            "left": {
+              "op": "sum-erg",
+              "role": "after"
+            },
+            "right": {
+              "op": "sum-erg",
+              "role": "before"
+            }
+          },
+          "right": {
+            "op": "sub",
+            "left": {
+              "op": "integer",
+              "value": "1000000000000",
+              "unit": {
+                "kind": "token",
+                "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+              }
+            },
+            "right": {
+              "op": "sum-token",
+              "role": "before",
+              "token": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            }
+          }
+        }
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/protocols/amm/pool.es; not compiled identity or execution evidence",
+          "sha256": "12af99b9bf21dc506c28c23dd5c56ece7eb4cfcfd872585c6fbffec8de111eec"
+        }
+      ]
+    }
+  },
+  {
+    "id": "A04",
+    "source": "examples/contracts/protocols/amm/pool.es",
+    "sourceSha256": "12af99b9bf21dc506c28c23dd5c56ece7eb4cfcfd872585c6fbffec8de111eec",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "A04",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {},
+      "guard": {
+        "op": "and",
+        "args": [
+          {
+            "op": "gt",
+            "left": {
+              "op": "sub",
+              "left": {
+                "op": "sum-token",
+                "role": "before",
+                "token": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+              },
+              "right": {
+                "op": "sum-token",
+                "role": "after",
+                "token": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+              }
+            },
+            "right": {
+              "op": "integer",
+              "value": "0",
+              "unit": {
+                "kind": "token",
+                "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+              }
+            }
+          },
+          {
+            "op": "gt",
+            "left": {
+              "op": "sub",
+              "left": {
+                "op": "sum-erg",
+                "role": "after"
+              },
+              "right": {
+                "op": "sum-erg",
+                "role": "before"
+              }
+            },
+            "right": {
+              "op": "integer",
+              "value": "0",
+              "unit": {
+                "kind": "nano-erg"
+              }
+            }
+          },
+          {
+            "op": "gt",
+            "left": {
+              "op": "sub",
+              "left": {
+                "op": "sum-token",
+                "role": "after",
+                "token": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "right": {
+                "op": "sum-token",
+                "role": "before",
+                "token": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              }
+            },
+            "right": {
+              "op": "integer",
+              "value": "0",
+              "unit": {
+                "kind": "token",
+                "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              }
+            }
+          }
+        ]
+      },
+      "assertion": {
+        "op": "le",
+        "left": {
+          "op": "mul",
+          "left": {
+            "op": "sub",
+            "left": {
+              "op": "sum-token",
+              "role": "before",
+              "token": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            },
+            "right": {
+              "op": "sum-token",
+              "role": "after",
+              "token": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            }
+          },
+          "right": {
+            "op": "sum-token",
+            "role": "before",
+            "token": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "right": {
+          "op": "mul",
+          "left": {
+            "op": "sub",
+            "left": {
+              "op": "sum-token",
+              "role": "after",
+              "token": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            },
+            "right": {
+              "op": "sum-token",
+              "role": "before",
+              "token": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          },
+          "right": {
+            "op": "sub",
+            "left": {
+              "op": "integer",
+              "value": "1000000000000",
+              "unit": {
+                "kind": "token",
+                "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+              }
+            },
+            "right": {
+              "op": "sum-token",
+              "role": "before",
+              "token": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            }
+          }
+        }
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/protocols/amm/pool.es; not compiled identity or execution evidence",
+          "sha256": "12af99b9bf21dc506c28c23dd5c56ece7eb4cfcfd872585c6fbffec8de111eec"
+        }
+      ]
+    }
+  },
+  {
+    "id": "B01",
+    "source": "examples/contracts/protocols/bank/bank.es",
+    "sourceSha256": "ed3a7e24920c0efe571a998e27d02ad560981eb5150b7b0393471359a39967d0",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "B01",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {
+        "scBefore": {
+          "role": "before",
+          "index": 4,
+          "valueType": "long",
+          "unit": {
+            "kind": "token",
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "scAfter": {
+          "role": "after",
+          "index": 4,
+          "valueType": "long",
+          "unit": {
+            "kind": "token",
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "rcBefore": {
+          "role": "before",
+          "index": 5,
+          "valueType": "long",
+          "unit": {
+            "kind": "token",
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        },
+        "rate": {
+          "role": "oracle",
+          "index": 4,
+          "valueType": "long",
+          "unit": {
+            "kind": "named-amount",
+            "name": "nanoerg-per-sc"
+          }
+        }
+      },
+      "guard": {
+        "op": "boolean",
+        "value": true
+      },
+      "assertion": {
+        "op": "eq",
+        "left": {
+          "op": "register",
+          "name": "scAfter"
+        },
+        "right": {
+          "op": "add",
+          "left": {
+            "op": "register",
+            "name": "scBefore"
+          },
+          "right": {
+            "op": "sub",
+            "left": {
+              "op": "sum-token",
+              "role": "before",
+              "token": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            },
+            "right": {
+              "op": "sum-token",
+              "role": "after",
+              "token": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          }
+        }
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/protocols/bank/bank.es; not compiled identity or execution evidence",
+          "sha256": "ed3a7e24920c0efe571a998e27d02ad560981eb5150b7b0393471359a39967d0"
+        }
+      ]
+    }
+  },
+  {
+    "id": "B02",
+    "source": "examples/contracts/protocols/bank/bank.es",
+    "sourceSha256": "ed3a7e24920c0efe571a998e27d02ad560981eb5150b7b0393471359a39967d0",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "B02",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {
+        "scBefore": {
+          "role": "before",
+          "index": 4,
+          "valueType": "long",
+          "unit": {
+            "kind": "token",
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "scAfter": {
+          "role": "after",
+          "index": 4,
+          "valueType": "long",
+          "unit": {
+            "kind": "token",
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "rcBefore": {
+          "role": "before",
+          "index": 5,
+          "valueType": "long",
+          "unit": {
+            "kind": "token",
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        },
+        "rate": {
+          "role": "oracle",
+          "index": 4,
+          "valueType": "long",
+          "unit": {
+            "kind": "named-amount",
+            "name": "nanoerg-per-sc"
+          }
+        }
+      },
+      "guard": {
+        "op": "gt",
+        "left": {
+          "op": "sub",
+          "left": {
+            "op": "register",
+            "name": "scAfter"
+          },
+          "right": {
+            "op": "register",
+            "name": "scBefore"
+          }
+        },
+        "right": {
+          "op": "integer",
+          "value": "0",
+          "unit": {
+            "kind": "token",
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        }
+      },
+      "assertion": {
+        "op": "ge",
+        "left": {
+          "op": "scale",
+          "arg": {
+            "op": "sum-erg",
+            "role": "after"
+          },
+          "factor": "100"
+        },
+        "right": {
+          "op": "scale",
+          "arg": {
+            "op": "mul",
+            "left": {
+              "op": "register",
+              "name": "scAfter"
+            },
+            "right": {
+              "op": "register",
+              "name": "rate"
+            }
+          },
+          "factor": "400"
+        }
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/protocols/bank/bank.es; not compiled identity or execution evidence",
+          "sha256": "ed3a7e24920c0efe571a998e27d02ad560981eb5150b7b0393471359a39967d0"
+        }
+      ]
+    }
+  },
+  {
+    "id": "B03",
+    "source": "examples/contracts/protocols/bank/bank.es",
+    "sourceSha256": "ed3a7e24920c0efe571a998e27d02ad560981eb5150b7b0393471359a39967d0",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "B03",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {
+        "scBefore": {
+          "role": "before",
+          "index": 4,
+          "valueType": "long",
+          "unit": {
+            "kind": "token",
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "scAfter": {
+          "role": "after",
+          "index": 4,
+          "valueType": "long",
+          "unit": {
+            "kind": "token",
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "rcBefore": {
+          "role": "before",
+          "index": 5,
+          "valueType": "long",
+          "unit": {
+            "kind": "token",
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        },
+        "rate": {
+          "role": "oracle",
+          "index": 4,
+          "valueType": "long",
+          "unit": {
+            "kind": "named-amount",
+            "name": "nanoerg-per-sc"
+          }
+        }
+      },
+      "guard": {
+        "op": "gt",
+        "left": {
+          "op": "sub",
+          "left": {
+            "op": "register",
+            "name": "scAfter"
+          },
+          "right": {
+            "op": "register",
+            "name": "scBefore"
+          }
+        },
+        "right": {
+          "op": "integer",
+          "value": "0",
+          "unit": {
+            "kind": "token",
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        }
+      },
+      "assertion": {
+        "op": "ge",
+        "left": {
+          "op": "sub",
+          "left": {
+            "op": "sum-erg",
+            "role": "after"
+          },
+          "right": {
+            "op": "sum-erg",
+            "role": "before"
+          }
+        },
+        "right": {
+          "op": "add",
+          "left": {
+            "op": "mul",
+            "left": {
+              "op": "sub",
+              "left": {
+                "op": "register",
+                "name": "scAfter"
+              },
+              "right": {
+                "op": "register",
+                "name": "scBefore"
+              }
+            },
+            "right": {
+              "op": "min",
+              "left": {
+                "op": "register",
+                "name": "rate"
+              },
+              "right": {
+                "op": "div",
+                "left": {
+                  "op": "sum-erg",
+                  "role": "before"
+                },
+                "right": {
+                  "op": "register",
+                  "name": "scBefore"
+                }
+              }
+            }
+          },
+          "right": {
+            "op": "div",
+            "left": {
+              "op": "scale",
+              "arg": {
+                "op": "mul",
+                "left": {
+                  "op": "sub",
+                  "left": {
+                    "op": "register",
+                    "name": "scAfter"
+                  },
+                  "right": {
+                    "op": "register",
+                    "name": "scBefore"
+                  }
+                },
+                "right": {
+                  "op": "min",
+                  "left": {
+                    "op": "register",
+                    "name": "rate"
+                  },
+                  "right": {
+                    "op": "div",
+                    "left": {
+                      "op": "sum-erg",
+                      "role": "before"
+                    },
+                    "right": {
+                      "op": "register",
+                      "name": "scBefore"
+                    }
+                  }
+                }
+              },
+              "factor": "2"
+            },
+            "right": {
+              "op": "integer",
+              "value": "100",
+              "unit": {
+                "kind": "scalar"
+              }
+            }
+          }
+        }
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/protocols/bank/bank.es; not compiled identity or execution evidence",
+          "sha256": "ed3a7e24920c0efe571a998e27d02ad560981eb5150b7b0393471359a39967d0"
+        }
+      ]
+    }
+  },
+  {
+    "id": "B04",
+    "source": "examples/contracts/protocols/bank/bank.es",
+    "sourceSha256": "ed3a7e24920c0efe571a998e27d02ad560981eb5150b7b0393471359a39967d0",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "B04",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {
+        "scBefore": {
+          "role": "before",
+          "index": 4,
+          "valueType": "long",
+          "unit": {
+            "kind": "token",
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "scAfter": {
+          "role": "after",
+          "index": 4,
+          "valueType": "long",
+          "unit": {
+            "kind": "token",
+            "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "rcBefore": {
+          "role": "before",
+          "index": 5,
+          "valueType": "long",
+          "unit": {
+            "kind": "token",
+            "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        },
+        "rate": {
+          "role": "oracle",
+          "index": 4,
+          "valueType": "long",
+          "unit": {
+            "kind": "named-amount",
+            "name": "nanoerg-per-sc"
+          }
+        }
+      },
+      "guard": {
+        "op": "boolean",
+        "value": true
+      },
+      "assertion": {
+        "op": "eq",
+        "left": {
+          "op": "nominal-price"
+        },
+        "right": {
+          "op": "if",
+          "condition": {
+            "op": "and",
+            "args": [
+              {
+                "op": "gt",
+                "left": {
+                  "op": "register",
+                  "name": "rcBefore"
+                },
+                "right": {
+                  "op": "integer",
+                  "value": "0",
+                  "unit": {
+                    "kind": "scalar"
+                  }
+                }
+              },
+              {
+                "op": "gt",
+                "left": {
+                  "op": "sub",
+                  "left": {
+                    "op": "sum-erg",
+                    "role": "before"
+                  },
+                  "right": {
+                    "op": "mul",
+                    "left": {
+                      "op": "register",
+                      "name": "scBefore"
+                    },
+                    "right": {
+                      "op": "min",
+                      "left": {
+                        "op": "register",
+                        "name": "rate"
+                      },
+                      "right": {
+                        "op": "div",
+                        "left": {
+                          "op": "sum-erg",
+                          "role": "before"
+                        },
+                        "right": {
+                          "op": "register",
+                          "name": "scBefore"
+                        }
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "op": "integer",
+                  "value": "0",
+                  "unit": {
+                    "kind": "nano-erg"
+                  }
+                }
+              }
+            ]
+          },
+          "then": {
+            "op": "div",
+            "left": {
+              "op": "sub",
+              "left": {
+                "op": "sum-erg",
+                "role": "before"
+              },
+              "right": {
+                "op": "mul",
+                "left": {
+                  "op": "register",
+                  "name": "scBefore"
+                },
+                "right": {
+                  "op": "min",
+                  "left": {
+                    "op": "register",
+                    "name": "rate"
+                  },
+                  "right": {
+                    "op": "div",
+                    "left": {
+                      "op": "sum-erg",
+                      "role": "before"
+                    },
+                    "right": {
+                      "op": "register",
+                      "name": "scBefore"
+                    }
+                  }
+                }
+              }
+            },
+            "right": {
+              "op": "register",
+              "name": "rcBefore"
+            }
+          },
+          "otherwise": {
+            "op": "integer",
+            "value": "1",
+            "unit": {
+              "kind": "nano-erg"
+            }
+          }
+        }
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/protocols/bank/bank.es; not compiled identity or execution evidence",
+          "sha256": "ed3a7e24920c0efe571a998e27d02ad560981eb5150b7b0393471359a39967d0"
+        }
+      ]
+    }
+  },
+  {
+    "id": "V01",
+    "source": "examples/contracts/recipes/vesting.es",
+    "sourceSha256": "683a5d672f6215de9034a82434ed25e3900573a3ce563f7d3de9aec69c837bfb",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "V01",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {},
+      "guard": {
+        "op": "lt",
+        "left": {
+          "op": "height"
+        },
+        "right": {
+          "op": "integer",
+          "value": "100",
+          "unit": {
+            "kind": "height"
+          }
+        }
+      },
+      "assertion": {
+        "op": "ge",
+        "left": {
+          "op": "sum-erg",
+          "role": "after"
+        },
+        "right": {
+          "op": "sum-erg",
+          "role": "before"
+        }
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/recipes/vesting.es; not compiled identity or execution evidence",
+          "sha256": "683a5d672f6215de9034a82434ed25e3900573a3ce563f7d3de9aec69c837bfb"
+        }
+      ]
+    }
+  },
+  {
+    "id": "V02",
+    "source": "examples/contracts/recipes/vesting.es",
+    "sourceSha256": "683a5d672f6215de9034a82434ed25e3900573a3ce563f7d3de9aec69c837bfb",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "V02",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {},
+      "guard": {
+        "op": "and",
+        "args": [
+          {
+            "op": "ge",
+            "left": {
+              "op": "height"
+            },
+            "right": {
+              "op": "integer",
+              "value": "100",
+              "unit": {
+                "kind": "height"
+              }
+            }
+          },
+          {
+            "op": "lt",
+            "left": {
+              "op": "height"
+            },
+            "right": {
+              "op": "integer",
+              "value": "200",
+              "unit": {
+                "kind": "height"
+              }
+            }
+          }
+        ]
+      },
+      "assertion": {
+        "op": "ge",
+        "left": {
+          "op": "sum-erg",
+          "role": "after"
+        },
+        "right": {
+          "op": "sub",
+          "left": {
+            "op": "sum-erg",
+            "role": "before"
+          },
+          "right": {
+            "op": "div",
+            "left": {
+              "op": "mul",
+              "left": {
+                "op": "sum-erg",
+                "role": "before"
+              },
+              "right": {
+                "op": "sub",
+                "left": {
+                  "op": "height"
+                },
+                "right": {
+                  "op": "integer",
+                  "value": "100",
+                  "unit": {
+                    "kind": "height"
+                  }
+                }
+              }
+            },
+            "right": {
+              "op": "sub",
+              "left": {
+                "op": "integer",
+                "value": "200",
+                "unit": {
+                  "kind": "height"
+                }
+              },
+              "right": {
+                "op": "integer",
+                "value": "100",
+                "unit": {
+                  "kind": "height"
+                }
+              }
+            }
+          }
+        }
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/recipes/vesting.es; not compiled identity or execution evidence",
+          "sha256": "683a5d672f6215de9034a82434ed25e3900573a3ce563f7d3de9aec69c837bfb"
+        }
+      ]
+    }
+  },
+  {
+    "id": "V03",
+    "source": "examples/contracts/recipes/vesting.es",
+    "sourceSha256": "683a5d672f6215de9034a82434ed25e3900573a3ce563f7d3de9aec69c837bfb",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "V03",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {},
+      "guard": {
+        "op": "ge",
+        "left": {
+          "op": "height"
+        },
+        "right": {
+          "op": "integer",
+          "value": "200",
+          "unit": {
+            "kind": "height"
+          }
+        }
+      },
+      "assertion": {
+        "op": "authorized-by",
+        "principal": "beneficiary"
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/recipes/vesting.es; not compiled identity or execution evidence",
+          "sha256": "683a5d672f6215de9034a82434ed25e3900573a3ce563f7d3de9aec69c837bfb"
+        }
+      ]
+    }
+  },
+  {
+    "id": "U01",
+    "source": "examples/contracts/recipes/auction.es",
+    "sourceSha256": "3356e0ecc4b2685a0cce24241f4dc29808898143687b64be6cb19e035da2a23f",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "U01",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {},
+      "guard": {
+        "op": "lt",
+        "left": {
+          "op": "height"
+        },
+        "right": {
+          "op": "integer",
+          "value": "200",
+          "unit": {
+            "kind": "height"
+          }
+        }
+      },
+      "assertion": {
+        "op": "ge",
+        "left": {
+          "op": "sum-erg",
+          "role": "after"
+        },
+        "right": {
+          "op": "add",
+          "left": {
+            "op": "sum-erg",
+            "role": "before"
+          },
+          "right": {
+            "op": "integer",
+            "value": "1000000",
+            "unit": {
+              "kind": "nano-erg"
+            }
+          }
+        }
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/recipes/auction.es; not compiled identity or execution evidence",
+          "sha256": "3356e0ecc4b2685a0cce24241f4dc29808898143687b64be6cb19e035da2a23f"
+        }
+      ]
+    }
+  },
+  {
+    "id": "U02",
+    "source": "examples/contracts/recipes/auction.es",
+    "sourceSha256": "3356e0ecc4b2685a0cce24241f4dc29808898143687b64be6cb19e035da2a23f",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "U02",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {},
+      "guard": {
+        "op": "lt",
+        "left": {
+          "op": "height"
+        },
+        "right": {
+          "op": "integer",
+          "value": "200",
+          "unit": {
+            "kind": "height"
+          }
+        }
+      },
+      "assertion": {
+        "op": "and",
+        "args": [
+          {
+            "op": "ge",
+            "left": {
+              "op": "sum-erg",
+              "role": "payment"
+            },
+            "right": {
+              "op": "sum-erg",
+              "role": "before"
+            }
+          },
+          {
+            "op": "bytes-eq",
+            "left": {
+              "op": "read-bytes",
+              "role": "payment",
+              "field": "script"
+            },
+            "right": {
+              "op": "register-bytes",
+              "role": "before",
+              "index": 4
+            }
+          }
+        ]
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/recipes/auction.es; not compiled identity or execution evidence",
+          "sha256": "3356e0ecc4b2685a0cce24241f4dc29808898143687b64be6cb19e035da2a23f"
+        }
+      ]
+    }
+  },
+  {
+    "id": "U03",
+    "source": "examples/contracts/recipes/auction.es",
+    "sourceSha256": "3356e0ecc4b2685a0cce24241f4dc29808898143687b64be6cb19e035da2a23f",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "U03",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {},
+      "guard": {
+        "op": "ge",
+        "left": {
+          "op": "height"
+        },
+        "right": {
+          "op": "integer",
+          "value": "200",
+          "unit": {
+            "kind": "height"
+          }
+        }
+      },
+      "assertion": {
+        "op": "and",
+        "args": [
+          {
+            "op": "bytes-eq",
+            "left": {
+              "op": "read-bytes",
+              "role": "payment",
+              "field": "script"
+            },
+            "right": {
+              "op": "register-bytes",
+              "role": "before",
+              "index": 4
+            }
+          },
+          {
+            "op": "tokens-eq",
+            "left": {
+              "op": "tokens",
+              "role": "payment"
+            },
+            "right": {
+              "op": "tokens",
+              "role": "before"
+            }
+          }
+        ]
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/recipes/auction.es; not compiled identity or execution evidence",
+          "sha256": "3356e0ecc4b2685a0cce24241f4dc29808898143687b64be6cb19e035da2a23f"
+        }
+      ]
+    }
+  },
+  {
+    "id": "R01",
+    "source": "examples/contracts/protocols/registry/registry.es",
+    "sourceSha256": "fee6f76b20241d5a5c809cdc531a673046fff818938c6ab2cb5d25f4cdc88876",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "R01",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {},
+      "guard": {
+        "op": "boolean",
+        "value": true
+      },
+      "assertion": {
+        "op": "ge",
+        "left": {
+          "op": "sum-erg",
+          "role": "after"
+        },
+        "right": {
+          "op": "sum-erg",
+          "role": "before"
+        }
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/protocols/registry/registry.es; not compiled identity or execution evidence",
+          "sha256": "fee6f76b20241d5a5c809cdc531a673046fff818938c6ab2cb5d25f4cdc88876"
+        }
+      ]
+    }
+  },
+  {
+    "id": "R02",
+    "source": "examples/contracts/protocols/registry/registry.es",
+    "sourceSha256": "fee6f76b20241d5a5c809cdc531a673046fff818938c6ab2cb5d25f4cdc88876",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "R02",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {},
+      "guard": {
+        "op": "boolean",
+        "value": true
+      },
+      "assertion": {
+        "op": "ge",
+        "left": {
+          "op": "sum-erg",
+          "role": "payment"
+        },
+        "right": {
+          "op": "integer",
+          "value": "1000000",
+          "unit": {
+            "kind": "nano-erg"
+          }
+        }
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/protocols/registry/registry.es; not compiled identity or execution evidence",
+          "sha256": "fee6f76b20241d5a5c809cdc531a673046fff818938c6ab2cb5d25f4cdc88876"
+        }
+      ]
+    }
+  },
+  {
+    "id": "R03",
+    "source": "examples/contracts/protocols/registry/registry.es",
+    "sourceSha256": "fee6f76b20241d5a5c809cdc531a673046fff818938c6ab2cb5d25f4cdc88876",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "R03",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {},
+      "guard": {
+        "op": "boolean",
+        "value": true
+      },
+      "assertion": {
+        "op": "avl-insert-matches",
+        "role": "before",
+        "successor": "after",
+        "proofContextVar": 0,
+        "keyContextVar": 1,
+        "recordContextVar": 2
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/protocols/registry/registry.es; not compiled identity or execution evidence",
+          "sha256": "fee6f76b20241d5a5c809cdc531a673046fff818938c6ab2cb5d25f4cdc88876"
+        }
+      ]
+    }
+  },
+  {
+    "id": "X01",
+    "source": "examples/contracts/protocols/mixer/half-mix.es",
+    "sourceSha256": "81acaa28e67b3a549fea31f8beb5251bbe5e550d172c9a76fba60ffd3438e798",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "X01",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {},
+      "guard": {
+        "op": "boolean",
+        "value": true
+      },
+      "assertion": {
+        "op": "and",
+        "args": [
+          {
+            "op": "eq",
+            "left": {
+              "op": "sum-erg",
+              "role": "after"
+            },
+            "right": {
+              "op": "sum-erg",
+              "role": "before"
+            }
+          },
+          {
+            "op": "eq",
+            "left": {
+              "op": "sum-erg",
+              "role": "payment"
+            },
+            "right": {
+              "op": "sum-erg",
+              "role": "before"
+            }
+          }
+        ]
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/protocols/mixer/half-mix.es; not compiled identity or execution evidence",
+          "sha256": "81acaa28e67b3a549fea31f8beb5251bbe5e550d172c9a76fba60ffd3438e798"
+        }
+      ]
+    }
+  },
+  {
+    "id": "X02",
+    "source": "examples/contracts/protocols/mixer/half-mix.es",
+    "sourceSha256": "81acaa28e67b3a549fea31f8beb5251bbe5e550d172c9a76fba60ffd3438e798",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "X02",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {},
+      "guard": {
+        "op": "boolean",
+        "value": true
+      },
+      "assertion": {
+        "op": "mirrored-group-registers",
+        "left": "after",
+        "right": "payment",
+        "indices": [
+          4,
+          5
+        ]
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/protocols/mixer/half-mix.es; not compiled identity or execution evidence",
+          "sha256": "81acaa28e67b3a549fea31f8beb5251bbe5e550d172c9a76fba60ffd3438e798"
+        }
+      ]
+    }
+  },
+  {
+    "id": "X03",
+    "source": "examples/contracts/protocols/mixer/half-mix.es",
+    "sourceSha256": "81acaa28e67b3a549fea31f8beb5251bbe5e550d172c9a76fba60ffd3438e798",
+    "declaration": {
+      "schemaVersion": "author-property:v1",
+      "propertyId": "X03",
+      "revision": "assessment-1",
+      "contracts": {
+        "syntaxStandIn": {
+          "script": "10010101d17300",
+          "compilerRevision": "uncompiled-parser-stand-in"
+        }
+      },
+      "scope": {
+        "kind": "transition"
+      },
+      "roles": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "payment": {
+          "collection": "outputs",
+          "selector": {
+            "kind": "position",
+            "index": 1
+          },
+          "cardinality": "exactly-one"
+        },
+        "oracle": {
+          "collection": "data-inputs",
+          "selector": {
+            "kind": "position",
+            "index": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "registers": {},
+      "guard": {
+        "op": "boolean",
+        "value": true
+      },
+      "assertion": {
+        "op": "prove-dh-tuple",
+        "ownerRole": "before",
+        "outputRole": "after"
+      },
+      "authorizationPremises": [],
+      "sources": [
+        {
+          "origin": "hypothetical",
+          "reference": "Parser sketch derived from examples/contracts/protocols/mixer/half-mix.es; not compiled identity or execution evidence",
+          "sha256": "81acaa28e67b3a549fea31f8beb5251bbe5e550d172c9a76fba60ffd3438e798"
+        }
+      ]
+    }
+  }
+]

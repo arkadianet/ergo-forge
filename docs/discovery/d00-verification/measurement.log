@@ -1,0 +1,4 @@
+   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+    Finished `release` profile [optimized] target(s) in 2.18s
+     Running `target-p00/release/examples/measure_d00_inventory`
+35 individually accepted reference transactions, 70 node API calls including fresh legacy replay; no linked-trace replay or new-property verdict

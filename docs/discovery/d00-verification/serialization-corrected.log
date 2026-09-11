@@ -1,0 +1,4 @@
+   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+    Finished `release` profile [optimized] target(s) in 2.00s
+     Running `target-p00/release/examples/author_d00_inventory`
+Frozen 24 reference rows without running validator or property evaluator; manifest 72609b827694feca9fb78ae440afc69644abb29238d9fd48dd7fe3467658304f answers "311f160e08a8875de546263474fb10ec621e881b34afc28bb65323db32c7f319"

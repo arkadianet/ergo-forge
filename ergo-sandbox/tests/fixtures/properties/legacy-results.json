@@ -1,0 +1,493 @@
+{
+  "builtInPropertyVersions": [
+    "recognized-attacker-receipts-v1"
+  ],
+  "discoveryCredit": 0,
+  "evaluatorAgreement": null,
+  "linkedTraceReplay": false,
+  "manifestSha256": "72609b827694feca9fb78ae440afc69644abb29238d9fd48dd7fe3467658304f",
+  "nodeValidationCalls": 70,
+  "referenceTransactions": 35,
+  "registeredSyntheticCases": 24,
+  "semanticMeasurement": "incomplete-independent-human-review-missing",
+  "transferDenominator": null,
+  "version": "property-legacy-measurement:v1",
+  "raw": {
+    "path": "legacy-results-raw.fixture",
+    "sha256": "9a2031b9324ab62b9bb91f7cf6960aa8a00209148b1b2eca0c1dfbd6323ea451"
+  },
+  "cases": [
+    {
+      "id": "reserve_violation_1",
+      "family": "reserve",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "03d0fa61d34e61335745d68a333ba31f09e37908baec0e826f3d9e47936ff8d1",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "reserve_violation_2",
+      "family": "reserve",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "b6bd490f808892d79522f6cfd551c786e67de094bc6950d7dd44cd674ea64240",
+          "legacyExtractionStatus": "confirmed-violation",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "reserve_control_1",
+      "family": "reserve",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "e4704efc3347fc46f31d840688949bf6b904bc1babda0fb1013ecc5128a6cff7",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "reserve_control_2",
+      "family": "reserve",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "096106a4c31795059a0080758a8bc31b901f4d1cd9fe6a1423bd572c608a2f28",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "issuance_violation_1",
+      "family": "issuance",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "8c3c18482bb5c29971ba5d1ed2e03d93ed15d6d1689ebf25266328d9e8c4ec8c",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "issuance_violation_2",
+      "family": "issuance",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "bf5d7eb1e5708b6bd2be0b7a5b957bfa41959b39f1a42fb244e61d0ea7386a40",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "issuance_control_1",
+      "family": "issuance",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "39589d71b48b80e36890e147f3beee2ce60d7055b6c9f11eb38b24e786c8abea",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "issuance_control_2",
+      "family": "issuance",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "64c95789c9f529668c11df50ce0943e3abb27bcd150323099116f349ab4cffac",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "continuation_violation_1",
+      "family": "continuation",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "0f04de4a385a91338df97b39a902b1d0cb7245160aa97868fc6ddd390c1c2f34",
+          "legacyExtractionStatus": "confirmed-violation",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "continuation_violation_2",
+      "family": "continuation",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "19ee47fda307a3b7170c4eb2b5a64aae64f710e7fb28495bc6508f3bb6b5a959",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "continuation_control_1",
+      "family": "continuation",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "7242bcdd0304c629aed2a4ac4031316ed9fa26fcd4cb34f86b53182423e06c82",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "continuation_control_2",
+      "family": "continuation",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "620e87a99115dc59c8c73c5dadedbaaae9c7fecf81617dcced2648bdc6b98f81",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "bounded_response_violation_1",
+      "family": "bounded_response",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "789e49623b658fff3abb8e2db73fcec6c05670bfc6b2feca3554511125b59205",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        },
+        {
+          "index": 1,
+          "nodeStatus": "node-accepted",
+          "transactionId": "f8f148fe86e0b7ac7868f3082619f9d6df0d0db2a6e395ab2769a2fe8468b00a",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        },
+        {
+          "index": 2,
+          "nodeStatus": "node-accepted",
+          "transactionId": "1e3fc5c087112380225ad96d0f5e2a3d10c3514f02abec9431bda46952869272",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "bounded_response_violation_2",
+      "family": "bounded_response",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "e2a1171f25bcb2d621d3a1b97b95685f19cde932e7ae8f8530037baf70035465",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        },
+        {
+          "index": 1,
+          "nodeStatus": "node-accepted",
+          "transactionId": "57e4106a2d3eac622a45aa7a52cc3b8700512a64cbfa8bcc45e9b4f6447f2dc9",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        },
+        {
+          "index": 2,
+          "nodeStatus": "node-accepted",
+          "transactionId": "66d9d78285fcd2aa6137167cd7f1ade13fca7b552255d4a34d7c0897e3fbfd09",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "bounded_response_control_1",
+      "family": "bounded_response",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "50081e5b303ee9a778f587b8dcfb673c89ec1d7f87fc8eb4f8529a53ccade515",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        },
+        {
+          "index": 1,
+          "nodeStatus": "node-accepted",
+          "transactionId": "d721587bf2997256d5ca26891ae591c0ecfecbe89ef3fc1432940ae042f351eb",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        },
+        {
+          "index": 2,
+          "nodeStatus": "node-accepted",
+          "transactionId": "f8118c8eaa890193a7189dd04ee46f8ce48c9a852ac11df636b2318bc4d1858e",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "bounded_response_control_2",
+      "family": "bounded_response",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "6e76a8c854ee6d4a33f55ef139f18ee2b32c0919ff851be04daf78853ada8308",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        },
+        {
+          "index": 1,
+          "nodeStatus": "node-accepted",
+          "transactionId": "01ce6d1e8ff5c4eb8bd3ed1081817d0b9123eda93d491f3e201c3ec95bfc01b7",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        },
+        {
+          "index": 2,
+          "nodeStatus": "node-accepted",
+          "transactionId": "53354af042ec3472c20b21ce65da8c8cbd193e05b0bdf5ff7b46b3746b63530f",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "missing_role",
+      "family": "boundary",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "31a747b210027b68fa1abc73d134d3b42ac0781c70feb052a2582394d2708ef6",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "ambiguous_role",
+      "family": "boundary",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "dc4a592931de246877387dc7a9901024dc2bdfbe5e65e8bea04ae0a455fb05cf",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "wrong_register_type",
+      "family": "boundary",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "16f287b37f3fcbcb3135236223a9231b35a2823c42630b812726650c45d94b7e",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "arithmetic_overflow",
+      "family": "boundary",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "7b609c4e04fa194c308286aebf7e887f38e26fd2f0514bd7632d0688c44fd1ff",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "false_guard",
+      "family": "boundary",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "ab3b90b2e31fa8858f0cdc0f35626d628723c555f9b02d90f6ccdb52c091055e",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "short_response_horizon",
+      "family": "boundary",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "636a3487965d56aa8739c53db78db219afea634258272c6f468d38b72b09d0c2",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        },
+        {
+          "index": 1,
+          "nodeStatus": "node-accepted",
+          "transactionId": "d6b06574b90c7b6af7b0863643d9de39232ea3b61691909550140bf72fc40864",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "unbounded_eventuality",
+      "family": "boundary",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "3043ae64f8926426fc6c0ed539bfc9b6f13e3f8339fc297141300d41f9054949",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        },
+        {
+          "index": 1,
+          "nodeStatus": "node-accepted",
+          "transactionId": "c414c34df943c20d9cb6f523eb24860398b0199882227d67a1e23c246afac7bd",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        },
+        {
+          "index": 2,
+          "nodeStatus": "node-accepted",
+          "transactionId": "20a005299a2c1ff5a20bbf35514934e3f9cb8fa54581c8edfdc3e67bcba8b62a",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    },
+    {
+      "id": "unsupported_dynamic_expression",
+      "family": "boundary",
+      "newPropertyResult": null,
+      "newPropertyProducer": "unsupported-not-implemented",
+      "references": [
+        {
+          "index": 0,
+          "nodeStatus": "node-accepted",
+          "transactionId": "b019fbb281c868017be295da13bb3283e7b6d90daf25b596317f3664679d3511",
+          "legacyExtractionStatus": "accepted-nonviolating",
+          "linkedTraceChecked": false,
+          "reachability": "assumed-state"
+        }
+      ]
+    }
+  ]
+}

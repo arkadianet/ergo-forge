@@ -1,0 +1,30 @@
+[
+  {
+    "name": "fmt-final",
+    "command": "CARGO_TARGET_DIR=./target-p00 cargo fmt --all -- --check",
+    "exitCode": 0,
+    "elapsedSeconds": 0.372,
+    "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "clippy-final",
+    "command": "CARGO_TARGET_DIR=./target-p00 cargo clippy --workspace --all-targets -- -D warnings",
+    "exitCode": 0,
+    "elapsedSeconds": 0.389,
+    "outputSha256": "c8e72b7ef58dcc0de3d867423825f4c98b236382213f5d93e58cf4675aa80b33"
+  },
+  {
+    "name": "property-schema-final",
+    "command": "CARGO_TARGET_DIR=./target-p00 cargo test -p ergo-sandbox --release --test property_schema -- --show-output",
+    "exitCode": 0,
+    "elapsedSeconds": 16.42,
+    "outputSha256": "496abcf1cc1aaa449d1d1d5d4c475d53e41a2124ce22cb43ee0e6f68388d9c63"
+  },
+  {
+    "name": "workspace-final",
+    "command": "CARGO_TARGET_DIR=./target-p00 cargo test --workspace --release",
+    "exitCode": 0,
+    "elapsedSeconds": 260.309,
+    "outputSha256": "060ca549749ebb1292ce659e5baf4b7b8cb43b8085f558409c8956decef2eaa5"
+  }
+]

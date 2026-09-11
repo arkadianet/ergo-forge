@@ -1,0 +1,44 @@
+{
+  "decision": "stop-entry-gate-not-met",
+  "candidateSha256": "ce65448f9a416370066113399f3480023775980fd9126721add609229769eecc",
+  "guarantees": 20,
+  "families": 6,
+  "qualifyingIds": [
+    "A03",
+    "A04",
+    "V02"
+  ],
+  "qualifyingFamilies": [
+    "amm",
+    "vesting"
+  ],
+  "uncertainIds": [
+    "A01",
+    "A02",
+    "B02"
+  ],
+  "threshold": {
+    "guarantees": 6,
+    "families": 3
+  },
+  "passed": false,
+  "assessmentCapPersonDays": 2,
+  "workingDaysTouched": 1,
+  "humanPersonHours": null,
+  "independentReview": false,
+  "discoveryCredit": 0,
+  "implementationAuthorized": false,
+  "implementationPerformed": false,
+  "artifacts": {
+    "REPORT.md": "aba31910e498cc7ef61337500b31c7099494c1cffe6c447d36d06dfaf6d7050d",
+    "attempts.json": "98122415da92688944ad875f64aaf2bf039980187d0d7c6d72e7588067d51984",
+    "candidates.json": "ce65448f9a416370066113399f3480023775980fd9126721add609229769eecc",
+    "candidates.sha256": "1f8a9c52dde674c414a93a47af29b726fd9e43abd714f12b6914fc1cbe5e082a",
+    "check.py": "83e19585585f276dee47a12c8e8b22931c0dcdd0e01962979663b198fe7bf285",
+    "gate-output.json": "11ba5a47ceae7ad6e8ca08ca346df48d4465c157b8d396be5c5fc1e9d4ebf954",
+    "parser-output.json": "b66c29c3ddd63dc63956697ac852c3384ae79d44556fee594b074325b61040ee",
+    "review.json": "9a865878911672e13ee04b2f98bafb78a48166910e5e7b821fcedd7b4ae1d4ef"
+  },
+  "gateCommand": "python3 docs/discovery/arithmetic-assessment/check.py",
+  "gateExitCode": 1
+}

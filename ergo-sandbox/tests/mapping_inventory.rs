@@ -241,16 +241,8 @@ fn legacy_metrics_are_measured_without_baseline_changes() {
         .split("```")
         .next()
         .unwrap();
-    let mut policy: Value = serde_json::from_str(block).unwrap();
-    policy["units"]
-        .as_array_mut()
-        .unwrap()
-        .retain(|u| !u["id"].as_str().unwrap().starts_with('M'));
-    policy["completedThrough"] = json!("P08");
-    assert_eq!(
-        sha(&serde_json::to_vec(&policy).unwrap()),
-        m["protectedPolicySha256"]
-    );
+    let policy: Value = serde_json::from_str(block).unwrap();
+    authenticate_policy(&policy, m["protectedPolicySha256"].as_str().unwrap()).unwrap();
     let measured = measure(&m, &e);
     assert_eq!(
         measured,
@@ -324,4 +316,216 @@ fn fixture_constructs_execute_and_unsupported_members_remain() {
     println!("{count} real engine vectors across 32 cases; {} unsupported members retained: {unsupported:?}; scenario reduction only, no node acceptance or necessity certification",unsupported.len());
     diagnostic("manifest.json");
     diagnostic("expected.json");
+}
+
+// D00/D01/D02/D03 explicitly governed additions are authenticated BEFORE projection.
+// Never regenerate the original M00 manifest or anchor from today's policy.
+fn authenticate_policy(policy: &Value, anchor: &str) -> Result<(), String> {
+    let original_bytes = include_bytes!("../../docs/discovery/original-policy.json");
+    let resolution_bytes = include_bytes!("../../docs/discovery/permitted-d00-resolution.json");
+    if sha(original_bytes) != "46f295bbcbc99324bea21000755259828d663cac68753cec80779d1d642249b0"
+        || sha(resolution_bytes)
+            != "9657cd03e5639911635d460db685ed573f1f985c785ebb34a357f2ed8ef28286"
+    {
+        return Err("authentication snapshot changed".into());
+    }
+    let original: Value = serde_json::from_slice(original_bytes).map_err(|e| e.to_string())?;
+    let resolution: Value = serde_json::from_slice(resolution_bytes).map_err(|e| e.to_string())?;
+    let mut allowed = original.clone();
+    allowed["units"].as_array_mut().unwrap().push(json!({
+        "id":"D00","depends":["M04"],"days":2,"package":"ergo-sandbox",
+        "target":"property_inventory","tests":["property_inventory_pins_24_cases_and_independent_answers",
+        "reference_executions_and_legacy_results_are_reproduced","transfer_registration_and_exposure_are_accounted"],
+        "implemented":true
+    }));
+    allowed["units"].as_array_mut().unwrap().push(json!({
+        "id":"D01","depends":["D00"],"days":2,"package":"ergo-sandbox",
+        "target":"property_schema","tests":["property_versions_units_and_limits_fail_closed",
+        "bindings_never_infer_missing_roles_or_authority","declaration_identity_binds_all_semantic_premises"],
+        "implemented":true
+    }));
+    allowed["units"].as_array_mut().unwrap().push(json!({
+        "id":"D02","depends":["D01"],"days":3,"package":"ergo-sandbox",
+        "target":"property_evaluation","tests":["four_property_families_match_independent_operands",
+        "guards_missing_fields_and_overflow_preserve_unknowns","bounded_response_requires_a_complete_accepted_linked_trace",
+        "property_evaluation_requires_fresh_node_acceptance"],"implemented":true
+    }));
+    allowed["units"].as_array_mut().unwrap().push(json!({"id": "D03", "depends": ["D02"], "days": 3, "package": "ergo-sandbox", "target": "property_replay", "tests": ["all_registered_property_dispositions_match", "property_replay_rejects_tampered_claims_and_premises", "legacy_replay_bytes_and_semantics_remain_unchanged", "registered_author_cases_show_usefulness_beyond_extraction"], "implemented": false}));
+    allowed["completedThrough"] = json!("D02");
+    allowed["resolvedStopRecords"]
+        .as_array_mut()
+        .unwrap()
+        .push(resolution);
+    if policy != &allowed {
+        return Err("unauthorized protected policy change".into());
+    }
+    let mut projected = policy.clone();
+    projected["units"] = json!(original["units"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|u| u["id"].as_str().unwrap().starts_with('P'))
+        .collect::<Vec<_>>());
+    projected["resolvedStopRecords"] = original["resolvedStopRecords"].clone();
+    projected["completedThrough"] = json!("P08");
+    if sha(&serde_json::to_vec(&projected).unwrap()) != anchor {
+        return Err("original M00 policy anchor mismatch".into());
+    }
+    Ok(())
+}
+
+#[test]
+fn protected_policy_rejects_unauthorized_additions_and_mutations() {
+    let text = include_str!("../../docs/ROADMAP.md");
+    let block = text
+        .split("<!-- roadmap-policy:v1 -->")
+        .nth(1)
+        .unwrap()
+        .split("```json")
+        .nth(1)
+        .unwrap()
+        .split("```")
+        .next()
+        .unwrap();
+    let p: Value = serde_json::from_str(block).unwrap();
+    let anchor = "41729240759244bd3edc833e31359bfe50d8430f0b5a2e27ebc727706363cd10";
+    authenticate_policy(&p, anchor).unwrap();
+    // Exact stopped D03 registration: neither its flag nor completion may advance.
+    let reject = |bad: Value| assert!(authenticate_policy(&bad, anchor).is_err());
+    // Type-preserving mutations reach valid-looking numeric thresholds, flags,
+    // IDs, dependencies, exact test names and resolution hashes, recursively.
+    fn mutations(v: &Value) -> Vec<Value> {
+        let mut out = vec![];
+        match v {
+            Value::Bool(b) => out.push(json!(!b)),
+            Value::Number(n) => out.push(json!(n.as_f64().unwrap() + 1.0)),
+            Value::String(s) => out.push(json!(format!("{s}0"))),
+            Value::Array(a) => {
+                for (i, member) in a.iter().enumerate() {
+                    for altered in mutations(member) {
+                        let mut bad = v.clone();
+                        bad[i] = altered;
+                        out.push(bad);
+                    }
+                    let mut bad = v.clone();
+                    bad.as_array_mut().unwrap().remove(i);
+                    out.push(bad);
+                }
+            }
+            Value::Object(o) => {
+                for (key, member) in o {
+                    for altered in mutations(member) {
+                        let mut bad = v.clone();
+                        bad[key] = altered;
+                        out.push(bad);
+                    }
+                }
+            }
+            Value::Null => out.push(json!(0)),
+        }
+        out
+    }
+    let typed = mutations(&p);
+    let mutation_count = typed.len();
+    for bad in typed {
+        reject(bad);
+    }
+    println!("{mutation_count} type-preserving field/member mutations rejected");
+    // Every top-level protected field, not just fields included in today's digest.
+    for key in p.as_object().unwrap().keys() {
+        let mut bad = p.clone();
+        bad.as_object_mut().unwrap().remove(key);
+        reject(bad);
+        let mut bad = p.clone();
+        bad[key] = json!("tampered");
+        reject(bad);
+    }
+    let mut bad = p.clone();
+    bad["unexpected"] = json!(true);
+    reject(bad);
+    for collection in ["units", "resolvedStopRecords"] {
+        for i in 0..p[collection].as_array().unwrap().len() {
+            let mut bad = p.clone();
+            bad[collection].as_array_mut().unwrap().remove(i);
+            reject(bad);
+            let mut bad = p.clone();
+            bad[collection]
+                .as_array_mut()
+                .unwrap()
+                .push(p[collection][i].clone());
+            reject(bad);
+            for key in p[collection][i].as_object().unwrap().keys() {
+                let mut bad = p.clone();
+                bad[collection][i][key] = json!("tampered");
+                reject(bad);
+            }
+            let mut bad = p.clone();
+            bad[collection][i]["unexpected"] = json!(true);
+            reject(bad);
+        }
+        let mut bad = p.clone();
+        bad[collection].as_array_mut().unwrap().reverse();
+        reject(bad);
+    }
+    let mut bad = p.clone();
+    let mut d01 = p["units"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|u| u["id"] == "D01")
+        .unwrap()
+        .clone();
+    d01["id"] = json!("D02");
+    bad["units"].as_array_mut().unwrap().push(d01);
+    reject(bad);
+    let mut bad = p.clone();
+    bad["resolvedStopRecords"]
+        .as_array_mut()
+        .unwrap()
+        .push(json!({"unit":"M05"}));
+    reject(bad);
+    // Even a coherent rollback of the previously permitted D00 scheduling
+    // pair is now a protected-field mutation, not another allowed addition.
+    let mut rollback = p.clone();
+    let units = rollback["units"].as_array_mut().unwrap();
+    units.iter_mut().find(|u| u["id"] == "D00").unwrap()["implemented"] = json!(false);
+    rollback["completedThrough"] = json!("M04");
+    reject(rollback);
+    let mut rollback = p.clone();
+    rollback["units"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|u| u["id"] == "D01")
+        .unwrap()["implemented"] = json!(false);
+    rollback["completedThrough"] = json!("D00");
+    reject(rollback);
+    let mut rollback = p.clone();
+    rollback["units"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|u| u["id"] == "D02")
+        .unwrap()["implemented"] = json!(false);
+    rollback["completedThrough"] = json!("D01");
+    reject(rollback);
+    // Keep the exact D01-shaped append rejections, and add D02-shaped probes.
+    for source in ["D01", "D02", "D03"] {
+        for id in ["D02", "D03", "D04"] {
+            let mut bad = p.clone();
+            let mut unit = p["units"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|u| u["id"] == source)
+                .unwrap()
+                .clone();
+            unit["id"] = json!(id);
+            unit["implemented"] = json!(false);
+            bad["units"].as_array_mut().unwrap().push(unit);
+            reject(bad);
+        }
+    }
+    assert!(authenticate_policy(&p, &"0".repeat(64)).is_err());
+    println!("original P/M registrations, P05 resolution, exact D00/D01/D02/D03 additions, every protected field: tampering rejected by the real authentication function");
 }

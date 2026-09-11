@@ -1,0 +1,101 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exitCode": 0,
+    "log": "docs/discovery/d00-stop-evidence/fmt.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exitCode": 0,
+    "log": "docs/discovery/d00-stop-evidence/clippy.log",
+    "sha256": "079f20cd2820eed389cc44557b918319f50f6be685b857c2ab04da646b2010ca"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "ergo-sandbox",
+      "--release",
+      "--test",
+      "property_inventory",
+      "--",
+      "--show-output"
+    ],
+    "exitCode": 101,
+    "log": "docs/discovery/d00-stop-evidence/property-inventory.log",
+    "sha256": "7ed585767a8e835175a0f133677e71cf7fd0d865c424c5d0b862a18a87dde1a0"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--workspace",
+      "--release"
+    ],
+    "exitCode": 0,
+    "log": "docs/discovery/d00-stop-evidence/workspace.log",
+    "sha256": "d94f2a44f0f8d859b5191ca62720fe6b9dd269a08041d8437406ba1b349598de"
+  },
+  {
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "scripts",
+      "-p",
+      "test_roadmap_gate.py"
+    ],
+    "exitCode": 0,
+    "log": "docs/discovery/d00-stop-evidence/python.log",
+    "sha256": "1161709f5495081b272abe6b1854c34be3dc39dbba2d24721d1e5ff06535a791"
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/roadmap_gate.py",
+      "--require",
+      "D00"
+    ],
+    "exitCode": 1,
+    "log": "docs/discovery/d00-stop-evidence/require-d00.log",
+    "sha256": "115c5674915cc8075d6d051e5e6f9748752f24fc8bb18b0d1f258f20bb521330"
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/roadmap_gate.py",
+      "--through-completed"
+    ],
+    "exitCode": 0,
+    "log": "docs/discovery/d00-stop-evidence/through-completed.log",
+    "sha256": "dfaea4aa0b26495d9766ef979a077a93542e6a73b2fdd53444e952308d8b09e8"
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/roadmap_gate.py",
+      "--ci"
+    ],
+    "exitCode": 0,
+    "log": "docs/discovery/d00-stop-evidence/ci.log",
+    "sha256": "24c20fa9a6f65bf833019803b45e81f2ccaaf62c07324df8fd922d4f270dacdd"
+  }
+]
