@@ -151,8 +151,10 @@ A checklist row and a `trust_assumptions` extension: script hash stored in a reg
 Gate: existing corpus expectations, `node_vectors_pass_on_new_rev`.
 
 **X02 — Release 0.4.0 (1 day).** Binaries, container, CI action `version: latest` pointing at it, changelog from the batch table.
+Gate: `release_action_points_at_tagged_binary`, `changelog_lists_every_batch`.
 
 **X03 — CI time (1 day).** Cache the node sibling checkout and split cost-trace into a separate job.
+Gate: `node_checkout_is_cached`, `cost_trace_runs_in_its_own_job`.
 
 ## 2. Sequencing — twelve batches, one PR each
 
@@ -229,7 +231,9 @@ To be installed by W00 as a **separate `roadmap-policy:v2` block** in `docs/ROAD
     {"id": "W05", "depends": ["S02"], "days": 2, "package": "ergo-sandbox", "target": "compose_recipes", "tests": ["new_recipes_have_independent_expectations", "new_recipe_mutants_are_caught"]},
     {"id": "S05", "depends": ["W00"], "days": 2, "package": "ergo-sandbox", "target": "incident_scaffold", "tests": ["incident_scaffold_reproduces_use_boxes", "incident_scaffold_never_fills_expectations"]},
     {"id": "X01", "depends": ["W00"], "days": 3, "package": "ergo-sandbox", "target": "node_validation", "tests": ["node_vectors_pass_on_new_rev"]},
-    {"id": "S03", "depends": ["S02", "X01"], "days": 3, "package": "ergo-sandbox", "target": "drain_promotion", "tests": ["two_instance_mutant_is_found_and_control_is_not", "caps_and_truncation_are_recorded"]}
+    {"id": "S03", "depends": ["S02", "X01"], "days": 3, "package": "ergo-sandbox", "target": "drain_promotion", "tests": ["two_instance_mutant_is_found_and_control_is_not", "caps_and_truncation_are_recorded"]},
+    {"id": "X02", "depends": ["X01"], "days": 1, "package": "scripts", "target": "test_release", "tests": ["release_action_points_at_tagged_binary", "changelog_lists_every_batch"]},
+    {"id": "X03", "depends": ["W00"], "days": 1, "package": "scripts", "target": "test_ci_workflow", "tests": ["node_checkout_is_cached", "cost_trace_runs_in_its_own_job"]}
   ]
 }
 ```

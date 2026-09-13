@@ -29,7 +29,7 @@ class RoadmapGateTests(unittest.TestCase):
         self.assertEqual(re.search(pattern, original_doc, re.S)[0], re.search(pattern, current_doc, re.S)[0])
         spec = (gate.ROOT / 'docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md').read_text()
         expected = json.loads(re.search(r'```json\n(.*?)\n```', spec, re.S)[1])['newUnits']
-        self.assertEqual(len(expected), 18)
+        self.assertEqual(len(expected), 20)
         self.assertEqual(v2['baselineRev'], 'a57df087df85813c7f90a6f6f9ad6aaf5b4597cd')
         self.assertIsNone(v2['completedThrough'])
         self.assertEqual(v1['completedThrough'], 'M04')

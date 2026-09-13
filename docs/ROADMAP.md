@@ -781,7 +781,7 @@ D04 remains unregistered and unattempted. Capabilities 2 and 3 are not scheduled
 
 ## Roadmap v2 policy
 
-The v1 block above is frozen. This separate block registers the eighteen new
+The v1 block above is frozen. This separate block registers the twenty new
 units; dependencies resolve against v1 followed by v2. Each block retains its
 own completed prefix. Only v2 units can be reported as `not-started` by CI.
 
@@ -1044,6 +1044,34 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
       "tests": [
         "two_instance_mutant_is_found_and_control_is_not",
         "caps_and_truncation_are_recorded"
+      ],
+      "implemented": false
+    },
+    {
+      "id": "X02",
+      "depends": [
+        "X01"
+      ],
+      "days": 1,
+      "package": "scripts",
+      "target": "test_release",
+      "tests": [
+        "release_action_points_at_tagged_binary",
+        "changelog_lists_every_batch"
+      ],
+      "implemented": false
+    },
+    {
+      "id": "X03",
+      "depends": [
+        "W00"
+      ],
+      "days": 1,
+      "package": "scripts",
+      "target": "test_ci_workflow",
+      "tests": [
+        "node_checkout_is_cached",
+        "cost_trace_runs_in_its_own_job"
       ],
       "implemented": false
     }
