@@ -1,0 +1,7 @@
+feat(ui): show the contract review checklist in Write and Read
+
+Keep unchecked rows visible and display each answer's provenance and anchors.
+Use a standalone local module with DOM tests for rendering and stale requests.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

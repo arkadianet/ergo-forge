@@ -1,0 +1,29 @@
+{"command": "cargo fmt --all", "exitCode": 0, "log": "docs/reports/batch-3/logs/fmt-apply.log"}
+{"command": "cargo test -p ergo-web --test http --no-run", "exitCode": 0, "log": "docs/reports/batch-3/logs/checklist-build.log"}
+{"command": "cargo test -p ergo-web --test checklist", "exitCode": 101, "log": "docs/reports/batch-3/logs/checklist-http.log"}
+{"command": "cargo test -p ergo-web --test checklist", "exitCode": 0, "log": "docs/reports/batch-3/logs/checklist-http-fixed.log"}
+{"command": "cargo fmt --all", "exitCode": 0, "log": "docs/reports/batch-3/logs/fmt-step1.log"}
+{"command": "cargo test -p ergo-sandbox --test checklist_cli", "exitCode": 0, "log": "docs/reports/batch-3/logs/checklist-cli.log"}
+{"command": "cargo fmt --all", "exitCode": 0, "log": "docs/reports/batch-3/logs/fmt-step1-final.log"}
+{"command": "git add ergo-sandbox/src/checklist.rs ergo-sandbox/src/lib.rs ergo-sandbox/src/bin/ergo-es.rs ergo-sandbox/tests/checklist_cli.rs ergo-web/src/routes/checklist.rs ergo-web/src/routes/mod.rs ergo-web/src/app.rs ergo-web/src/dto.rs ergo-web/tests/checklist.rs docs/security/CHECKLIST.md", "exitCode": 128, "log": "docs/reports/batch-3/logs/git-add-step1.log"}
+{"command": "git commit -F docs/reports/batch-3/commit-1-message.txt", "exitCode": 128, "log": "docs/reports/batch-3/logs/git-commit-step1.log"}
+{"command": "node --test ui/tests/checklist.test.js", "exitCode": 1, "log": "docs/reports/batch-3/logs/checklist-dom.log"}
+{"command": "cargo fmt --all", "exitCode": 0, "log": "docs/reports/batch-3/logs/fmt-step3.log"}
+{"command": "cargo test -p ergo-web --test negative_space", "exitCode": 0, "log": "docs/reports/batch-3/logs/negative-space-http.log"}
+{"command": "node --test ui/tests/checklist.test.js", "exitCode": 0, "log": "docs/reports/batch-3/logs/checklist-dom-fixed.log"}
+{"command": "cargo fmt --all", "exitCode": 0, "log": "docs/reports/batch-3/logs/fmt-final-apply.log"}
+{"command": "cargo fmt --all -- --check", "exitCode": 0, "log": "docs/reports/batch-3/logs/fmt-check.log"}
+{"command": "node --test ui/tests/", "exitCode": 1, "log": "docs/reports/batch-3/logs/ui-all.log"}
+{"command": "python3 scripts/test_roadmap_gate.py", "exitCode": 0, "log": "docs/reports/batch-3/logs/roadmap-python.log"}
+{"command": "cargo clippy --workspace --all-targets -- -D warnings", "exitCode": 0, "log": "docs/reports/batch-3/logs/clippy.log"}
+{"command": "python3 scripts/test_roadmap_gate.py", "exitCode": 0, "log": "docs/reports/batch-3/logs/roadmap-python-final.log"}
+{"command": "node --test ui/tests/attack.test.js ui/tests/checklist.test.js ui/tests/claim-labels.test.js ui/tests/evidence-replay.test.js", "exitCode": 0, "log": "docs/reports/batch-3/logs/ui-all-files.log"}
+{"command": "python3 $TMPDIR/batch3-integrity.py", "exitCode": 0, "log": "docs/reports/batch-3/logs/protected-integrity.log"}
+{"command": "git diff --check", "exitCode": 0, "log": "docs/reports/batch-3/logs/whitespace.log"}
+{"command": "python3 scripts/roadmap_gate.py --require S01 --report docs/reports/batch-3/S01.json", "exitCode": 0, "log": "docs/reports/batch-3/logs/gate-s01.log"}
+{"command": "python3 scripts/roadmap_gate.py --require W06 --report docs/reports/batch-3/W06.json", "exitCode": 1, "log": "docs/reports/batch-3/logs/gate-w06.log"}
+{"command": "python3 scripts/roadmap_gate.py --require W06 --report docs/reports/batch-3/W06.json", "exitCode": 0, "log": "docs/reports/batch-3/logs/gate-w06-retry.log"}
+{"command": "cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present", "exitCode": -15, "log": "docs/reports/batch-3/logs/workspace-tests.log"}
+{"command": "cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present --skip the_corpus_is_measured_and_does_not_regress", "exitCode": 0, "log": "docs/reports/batch-3/logs/workspace-supplement.log"}
+{"command": "python3 docs/reports/batch-3/check-boundaries.py", "exitCode": 0, "log": "docs/reports/batch-3/logs/protected-integrity-final.log"}
+{"command": "git diff --check", "exitCode": 0, "log": "docs/reports/batch-3/logs/whitespace-final.log"}

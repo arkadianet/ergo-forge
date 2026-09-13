@@ -1,0 +1,7 @@
+feat(read): show anchored static negative-space observations
+
+Project existing S00 lint findings into inspect's negativeSpace field and
+render them beneath Read's plain words, with a static label on every line.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

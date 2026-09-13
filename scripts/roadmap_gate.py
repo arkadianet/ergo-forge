@@ -283,6 +283,9 @@ def check_test_output(output, names, kind='rust'):
 
 def portable_output(text, root=ROOT):
     """Normalize workstation locations before printing, storing, and hashing."""
+    target = os.environ.get('CARGO_TARGET_DIR')
+    if target and Path(target).is_absolute():
+        text = text.replace(target.rstrip(os.sep), '$CARGO_TARGET_DIR')
     text = text.replace(str(root.resolve()), '<repo>')
     text = text.replace(str(Path.home()), '<home>')
     return text.replace(tempfile.gettempdir() + os.sep, '<tmp>/')
@@ -304,6 +307,8 @@ def extras(unit):
         return [('python', [sys.executable, '-m', 'unittest', 'discover', '-s', 'scripts', '-p', 'test_roadmap_gate.py']), ('node', ['node', '--test', 'ui/tests/claim-labels.test.js'])]
     if unit == 'P08':
         return [('node', ['node', '--test', 'ui/tests/evidence-replay.test.js'])]
+    if unit == 'S01':
+        return [('node', ['node', '--test', 'ui/tests/checklist.test.js'])]
     return []
 
 
