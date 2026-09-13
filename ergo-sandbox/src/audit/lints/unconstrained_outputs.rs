@@ -93,6 +93,11 @@ fn total_value(n: &Node, vals: &Vals) -> bool {
     if name != "fold" || args.len() != 2 {
         return false;
     }
+    // A non-zero seed shifts the sum: `fold(-1000L, ...) <= SELF.value` bounds
+    // nothing. Only a literal zero accumulator makes the fold a total.
+    if !matches!(&deref(&args[0], vals).kind, NodeKind::Num(seed) if seed == "0L" || seed == "0") {
+        return false;
+    }
     let NodeKind::Lambda(params, body) = &deref(&args[1], vals).kind else {
         return false;
     };

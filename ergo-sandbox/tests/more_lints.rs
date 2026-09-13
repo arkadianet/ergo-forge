@@ -258,6 +258,9 @@ fn output_tail_needs_an_upper_bound_sum_or_universal_constraint() {
         "OUTPUTS.fold(0L, { (s: Long, b: Box) => s + b.value }) > 0L",
         "SELF.value / 2L <= OUTPUTS.fold(0L, { (s: Long, b: Box) => s + b.value })",
         "OUTPUTS.map { (b: Box) => b.value }.fold(0L, { (a: Long, b: Long) => a + b }) != 0L",
+        "OUTPUTS.fold(-1000000L, { (s: Long, b: Box) => s + b.value }) <= SELF.value",
+        "OUTPUTS.fold(1L, { (s: Long, b: Box) => s + b.value }) == SELF.value",
+        "OUTPUTS.map { (b: Box) => b.value }.fold(-1L, { (a: Long, b: Long) => a + b }) <= SELF.value",
     ] {
         let src = format!("sigmaProp(OUTPUTS(0).value > 0L && OUTPUTS(1).value > 0L && ({guard}))");
         assert_eq!(source(&src, "unconstrained-outputs").len(), 1, "{guard}");

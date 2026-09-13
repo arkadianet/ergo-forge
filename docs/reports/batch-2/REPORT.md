@@ -100,9 +100,15 @@ pinned floor were left unchanged. A subsequent workspace run with only that
 exact environmental test skipped first exposed the M00 file-hash issue above;
 that issue was fixed and the run repeated. The repeated run passed the debug
 historical mutation measurement, then exposed the same answer-key pin in D00.
-Both inventory suites pass after sharing the archive check. The final remainder
-run skips the environment-mismatch test and the unchanged historical measurement
-that just passed; its full command and observed result are recorded below.
+Concretely: the workspace run recorded below with only the environmental test
+skipped exited **101** because `property_inventory_pins_24_cases_and_independent_answers`
+failed on the answer-key hash pin. That pin was then shared through the archive
+check, and both inventory suites passed (`inventory-baselines.log`). No complete
+workspace run passed inside the implementation session. After the branch was
+rebased onto main and the review fixes were applied, the full workspace command
+with only the environmental skip was run again outside the session and exited
+**0**; its filtered output is retained as `workspace-rebased.log` and recorded in
+the table below.
 
 The S02 report is [S02.json](S02.json); scoreboard, W00, S00 and S02 all passed.
 Its command stream includes instrument existence, compiled suites, both S02
@@ -141,6 +147,7 @@ gates and the unchanged historical mutation corpus, with no skipped tests.
 | `cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present` | 101 | [workspace-with-known-skip-final.log](workspace-with-known-skip-final.log) |
 | `cargo fmt --all -- --check` | 0 | [fmt-baselines.log](fmt-baselines.log) |
 | `cargo test -p ergo-sandbox --test mapping_inventory --test property_inventory` | 0 | [inventory-baselines.log](inventory-baselines.log) |
+| `cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present` (after rebase and review fixes) | 0 | [workspace-rebased.log](workspace-rebased.log) |
 
 `cargo fmt --all` was also run during editing and exited 0; the final check
 commands above verify the resulting formatting without edits. Read-only
