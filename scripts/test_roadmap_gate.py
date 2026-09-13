@@ -41,7 +41,7 @@ class RoadmapGateTests(unittest.TestCase):
         union = gate.union_policy([v1, v2])
         for unit in v2['units']:
             self.assertEqual(gate.select_units(union, unit['id'])[-1], unit)
-        self.assertEqual({u['id'] for u in v2['units'] if u['implemented']}, {'W00', 'S00', 'W01', 'S02'})
+        self.assertEqual({u['id'] for u in v2['units'] if u['implemented']}, {'W00', 'S00', 'W01', 'S02', 'S01', 'W06'})
         archived = (gate.ROOT / 'docs/reports/ROADMAP-v1-queue.md').read_text()
         self.assertIn(original_doc[original_doc.index('## 2. '):original_doc.index('## 4. ')], archived)
         self.assert_status('missing-gate', lambda: gate.policy_v2_from(current_doc + gate.V2_MARKER, v1))
@@ -69,6 +69,31 @@ class RoadmapGateTests(unittest.TestCase):
                     gate.read(Path('/nonexistent-batch-0-artifact')) if p == path else baseline(root, rev, p)
                 )):
                     self.assert_status('missing-gate', lambda: gate.scoreboard(policy))
+
+    def test_s01_extras_require_the_checklist_dom_test(self):
+        self.assertEqual(gate.extras('S01'), [('node', ['node', '--test', 'ui/tests/checklist.test.js'])])
+        from types import SimpleNamespace
+        unit = next(u for u in gate.load_policies()[1]['units'] if u['id'] == 'S01')
+        names = unit['tests']
+        listing = '\n'.join(f'{n}: test' for n in names)
+        output = '\n'.join(f'test {n} ... ok' for n in names) + '\ntest result: ok. 3 passed; 0 failed; 0 ignored;'
+        node = '# tests 1\n# pass 1\n# fail 0\n# skipped 0\n# cancelled 0\n# todo 0'
+        for code, status in [(0, None), (1, 'failed')]:
+            with patch.object(gate, 'read'), patch.object(Path, 'exists', return_value=True), patch.object(gate, 'command', side_effect=[
+                SimpleNamespace(returncode=0, stdout=listing),
+                SimpleNamespace(returncode=0, stdout=output),
+                SimpleNamespace(returncode=code, stdout=node),
+            ]) as command:
+                if status:
+                    self.assert_status(status, lambda: gate.run_unit(unit, []))
+                else:
+                    gate.run_unit(unit, [])
+                self.assertEqual(command.call_args_list[-1].args[0], gate.extras('S01')[0][1])
+
+    def test_absolute_cargo_target_is_normalized_before_report_hashing(self):
+        with patch.dict(gate.os.environ, {'CARGO_TARGET_DIR': '/tmp/batch-build'}):
+            self.assertEqual(gate.portable_output('/tmp/batch-build/release/deps/checklist'),
+                             '$CARGO_TARGET_DIR/release/deps/checklist')
 
     def test_python_targets_require_discovered_executed_unskipped_names(self):
         with tempfile.TemporaryDirectory() as tmp, contextlib.redirect_stdout(io.StringIO()):

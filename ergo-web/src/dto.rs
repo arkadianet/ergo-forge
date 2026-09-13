@@ -12,6 +12,16 @@ pub struct InspectRequest {
     pub network: Option<String>,
 }
 
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChecklistRequest {
+    pub input: Option<String>,
+    pub source: Option<String>,
+    pub network: Option<String>,
+    #[serde(flatten)]
+    pub artifacts: ergo_sandbox::checklist::Artifacts,
+}
+
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FindingDto {
@@ -47,6 +57,8 @@ pub struct InspectResponse {
     /// clauses are quoted as code and `plainComplete` is false.
     pub plain: Vec<String>,
     pub plain_complete: bool,
+    /// Existing static lint observations, never additional absence analysis.
+    pub negative_space: Vec<ergo_sandbox::negative_space::Line>,
     pub tree_hex: String,
     pub address: String,
     pub source: String,

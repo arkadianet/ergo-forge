@@ -180,6 +180,8 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
         <h2>In plain words</h2>
         <ul id="c-plain" class="plain"></ul>
         <p id="c-plain-note" class="hint" hidden>Parts shown as code are clauses the reader could not put into words.</p>
+        <h2>Review checklist</h2>
+        <div id="c-checklist"></div>
         <h2>What consensus will run</h2>
         <p class="hint">The tree decompiled back to source: constants inlined, sugar gone.</p>
         <pre id="c-source"></pre>
@@ -309,6 +311,10 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
       <h2>In plain words</h2>
       <ul id="plain" class="plain"></ul>
       <p id="plain-note" class="hint" hidden>Parts shown as code could not be put into words. Check the recovered source and its completeness status.</p>
+      <h2>What the contract does not check</h2>
+      <div id="negative-space"></div>
+      <h2>Review checklist</h2>
+      <div id="checklist"></div>
       <div class="source-heading"><h2>Recovered source</h2><button type="button" id="copy-source" class="secondary tiny">Copy source</button><button type="button" id="read-test" class="secondary tiny">Test this contract</button></div>
       <p class="hint">Reconstructed from ErgoTree bytes. Original names and comments are not stored on chain.</p>
       <pre id="source" tabindex="0"></pre>
@@ -513,6 +519,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
   <script src="claim-labels.js"></script>
   <script src="evidence-replay.js"></script>
   <script src="attack.js"></script>
+  <script src="checklist.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -863,7 +863,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
         "checklist_answer_carries_provenance",
         "checklist_never_emits_a_score"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "W06",
@@ -877,7 +877,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
         "negative_space_lines_have_anchors",
         "negative_space_is_labelled_static"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "I01",

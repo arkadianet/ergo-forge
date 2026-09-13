@@ -1,0 +1,7 @@
+chore: register batch 3 gates and record verification evidence
+
+Register S01 and W06 in both v2 policy records, require S01's DOM test, and
+retain command statuses, logs, gate reports and commit messages for batch 3.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

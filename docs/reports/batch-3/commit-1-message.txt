@@ -1,0 +1,8 @@
+feat: add provenance-bound contract checklist library, API and CLI
+
+List S00 vectors with anchored static observations and visible unchecked rows.
+Replay explicitly associated scenario, preflight and P05 evidence through the
+existing engines; preserve the static claim boundary and artifact scopes.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

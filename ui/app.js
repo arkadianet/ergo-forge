@@ -22,6 +22,7 @@ async function readerRequest(path, payload, signal) {
 }
 
 function invalidateRead() {
+  Checklist.invalidate($("checklist"));
   ++contextGeneration;
   ++readGeneration;
   ++huntGeneration;
@@ -74,6 +75,10 @@ async function read(context = {}) {
     if (generation !== readGeneration) return;
     lastRead = { ...body, network, box, height: $("height").value };
     render(body);
+    Checklist.load(body.treeHex, network, $("checklist"), {
+      isCurrent: () => generation === readGeneration,
+      select: finding => showSource(body.source, finding.snippet),
+    });
     $("read-completeness").textContent = body.completeness === "complete" ? "Source recovered" : "Partial source";
     $("read-origin").textContent = box ? `Box ${box.boxId?.slice(0, 12) || "from chain"}… · ${network}` : `ErgoTree · ${network} · no box context`;
     $("reader-test-context").textContent = `Testing the recovered tree ${body.treeHex.slice(0, 20)}… on ${network}. Explicit source or tree in a scenario overrides it.`;
@@ -149,6 +154,7 @@ function render(r) {
   currentSource = r.source;
   showSource(r.source, "");
   renderPlain("plain", "plain-note", r.plain, r.plainComplete);
+  Checklist.renderNegativeSpace(r.negativeSpace, $("negative-space"), finding => showSource(r.source, finding.snippet));
   $("tree-hex").textContent = r.treeHex;
   $("address").textContent = r.address;
 
@@ -443,6 +449,7 @@ function clearCompileError() {
   $("caret").hidden = true;
 }
 function invalidateCompileError() {
+  Checklist.invalidate($("c-checklist"));
   ++compileGeneration;
   clearCompileError();
   $("compile-status").hidden = true;
@@ -657,6 +664,11 @@ function markFindings(findings) {
 }
 
 function renderCompiled(c) {
+  const generation = compileGeneration;
+  const context = contextGeneration;
+  Checklist.load(c.treeHex, $("write-network").value, $("c-checklist"), {
+    isCurrent: () => generation === compileGeneration && context === contextGeneration,
+  });
   $("c-tree").textContent = c.treeHex;
   $("c-p2s").textContent = c.p2s;
   $("c-p2sh").textContent = c.p2sh;

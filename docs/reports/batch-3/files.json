@@ -1,0 +1,112 @@
+[
+  {
+    "path": "docs/ROADMAP.md",
+    "status": "modified",
+    "sha256": "7ac4a2bc8526cdbd534082ae8d636061c4cbce4eb4bf025d9303854c463faaf5"
+  },
+  {
+    "path": "docs/security/CHECKLIST.md",
+    "status": "added",
+    "sha256": "8b7b97cc23e36c88347869f391ffb317845c55c6fddb702c291ac74bdbaae972"
+  },
+  {
+    "path": "docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md",
+    "status": "modified",
+    "sha256": "d629c47e0b8db7b10c7cf8d7ed9fb7ec167c905cb8eaf29a09974eee6ffd5a4e"
+  },
+  {
+    "path": "ergo-sandbox/src/bin/ergo-es.rs",
+    "status": "modified",
+    "sha256": "09baaf9634179539dc2f8725fb512d086d1e048885fcec89a74434cb870521d3"
+  },
+  {
+    "path": "ergo-sandbox/src/checklist.rs",
+    "status": "added",
+    "sha256": "5c156db71772fc6c8f838926df66c5b991ce07792ba9da5568c34f07ebad125c"
+  },
+  {
+    "path": "ergo-sandbox/src/lib.rs",
+    "status": "modified",
+    "sha256": "367e736056526dd6480d26565e1a2ccf5d17c468ac7e557f7b1177c9357cd19f"
+  },
+  {
+    "path": "ergo-sandbox/src/negative_space.rs",
+    "status": "added",
+    "sha256": "b4b7d658e7531603d3b0188574d3196e9bf677fabdced7247952f9d226d6bcc0"
+  },
+  {
+    "path": "ergo-sandbox/tests/checklist_cli.rs",
+    "status": "added",
+    "sha256": "35124a27f4973a4c02adf835f0c75038f211aa0ec45125965fc8807716cc2c53"
+  },
+  {
+    "path": "ergo-web/src/app.rs",
+    "status": "modified",
+    "sha256": "0c88c9a94bab6c34aaa674a43e5b104206ad7ecf5f840fb2f356c9fde8a68a12"
+  },
+  {
+    "path": "ergo-web/src/dto.rs",
+    "status": "modified",
+    "sha256": "84e38f662737002dbb2ae8b7927ced2d0ae30891c07f377d1946d0c675fa1f4b"
+  },
+  {
+    "path": "ergo-web/src/routes/checklist.rs",
+    "status": "added",
+    "sha256": "cea59099d4e395a6a68cb0dbe56c67b1d88b153282fc37bb6dc90a5c9ca6346c"
+  },
+  {
+    "path": "ergo-web/src/routes/inspect.rs",
+    "status": "modified",
+    "sha256": "b41d80e2c81edbf7fca2af2811b1474b19976bdf50da93dea0cfb20656f6a178"
+  },
+  {
+    "path": "ergo-web/src/routes/mod.rs",
+    "status": "modified",
+    "sha256": "635e2e980af153080d85e1e54e8f23405b1e60a3e60214c8062a3f1791f7972e"
+  },
+  {
+    "path": "ergo-web/tests/checklist.rs",
+    "status": "added",
+    "sha256": "b23dfc2f3701cef16ed5784b5f4ac6bb1b0fc8d5c6d449a992c99524343c79aa"
+  },
+  {
+    "path": "ergo-web/tests/negative_space.rs",
+    "status": "added",
+    "sha256": "f65cd0f3e1e7fa1f2577194b8816ef290d599b5dc42d87f5a4bacd3b3772419a"
+  },
+  {
+    "path": "scripts/roadmap_gate.py",
+    "status": "modified",
+    "sha256": "6c4c00d0c018c67881f4f4526557abafe24b07274202d11c33c6856687e041ae"
+  },
+  {
+    "path": "scripts/test_roadmap_gate.py",
+    "status": "modified",
+    "sha256": "ce24d422b15d6b2bafd7391b16b5b6210e349b9ab850a1f8321bc6a5284c4a8f"
+  },
+  {
+    "path": "ui/app.js",
+    "status": "modified",
+    "sha256": "88d49b737fb71439afd65360fe1dbb9e86f54af47067479323798ef054e4cbdf"
+  },
+  {
+    "path": "ui/checklist.js",
+    "status": "added",
+    "sha256": "b9f44f3c7703cc3aa6e06b27e12bae77d403bb6e1030e0dd36a7f9245c34dfb6"
+  },
+  {
+    "path": "ui/index.html",
+    "status": "modified",
+    "sha256": "5580dfd863370ce513a74adebfcaeb8e6d362683d429bb1707e0bc524fc44c49"
+  },
+  {
+    "path": "ui/style.css",
+    "status": "modified",
+    "sha256": "636fb56dafe67831f2ef2a672f5d4435e3a99c914f9900993d1f6bc3c73eed11"
+  },
+  {
+    "path": "ui/tests/checklist.test.js",
+    "status": "added",
+    "sha256": "b6c691822f38c866317faa233431f52dfa01fd94e1a930bbe0df3e81d199c62f"
+  }
+]
