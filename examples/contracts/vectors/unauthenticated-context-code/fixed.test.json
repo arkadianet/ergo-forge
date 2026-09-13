@@ -1,0 +1,27 @@
+{
+  "source": "sigmaProp(getVar[Coll[Byte]](1).get == fromBase16(\"92a304c801\") && executeFromVar[Boolean](1))\n",
+  "scenarios": [
+    {
+      "name": "adversarial context",
+      "expect": "fail",
+      "height": 99,
+      "contextVars": {
+        "1": {
+          "type": "Coll[Byte]",
+          "value": "0101"
+        }
+      }
+    },
+    {
+      "name": "intended context",
+      "expect": "pass",
+      "height": 100,
+      "contextVars": {
+        "1": {
+          "type": "Coll[Byte]",
+          "value": "92a304c801"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "source": "atLeast(0, Coll(sigmaProp(HEIGHT >= 100)))\n",
+  "scenarios": [
+    {
+      "name": "adversarial context",
+      "expect": "pass",
+      "height": 99
+    },
+    {
+      "name": "intended context",
+      "expect": "pass",
+      "height": 100
+    }
+  ]
+}

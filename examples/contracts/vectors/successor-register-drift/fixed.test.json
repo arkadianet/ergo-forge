@@ -1,0 +1,57 @@
+{
+  "source": "{\n  val next = OUTPUTS(0)\n  sigmaProp(SELF.R4[Int].get > 0 &&\n    next.propositionBytes == SELF.propositionBytes && next.value >= SELF.value &&\n    next.tokens == SELF.tokens && next.R4[Int].get == SELF.R4[Int].get)\n}\n",
+  "scenarios": [
+    {
+      "name": "adversarial context",
+      "expect": "fail",
+      "height": 100,
+      "selfBox": {
+        "value": 10000000,
+        "registers": {
+          "R4": {
+            "type": "Int",
+            "value": 1
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "$self",
+          "registers": {
+            "R4": {
+              "type": "Int",
+              "value": 999
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "intended context",
+      "expect": "pass",
+      "height": 100,
+      "selfBox": {
+        "value": 10000000,
+        "registers": {
+          "R4": {
+            "type": "Int",
+            "value": 1
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "$self",
+          "registers": {
+            "R4": {
+              "type": "Int",
+              "value": 1
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

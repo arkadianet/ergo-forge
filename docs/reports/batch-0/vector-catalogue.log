@@ -1,0 +1,10 @@
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.60s
+     Running tests/vector_catalogue.rs (<home>/coding/ergo-forge/target-p00/debug/deps/vector_catalogue-40c95a5ad17b3938)
+
+running 2 tests
+test every_named_instrument_exists ... ok
+test every_vector_has_examples_or_is_marked_manual ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+

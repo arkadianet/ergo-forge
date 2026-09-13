@@ -1,0 +1,146 @@
+{
+  "examples/contracts/vectors/deployment-constant-drift/fixed.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "8d6b486aceb175f25bf98920fcb60d5df31719cd448d494c19bd87c6725da33b",
+    "truncated": false
+  },
+  "examples/contracts/vectors/deployment-constant-drift/vulnerable.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "8a6f7f4230993f01a2154f57f31097009bdf8d71c3863830ab28e0b8ffebe4ac",
+    "truncated": false
+  },
+  "examples/contracts/vectors/mutable-upgrade-digest/fixed.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "2fb7217e2e195cbbf2485023935aedad0ee2e3da196dce08fd6d72bf45548c94",
+    "truncated": false
+  },
+  "examples/contracts/vectors/mutable-upgrade-digest/vulnerable.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "d768a10b77503616e56d1b1dd204788e23315a0c5edfc456bdddd06fd8c0f112",
+    "truncated": false
+  },
+  "examples/contracts/vectors/rounded-payment/contract.test.json#/scenarios/0/outputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d",
+    "truncated": false
+  },
+  "examples/contracts/vectors/rounded-payment/fixed.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "59b42c02bff1af913fc33eba785c96246e0de1c9fa3446a637193e0bb3c27cf2",
+    "truncated": false
+  },
+  "examples/contracts/vectors/rounded-payment/fixed.test.json#/scenarios/0/outputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d",
+    "truncated": false
+  },
+  "examples/contracts/vectors/rounded-payment/vulnerable.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "8499549fe65620be45b9479febbee6b51d5d871bff1603eb8243d2e56016f973",
+    "truncated": false
+  },
+  "examples/contracts/vectors/shared-payment-across-instances/contract.test.json#/scenarios/0/outputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "970d95ad1f9156c0d9dc60c5ce022c1861a48be5b1933e8892df0582f3c28e3b",
+    "truncated": false
+  },
+  "examples/contracts/vectors/shared-payment-across-instances/contract.test.json#/scenarios/0/outputs/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d",
+    "truncated": false
+  },
+  "examples/contracts/vectors/shared-payment-across-instances/fixed.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "aedb5fab5213ea1a66b3225c727ef7e7efbcdabfe1fbbf5a767eea89a76b4d04",
+    "truncated": false
+  },
+  "examples/contracts/vectors/shared-payment-across-instances/fixed.test.json#/scenarios/0/outputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "970d95ad1f9156c0d9dc60c5ce022c1861a48be5b1933e8892df0582f3c28e3b",
+    "truncated": false
+  },
+  "examples/contracts/vectors/shared-payment-across-instances/fixed.test.json#/scenarios/0/outputs/1/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d",
+    "truncated": false
+  },
+  "examples/contracts/vectors/shared-payment-across-instances/vulnerable.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "468743d3758a6e39996b8975331fa0f68873210b61fef3a5c0beaa1c71ece806",
+    "truncated": false
+  },
+  "examples/contracts/vectors/stale-oracle-epoch/contract.test.json#/scenarios/0/dataInputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d",
+    "truncated": false
+  },
+  "examples/contracts/vectors/stale-oracle-epoch/fixed.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "081e44e12af48299269ccc82eb0c93f2a58db44cefa07bdcf15b1fc2512f7186",
+    "truncated": false
+  },
+  "examples/contracts/vectors/stale-oracle-epoch/fixed.test.json#/scenarios/0/dataInputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d",
+    "truncated": false
+  },
+  "examples/contracts/vectors/stale-oracle-epoch/vulnerable.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "44d355f7772e9a58c509035741289e462bc42dbd688554c86124805642a423bd",
+    "truncated": false
+  },
+  "examples/contracts/vectors/successor-register-drift/fixed.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "c4b8a75978dd6db161fb67bb0e89d56463e9c61b2cbc5d360a1e81ae4fce7ed3",
+    "truncated": false
+  },
+  "examples/contracts/vectors/successor-register-drift/vulnerable.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "c8c29eaff7f83db0774f29ffcbfb46c29ad11880e50ccef79996b036ea44686e",
+    "truncated": false
+  },
+  "examples/contracts/vectors/unauthenticated-context-code/fixed.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "2632a4c979116eef5eeef0e68c86298f7d11f0829d847d49cf6c49c465fb9026",
+    "truncated": false
+  },
+  "examples/contracts/vectors/unauthenticated-context-code/vulnerable.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "1435a9720d2f26e0f358a5aa3bba06c7e1a0100befa3da248ade8d7727c302b2",
+    "truncated": false
+  },
+  "examples/contracts/vectors/zero-threshold/fixed.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "ae62ad4d1e60fc3aa5d21c00c02cefcb8a638d3bb2a9ec820dbdd3b7fbd09945",
+    "truncated": false
+  },
+  "examples/contracts/vectors/zero-threshold/vulnerable.es": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "61cbcc2dc5d7893e2e83bb5d793350526baa9686ea647b842f4217854a479b6f",
+    "truncated": false
+  }
+}

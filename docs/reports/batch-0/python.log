@@ -1,0 +1,69 @@
+M05: stopped: recorded stop blocks this unit
+scoreboard: passed
+M05: stopped: recorded stop blocks this unit
+report: <tmp>/tmpnhasanh0/report.json
+M05: stopped: recorded stop blocks this unit
+scoreboard: passed
+M05: stopped: recorded stop blocks this unit
+report: <tmp>/tmp7u_nbbfl/report.json
+M05: stopped: recorded stop blocks this unit
+scoreboard: passed
+M05: stopped: recorded stop blocks this unit
+report: <tmp>/tmpfyaoflwr/report.json
+M05: unimplemented: registered product unit is not implemented
+..scoreboard: passed
+M05: unimplemented: registered product unit is not implemented
+report: <tmp>/tmph4c7vi5g/report.json
+policy/evidence: missing-gate: stop evidence hash mismatch
+report: <tmp>/tmpgc8oxqli/ci.json
+A: failed: test failure
+scoreboard: passed
+A: failed: test failure
+report: <tmp>/tmpa9w_zd_a/report.json
+A: missing-gate: test failure
+scoreboard: passed
+A: missing-gate: test failure
+report: <tmp>/tmpot754yoz/report.json
+A: stopped: recorded stop blocks this unit
+B: unimplemented: registered product unit is not implemented
+scoreboard: passed
+A: stopped: recorded stop blocks this unit
+B: unimplemented: registered product unit is not implemented
+report: <tmp>/tmp313xp201/report.json
+A: stopped: recorded stop blocks this unit
+B: blocked: dependency did not pass
+scoreboard: passed
+A: stopped: recorded stop blocks this unit
+B: blocked: dependency did not pass
+report: <tmp>/tmpj7oank72/report.json
+A: passed: required tests executed
+.scoreboard: passed
+A: passed: required tests executed
+report: <tmp>/tmpd5pvldkd/report.json
+future: not-started: registered future unit has not started
+later: not-started: registered future unit has not started
+scoreboard: passed
+future: not-started: registered future unit has not started
+later: not-started: registered future unit has not started
+report: <tmp>/tmpxvsa8py4/report.json
+future: unimplemented: registered product unit is not implemented
+later: unimplemented: registered product unit is not implemented
+scoreboard: passed
+future: unimplemented: registered product unit is not implemented
+later: unimplemented: registered product unit is not implemented
+report: <tmp>/tmpbdjgq1ke/report.json
+future: unimplemented: registered product unit is not implemented
+.....................
+----------------------------------------------------------------------
+Ran 24 tests in 0.514s
+
+OK
+scoreboard: passed
+future: unimplemented: registered product unit is not implemented
+report: <tmp>/tmpk2cis8v9/report.json
+policy/evidence: missing-gate: 'list' object has no attribute 'values'
+report: <tmp>/tmppmvmnmtc/nested/report.json
+policy/evidence: missing-gate: 'NoneType' object has no attribute 'keys'
+report: <tmp>/tmpk0t6ap_c/nested/report.json
+policy/evidence: missing-gate: division by zero
+report: <tmp>/tmpketiwehx/nested/report.json

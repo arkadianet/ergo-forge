@@ -1,0 +1,32 @@
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
+    Finished `release` profile [optimized] target(s) in 0.96s
+     Running tests/decompile_corpus.rs (<home>/coding/ergo-forge/target-p00/release/deps/decompile_corpus-a032bb77c5f756f7)
+
+running 1 test
+test bundled_contracts_and_compiled_fixtures_round_trip ... FAILED
+
+successes:
+
+successes:
+
+failures:
+
+---- bundled_contracts_and_compiled_fixtures_round_trip stdout ----
+363 entries in 253.156828ms: {"byte-identical": 262, "initial-compile-failed": 10, "recompiles-but-differs": 91}
+
+thread '<unnamed>' (110) panicked at ergo-sandbox/tests/decompile_corpus.rs:283:13:
+assertion `left == right` failed: examples/contracts/vectors/shared-payment-across-instances/contract.test.json#/scenarios/0/outputs/0/ergoTree: round-trip outcome or original bytes changed; inspect DC_REPORT before updating expectations
+  left: Object {"bucket": String("byte-identical"), "raw_placeholders": Number(0), "tree_sha256": String("970d95ad1f9156c0d9dc60c5ce022c1861a48be5b1933e8892df0582f3c28e3b"), "truncated": Bool(false)}
+ right: Object {"bucket": String("byte-identical"), "raw_placeholders": Number(0), "tree_sha256": String("22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d"), "truncated": Bool(false)}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'bundled_contracts_and_compiled_fixtures_round_trip' (109) panicked at ergo-sandbox/src/decompile/mod.rs:119:10:
+decompile thread must not panic: Any { .. }
+
+
+failures:
+    bundled_contracts_and_compiled_fixtures_round_trip
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.26s
+
+error: test failed, to rerun pass `-p ergo-sandbox --test decompile_corpus`

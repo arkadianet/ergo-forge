@@ -1,0 +1,178 @@
+[
+  {
+    "command": [
+      "<home>/coding/ergo-forge/target-p00/release/ergo-es",
+      "test",
+      "examples/contracts/vectors/deployment-constant-drift/contract.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "output": "{\n  \"address\": \"5yE8zxMTsrRw4wtwC9f9\",\n  \"cases\": [\n    {\n      \"actual\": \"pass\",\n      \"cost\": 6,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"adversarial context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    },\n    {\n      \"actual\": \"pass\",\n      \"cost\": 6,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"intended context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    }\n  ],\n  \"failed\": 0,\n  \"formatVersion\": 1,\n  \"method\": \"scenario-simulation\",\n  \"nodeValidated\": false,\n  \"passed\": 2,\n  \"provenance\": \"caller-supplied/default context and box material; proofs use a supplied/default message\",\n  \"treeHex\": \"100104c801d192a37300\"\n}\n",
+    "outputSha256": "5f6f28e191e139e92cde5cd783584b03406bd7f4dba5c2b42fde3da84df9d009"
+  },
+  {
+    "command": [
+      "<home>/coding/ergo-forge/target-p00/release/ergo-es",
+      "test",
+      "examples/contracts/vectors/deployment-constant-drift/fixed.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "output": "{\n  \"address\": \"5yE8ziU9tWucvhUFP7W7\",\n  \"cases\": [\n    {\n      \"actual\": \"fail\",\n      \"cost\": 6,\n      \"error\": null,\n      \"expected\": \"fail\",\n      \"name\": \"adversarial context\",\n      \"passed\": true,\n      \"reducedTo\": \"false\"\n    },\n    {\n      \"actual\": \"pass\",\n      \"cost\": 6,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"intended context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    }\n  ],\n  \"failed\": 0,\n  \"formatVersion\": 1,\n  \"method\": \"scenario-simulation\",\n  \"nodeValidated\": false,\n  \"passed\": 2,\n  \"provenance\": \"caller-supplied/default context and box material; proofs use a supplied/default message\",\n  \"treeHex\": \"1001049003d192a37300\"\n}\n",
+    "outputSha256": "ba8a4a4539e68e00fa1b3f84ef53258e3c94d38bf621cab498649ab5a094ad92"
+  },
+  {
+    "command": [
+      "<home>/coding/ergo-forge/target-p00/release/ergo-es",
+      "test",
+      "examples/contracts/vectors/mutable-upgrade-digest/contract.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "output": "{\n  \"address\": \"LQ7heoTeBMcTFmEnM5cE5rgsZtGoDZfRVYz8wrgULYrgUBMVY5qZ9MN2jgnZa9\",\n  \"cases\": [\n    {\n      \"actual\": \"pass\",\n      \"cost\": 34,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"adversarial context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    },\n    {\n      \"actual\": \"pass\",\n      \"cost\": 34,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"intended context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    }\n  ],\n  \"failed\": 0,\n  \"formatVersion\": 1,\n  \"method\": \"scenario-simulation\",\n  \"nodeValidated\": false,\n  \"passed\": 2,\n  \"provenance\": \"caller-supplied/default context and box material; proofs use a supplied/default message\",\n  \"treeHex\": \"10010400d802d601b2a5730000d602c27201d1ec93cb7202e4c6a7040eed937202c2a792c17201c1a7\"\n}\n",
+    "outputSha256": "3a3ca07f7a260e528a8d6fce3622b39443bb8909d7269dedc264b95106dfff67"
+  },
+  {
+    "command": [
+      "<home>/coding/ergo-forge/target-p00/release/ergo-es",
+      "test",
+      "examples/contracts/vectors/mutable-upgrade-digest/fixed.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "output": "{\n  \"address\": \"YUgTvNvqAxfm5AAh2fF1572yRmdQ8tNE8crkwgNPfkrYHtVwJgWHBWRMiFtpibHzuuT8gPGabVrHQRCoV\",\n  \"cases\": [\n    {\n      \"actual\": \"fail\",\n      \"cost\": 46,\n      \"error\": null,\n      \"expected\": \"fail\",\n      \"name\": \"adversarial context\",\n      \"passed\": true,\n      \"reducedTo\": \"false\"\n    },\n    {\n      \"actual\": \"pass\",\n      \"cost\": 46,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"intended context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    }\n  ],\n  \"failed\": 0,\n  \"formatVersion\": 1,\n  \"method\": \"scenario-simulation\",\n  \"nodeValidated\": false,\n  \"passed\": 2,\n  \"provenance\": \"caller-supplied/default context and box material; proofs use a supplied/default message\",\n  \"treeHex\": \"10010400d803d601b2a5730000d602c27201d603e4c6a7040ed1ec93cb72027203eded937202c2a792c17201c1a793e4c67201040e7203\"\n}\n",
+    "outputSha256": "36e20f98ede73475685fef88687fddd8ea712e048fcd711a9de5545144130bb3"
+  },
+  {
+    "command": [
+      "<home>/coding/ergo-forge/target-p00/release/ergo-es",
+      "test",
+      "examples/contracts/vectors/rounded-payment/contract.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "output": "{\n  \"address\": \"LQ8gJM56eEt2oNoddKqtY6ZryWXpsCmpGVtSnm9xVpBiNVFtNkGeLLdB8P3JgE\",\n  \"cases\": [\n    {\n      \"actual\": \"pass\",\n      \"cost\": 24,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"adversarial context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    },\n    {\n      \"actual\": \"pass\",\n      \"cost\": 24,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"intended context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    }\n  ],\n  \"failed\": 0,\n  \"formatVersion\": 1,\n  \"method\": \"scenario-simulation\",\n  \"nodeValidated\": false,\n  \"passed\": 2,\n  \"provenance\": \"caller-supplied/default context and box material; proofs use a supplied/default message\",\n  \"treeHex\": \"10040500040005060504d801d601e4c6a70405d1ed917201730092c1b2a57301009c9d720173027303\"\n}\n",
+    "outputSha256": "bc229cf096b9c79980a5322d6c99d67f94be4e9afc11f37968d5fdf5112b512f"
+  },
+  {
+    "command": [
+      "<home>/coding/ergo-forge/target-p00/release/ergo-es",
+      "test",
+      "examples/contracts/vectors/rounded-payment/fixed.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "output": "{\n  \"address\": \"jdyTsgzu5qKpqVhyaupypGhcfBtUcSv8oLLfM8AxG43Bq65fLqh2YbAEwtP3bW357BHZgH\",\n  \"cases\": [\n    {\n      \"actual\": \"fail\",\n      \"cost\": 32,\n      \"error\": null,\n      \"expected\": \"fail\",\n      \"name\": \"adversarial context\",\n      \"passed\": true,\n      \"reducedTo\": \"false\"\n    },\n    {\n      \"actual\": \"pass\",\n      \"cost\": 32,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"intended context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    }\n  ],\n  \"failed\": 0,\n  \"formatVersion\": 1,\n  \"method\": \"scenario-simulation\",\n  \"nodeValidated\": false,\n  \"passed\": 2,\n  \"provenance\": \"caller-supplied/default context and box material; proofs use a supplied/default message\",\n  \"treeHex\": \"100405000400060103060102d801d601e4c6a70405d1ed9172017300929c7ec1b2a57301000673029c7e7201067303\"\n}\n",
+    "outputSha256": "db4bd04fe231d3f0b42f7f98ff4731d0ac62eb2441a6330cf92532ac4ae7f586"
+  },
+  {
+    "command": [
+      "<home>/coding/ergo-forge/target-p00/release/ergo-es",
+      "test",
+      "examples/contracts/vectors/shared-payment-across-instances/contract.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "output": "{\n  \"address\": \"8oj4ZAJ1nwmPmhQitXsMAXgswoca8YRMnsdqhuR6zNQD4aUqBUwoJtER25zZ1aMS4k9bRHgnpeXcahgoBQomVhWhk7Ns9x9\",\n  \"cases\": [\n    {\n      \"actual\": \"pass\",\n      \"cost\": 16,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"adversarial context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    },\n    {\n      \"actual\": \"pass\",\n      \"cost\": 16,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"adversarial context 2\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    },\n    {\n      \"actual\": \"pass\",\n      \"cost\": 16,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"intended context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    }\n  ],\n  \"failed\": 0,\n  \"formatVersion\": 1,\n  \"method\": \"scenario-simulation\",\n  \"nodeValidated\": false,\n  \"passed\": 3,\n  \"provenance\": \"caller-supplied/default context and box material; proofs use a supplied/default message\",\n  \"treeHex\": \"100204000e240008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798d801d601b2a5730000d1ed92c17201c1a793c272017301\"\n}\n",
+    "outputSha256": "d4b799235661d352bac63b8c78d905ae8b47d39f1a957b154f864b10f2506876"
+  },
+  {
+    "command": [
+      "<home>/coding/ergo-forge/target-p00/release/ergo-es",
+      "test",
+      "examples/contracts/vectors/shared-payment-across-instances/fixed.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "output": "{\n  \"address\": \"37smDh9F7YSCUQqhugGbZsxyVPbTaNuVxznVapBC1BRhG3ukSN5GwUafjF9g6pePiiDn1UhfyG99RAmtvPkRTeD9tMLqtx5Hp3AGRW5oN8pvBmm15cuhK7ACADzj\",\n  \"cases\": [\n    {\n      \"actual\": \"fail\",\n      \"cost\": 36,\n      \"error\": null,\n      \"expected\": \"fail\",\n      \"name\": \"adversarial context\",\n      \"passed\": true,\n      \"reducedTo\": \"false\"\n    },\n    {\n      \"actual\": \"fail\",\n      \"cost\": 36,\n      \"error\": null,\n      \"expected\": \"fail\",\n      \"name\": \"adversarial context 2\",\n      \"passed\": true,\n      \"reducedTo\": \"false\"\n    },\n    {\n      \"actual\": \"pass\",\n      \"cost\": 30,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"intended context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    }\n  ],\n  \"failed\": 0,\n  \"formatVersion\": 1,\n  \"method\": \"scenario-simulation\",\n  \"nodeValidated\": false,\n  \"passed\": 3,\n  \"provenance\": \"caller-supplied/default context and box material; proofs use a supplied/default message\",\n  \"treeHex\": \"1003040004020e240008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798d801d601b2a5730000ea02d193b1b5a4d901026393c27202c2a77301d1ed92c17201c1a793c272017302\"\n}\n",
+    "outputSha256": "23714a24b5a907c492583d24ef47180d84023c1f62962e1277d31a957319a00d"
+  },
+  {
+    "command": [
+      "<home>/coding/ergo-forge/target-p00/release/ergo-es",
+      "test",
+      "examples/contracts/vectors/stale-oracle-epoch/contract.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "output": "{\n  \"address\": \"xuVQDwAeaic8gAfnneaHKgEEdEegrh6Bq7dX5qK9gZibNt9aQkEqWeoMBUYHt9knaN4nHfPFEbd7TuJtYp96fJhDA7t2AwRk5BVvc5WMG3pHXFrsAVK\",\n  \"cases\": [\n    {\n      \"actual\": \"pass\",\n      \"cost\": 26,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"adversarial context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    },\n    {\n      \"actual\": \"pass\",\n      \"cost\": 26,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"intended context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    }\n  ],\n  \"failed\": 0,\n  \"formatVersion\": 1,\n  \"method\": \"scenario-simulation\",\n  \"nodeValidated\": false,\n  \"passed\": 2,\n  \"provenance\": \"caller-supplied/default context and box material; proofs use a supplied/default message\",\n  \"treeHex\": \"1004040004000e20010101010101010101010101010101010101010101010101010101010101010105c801d801d601b2db6501fe730000d1ed938cb2db6308720173010001730292e4c6720104057303\"\n}\n",
+    "outputSha256": "8b072dcb4fe7b4a488e07616ef2dd5df206bb4e02ff40d4d5b131eada489cbdc"
+  },
+  {
+    "command": [
+      "<home>/coding/ergo-forge/target-p00/release/ergo-es",
+      "test",
+      "examples/contracts/vectors/stale-oracle-epoch/fixed.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "output": "{\n  \"address\": \"Rd2sZx1CcCN8DYYusTfK7gt6eQCCsM5qbDFwKNgZ2sFaJSMeqtyKecyDKhsRWpWPbxhS6HK1reyey5x1nDXvGyVhS7sYxUfqmLSDvPjzxKUZ26jy7kUjwDeADtCBjpgW4ZRn7yn5g5YivtpT9k1r65jYNYZLA2yFc2u\",\n  \"cases\": [\n    {\n      \"actual\": \"fail\",\n      \"cost\": 44,\n      \"error\": null,\n      \"expected\": \"fail\",\n      \"name\": \"adversarial context\",\n      \"passed\": true,\n      \"reducedTo\": \"false\"\n    },\n    {\n      \"actual\": \"pass\",\n      \"cost\": 61,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"intended context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    }\n  ],\n  \"failed\": 0,\n  \"formatVersion\": 1,\n  \"method\": \"scenario-simulation\",\n  \"nodeValidated\": false,\n  \"passed\": 2,\n  \"provenance\": \"caller-supplied/default context and box material; proofs use a supplied/default message\",\n  \"treeHex\": \"1006040004000e20010101010101010101010101010101010101010101010101010101010101010105c8010414040ad801d601b2db6501fe730000d1edededed938cb2db6308720173010001730292e4c672010405730393e4c6720105049da37304928cc772010199a37305908cc7720101a3\"\n}\n",
+    "outputSha256": "dabe783eaa3935db424cdf54b39c736c8a76a4f839b7d6fbcb78cae26c3154cc"
+  },
+  {
+    "command": [
+      "<home>/coding/ergo-forge/target-p00/release/ergo-es",
+      "test",
+      "examples/contracts/vectors/successor-register-drift/contract.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "output": "{\n  \"address\": \"FKdvcZUGpFxRwakYXzWaY6w1i7gQsTukVvZX8QJHizjFMmyJT4sxYWdHW2WnWfAdkgzWs2RZv\",\n  \"cases\": [\n    {\n      \"actual\": \"pass\",\n      \"cost\": 38,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"adversarial context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    },\n    {\n      \"actual\": \"pass\",\n      \"cost\": 38,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"intended context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    }\n  ],\n  \"failed\": 0,\n  \"formatVersion\": 1,\n  \"method\": \"scenario-simulation\",\n  \"nodeValidated\": false,\n  \"passed\": 2,\n  \"provenance\": \"caller-supplied/default context and box material; proofs use a supplied/default message\",\n  \"treeHex\": \"100204000400d801d601b2a5730000d1ededed91e4c6a70404730193c27201c2a792c17201c1a793db63087201db6308a7\"\n}\n",
+    "outputSha256": "94134185b2061933e199a281b6e9367858a360ffb4f22926a42a4a27c5b84633"
+  },
+  {
+    "command": [
+      "<home>/coding/ergo-forge/target-p00/release/ergo-es",
+      "test",
+      "examples/contracts/vectors/successor-register-drift/fixed.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "output": "{\n  \"address\": \"QEqnf7CTs64bobCf5UUvCEvxqHRkwkmgmtySCg3miTzskxjxqNiNYaFUcUcc1DAvhFgpHVFkmp7yfsJJuB76QpVADLDE\",\n  \"cases\": [\n    {\n      \"actual\": \"fail\",\n      \"cost\": 49,\n      \"error\": null,\n      \"expected\": \"fail\",\n      \"name\": \"adversarial context\",\n      \"passed\": true,\n      \"reducedTo\": \"false\"\n    },\n    {\n      \"actual\": \"pass\",\n      \"cost\": 49,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"intended context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    }\n  ],\n  \"failed\": 0,\n  \"formatVersion\": 1,\n  \"method\": \"scenario-simulation\",\n  \"nodeValidated\": false,\n  \"passed\": 2,\n  \"provenance\": \"caller-supplied/default context and box material; proofs use a supplied/default message\",\n  \"treeHex\": \"100204000400d802d601e4c6a70404d602b2a5730000d1edededed917201730193c27202c2a792c17202c1a793db63087202db6308a793e4c6720204047201\"\n}\n",
+    "outputSha256": "1255e88da5d0c17e05846c1078b6a7829d7d602df471579295451aed844fa521"
+  },
+  {
+    "command": [
+      "<home>/coding/ergo-forge/target-p00/release/ergo-es",
+      "test",
+      "examples/contracts/vectors/unauthenticated-context-code/contract.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "output": "{\n  \"address\": \"m3iBJt1LW3aveS\",\n  \"cases\": [\n    {\n      \"actual\": \"pass\",\n      \"cost\": 3,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"adversarial context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    },\n    {\n      \"actual\": \"pass\",\n      \"cost\": 7,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"intended context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    }\n  ],\n  \"failed\": 0,\n  \"formatVersion\": 1,\n  \"method\": \"scenario-simulation\",\n  \"nodeValidated\": false,\n  \"passed\": 2,\n  \"provenance\": \"caller-supplied/default context and box material; proofs use a supplied/default message\",\n  \"treeHex\": \"1000d1d40101\"\n}\n",
+    "outputSha256": "7a1f3a42b2bd853adac977f5a5ee96f897fd1a6c91341144334b7d0e080f32c6"
+  },
+  {
+    "command": [
+      "<home>/coding/ergo-forge/target-p00/release/ergo-es",
+      "test",
+      "examples/contracts/vectors/unauthenticated-context-code/fixed.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "output": "{\n  \"address\": \"6SU5URaHkedCNZ2CTxTzDxAoXbcMnVDQ47i\",\n  \"cases\": [\n    {\n      \"actual\": \"fail\",\n      \"cost\": 6,\n      \"error\": null,\n      \"expected\": \"fail\",\n      \"name\": \"adversarial context\",\n      \"passed\": true,\n      \"reducedTo\": \"false\"\n    },\n    {\n      \"actual\": \"pass\",\n      \"cost\": 14,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"intended context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    }\n  ],\n  \"failed\": 0,\n  \"formatVersion\": 1,\n  \"method\": \"scenario-simulation\",\n  \"nodeValidated\": false,\n  \"passed\": 2,\n  \"provenance\": \"caller-supplied/default context and box material; proofs use a supplied/default message\",\n  \"treeHex\": \"10010e0592a304c801d1ed93e4e3010e7300d40101\"\n}\n",
+    "outputSha256": "a04f155391846a5314d262b0dfb652c17d313425dc1d0d54bc48ba435d97e93c"
+  },
+  {
+    "command": [
+      "<home>/coding/ergo-forge/target-p00/release/ergo-es",
+      "test",
+      "examples/contracts/vectors/zero-threshold/contract.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "output": "{\n  \"address\": \"4fnj4w3qyQcajV2G6VN3haCMJwdXriT\",\n  \"cases\": [\n    {\n      \"actual\": \"pass\",\n      \"cost\": 10,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"adversarial context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    },\n    {\n      \"actual\": \"pass\",\n      \"cost\": 10,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"intended context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    }\n  ],\n  \"failed\": 0,\n  \"formatVersion\": 1,\n  \"method\": \"scenario-simulation\",\n  \"nodeValidated\": false,\n  \"passed\": 2,\n  \"provenance\": \"caller-supplied/default context and box material; proofs use a supplied/default message\",\n  \"treeHex\": \"1002040004c801987300830108d192a37301\"\n}\n",
+    "outputSha256": "8ff34ff5e6d7d41f380580e77dd825d8e53b50f148e115fdf5793282f15a764c"
+  },
+  {
+    "command": [
+      "<home>/coding/ergo-forge/target-p00/release/ergo-es",
+      "test",
+      "examples/contracts/vectors/zero-threshold/fixed.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "output": "{\n  \"address\": \"4fnj4wR5g6vmdA9PvxzP1ZAe8VdLdTh\",\n  \"cases\": [\n    {\n      \"actual\": \"fail\",\n      \"cost\": 10,\n      \"error\": null,\n      \"expected\": \"fail\",\n      \"name\": \"adversarial context\",\n      \"passed\": true,\n      \"reducedTo\": \"false\"\n    },\n    {\n      \"actual\": \"pass\",\n      \"cost\": 10,\n      \"error\": null,\n      \"expected\": \"pass\",\n      \"name\": \"intended context\",\n      \"passed\": true,\n      \"reducedTo\": \"true\"\n    }\n  ],\n  \"failed\": 0,\n  \"formatVersion\": 1,\n  \"method\": \"scenario-simulation\",\n  \"nodeValidated\": false,\n  \"passed\": 2,\n  \"provenance\": \"caller-supplied/default context and box material; proofs use a supplied/default message\",\n  \"treeHex\": \"1002040204c801987300830108d192a37301\"\n}\n",
+    "outputSha256": "8ba49048197605422915214eacbab5c07a7ed5c361eaaaaaa97d77bbe85f00f9"
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "source": "sigmaProp(executeFromVar[Boolean](1))\n",
+  "scenarios": [
+    {
+      "name": "adversarial context",
+      "expect": "pass",
+      "height": 99,
+      "contextVars": {
+        "1": {
+          "type": "Coll[Byte]",
+          "value": "0101"
+        }
+      }
+    },
+    {
+      "name": "intended context",
+      "expect": "pass",
+      "height": 100,
+      "contextVars": {
+        "1": {
+          "type": "Coll[Byte]",
+          "value": "92a304c801"
+        }
+      }
+    }
+  ]
+}

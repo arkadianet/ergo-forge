@@ -110,6 +110,8 @@ It does not establish historical state or infer protocol intent.
 
 The [governing roadmap v2](docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md) and [record-only scoreboard](docs/roadmap-metrics.json)
 separate recovery coverage, sampled preflight detection, and node-validated claims.
+The [attack-vector catalogue](docs/security/VECTORS.md) links review questions to
+existing instruments, example contracts and explicit manual checks.
 
 Example scenario (`sigmaProp(HEIGHT > 100)` failing at height 99):
 

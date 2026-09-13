@@ -1,0 +1,45 @@
+{
+  "source": "{\n  val amount = SELF.R4[Long].get\n  sigmaProp(amount > 0L && OUTPUTS(0).value >= amount / 3L * 2L)\n}\n",
+  "scenarios": [
+    {
+      "name": "adversarial context",
+      "expect": "pass",
+      "height": 100,
+      "selfBox": {
+        "value": 5000000,
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 3000002
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 2000000,
+          "ergoTree": "10010101d17300"
+        }
+      ]
+    },
+    {
+      "name": "intended context",
+      "expect": "pass",
+      "height": 100,
+      "selfBox": {
+        "value": 5000000,
+        "registers": {
+          "R4": {
+            "type": "Long",
+            "value": 3000002
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 2000002,
+          "ergoTree": "10010101d17300"
+        }
+      ]
+    }
+  ]
+}

@@ -818,7 +818,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
         "every_vector_has_examples_or_is_marked_manual",
         "every_named_instrument_exists"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "W01",

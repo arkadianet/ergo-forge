@@ -1,0 +1,57 @@
+{
+  "source": "{\n  val next = OUTPUTS(0)\n  val upgrade = blake2b256(next.propositionBytes) == SELF.R4[Coll[Byte]].get\n  val continue = next.propositionBytes == SELF.propositionBytes && next.value >= SELF.value &&\n    next.R4[Coll[Byte]].get == SELF.R4[Coll[Byte]].get\n  sigmaProp(upgrade || continue)\n}\n",
+  "scenarios": [
+    {
+      "name": "adversarial context",
+      "expect": "fail",
+      "height": 100,
+      "selfBox": {
+        "value": 10000000,
+        "registers": {
+          "R4": {
+            "type": "Coll[Byte]",
+            "value": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "$self",
+          "registers": {
+            "R4": {
+              "type": "Coll[Byte]",
+              "value": "1111111111111111111111111111111111111111111111111111111111111111"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "intended context",
+      "expect": "pass",
+      "height": 100,
+      "selfBox": {
+        "value": 10000000,
+        "registers": {
+          "R4": {
+            "type": "Coll[Byte]",
+            "value": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        }
+      },
+      "outputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "$self",
+          "registers": {
+            "R4": {
+              "type": "Coll[Byte]",
+              "value": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
