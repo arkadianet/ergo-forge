@@ -156,9 +156,9 @@ Gate: `release_action_points_at_tagged_binary`, `changelog_lists_every_batch`.
 **X03 — CI time (1 day).** Cache the node sibling checkout and split cost-trace into a separate job.
 Gate: `node_checkout_is_cached`, `cost_trace_runs_in_its_own_job`.
 
-## 2. Sequencing — twelve batches, one PR each
+## 2. Sequencing — thirteen batches, one PR each
 
-Order is by user value first, with each security unit landing before the surface that displays it. Ceilings sum to 52 working days; that is the scope of this plan, not a schedule promise.
+Order is by user value first, with each security unit landing before the surface that displays it. Ceilings sum to 47 working days; that is the scope of this plan, not a schedule promise.
 
 | Batch | Units | Days | What a user gets |
 |---|---|---|---|
@@ -210,7 +210,7 @@ To be installed by W00 as a **separate `roadmap-policy:v2` block** in `docs/ROAD
 {
   "schemaVersion": 1,
   "baselineRev": "11d9a1c0986c5943d5b421e42271e1277d23528c",
-  "completedThrough": "M04",
+  "completedThrough": null,
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,
   "newUnits": [
