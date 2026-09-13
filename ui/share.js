@@ -12,6 +12,31 @@ const Share = (() => {
   function checkSize(size) {
     if (size > FRAGMENT_CAP) throw new Error(`Share fragment is ${size} bytes; cap is ${FRAGMENT_CAP} bytes.`);
   }
+  function validateBox(b, what) {
+    requireThat(object(b), `${what} must be an object`);
+    requireThat(b.boxId == null || (hex(b.boxId) && b.boxId.length === 64), `${what} boxId must be 32-byte hex`);
+    requireThat(b.ergoTree == null || hex(b.ergoTree), `${what} ergoTree must be hex`);
+    requireThat(b.value == null || uint(b.value), `${what} value must be an exact nonnegative integer`);
+    requireThat(b.creationHeight == null || (uint(b.creationHeight) && b.creationHeight <= 0xffffffff), `${what} creation height is invalid`);
+    requireThat(b.registers == null || object(b.registers), `${what} registers must be an object`);
+    for (const tv of Object.values(b.registers || {})) requireThat(object(tv) && typeof tv.type === "string" && Object.hasOwn(tv, "value"), `${what} registers need typed values`);
+    requireThat(b.tokens == null || Array.isArray(b.tokens), `${what} tokens must be an array`);
+    for (const t of b.tokens || []) requireThat(object(t) && hex(t.id) && t.id.length === 64 && uint(t.amount) && t.amount > 0, `${what} token is invalid`);
+  }
+  function validateCaseScenario(c) {
+    requireThat(c.treeVersion == null || (uint(c.treeVersion) && c.treeVersion <= 255), "treeVersion must be 0..255");
+    requireThat(c.selfIndex == null || uint(c.selfIndex), "selfIndex must be a nonnegative integer");
+    if (c.selfBox != null) validateBox(c.selfBox, "selfBox");
+    for (const key of ["inputs", "outputs", "dataInputs"]) {
+      requireThat(c[key] == null || Array.isArray(c[key]), `${key} must be an array`);
+      for (const b of c[key] || []) validateBox(b, `${key} box`);
+    }
+    requireThat(c.contextVars == null || object(c.contextVars), "contextVars must be an object");
+    for (const [id, tv] of Object.entries(c.contextVars || {})) {
+      requireThat(/^(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])$/.test(id), "contextVars keys must be 0..255");
+      requireThat(object(tv) && typeof tv.type === "string" && Object.hasOwn(tv, "value"), "contextVars need typed values");
+    }
+  }
   function validateSuite(suite) {
     requireThat(object(suite), "suite must be an object");
     requireThat(suite.nodeValidated == null || suite.nodeValidated === false, "shared suites are not node-validated");
@@ -19,12 +44,14 @@ const Share = (() => {
     requireThat(suite.tree == null || hex(suite.tree), "suite tree must be hex");
     requireThat(suite.network == null || network(suite.network), "unknown suite network");
     requireThat(suite.params == null || object(suite.params), "suite params must be an object");
+    requireThat(suite.treeVersion == null || (uint(suite.treeVersion) && suite.treeVersion <= 255), "suite treeVersion must be 0..255");
     requireThat(Array.isArray(suite.scenarios), "suite scenarios must be an array");
     for (const c of suite.scenarios) {
       requireThat(object(c) && typeof c.name === "string" && uint(c.height) && c.height <= 0xffffffff, "invalid suite case");
       requireThat(["pass", "fail", "error", "needsProof", "proofAccepted", "proofRejected"].includes(c.expect), "unknown expectation");
       requireThat(c.source == null && c.tree == null, "only the suite may name the contract");
       requireThat(c.nodeValidated == null || c.nodeValidated === false, "shared cases are not node-validated");
+      validateCaseScenario(c);
     }
     return suite;
   }
@@ -50,12 +77,8 @@ const Share = (() => {
         requireThat(!ids.has(b.boxId.toLowerCase()), "duplicate boxId"); ids.add(b.boxId.toLowerCase());
         requireThat(hex(b.ergoTree), "ergoTree must be hex");
         requireThat(uint(b.value), "box value must be an exact nonnegative integer");
-        requireThat(b.creationHeight == null || (uint(b.creationHeight) && b.creationHeight <= 0xffffffff), "invalid creation height");
         requireThat(b.spent == null || typeof b.spent === "boolean", "spent must be boolean");
-        requireThat(b.registers == null || object(b.registers), "registers must be an object");
-        for (const tv of Object.values(b.registers || {})) requireThat(object(tv) && typeof tv.type === "string" && Object.hasOwn(tv, "value"), "registers need typed values");
-        requireThat(b.tokens == null || Array.isArray(b.tokens), "tokens must be an array");
-        for (const t of b.tokens || []) requireThat(object(t) && hex(t.id) && t.id.length === 64 && uint(t.amount) && t.amount > 0, "invalid token");
+        validateBox(b, "Play box");
       }
       requireThat(state.history == null || (Array.isArray(state.history) && state.history.every(line => typeof line === "string")), "history must be an array of text entries");
     }

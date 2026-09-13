@@ -115,6 +115,19 @@ test("shared chain rendering stays offline, shows its network, and treats regist
   assert.equal(c.$("play-history").querySelectorAll("script").length,0);
   assert.throws(()=>Share.encodeShare({...state,boxes:[{...state.boxes[0],registers:{R4:null}}]}),/typed values/);
   assert.throws(()=>Share.encodeShare({k:"suite",v:1,suite:{...suite,nodeValidated:true}}),/not node-validated/);
+  const withCase=(extra)=>({k:"suite",v:1,suite:{...suite,scenarios:[{...suite.scenarios[0],...extra}]}});
+  const box={boxId:"cc".repeat(32),ergoTree:"10010101d17300",value:1,tokens:[],registers:{R4:{type:"Int",value:1}}};
+  Share.encodeShare(withCase({inputs:[box],outputs:[box],dataInputs:[box],selfIndex:0,contextVars:{"0":{type:"Int",value:1},"255":{type:"Int",value:2}},treeVersion:3}));
+  for (const [extra,message] of [
+    [{inputs:{}},/inputs must be an array/],
+    [{outputs:[{...box,value:"1"}]},/value must be an exact/],
+    [{dataInputs:[{...box,registers:{R4:null}}]},/typed values/],
+    [{contextVars:{"256":{type:"Int",value:1}}},/keys must be 0\.\.255/],
+    [{contextVars:{"1":5}},/contextVars need typed values/],
+    [{treeVersion:256},/treeVersion must be 0\.\.255/],
+    [{selfIndex:-1},/selfIndex/],
+  ]) assert.throws(()=>Share.encodeShare(withCase(extra)),message);
+  assert.throws(()=>Share.encodeShare({k:"suite",v:1,suite:{...suite,treeVersion:256}}),/suite treeVersion/);
 });
 
 test("clipboard refusal leaves the share URL visible in the active page", async () => {
