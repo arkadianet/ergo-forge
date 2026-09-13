@@ -162,12 +162,6 @@ No baseline digest was re-blessed. Report paths use portable placeholders.
 
 ## Post-session verification
 
-No post-session execution was recorded. All reported exits were observed in
-this implementation session. A later commit or verification can be appended
-here without rewriting the session's failed Git attempts.
-
-## Post-session verification
-
 After the implementation session ended (it could not create commits: its
 sandbox mounted this worktree's Git metadata read-only, exit 128 on staging
 and commit; the commits were created afterwards from its four prepared

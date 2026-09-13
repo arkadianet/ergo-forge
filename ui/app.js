@@ -2297,7 +2297,9 @@ $("fund-go").addEventListener("click", async () => {
   } catch (e) { st.textContent = e.message; st.hidden = false; }
 });
 
+let playRenderGeneration = 0;
 async function renderPlay(inspect = true) {
+  const generation = ++playRenderGeneration;
   const renderedState = play;
   $("play-height").textContent = String(play.height);
   $("play-network").textContent = playNetwork();
@@ -2309,7 +2311,7 @@ async function renderPlay(inspect = true) {
     const card = document.createElement("div");
     card.className = "play-box" + (b.spent ? " spent" : "") + (selectedBoxes.has(b.boxId) ? " selected" : "");
     const w = inspect ? await wordsFor(b.ergoTree) : { plain: [], address: "" };
-    if (play !== renderedState) return;
+    if (generation !== playRenderGeneration || play !== renderedState) return;
     const toks = (b.tokens || []).map((t) => `${t.amount} × ${t.id.slice(0, 8)}…`).join(", ");
     const regs = Object.entries(b.registers || {}).map(([k, v]) => `${k}=${typeof v.value === "object" ? JSON.stringify(v.value) : v.value}`).join(" ");
     card.innerHTML = `<div class="amount">${ergOf(b.value)}${toks ? ` <span class="meta">+ ${toks}</span>` : ""}</div>

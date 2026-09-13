@@ -104,7 +104,7 @@ test("shared chain rendering stays offline, shows its network, and treats regist
   c.context.renderTxForm=()=>{};
   const words=app.indexOf("async function wordsFor(");
   vm.runInContext(app.slice(words,app.indexOf("/// Resolve what the user typed",words)),c.context);
-  const render=app.indexOf("async function renderPlay(");
+  const render=app.indexOf("let playRenderGeneration = 0;");
   vm.runInContext(app.slice(render,app.indexOf("let txOutputs =",render)),c.context);
   vm.runInContext("replaceSharedPlay(imported)",c.context);
   await vm.runInContext("renderPlay()",c.context);

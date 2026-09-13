@@ -11,7 +11,8 @@ def git(*args):
     result = subprocess.run(['git',*args],cwd=root,capture_output=True,check=True)
     return result.stdout
 assert git('branch','--show-current').decode().strip() == 'v2/batch-5'
-assert git('rev-parse','--short=7','HEAD').decode().strip() == '126567f'
+# The baseline is the protected-scope reference; committed checkouts are its descendants.
+subprocess.run(['git','merge-base','--is-ancestor','126567f','HEAD'],cwd=root,check=True)
 protected = ['docs/reports/batch-1','docs/reports/batch-2','docs/reports/batch-3','docs/reports/batch-4','examples/mutants',
     'ergo-sandbox/tests/fixtures/mapping/manifest.json','ergo-sandbox/tests/fixtures/properties']
 assert not git('diff','126567f','--',*protected)
