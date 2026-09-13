@@ -9,7 +9,7 @@ inputs:
     required: false
     default: "**/contract.test.json"
   lockfile:
-    description: "Optional space-separated paths/globs of .lock.json files. Verify sibling <stem>.es and params.json; network/treeVersion come from <stem>.test.json (default mainnet/3). Fail on drift or no matches."
+    description: "Optional space-separated paths/globs of .lock.json files. Verify sibling <stem>.es and params.json; network/treeVersion come from <stem>.test.json (default mainnet/3). Fail on drift or no matches. Needs an ergo-es that has verify-lock: use version: source, or a release published after it; older binaries fail this step with a compatibility error."
     required: false
     default: ""
   version:

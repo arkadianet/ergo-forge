@@ -125,8 +125,11 @@ For each `<stem>.lock.json`, it checks sibling `<stem>.es` and optional
 layout. Custom names must follow that convention. Unmatched patterns, missing
 source, malformed options and any nonzero verifier exit fail the action.
 Suites still run as before; `version: latest` keeps GitHub's latest-release
-selection and is not pinned to a new tag. The selected binary must include the
-new `verify-lock` command; this batch does not publish a release.
+selection and is not pinned to a new tag. The lockfile step first probes
+`ergo-es --help` for `verify-lock`; a binary that predates it (every release
+before this batch, since this batch publishes none) fails the step with a
+compatibility error naming `version: source` as the fix, instead of failing
+on an unknown subcommand.
 
 Every verify/lock result carries `identity::LIMITATION`. Structural identity
 under constant substitution does not establish behavioural equivalence, safety,

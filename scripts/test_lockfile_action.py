@@ -27,26 +27,43 @@ class LockfileActionTests(unittest.TestCase):
                 (root / (name + '.es')).write_text('sigmaProp(true)')
             (root / 'params.json').write_text('{}')
             (root / 'contract.test.json').write_text(json.dumps({'network': 'testnet', 'treeVersion': 3}))
-            with patch.object(locks.subprocess, 'run', side_effect=[SimpleNamespace(returncode=5), SimpleNamespace(returncode=0)]) as run:
+            help_ok = SimpleNamespace(returncode=0, stdout='USAGE:\n  ergo-es verify-lock <contract.lock.json>', stderr='')
+            with patch.object(locks.subprocess, 'run', side_effect=[help_ok, SimpleNamespace(returncode=5), SimpleNamespace(returncode=0)]) as run:
                 self.assertEqual(locks.verify(str(root / '*.lock.json')), 1)
-                self.assertEqual(run.call_count, 2)
-                first = run.call_args_list[0].args[0]
+                self.assertEqual(run.call_count, 3)
+                self.assertEqual(run.call_args_list[0].args[0], ['ergo-es', '--help'])
+                first = run.call_args_list[1].args[0]
                 self.assertEqual(first[:2], ['ergo-es', 'verify-lock'])
                 self.assertIn('testnet', first)
                 self.assertIn(str(root / 'params.json'), first)
-                self.assertIn('mainnet', run.call_args_list[1].args[0])
+                self.assertIn('mainnet', run.call_args_list[2].args[0])
+
+    def test_binary_without_verify_lock_fails_with_compatibility_error(self):
+        with tempfile.TemporaryDirectory() as tmp, contextlib.redirect_stderr(io.StringIO()) as err:
+            root = Path(tmp)
+            (root / 'contract.lock.json').write_text('{}')
+            (root / 'contract.es').write_text('sigmaProp(true)')
+            old_help = SimpleNamespace(returncode=0, stdout='USAGE:\n  ergo-es match <source.es|treeHex> <treeHex>', stderr='')
+            with patch.object(locks.subprocess, 'run', side_effect=[old_help]) as run:
+                self.assertEqual(locks.verify(str(root / 'contract.lock.json')), 1)
+                self.assertEqual(run.call_count, 1)
+            self.assertIn('version: source', err.getvalue())
+            with patch.object(locks.subprocess, 'run', side_effect=OSError('not found')):
+                self.assertEqual(locks.verify(str(root / 'contract.lock.json')), 1)
 
     def test_absent_globs_sources_and_invalid_options_fail(self):
         with tempfile.TemporaryDirectory() as tmp, contextlib.redirect_stderr(io.StringIO()):
             root = Path(tmp)
-            with patch.object(locks.subprocess, 'run') as run:
+            help_ok = SimpleNamespace(returncode=0, stdout='ergo-es verify-lock', stderr='')
+            with patch.object(locks.subprocess, 'run', return_value=help_ok) as run:
                 self.assertEqual(locks.verify(str(root / '*.lock.json')), 1)
                 lock = root / 'contract.lock.json'; lock.write_text('{}')
                 self.assertEqual(locks.verify(str(lock)), 1)
                 (root / 'contract.es').write_text('sigmaProp(true)')
                 (root / 'contract.test.json').write_text('{"network":"moon"}')
                 self.assertEqual(locks.verify(str(lock)), 1)
-                run.assert_not_called()
+                for call in run.call_args_list:
+                    self.assertEqual(call.args[0], ['ergo-es', '--help'])
 
     def test_action_keeps_latest_release_semantics(self):
         action = (ROOT / '.github/actions/test/action.yml').read_text()

@@ -8,7 +8,24 @@ import subprocess
 import sys
 
 
+def supports_verify_lock():
+    """The installed ergo-es must know `verify-lock`; releases before it do not."""
+    try:
+        probe = subprocess.run(['ergo-es', '--help'], check=False, capture_output=True, text=True)
+    except OSError as error:
+        print(f'ergo-es is not runnable: {error}', file=sys.stderr)
+        return False
+    if 'verify-lock' in (probe.stdout or '') + (probe.stderr or ''):
+        return True
+    print('The installed ergo-es predates `verify-lock`, so `lockfile` cannot be verified. '
+          'Use `version: source`, or a release whose ergo-es lists verify-lock in `ergo-es --help`.',
+          file=sys.stderr)
+    return False
+
+
 def verify(patterns):
+    if not supports_verify_lock():
+        return 1
     paths = set()
     failed = False
     for pattern in shlex.split(patterns):
