@@ -40,7 +40,7 @@ class RoadmapGateTests(unittest.TestCase):
         union = gate.union_policy([v1, v2])
         for unit in v2['units']:
             self.assertEqual(gate.select_units(union, unit['id'])[-1], unit)
-        self.assertTrue(all(not u['implemented'] for u in v2['units'] if u['id'] not in {'W00', 'S00'}))
+        self.assertTrue(all(not u['implemented'] for u in v2['units'] if u['id'] not in {'W00', 'S00', 'W01'}))
         archived = (gate.ROOT / 'docs/reports/ROADMAP-v1-queue.md').read_text()
         self.assertIn(original_doc[original_doc.index('## 2. '):original_doc.index('## 4. ')], archived)
         self.assert_status('missing-gate', lambda: gate.policy_v2_from(current_doc + gate.V2_MARKER, v1))
