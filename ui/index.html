@@ -206,15 +206,19 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
     </div>
     </section>
 
+    <p id="share-status" class="status" role="status" hidden></p>
+    <div id="share-confirm" hidden></div>
+
     <section id="play" class="pane" hidden>
       <p class="hint">A sandbox chain in your browser: fund boxes under any contract, build transactions that spend them, and watch what the real rules do. Nothing leaves this page except the check; the boxes are saved in this browser.</p>
       <div class="play-bar">
-        <span>Height <strong id="play-height">1000</strong></span>
+        <span>Height <strong id="play-height">1000</strong> · <span id="play-network">mainnet</span></span>
         <button type="button" class="secondary tiny" data-advance="1">+1 block</button>
         <button type="button" class="secondary tiny" data-advance="720">+1 day</button>
         <button type="button" class="secondary tiny" data-advance="21600">+30 days</button>
         <button type="button" class="secondary tiny" id="play-fund-toggle">+ Fund a box</button>
         <button type="button" class="secondary tiny" id="play-reset">Reset chain</button>
+        <button type="button" class="secondary tiny" id="play-share">Copy Play share link</button>
       </div>
       <div id="play-fund" class="play-form" hidden>
         <h3>Fund a box</h3>
@@ -236,11 +240,12 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
           <button type="button" class="secondary tiny" id="tx-add-output">+ output</button>
           <button type="button" class="secondary tiny" id="tx-balance">balance ERG into the last output</button></div>
         <button type="button" id="tx-send">Send</button>
-        <p id="tx-status" class="status" hidden></p>
-        <div id="tx-result" hidden>
-          <table class="probes"><tbody id="tx-result-rows"></tbody></table>
-          <ul id="tx-problems" class="residuals"></ul>
-        </div>
+      </div>
+      <p id="tx-status" class="status" hidden></p>
+      <div id="tx-result" hidden>
+        <table class="probes"><tbody id="tx-result-rows"></tbody></table>
+        <ul id="tx-problems" class="residuals"></ul>
+        <div id="play-export"></div>
       </div>
       <details id="attack-panel"><summary>Attacker experiments (synthetic)</summary>
         <p class="hint">Mutate the drafted transaction the way a spender could — reorder inputs, insert a decoy box, swap a data input — and see which input scripts still accept. Synthetic; never node-validated.</p>
@@ -435,7 +440,8 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
     <p class="hint">Named scenarios with the verdict each must produce, run
        against the active contract (Read or Write). Save the whole thing as
        <code>contract.test.json</code> and run <code>ergo-es test</code> in CI.</p>
-    <label for="tests">Scenarios JSON — an array of <code>{ name, expect, ...scenario }</code></label>
+    <p class="hint">Synthetic sandbox results, not node-validated. A full suite document uses its own contract. Share links stay in the browser and are limited to 7 KiB (7168 bytes), including <code>#s=</code>.</p>
+    <label for="tests">Scenarios JSON — an array of <code>{ name, expect, ...scenario }</code>, or a full <code>contract.test.json</code> document</label>
     <textarea id="tests" rows="7" spellcheck="false">[
   { "name": "still locked at the unlock height", "expect": "fail", "height": 1000 },
   { "name": "unlocked one block after", "expect": "pass", "height": 1001 }
@@ -443,6 +449,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
     <div class="write-row">
       <button id="run-tests">Run tests</button>
       <button id="export-tests" class="secondary">Copy contract.test.json</button>
+      <button id="share-tests" class="secondary">Copy suite share link</button>
     </div>
     <p id="tests-status" class="status" hidden></p>
     <div id="tests-result" hidden>
@@ -529,6 +536,8 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
   <script src="attack.js"></script>
   <script src="checklist.js"></script>
   <script src="verify.js"></script>
+  <script src="play-export.js"></script>
+  <script src="share.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
