@@ -58,6 +58,7 @@ pub async fn inspect(
         rent: dto::rent_for(&bytes, None),
         plain: plain.paths,
         plain_complete: plain.complete,
+        negative_space: ergo_sandbox::negative_space::negative_space(&report),
         address: ergo_ser::address::encode_p2s(network, &bytes),
         tree_hex,
         source,

@@ -60,6 +60,7 @@ pub mod ingest;
 pub mod inspect;
 pub mod map;
 pub mod method_names;
+pub mod negative_space;
 pub mod play;
 pub mod properties;
 pub mod prove;

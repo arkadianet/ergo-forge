@@ -57,6 +57,8 @@ pub struct InspectResponse {
     /// clauses are quoted as code and `plainComplete` is false.
     pub plain: Vec<String>,
     pub plain_complete: bool,
+    /// Existing static lint observations, never additional absence analysis.
+    pub negative_space: Vec<ergo_sandbox::negative_space::Line>,
     pub tree_hex: String,
     pub address: String,
     pub source: String,
