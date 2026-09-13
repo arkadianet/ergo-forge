@@ -1,3 +1,4 @@
+pub mod attack;
 pub mod compile;
 pub mod compose;
 pub mod eval;

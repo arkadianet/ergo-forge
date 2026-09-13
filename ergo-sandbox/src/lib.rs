@@ -41,6 +41,7 @@
 //! assert!(outcome.cost > 0);
 //! ```
 
+pub mod attack;
 pub mod audit;
 pub mod avl;
 pub mod box_build;
