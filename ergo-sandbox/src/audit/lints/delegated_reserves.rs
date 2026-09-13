@@ -41,17 +41,17 @@ use crate::audit::{children, Finding, Severity};
 use crate::{Node, NodeKind};
 
 #[derive(Default)]
-struct Successor {
-    node_id: u64,
-    id_slots: BTreeSet<String>,
+pub(super) struct Successor {
+    pub(super) node_id: u64,
+    pub(super) id_slots: BTreeSet<String>,
 }
 
 #[derive(Default)]
-struct Evidence {
-    successors: BTreeMap<String, Successor>,
-    erg_bounds: HashSet<String>,
-    amounts: HashSet<(String, String)>,
-    token_collections: HashSet<String>,
+pub(super) struct Evidence {
+    pub(super) successors: BTreeMap<String, Successor>,
+    pub(super) erg_bounds: HashSet<String>,
+    pub(super) amounts: HashSet<(String, String)>,
+    pub(super) token_collections: HashSet<String>,
 }
 
 /// Report successors whose identity is preserved but whose reserves are
@@ -60,8 +60,7 @@ struct Evidence {
 pub fn delegated_reserves(root: &Node) -> Vec<Finding> {
     let mut vals = Vals::new();
     collect_vals(root, &mut vals);
-    let mut evidence = Evidence::default();
-    scan(root, &vals, &mut evidence);
+    let evidence = evidence(root, &vals);
 
     evidence
         .successors
@@ -100,6 +99,13 @@ pub fn delegated_reserves(root: &Node) -> Vec<Finding> {
             })
         })
         .collect()
+}
+
+/// Shared successor and reserve syntax for the field-drift lint. No path proof.
+pub(super) fn evidence(root: &Node, vals: &Vals) -> Evidence {
+    let mut evidence = Evidence::default();
+    scan(root, vals, &mut evidence);
+    evidence
 }
 
 /// A token collection, pair or id, preserving the index and projection so

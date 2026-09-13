@@ -1,0 +1,634 @@
+{
+  "schemaVersion": 1,
+  "method": "static-analysis",
+  "sweepSha256": "7b906e32fbf47229c96331a0fc7832e880c1438795cc92f535eb6f6d05ec9495",
+  "decisions": {
+    "unconstrained-outputs": {
+      "reviewPriority": "LOW",
+      "decision": "Ship as observation: ordinary fee/change, composable accounting and inverted branch guards cannot be distinguished from missing policy within scope."
+    },
+    "successor-field-drift": {
+      "reviewPriority": "LOW",
+      "decision": "Ship as observation: intentional state resets, delegated accounting, token delivery and singleton supply cannot be resolved within scope."
+    },
+    "trivial-sigma-branch": {
+      "reviewPriority": "LOW",
+      "decision": "Ship as observation: constant-true test/permissionless scripts are intentional; writable data remains limited to direct result disjuncts."
+    },
+    "unauthenticated-code-execution": {
+      "reviewPriority": "MED",
+      "decision": "Retain medium review priority: only the authored positive reports; no benign deployed site was observed, which is not a precision guarantee."
+    }
+  },
+  "sites": [
+    {
+      "contract": "basics/self-preserving.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 1,
+      "outcome": "benign",
+      "reason": "The teaching example retains SELF.value at output 0; other inputs can fund fee/change."
+    },
+    {
+      "contract": "chaincash-basis/chaincash/layer2-old/note.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 156,
+      "outcome": "benign",
+      "reason": "Note transfer/change and redemption have action-specific checks; the tail is outside this historical note template."
+    },
+    {
+      "contract": "chaincash-basis/chaincash/layer2-old/redemption.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 103,
+      "outcome": "benign",
+      "reason": "Dispute paths intentionally release collateral; preservation is checked only on continuing dispute paths."
+    },
+    {
+      "contract": "chaincash-basis/chaincash/layer2-old/redproducer.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 1,
+      "outcome": "benign",
+      "reason": "The producer retains its reserves and funds one redemption request; extra funding/change is outside that pair."
+    },
+    {
+      "contract": "chaincash-basis/chaincash/onchain/receipt.es",
+      "lint": "successor-field-drift",
+      "nodeId": 40,
+      "outcome": "benign",
+      "reason": "The receipt explicitly delegates new receipt fields to the co-spent reserve; R6/R7 change for re-redemption."
+    },
+    {
+      "contract": "chaincash-basis/chaincash/onchain/reserve.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 127,
+      "outcome": "benign",
+      "reason": "Redemption bounds and receipt/buyback checks are action-specific; the note recipient and funding tail vary."
+    },
+    {
+      "contract": "dexy/bank/arbmint.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 47,
+      "outcome": "benign",
+      "reason": "Bank and buyback deltas plus the action successor are checked; minted-token destinations and funding remain composable."
+    },
+    {
+      "contract": "dexy/bank/arbmint.es",
+      "lint": "successor-field-drift",
+      "nodeId": 166,
+      "outcome": "benign",
+      "reason": "R5 equals availableToMint minus minted tokens; availableToMint selects the old R5 or a reset quota through an if expression."
+    },
+    {
+      "contract": "dexy/bank/bank.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 1,
+      "outcome": "benign",
+      "reason": "The bank explicitly delegates emission and payout accounting to NFT-selected action inputs."
+    },
+    {
+      "contract": "dexy/bank/bank.es",
+      "lint": "successor-field-drift",
+      "nodeId": 20,
+      "outcome": "benign",
+      "reason": "The source explicitly delegates ERG/emission amount restrictions to NFT-selected action contracts."
+    },
+    {
+      "contract": "dexy/bank/buyback-patched.es",
+      "lint": "successor-field-drift",
+      "nodeId": 60,
+      "outcome": "benign",
+      "reason": "The reported slot is the declared buyback NFT, whose amount relies on issuance supply; the script patch does not establish supply."
+    },
+    {
+      "contract": "dexy/bank/buyback.es",
+      "lint": "successor-field-drift",
+      "nodeId": 59,
+      "outcome": "benign",
+      "reason": "The reported slot is the declared buyback NFT; id-only preservation leaves singleton supply outside static analysis."
+    },
+    {
+      "contract": "dexy/bank/freemint.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 6,
+      "outcome": "benign",
+      "reason": "Bank and buyback payments and the action successor are checked; mint recipients and funding can occupy other outputs."
+    },
+    {
+      "contract": "dexy/bank/freemint.es",
+      "lint": "successor-field-drift",
+      "nodeId": 116,
+      "outcome": "benign",
+      "reason": "R5 is recomputed from an if-selected reset quota or old R5; the arithmetic-only register recogniser stops at that if."
+    },
+    {
+      "contract": "dexy/bank/intervention.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 17,
+      "outcome": "benign",
+      "reason": "LP/bank deltas and intervention successor are constrained; update and funding outputs are action-specific."
+    },
+    {
+      "contract": "dexy/bank/payout.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 1,
+      "outcome": "benign",
+      "reason": "Bank payout is matched by buyback gain and a preserved action box; this is not a fixed-output-count policy."
+    },
+    {
+      "contract": "dexy/bank/payout.es",
+      "lint": "successor-field-drift",
+      "nodeId": 36,
+      "outcome": "benign",
+      "reason": "R4 intentionally records the new payment height using HEIGHT while the old R4 gates the payment delay."
+    },
+    {
+      "contract": "dexy/bank/update/update.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 6,
+      "outcome": "benign",
+      "reason": "Votes authorise a target upgrade while target reserves and update box are preserved; funding outputs remain open."
+    },
+    {
+      "contract": "dexy/hodlcoin/hodlcoin.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 1,
+      "outcome": "benign",
+      "reason": "Mint/burn reserve deltas and three treasury recipients are checked; the rest of a composed transaction is open."
+    },
+    {
+      "contract": "dexy/hodlcoin/hodlcoin.es",
+      "lint": "successor-field-drift",
+      "nodeId": 88,
+      "outcome": "benign",
+      "reason": "Slot 1 is documented as the bank NFT; token amount is left to singleton issuance rather than a local amount comparison."
+    },
+    {
+      "contract": "dexy/lp/pool/extract.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 17,
+      "outcome": "benign",
+      "reason": "LP/extraction reserve deltas are coupled; separate funding and upgrade paths do not fix the output count."
+    },
+    {
+      "contract": "dexy/lp/pool/extract.es",
+      "lint": "successor-field-drift",
+      "nodeId": 85,
+      "outcome": "benign",
+      "reason": "The reported slot 0 is the extraction NFT; Dexy amounts are compared separately, while singleton supply is not visible."
+    },
+    {
+      "contract": "dexy/lp/pool/main.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 1,
+      "outcome": "benign",
+      "reason": "The pool explicitly delegates action accounting to NFT-selected swap/mint/redeem/intervention inputs."
+    },
+    {
+      "contract": "dexy/lp/pool/main.es",
+      "lint": "successor-field-drift",
+      "nodeId": 31,
+      "outcome": "benign",
+      "reason": "The pool delegates ERG and Dexy accounting to its NFT-selected action contracts; local identity alone is not a reserve proof."
+    },
+    {
+      "contract": "dexy/lp/pool/mint.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 10,
+      "outcome": "benign",
+      "reason": "LP issuance is compared with reserve additions and the action box continues; depositor outputs remain open."
+    },
+    {
+      "contract": "dexy/lp/pool/redeem.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 10,
+      "outcome": "benign",
+      "reason": "Redemption deltas and oracle bounds are checked; the redeemer and funding outputs are outside the action successor."
+    },
+    {
+      "contract": "dexy/lp/pool/swap.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 6,
+      "outcome": "benign",
+      "reason": "Swap reserve arithmetic and action-box preservation leave trader and fee/change destinations to the transaction."
+    },
+    {
+      "contract": "dexy/lp/proxy/Deposit.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 21,
+      "outcome": "benign",
+      "reason": "LP reward/change and a miner-script subtotal cap exist; that subtotal does not constrain every output."
+    },
+    {
+      "contract": "dexy/lp/proxy/Redeem.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 21,
+      "outcome": "benign",
+      "reason": "Return amounts/recipient and miner-script subtotal are checked; remaining outputs are deliberately composable."
+    },
+    {
+      "contract": "dexy/lp/proxy/SwapBuyV1.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 24,
+      "outcome": "true-positive",
+      "reason": "Only the positional reward delta/price is compared; no total-output or tail guard is present in this source."
+    },
+    {
+      "contract": "dexy/lp/proxy/SwapBuyV2.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 21,
+      "outcome": "benign",
+      "reason": "Recipient, quote and miner-script subtotal checks exist; the subtotal is narrower than total-output accounting."
+    },
+    {
+      "contract": "dexy/lp/proxy/SwapSell.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 21,
+      "outcome": "benign",
+      "reason": "Recipient, quote and miner-script subtotal checks exist; the rest of the composed transaction remains open."
+    },
+    {
+      "contract": "dexy/lp/proxy/SwapSellV1.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 19,
+      "outcome": "true-positive",
+      "reason": "Only the positional reward price/fee expressions are checked; no total-output or tail guard is present in this source."
+    },
+    {
+      "contract": "dexy/tracking.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 1,
+      "outcome": "benign",
+      "reason": "The tracker preserves its value/tokens while updating alarm state; external funding covers fee/change."
+    },
+    {
+      "contract": "dexy/tracking.es",
+      "lint": "successor-field-drift",
+      "nodeId": 53,
+      "outcome": "benign",
+      "reason": "R7 intentionally changes between a HEIGHT window and the infinity sentinel when the alarm triggers or resets."
+    },
+    {
+      "contract": "hodlcoin/phoenix/phoenix_v1_hodlcoin_bank.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 8,
+      "outcome": "benign",
+      "reason": "Mint/burn reserve deltas and the developer-fee output are checked; user redemption outputs are open."
+    },
+    {
+      "contract": "hodlcoin/phoenix/phoenix_v1_hodltoken_bank.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 8,
+      "outcome": "benign",
+      "reason": "ERG is preserved, token reserve deltas and developer fee are checked; recipient/funding outputs vary."
+    },
+    {
+      "contract": "hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_bank.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 8,
+      "outcome": "benign",
+      "reason": "This variant also checks mint/burn reserve deltas and developer fee, leaving user redemption outputs open."
+    },
+    {
+      "contract": "hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodltoken_bank.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 8,
+      "outcome": "benign",
+      "reason": "This variant preserves ERG and checks token reserve/fee deltas; it has no fixed recipient/output count policy."
+    },
+    {
+      "contract": "lsp/test_simple.es",
+      "lint": "trivial-sigma-branch",
+      "nodeId": 0,
+      "outcome": "benign",
+      "reason": "The bundled LSP smoke-test contract is intentionally sigmaProp(true), not an authorisation policy."
+    },
+    {
+      "contract": "protocols/amm/pool.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 11,
+      "outcome": "benign",
+      "reason": "Swap/deposit/redeem arithmetic governs pool reserves; traders need other outputs for receipts and change."
+    },
+    {
+      "contract": "protocols/amm/swap-order.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 36,
+      "outcome": "benign",
+      "reason": "The order pins its minimum token payment and recipient, permitting a trader refund and unrelated transaction outputs."
+    },
+    {
+      "contract": "protocols/bank/bank.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 19,
+      "outcome": "benign",
+      "reason": "Mint/redeem accounting and circulation registers govern the successor; user receipts and fee/change remain open."
+    },
+    {
+      "contract": "protocols/mixer/half-mix.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 13,
+      "outcome": "benign",
+      "reason": "The non-owner path is inside the else of OUTPUTS.size != 2; this absence lint does not infer the inverted branch guard."
+    },
+    {
+      "contract": "protocols/registry/registry.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 22,
+      "outcome": "benign",
+      "reason": "The AVL insertion and registrar payment are checked; additional funding/change outputs are not a registry invariant."
+    },
+    {
+      "contract": "protocols/registry/registry.es",
+      "lint": "successor-field-drift",
+      "nodeId": 44,
+      "outcome": "benign",
+      "reason": "The successor AVL digest equals the result of a proved insertion into SELF.R4, beyond direct register arithmetic."
+    },
+    {
+      "contract": "recipes/auction.es",
+      "lint": "successor-field-drift",
+      "nodeId": 30,
+      "outcome": "benign",
+      "reason": "A new bid intentionally replaces R4 with the new bidder rather than preserving the previous bidder."
+    },
+    {
+      "contract": "recipes/auction.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 32,
+      "outcome": "benign",
+      "reason": "Bid refund or settlement payments are checked at their slots; bidder/funder change is outside the auction policy."
+    },
+    {
+      "contract": "recipes/auction.es",
+      "lint": "successor-field-drift",
+      "nodeId": 112,
+      "outcome": "benign",
+      "reason": "Whole-token equality identifies the settlement delivery as a successor; it is an item transfer, not a continuing auction state."
+    },
+    {
+      "contract": "recipes/cliff-vesting.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 5,
+      "outcome": "benign",
+      "reason": "The beneficiary authorises the vested release while the unvested remainder stays; withdrawal destinations are open."
+    },
+    {
+      "contract": "recipes/nft-sale.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 22,
+      "outcome": "benign",
+      "reason": "Seller/artist payments and token delivery are checked; the buyer chooses the receiving box and funding change."
+    },
+    {
+      "contract": "recipes/nft-sale.es",
+      "lint": "successor-field-drift",
+      "nodeId": 57,
+      "outcome": "benign",
+      "reason": "Whole-token delivery identifies the buyer output as a successor; sale completion does not preserve the sale box ERG there."
+    },
+    {
+      "contract": "recipes/savings-cap.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 2,
+      "outcome": "benign",
+      "reason": "An owner-authorised capped withdrawal preserves the remainder; a joint-key closure intentionally permits release."
+    },
+    {
+      "contract": "recipes/savings-cap.es",
+      "lint": "successor-field-drift",
+      "nodeId": 20,
+      "outcome": "benign",
+      "reason": "R4 intentionally becomes HEIGHT for the new withdrawal period; the old height gates eligibility."
+    },
+    {
+      "contract": "recipes/subscription.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 2,
+      "outcome": "benign",
+      "reason": "Periodic payment and remaining-pot bounds exist; authorised final payment/cancellation need no fixed tail."
+    },
+    {
+      "contract": "recipes/subscription.es",
+      "lint": "successor-field-drift",
+      "nodeId": 41,
+      "outcome": "benign",
+      "reason": "R4 intentionally becomes HEIGHT on a periodic claim; old R4 is used only for the delay check."
+    },
+    {
+      "contract": "recipes/token-sale.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 28,
+      "outcome": "benign",
+      "reason": "Payment is tied to sold stock and the partial-sale successor; buyer receipts and change occupy other outputs."
+    },
+    {
+      "contract": "recipes/token-sale.es",
+      "lint": "successor-field-drift",
+      "nodeId": 81,
+      "outcome": "benign",
+      "reason": "Remaining stock is compared through an if expression in sold/paid accounting; the bounded reserve helper misses that relationship."
+    },
+    {
+      "contract": "recipes/vesting.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 5,
+      "outcome": "benign",
+      "reason": "The beneficiary authorises withdrawals and the unvested remainder is bounded; fee/change is left to the transaction."
+    },
+    {
+      "contract": "rosen-bridge/Collateral.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 1,
+      "outcome": "benign",
+      "reason": "Collateral/repository token deltas and watcher identity govern partial return or closure; other flow outputs vary."
+    },
+    {
+      "contract": "rosen-bridge/Collateral.es",
+      "lint": "successor-field-drift",
+      "nodeId": 69,
+      "outcome": "benign",
+      "reason": "Collateral token identity and repository accounting determine the flow; this local id-only slot check does not establish issuance supply."
+    },
+    {
+      "contract": "rosen-bridge/Commitment.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 16,
+      "outcome": "benign",
+      "reason": "Commitment aggregation/redemption uses filtered permit outputs and event accounting, beyond a fixed tail policy."
+    },
+    {
+      "contract": "rosen-bridge/Commitment.es",
+      "lint": "successor-field-drift",
+      "nodeId": 378,
+      "outcome": "benign",
+      "reason": "Token continuity can lead back to a permit with a different script; commitment R5/R6/R7 are deliberately not continued as commitment state."
+    },
+    {
+      "contract": "rosen-bridge/Emission.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 14,
+      "outcome": "benign",
+      "reason": "Swap token accounting or guard-signature update controls the flow; output count is not its invariant."
+    },
+    {
+      "contract": "rosen-bridge/EventTrigger.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 29,
+      "outcome": "benign",
+      "reason": "Filtered reward count, token amounts and WID digest are checked; the universal check covers rewards rather than every output."
+    },
+    {
+      "contract": "rosen-bridge/Fraud.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 18,
+      "outcome": "benign",
+      "reason": "The fraud flow matches repository RWT gain and requires cleanup/repository inputs; accounting is delegated across scripts."
+    },
+    {
+      "contract": "rosen-bridge/GuardSign.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 3,
+      "outcome": "benign",
+      "reason": "A SELF-rooted signature threshold authorises a guard update; arbitrary update transaction outputs are intentional."
+    },
+    {
+      "contract": "rosen-bridge/GuardSign.es",
+      "lint": "successor-field-drift",
+      "nodeId": 39,
+      "outcome": "benign",
+      "reason": "SELF-rooted guard signatures authorise replacing the guard set and thresholds; this is an intentional configuration update."
+    },
+    {
+      "contract": "rosen-bridge/Permit.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 1,
+      "outcome": "benign",
+      "reason": "Permit aggregation/return and commitment token accounting use specific recipients; they do not cap all transaction outputs."
+    },
+    {
+      "contract": "rosen-bridge/Permit.es",
+      "lint": "successor-field-drift",
+      "nodeId": 101,
+      "outcome": "benign",
+      "reason": "Returned permits aggregate token quantities across inputs, so their ERG value need not relate to this one SELF."
+    },
+    {
+      "contract": "rosen-bridge/Permit.es",
+      "lint": "successor-field-drift",
+      "nodeId": 152,
+      "outcome": "benign",
+      "reason": "Permit splitting preserves the permit token lineage while allowing ERG funding to be allocated across the transaction."
+    },
+    {
+      "contract": "rosen-bridge/Permit.es",
+      "lint": "successor-field-drift",
+      "nodeId": 162,
+      "outcome": "benign",
+      "reason": "Token-id continuity selects a newly created commitment, whose new script and state are deliberately different from a permit."
+    },
+    {
+      "contract": "rosen-bridge/RepoConfig.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 7,
+      "outcome": "benign",
+      "reason": "Guard-NFT-selected signatures authorise reconfiguration while preserving its token; funding/change is outside this policy."
+    },
+    {
+      "contract": "rosen-bridge/RepoConfig.es",
+      "lint": "successor-field-drift",
+      "nodeId": 27,
+      "outcome": "benign",
+      "reason": "Guard-authorised configuration replacement preserves the configuration token; it does not require the old ERG amount locally."
+    },
+    {
+      "contract": "rosen-bridge/RwtRepo.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 1,
+      "outcome": "benign",
+      "reason": "Repository, collateral and permit transitions constrain their own accounting; unrelated transaction outputs remain open."
+    },
+    {
+      "contract": "vectors/mutable-upgrade-digest/fixed.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 1,
+      "outcome": "true-positive",
+      "reason": "This authored upgrade fixture checks continuation or the upgrade digest, with no total-output/tail guard; safety of either path is not inferred."
+    },
+    {
+      "contract": "vectors/mutable-upgrade-digest/vulnerable.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 1,
+      "outcome": "true-positive",
+      "reason": "This authored upgrade fixture checks continuation or the upgrade digest, with no total-output/tail guard; safety of either path is not inferred."
+    },
+    {
+      "contract": "vectors/mutable-upgrade-digest/vulnerable.es",
+      "lint": "successor-field-drift",
+      "nodeId": 15,
+      "outcome": "true-positive",
+      "reason": "The authored continuation omits the R4 upgrade-digest relationship; its fixed counterpart supplies it."
+    },
+    {
+      "contract": "vectors/rounded-payment/fixed.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 13,
+      "outcome": "benign",
+      "reason": "This authored fixture isolates payment rounding; a payment bound does not declare a closed output tail."
+    },
+    {
+      "contract": "vectors/rounded-payment/vulnerable.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 11,
+      "outcome": "benign",
+      "reason": "This authored fixture isolates payment rounding; a payment bound does not declare a closed output tail."
+    },
+    {
+      "contract": "vectors/shared-payment-across-instances/fixed.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 1,
+      "outcome": "benign",
+      "reason": "This authored fixture isolates shared-payment composition; recipient payment is checked while funding/change outputs remain open."
+    },
+    {
+      "contract": "vectors/shared-payment-across-instances/vulnerable.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 1,
+      "outcome": "benign",
+      "reason": "This authored fixture isolates shared-payment composition; recipient payment is checked while funding/change outputs remain open."
+    },
+    {
+      "contract": "vectors/successor-register-drift/fixed.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 4,
+      "outcome": "benign",
+      "reason": "This authored fixture isolates register carry-forward and preserves successor reserves; external fee/change remains open."
+    },
+    {
+      "contract": "vectors/successor-register-drift/vulnerable.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 1,
+      "outcome": "benign",
+      "reason": "This authored fixture isolates register carry-forward and preserves successor reserves; external fee/change remains open."
+    },
+    {
+      "contract": "vectors/successor-register-drift/vulnerable.es",
+      "lint": "successor-field-drift",
+      "nodeId": 13,
+      "outcome": "true-positive",
+      "reason": "The authored successor omits the SELF-read R4 relationship while preserving script/value/tokens; the control restores it."
+    },
+    {
+      "contract": "vectors/unauthenticated-context-code/vulnerable.es",
+      "lint": "unauthenticated-code-execution",
+      "nodeId": 0,
+      "outcome": "true-positive",
+      "reason": "The authored executeFromVar(1) has no byte/digest authentication; its control pins those same variable bytes."
+    },
+    {
+      "contract": "vectors/zero-threshold/vulnerable.es",
+      "lint": "trivial-sigma-branch",
+      "nodeId": 0,
+      "outcome": "true-positive",
+      "reason": "The authored zero-threshold example retains atLeast(0, ...); its control requires a positive threshold."
+    }
+  ]
+}

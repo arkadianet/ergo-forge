@@ -1508,5 +1508,147 @@
    "type": "Coll[Byte]",
    "value": "ef461517a55b8bfcd30356f112928f3333b5b50faf472e8374081307a09110cf"
   }
- }
+ },
+ "staticLintPairs": {
+ "schemaVersion": 1,
+ "method": "static-analysis",
+ "note": "S02 authored syntax pairs; no execution, hunt caps, proven denominator or deployment claim. Versioned sources and mechanical diffs are checked by mutation_corpus.",
+ "pairs": [
+  {
+   "id": "S02-01-v1",
+   "version": 1,
+   "lint": "unconstrained-outputs",
+   "operator": "replace-expression",
+   "diff": {
+    "find": " && OUTPUTS.size == 1",
+    "replace": ""
+   },
+   "originalPath": "examples/mutants/s02/v1/output-tail-control.es",
+   "mutatedPath": "examples/mutants/s02/v1/output-tail-mutant.es",
+   "originalSource": "sigmaProp(OUTPUTS(0).value >= SELF.value / 2L && OUTPUTS.size == 1)\n",
+   "mutatedSource": "sigmaProp(OUTPUTS(0).value >= SELF.value / 2L)\n",
+   "params": {}
+  },
+  {
+   "id": "S02-02-v1",
+   "version": 1,
+   "lint": "successor-field-drift",
+   "operator": "replace-expression",
+   "diff": {
+    "find": "out.value >= SELF.value",
+    "replace": "out.value >= 0L"
+   },
+   "originalPath": "examples/mutants/s02/v1/value-floor-control.es",
+   "mutatedPath": "examples/mutants/s02/v1/value-floor-mutant.es",
+   "originalSource": "{ val out = OUTPUTS(0); sigmaProp(out.propositionBytes == SELF.propositionBytes && out.value >= SELF.value && out.tokens(1)._1 == SELF.tokens(1)._1 && out.tokens(1)._2 >= SELF.tokens(1)._2 && out.R4[Long].get == SELF.R4[Long].get) }\n",
+   "mutatedSource": "{ val out = OUTPUTS(0); sigmaProp(out.propositionBytes == SELF.propositionBytes && out.value >= 0L && out.tokens(1)._1 == SELF.tokens(1)._1 && out.tokens(1)._2 >= SELF.tokens(1)._2 && out.R4[Long].get == SELF.R4[Long].get) }\n",
+   "params": {}
+  },
+  {
+   "id": "S02-03-v1",
+   "version": 1,
+   "lint": "successor-field-drift",
+   "operator": "replace-expression",
+   "diff": {
+    "find": "out.tokens(1)._2 >= SELF.tokens(1)._2",
+    "replace": "SELF.tokens(1)._2 > 0L"
+   },
+   "originalPath": "examples/mutants/s02/v1/token-amount-control.es",
+   "mutatedPath": "examples/mutants/s02/v1/token-amount-mutant.es",
+   "originalSource": "{ val out = OUTPUTS(0); sigmaProp(out.propositionBytes == SELF.propositionBytes && out.value >= SELF.value && out.tokens(1)._1 == SELF.tokens(1)._1 && out.tokens(1)._2 >= SELF.tokens(1)._2 && out.R4[Long].get == SELF.R4[Long].get) }\n",
+   "mutatedSource": "{ val out = OUTPUTS(0); sigmaProp(out.propositionBytes == SELF.propositionBytes && out.value >= SELF.value && out.tokens(1)._1 == SELF.tokens(1)._1 && SELF.tokens(1)._2 > 0L && out.R4[Long].get == SELF.R4[Long].get) }\n",
+   "params": {}
+  },
+  {
+   "id": "S02-04-v1",
+   "version": 1,
+   "lint": "successor-field-drift",
+   "operator": "replace-expression",
+   "diff": {
+    "find": "out.R4[Long].get == SELF.R4[Long].get",
+    "replace": "SELF.R4[Long].get > 0L"
+   },
+   "originalPath": "examples/mutants/s02/v1/register-control.es",
+   "mutatedPath": "examples/mutants/s02/v1/register-mutant.es",
+   "originalSource": "{ val out = OUTPUTS(0); sigmaProp(out.propositionBytes == SELF.propositionBytes && out.value >= SELF.value && out.tokens(1)._1 == SELF.tokens(1)._1 && out.tokens(1)._2 >= SELF.tokens(1)._2 && out.R4[Long].get == SELF.R4[Long].get) }\n",
+   "mutatedSource": "{ val out = OUTPUTS(0); sigmaProp(out.propositionBytes == SELF.propositionBytes && out.value >= SELF.value && out.tokens(1)._1 == SELF.tokens(1)._1 && out.tokens(1)._2 >= SELF.tokens(1)._2 && SELF.R4[Long].get > 0L) }\n",
+   "params": {}
+  },
+  {
+   "id": "S02-05-v1",
+   "version": 1,
+   "lint": "trivial-sigma-branch",
+   "operator": "replace-expression",
+   "diff": {
+    "find": "|| false",
+    "replace": "|| true"
+   },
+   "originalPath": "examples/mutants/s02/v1/constant-branch-control.es",
+   "mutatedPath": "examples/mutants/s02/v1/constant-branch-mutant.es",
+   "originalSource": "sigmaProp(SELF.R4[Boolean].get || false)\n",
+   "mutatedSource": "sigmaProp(SELF.R4[Boolean].get || true)\n",
+   "params": {}
+  },
+  {
+   "id": "S02-06-v1",
+   "version": 1,
+   "lint": "trivial-sigma-branch",
+   "operator": "replace-expression",
+   "diff": {
+    "find": "SELF.R5[Boolean].get",
+    "replace": "getVar[Boolean](1).get"
+   },
+   "originalPath": "examples/mutants/s02/v1/writable-context-control.es",
+   "mutatedPath": "examples/mutants/s02/v1/writable-context-mutant.es",
+   "originalSource": "sigmaProp(SELF.R4[Boolean].get || SELF.R5[Boolean].get)\n",
+   "mutatedSource": "sigmaProp(SELF.R4[Boolean].get || getVar[Boolean](1).get)\n",
+   "params": {}
+  },
+  {
+   "id": "S02-07-v1",
+   "version": 1,
+   "lint": "trivial-sigma-branch",
+   "operator": "replace-expression",
+   "diff": {
+    "find": "SELF.R5[GroupElement].get",
+    "replace": "OUTPUTS(0).R5[GroupElement].get"
+   },
+   "originalPath": "examples/mutants/s02/v1/writable-key-control.es",
+   "mutatedPath": "examples/mutants/s02/v1/writable-key-mutant.es",
+   "originalSource": "SELF.R4[SigmaProp].get || proveDlog(SELF.R5[GroupElement].get)\n",
+   "mutatedSource": "SELF.R4[SigmaProp].get || proveDlog(OUTPUTS(0).R5[GroupElement].get)\n",
+   "params": {}
+  },
+  {
+   "id": "S02-08-v1",
+   "version": 1,
+   "lint": "unauthenticated-code-execution",
+   "operator": "replace-expression",
+   "diff": {
+    "find": "getVar[Coll[Byte]](1).get == fromBase16(\"92a304c801\") && ",
+    "replace": ""
+   },
+   "originalPath": "examples/mutants/s02/v1/execute-context-control.es",
+   "mutatedPath": "examples/mutants/s02/v1/execute-context-mutant.es",
+   "originalSource": "sigmaProp(getVar[Coll[Byte]](1).get == fromBase16(\"92a304c801\") && executeFromVar[Boolean](1))\n",
+   "mutatedSource": "sigmaProp(executeFromVar[Boolean](1))\n",
+   "params": {}
+  },
+  {
+   "id": "S02-09-v1",
+   "version": 1,
+   "lint": "unauthenticated-code-execution",
+   "operator": "replace-expression",
+   "diff": {
+    "find": "SELF.propositionBytes",
+    "replace": "getVar[Coll[Byte]](1).get"
+   },
+   "originalPath": "examples/mutants/s02/v1/substitute-template-control.es",
+   "mutatedPath": "examples/mutants/s02/v1/substitute-template-mutant.es",
+   "originalSource": "sigmaProp(substConstants(SELF.propositionBytes, Coll(0), Coll(HEIGHT)).size > 0)\n",
+   "mutatedSource": "sigmaProp(substConstants(getVar[Coll[Byte]](1).get, Coll(0), Coll(HEIGHT)).size > 0)\n",
+   "params": {}
+  }
+ ]
+}
 }
