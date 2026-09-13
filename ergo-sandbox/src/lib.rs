@@ -63,6 +63,7 @@ pub mod map;
 pub mod method_names;
 pub mod negative_space;
 pub mod play;
+pub mod play_export;
 pub mod properties;
 pub mod prove;
 pub mod recognize;

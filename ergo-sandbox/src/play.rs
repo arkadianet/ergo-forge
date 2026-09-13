@@ -95,8 +95,16 @@ fn find<'a>(
         .ok_or_else(|| SandboxError::Scenario(format!("{what} {id}: no such unspent box")))
 }
 
-/// Apply `req.tx` to `req.boxes` at `req.height`.
-pub fn apply(req: &PlayRequest) -> Result<PlayResult, SandboxError> {
+/// Prepared context shared with Play export. In particular, outputs already
+/// carry Play's deterministic IDs and default creation heights.
+pub(crate) struct PreparedPlay<'a> {
+    inputs: Vec<&'a ScenarioBox>,
+    data_inputs: Vec<&'a ScenarioBox>,
+    outputs: Vec<ScenarioBox>,
+    tx_id: [u8; 32],
+}
+
+pub(crate) fn prepare(req: &PlayRequest) -> Result<PreparedPlay<'_>, SandboxError> {
     if req.tx.inputs.is_empty() {
         return Err(SandboxError::Scenario(
             "a transaction needs at least one input".into(),
@@ -169,28 +177,51 @@ pub fn apply(req: &PlayRequest) -> Result<PlayResult, SandboxError> {
         o.box_id = Some(hex::encode(eb.id));
     }
 
-    // Every input's script, in the full context.
-    let mut results = Vec::with_capacity(inputs.len());
-    let mut all_ok = true;
-    let input_boxes_json: Vec<serde_json::Value> = inputs
-        .iter()
-        .map(|b| serde_json::to_value(b).unwrap_or_default())
-        .collect();
-    for (i, pin) in req.tx.inputs.iter().enumerate() {
-        let sc_json = serde_json::json!({
-            "tree": inputs[i].ergo_tree,
+    Ok(PreparedPlay {
+        inputs,
+        data_inputs,
+        outputs,
+        tx_id,
+    })
+}
+
+impl PreparedPlay<'_> {
+    pub(crate) fn scenario(
+        &self,
+        req: &PlayRequest,
+        index: usize,
+    ) -> Result<Scenario, SandboxError> {
+        let pin =
+            req.tx.inputs.get(index).ok_or_else(|| {
+                SandboxError::Scenario(format!("inputIndex {index} is out of range"))
+            })?;
+        serde_json::from_value(serde_json::json!({
+            "tree": self.inputs[index].ergo_tree,
             "height": req.height,
-            "selfIndex": i,
-            "inputs": input_boxes_json,
-            "outputs": outputs,
-            "dataInputs": data_inputs,
+            "selfIndex": index,
+            "inputs": self.inputs,
+            "outputs": self.outputs,
+            "dataInputs": self.data_inputs,
             "contextVars": pin.context_vars,
             "secrets": pin.secrets,
             "parties": pin.parties,
             "network": req.network,
-        });
-        let sc: Scenario = serde_json::from_value(sc_json)
-            .map_err(|e| SandboxError::Scenario(format!("input {i}: {e}")))?;
+        }))
+        .map_err(|e| SandboxError::Scenario(format!("input {index}: {e}")))
+    }
+}
+
+/// Apply `req.tx` to `req.boxes` at `req.height`.
+pub fn apply(req: &PlayRequest) -> Result<PlayResult, SandboxError> {
+    let prepared = prepare(req)?;
+    let inputs = &prepared.inputs;
+    let outputs = &prepared.outputs;
+    let tx_id = prepared.tx_id;
+    // Every input's script, in the full context.
+    let mut results = Vec::with_capacity(inputs.len());
+    let mut all_ok = true;
+    for (i, pin) in req.tx.inputs.iter().enumerate() {
+        let sc = prepared.scenario(req, i)?;
         let out = eval_scenario(&sc)?;
         let verdict = crate::testsuite::verdict_name(out.verdict);
         let ok = matches!(out.verdict, Verdict::Pass | Verdict::ProofAccepted);
@@ -221,12 +252,12 @@ pub fn apply(req: &PlayRequest) -> Result<PlayResult, SandboxError> {
     }
     let mut tin: BTreeMap<String, u128> = BTreeMap::new();
     let mut tout: BTreeMap<String, u128> = BTreeMap::new();
-    for b in &inputs {
+    for b in inputs {
         for t in &b.tokens {
             *tin.entry(t.id.to_lowercase()).or_default() += t.amount as u128;
         }
     }
-    for b in &outputs {
+    for b in outputs {
         for t in &b.tokens {
             *tout.entry(t.id.to_lowercase()).or_default() += t.amount as u128;
         }
@@ -251,7 +282,7 @@ pub fn apply(req: &PlayRequest) -> Result<PlayResult, SandboxError> {
         ok,
         tx_id: hex::encode(tx_id),
         inputs: results,
-        outputs,
+        outputs: prepared.outputs,
         problems,
         erg_in,
         erg_out,
