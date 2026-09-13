@@ -178,12 +178,17 @@ fn apply_op(req: &mut PlayRequest, op: &AttackOp) -> Result<(), SandboxError> {
 }
 
 /// The shape a decoy must have to satisfy a script's positional reads: which
-/// `tokens(i)` slots and which registers `R4..R9` it accesses, and whether it
-/// reads `.value`.
+/// `tokens(i)` slots and which registers `R4..R9` it accesses (with the type
+/// each is read at), and whether it reads `.value`.
 #[derive(Default, Debug)]
 struct SlotShape {
     max_token_index: Option<usize>,
-    registers: BTreeSet<u8>,
+    /// Register number → the element type it is read at, when the lift
+    /// recovered one (the typed `R{n}[T]` accessor or `getReg[T](i)`). `None`
+    /// for the v5 `R{n}` property form, whose wire shape carries no type. A
+    /// decoy must carry each register at its read type or the reducer errors
+    /// on the mismatch before positional identity matters.
+    registers: BTreeMap<u8, Option<String>>,
     reads_value: bool,
 }
 
@@ -229,22 +234,69 @@ fn walk_slot(n: &Node, vals: &Vals, want: &str, shape: &mut SlotShape) {
         }
     }
     match &d.kind {
-        // `<slot>.R<n>[T]` register read.
-        NodeKind::Method(obj, name, _) | NodeKind::GetRegDyn(obj, name, _) => {
+        // `R4[Coll[Byte]]` — the typed accessor ExtractRegisterAs lifts to
+        // (bare, or wrapped by `.get`/`.isDefined`). The element type is in
+        // the name; the decoy must carry the register at that type.
+        NodeKind::Prop(obj, name) => {
+            if let Some((r, tpe)) = typed_register(name) {
+                if is_slot(obj, vals, want) {
+                    note_register(shape, r, Some(tpe));
+                }
+            } else if name == "value" && is_slot(obj, vals, want) {
+                shape.reads_value = true;
+            }
+        }
+        // `R4` — the v5 property form; the wire carries no element type, so
+        // the placeholder falls back to the Long default.
+        NodeKind::Method(obj, name, _) => {
             if let Some(r) = name.strip_prefix('R').and_then(|s| s.parse::<u8>().ok()) {
-                if (4..=9).contains(&r) && is_slot(obj, vals, want) {
-                    shape.registers.insert(r);
+                if is_slot(obj, vals, want) {
+                    note_register(shape, r, None);
                 }
             }
         }
-        // `<slot>.value`.
-        NodeKind::Prop(obj, name) if name == "value" && is_slot(obj, vals, want) => {
-            shape.reads_value = true;
+        // `getReg[Long](i)` — the v6 dynamic form carries the element type on
+        // the wire and the register index as its argument.
+        NodeKind::GetRegDyn(obj, tpe, args) => {
+            if let Some(idx) = args.first().and_then(|a| literal_index(a, vals)) {
+                if let Ok(r) = u8::try_from(idx) {
+                    if is_slot(obj, vals, want) {
+                        note_register(shape, r, Some(tpe.clone()));
+                    }
+                }
+            }
         }
         _ => {}
     }
     for c in children(d) {
         walk_slot(c, vals, want, shape);
+    }
+}
+
+/// `R4[Coll[Byte]]` → (4, `Coll[Byte]`). The typed register accessor the
+/// compiler's ExtractRegisterAs lifts to.
+fn typed_register(name: &str) -> Option<(u8, String)> {
+    let rest = name.strip_prefix('R')?;
+    let (n, tpe) = rest.split_once('[')?;
+    let n = n.parse::<u8>().ok()?;
+    let tpe = tpe.strip_suffix(']')?;
+    Some((n, tpe.to_string()))
+}
+
+/// Record a register access, keeping the first recovered type for the slot.
+fn note_register(shape: &mut SlotShape, r: u8, tpe: Option<String>) {
+    if !(4..=9).contains(&r) {
+        return;
+    }
+    match shape.registers.get_mut(&r) {
+        Some(slot) => {
+            if slot.is_none() {
+                *slot = tpe;
+            }
+        }
+        None => {
+            shape.registers.insert(r, tpe);
+        }
     }
 }
 
@@ -265,14 +317,44 @@ fn junk_token_id(seed: &str, n: usize) -> String {
 }
 
 /// A type-plausible register value. The decoy's job is to let positional reads
-/// resolve without an `Option.get` throwing; the concrete value is a benign
-/// placeholder, not an assertion about the contract.
-fn placeholder_register() -> TypedValue {
+/// resolve without an `Option.get` throwing or a type mismatch erroring; the
+/// concrete value is a benign placeholder, not an assertion about the
+/// contract. Reads whose type the lift could not recover (the v5 `R{n}`
+/// property form) fall back to `Long`, as do type names the value parser does
+/// not know.
+fn placeholder_register(tpe: Option<&str>) -> TypedValue {
+    let (tpe, value) = match tpe {
+        None | Some("Long") => ("Long", serde_json::json!(0)),
+        Some("Int") => ("Int", serde_json::json!(0)),
+        Some("Byte") => ("Byte", serde_json::json!(0)),
+        Some("Short") => ("Short", serde_json::json!(0)),
+        Some("Boolean") => ("Boolean", serde_json::json!(false)),
+        Some("BigInt") => ("BigInt", serde_json::json!("0")),
+        Some("SigmaProp") => ("SigmaProp", serde_json::json!(true)),
+        // The curve generator, mirroring compose's `sample`: a decoy's point
+        // only needs to parse.
+        Some("GroupElement") => (
+            "GroupElement",
+            serde_json::json!("0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"),
+        ),
+        // A deterministic all-zero digest; the decoy's tree only needs to build.
+        Some("AvlTree") => (
+            "AvlTree",
+            serde_json::json!({"digest": AVL_DIGEST, "keyLength": 32}),
+        ),
+        // The empty collection is valid at every element type.
+        Some("Coll[Byte]") => ("Coll[Byte]", serde_json::json!("")),
+        Some(other) if other.starts_with("Coll[") => (other, serde_json::json!([])),
+        Some(_) => ("Long", serde_json::json!(0)),
+    };
     TypedValue {
-        r#type: "Long".to_string(),
-        value: serde_json::json!(0),
+        r#type: tpe.to_string(),
+        value,
     }
 }
+
+/// The digest of the placeholder `AvlTree` register value: 32 zero bytes.
+const AVL_DIGEST: &str = "0000000000000000000000000000000000000000000000000000000000000000";
 
 fn insert_decoy(
     req: &mut PlayRequest,
@@ -295,6 +377,20 @@ fn insert_decoy(
 
     let decoy = build_decoy(&shape, at_index);
     let decoy_id = decoy.box_id.clone().expect("decoy has an id");
+    // The decoy adds input value, and play::apply requires ERG to balance
+    // exactly: return it in a new output so the experiment's only delta is the
+    // mutation itself — otherwise `ERG not conserved` sets ok=false and
+    // shadows every reader verdict. (A real spender funds a decoy from change
+    // the same way; the decoy's junk tokens may simply burn.)
+    req.tx.outputs.push(ScenarioBox {
+        value: decoy.value,
+        ergo_tree: decoy.ergo_tree.clone(),
+        tokens: Vec::new(),
+        creation_height: 0,
+        registers: BTreeMap::new(),
+        box_id: None,
+        extension: BTreeMap::new(),
+    });
     req.boxes.push(decoy);
     req.tx.inputs.insert(
         at_index,
@@ -311,8 +407,9 @@ fn insert_decoy(
 /// Token slots a decoy always carries, even when the lift did not recognise a
 /// `tokens(i)` access — enough to cover the small indices scripts read.
 const DEFAULT_TOKEN_SLOTS: usize = 4;
-/// Registers a decoy always populates, so an unrecognised `R{n}.get` resolves.
-const DEFAULT_REGISTERS: [u8; 3] = [4, 5, 6];
+/// The highest register a decoy always populates, so an unrecognised `R{n}`
+/// read up to R6 resolves.
+const DEFAULT_MAX_REGISTER: u8 = 6;
 
 fn build_decoy(shape: &SlotShape, at_index: usize) -> ScenarioBox {
     let seed = format!("input-{at_index}");
@@ -328,11 +425,21 @@ fn build_decoy(shape: &SlotShape, at_index: usize) -> ScenarioBox {
             amount: 1,
         })
         .collect();
-    let mut reg_ids: BTreeSet<u8> = shape.registers.clone();
-    reg_ids.extend(DEFAULT_REGISTERS);
-    let registers: BTreeMap<String, TypedValue> = reg_ids
-        .iter()
-        .map(|r| (format!("R{r}"), placeholder_register()))
+    // Every register from R4 through the highest one the shape requires (at
+    // least R6): the EvalBox builder expects registers dense from R4, so a
+    // gap — R8 present, R7 missing — would fail the build before evaluation.
+    let max_reg = shape
+        .registers
+        .keys()
+        .copied()
+        .next_back()
+        .unwrap_or(DEFAULT_MAX_REGISTER)
+        .max(DEFAULT_MAX_REGISTER);
+    let registers: BTreeMap<String, TypedValue> = (4..=max_reg)
+        .map(|r| {
+            let tpe = shape.registers.get(&r).cloned().flatten();
+            (format!("R{r}"), placeholder_register(tpe.as_deref()))
+        })
         .collect();
     // A trivially satisfiable script so the decoy is spendable in the draft;
     // the point of the experiment is the *other* inputs' scripts.
@@ -368,7 +475,18 @@ fn swap_data_input(req: &mut PlayRequest, index: usize) -> Result<(), SandboxErr
     Ok(())
 }
 
+/// The widest token shift one experiment may request. Real positional
+/// confusions happen in the first few slots, and a box serialises at most 255
+/// tokens anyway; the cap keeps a hostile `by` from allocating this route into
+/// an out-of-memory kill.
+const MAX_TOKEN_SHIFT: usize = 255;
+
 fn shift_token_indices(req: &mut PlayRequest, input: usize, by: usize) -> Result<(), SandboxError> {
+    if by > MAX_TOKEN_SHIFT {
+        return Err(SandboxError::Scenario(format!(
+            "shiftTokenIndices: by {by} exceeds the experiment limit of {MAX_TOKEN_SHIFT}"
+        )));
+    }
     let id = req
         .tx
         .inputs

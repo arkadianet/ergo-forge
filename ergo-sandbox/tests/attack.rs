@@ -169,11 +169,98 @@ fn decoy_box_satisfies_every_positional_access() {
         reader.verdict, "pass",
         "decoy satisfied value, tokens(2) and R4"
     );
+    // The decoy's added input value comes back in an output: conservation
+    // holds, so the reader verdict is the only thing the experiment reports.
+    assert!(out.result.ok, "the decoy draft evaluates clean");
+    assert_eq!(
+        out.result.erg_in, out.result.erg_out,
+        "inserting a decoy keeps ERG conserved"
+    );
 
     // The decoy carries junk tokens (indices 0..=2) but no real NFT: its ids are
     // the deterministic decoy-domain hashes, not any contract's expected token.
     let decoy = out.result.outputs.first();
     let _ = decoy; // decoy is an input, asserted via the reader's clean pass above
+}
+
+#[test]
+fn decoy_carries_each_register_at_its_read_type() {
+    // Typed reads: the decoy must carry R4 at Coll[Byte] — a Long placeholder
+    // would error on the type mismatch before positional identity matters —
+    // and R8 must leave registers dense from R4, or the EvalBox builder
+    // refuses the decoy outright.
+    let source = "sigmaProp(INPUTS(0).R4[Coll[Byte]].get.size == 0 && \
+                  INPUTS(0).R8[Long].get >= 0L)";
+    let compiled =
+        ergo_sandbox::compile::compile_source(source, 3, NetworkPrefix::Mainnet).expect("compiles");
+
+    let anyone = "10010101d17300";
+    let req: AttackRequest = serde_json::from_value(json!({
+        "height": 1000,
+        "boxes": [
+            { "boxId": box_id(0), "value": 1000000, "ergoTree": hex::encode(&compiled.tree_bytes),
+              "tokens": [], "registers": {} },
+        ],
+        "tx": {
+            "inputs": [ { "boxId": box_id(0) } ],
+            "dataInputs": [],
+            "outputs": [ { "value": 1000000, "ergoTree": anyone } ],
+        },
+        "operations": [ { "op": "insertDecoy", "atIndex": 0, "targetInput": 0 } ],
+    }))
+    .unwrap();
+    let out = apply_attack(&req).unwrap();
+
+    let reader = out
+        .result
+        .inputs
+        .iter()
+        .find(|r| r.box_id == box_id(0))
+        .expect("reader input present");
+    assert_eq!(
+        reader.verdict, "pass",
+        "decoy carried R4 as Coll[Byte] and stayed dense through R8"
+    );
+    assert!(out.result.ok);
+}
+
+#[test]
+fn shift_token_indices_stays_within_the_experiment_limit() {
+    let anyone = "10010101d17300";
+    let draft = json!({
+        "height": 1000,
+        "boxes": [
+            { "boxId": box_id(0), "value": 1000000, "ergoTree": anyone,
+              "tokens": [], "registers": {} },
+        ],
+        "tx": {
+            "inputs": [ { "boxId": box_id(0) } ],
+            "dataInputs": [],
+            "outputs": [ { "value": 1000000, "ergoTree": anyone } ],
+        },
+    });
+
+    // Over the limit the operation is refused before any allocation runs —
+    // a hostile `by` cannot turn the route into an out-of-memory kill.
+    let over: AttackRequest = serde_json::from_value(json!({
+        "height": draft["height"], "boxes": draft["boxes"], "tx": draft["tx"],
+        "operations": [ { "op": "shiftTokenIndices", "input": 0, "by": 256 } ],
+    }))
+    .unwrap();
+    let err = apply_attack(&over).unwrap_err();
+    assert!(
+        err.to_string().contains("experiment limit"),
+        "over-limit `by` is refused: {err}"
+    );
+
+    // At the limit it still runs, and the shifted box evaluates clean.
+    let at: AttackRequest = serde_json::from_value(json!({
+        "height": draft["height"], "boxes": draft["boxes"], "tx": draft["tx"],
+        "operations": [ { "op": "shiftTokenIndices", "input": 0, "by": 255 } ],
+    }))
+    .unwrap();
+    let out = apply_attack(&at).unwrap();
+    assert!(out.result.ok, "a shift within the limit evaluates clean");
 }
 
 #[test]
