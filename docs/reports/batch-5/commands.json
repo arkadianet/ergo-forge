@@ -1,0 +1,240 @@
+{
+  "formatVersion": 1,
+  "baseRevision": "126567f",
+  "branch": "v2/batch-5",
+  "cargoTargetDir": "$CARGO_TARGET_DIR",
+  "commands": [
+    {
+      "command": "cargo fmt --all",
+      "exitStatus": "0",
+      "log": "logs/fmt-step1.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.49
+    },
+    {
+      "command": "cargo test -p ergo-web --test play_export",
+      "exitStatus": "0",
+      "log": "logs/export-http.log",
+      "exitCode": 0,
+      "elapsedSeconds": 11.0
+    },
+    {
+      "command": "git add ergo-sandbox/src/lib.rs ergo-sandbox/src/play.rs ergo-sandbox/src/play_export.rs ergo-web/src/app.rs ergo-web/src/routes/mod.rs ergo-web/src/routes/play_export.rs ergo-web/tests/play_export.rs",
+      "exitStatus": "128",
+      "log": "logs/git-add-step1.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "git commit -F docs/reports/batch-5/commit-1-message.txt",
+      "exitStatus": "128",
+      "log": "logs/git-commit-step1.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "cargo fmt --all",
+      "exitStatus": "0",
+      "log": "logs/fmt-step2.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.39
+    },
+    {
+      "command": "cargo test -p ergo-web --test share_links",
+      "exitStatus": "101",
+      "log": "logs/share-rust.log",
+      "exitCode": 101,
+      "elapsedSeconds": 0.49
+    },
+    {
+      "command": "cargo test -p ergo-web --test share_links",
+      "exitStatus": "0",
+      "log": "logs/share-rust-boundary.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.34
+    },
+    {
+      "command": "git add ui/share.js ergo-web/tests/share_links.rs",
+      "exitStatus": "128",
+      "log": "logs/git-add-step2.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "git commit -F docs/reports/batch-5/commit-2-message.txt",
+      "exitStatus": "128",
+      "log": "logs/git-commit-step2.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present",
+      "exitStatus": "0",
+      "log": "logs/workspace.log",
+      "exitCode": 0,
+      "elapsedSeconds": 945.76
+    },
+    {
+      "command": "node --test ui/tests/play-export.test.js ui/tests/share.test.js",
+      "exitStatus": "0",
+      "log": "logs/dom-new.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.3
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "exitStatus": "0",
+      "log": "logs/clippy.log",
+      "exitCode": 0,
+      "elapsedSeconds": 7.66
+    },
+    {
+      "command": "python3 scripts/test_roadmap_gate.py",
+      "exitStatus": "0",
+      "log": "logs/roadmap-tests.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.76
+    },
+    {
+      "command": "node --test ui/tests/attack.test.js ui/tests/checklist.test.js ui/tests/claim-labels.test.js ui/tests/evidence-replay.test.js ui/tests/play-export.test.js ui/tests/share.test.js ui/tests/verify.test.js",
+      "exitStatus": "0",
+      "log": "logs/dom-all.log",
+      "exitCode": 0,
+      "elapsedSeconds": 16.96
+    },
+    {
+      "command": "python3 scripts/test_lockfile_action.py",
+      "exitStatus": "0",
+      "log": "logs/lock-action-tests.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.07
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require W02 --report docs/reports/batch-5/W02.json",
+      "exitStatus": "0",
+      "log": "logs/gate-w02.log",
+      "exitCode": 0,
+      "elapsedSeconds": 51.56
+    },
+    {
+      "command": "cargo build -p ergo-sandbox -p ergo-web --bins",
+      "exitStatus": "0",
+      "log": "logs/build-cli-http.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.29
+    },
+    {
+      "command": "python3 docs/reports/batch-5/cli-roundtrip.py",
+      "exitStatus": "0",
+      "log": "logs/cli-roundtrip.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.12
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "exitStatus": "0",
+      "log": "logs/fmt-check.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.53
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require W03 --report docs/reports/batch-5/W03.json",
+      "exitStatus": "0",
+      "log": "logs/gate-w03.log",
+      "exitCode": 0,
+      "elapsedSeconds": 1.99
+    },
+    {
+      "command": "git add ui/app.js ui/index.html ui/play-export.js ui/tests/play-export.test.js ui/tests/share.test.js docs/play-sharing.md",
+      "exitStatus": "128",
+      "log": "logs/git-add-step3.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "git commit -F docs/reports/batch-5/commit-3-message.txt",
+      "exitStatus": "128",
+      "log": "logs/git-commit-step3.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "node --test ui/tests/share.test.js",
+      "exitStatus": "0",
+      "log": "logs/dom-share-final.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.31
+    },
+    {
+      "command": "node --test ui/tests/attack.test.js ui/tests/checklist.test.js ui/tests/claim-labels.test.js ui/tests/evidence-replay.test.js ui/tests/play-export.test.js ui/tests/share.test.js ui/tests/verify.test.js",
+      "exitStatus": "0",
+      "log": "logs/dom-all-final.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.5
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require W03 --report docs/reports/batch-5/W03.json",
+      "exitStatus": "0",
+      "log": "logs/gate-w03-final.log",
+      "exitCode": 0,
+      "elapsedSeconds": 1.94
+    },
+    {
+      "command": "git diff --check",
+      "exitStatus": "0",
+      "log": "logs/whitespace.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.02
+    },
+    {
+      "command": "python3 docs/reports/batch-5/check-integrity.py",
+      "exitStatus": "0",
+      "log": "logs/integrity.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.03
+    },
+    {
+      "command": "git diff --stat",
+      "exitStatus": "0",
+      "log": "logs/final-diff.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.02
+    },
+    {
+      "command": "git add docs/ROADMAP.md docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md scripts/roadmap_gate.py scripts/test_roadmap_gate.py docs/reports/batch-5",
+      "exitStatus": "128",
+      "log": "logs/git-add-step4.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "git add -f docs/reports/batch-5/logs",
+      "exitStatus": "128",
+      "log": "logs/git-add-logs.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "git commit -F docs/reports/batch-5/commit-4-message.txt",
+      "exitStatus": "128",
+      "log": "logs/git-commit-step4.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "python3 docs/reports/batch-5/check-integrity.py",
+      "exitStatus": "0",
+      "log": "logs/integrity-final.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.03
+    }
+  ],
+  "postSession": [
+    {
+      "command": "cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present",
+      "exitCode": 0,
+      "log": "docs/reports/batch-5/logs/workspace-post-session.log",
+      "note": "Post-session re-verification outside the implementation sandbox; the same log records the W02 and W03 gate runs (exit 0) that wrote the committed W02.json and W03.json."
+    }
+  ]
+}

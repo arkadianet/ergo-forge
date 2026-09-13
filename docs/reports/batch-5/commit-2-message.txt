@@ -1,0 +1,8 @@
+feat(share): add offline Play and suite fragment codecs with size limits
+
+Preserve legacy Write links and validate versioned Play and suite payloads.
+Cap fragments at 7 KiB and report actual and allowed bytes on encode and load.
+Exercise the production JavaScript codec from the named ergo-web gate tests.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

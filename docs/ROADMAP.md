@@ -919,7 +919,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
         "play_export_roundtrips_through_cli_test_runner",
         "exported_case_names_only_the_suite_contract"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "W03",
@@ -933,7 +933,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
         "share_link_roundtrips_play_state",
         "share_link_over_cap_is_refused_with_size"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "W04",

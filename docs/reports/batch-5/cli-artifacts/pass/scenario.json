@@ -1,0 +1,55 @@
+{
+  "contextVars": {
+    "0": {
+      "type": "Int",
+      "value": 5
+    }
+  },
+  "dataInputs": [
+    {
+      "boxId": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "creationHeight": 0,
+      "ergoTree": "10010101d17300",
+      "registers": {},
+      "tokens": [],
+      "value": 1
+    }
+  ],
+  "height": 200,
+  "inputs": [
+    {
+      "boxId": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "creationHeight": 0,
+      "ergoTree": "10010100d17300",
+      "registers": {},
+      "tokens": [],
+      "value": 3
+    },
+    {
+      "boxId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "creationHeight": 0,
+      "ergoTree": "10060402049003040a040005020400d1edededed93c5a7c5b2a473000093a3730193e4e30004730293c1b2db6501fe7303007304938cc7b2a573050001a3",
+      "registers": {},
+      "tokens": [],
+      "value": 7
+    }
+  ],
+  "method": "scenario-simulation",
+  "network": "testnet",
+  "nodeValidated": false,
+  "outputs": [
+    {
+      "boxId": "bab9f50a6edc30297a0201c7c5d1bd03013c98b39a1fbaec3c91b6233bc8bc8c",
+      "creationHeight": 200,
+      "ergoTree": "10010101d17300",
+      "registers": {},
+      "tokens": [],
+      "value": 10
+    }
+  ],
+  "provenance": "caller-supplied/default context and box material; proofs use a supplied/default message",
+  "selfIndex": 1,
+  "synthetic": true,
+  "tree": "10060402049003040a040005020400d1edededed93c5a7c5b2a473000093a3730193e4e30004730293c1b2db6501fe7303007304938cc7b2a573050001a3",
+  "treeVersion": 3
+}

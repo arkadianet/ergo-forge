@@ -331,7 +331,7 @@ function clearMarks() { for (const m of marks) m.clear(); marks = []; }
 let lastCompiled = null; // { treeHex } for the scenario panel
 const paramTypes = ["Int", "Long", "Coll[Byte]", "SigmaProp", "GroupElement", "Boolean", "Byte", "Short", "BigInt", "Coll[Long]", "String"];
 
-function setMode(mode) {
+function setMode(mode, options = {}) {
   ++contextGeneration;
   for (const m of ["build", "write", "read", "play"]) {
     const on = m === mode;
@@ -352,7 +352,7 @@ function setMode(mode) {
   document.body.classList.toggle("wide", mode === "write" || mode === "play");
   if (mode === "write") editor.refresh();
   for (const id of ["eval-result", "tests-result", "eval-status", "tests-status"]) $(id).hidden = true;
-  if (mode === "play") renderPlay();
+  if (mode === "play") renderPlay(options.inspectPlay !== false);
 }
 $("mode-play").addEventListener("click", () => setMode("play"));
 document.querySelector(".modes").addEventListener("keydown", e => {
@@ -1667,35 +1667,62 @@ Verify.invalidate($("verify-result"));
 
 // ── export: share link, SDK snippets ─────────────────────────────────────
 
-/// The editor state as a URL fragment: base64url of {source, params, network}.
-function encodeShare() {
-  const state = { s: editorValue(), p: collectParams(), n: $("write-network").value };
-  const bytes = new TextEncoder().encode(JSON.stringify(state));
-  let bin = ""; for (const b of bytes) bin += String.fromCharCode(b);
-  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+/// Codecs live in share.js; all link creation and parsing stays in the browser.
+function encodeShare(state = { s: editorValue(), p: collectParams(), n: $("write-network").value }) {
+  return Share.encodeShare(state);
 }
-function decodeShare(frag) {
-  const b64 = frag.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - frag.length % 4) % 4);
-  const bin = atob(b64);
-  const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
-  return JSON.parse(new TextDecoder().decode(bytes));
+function decodeShare(fragment) { return Share.decodeShare(fragment); }
+
+function replaceSharedPlay(st) {
+  play = { height: st.height, network: st.network, boxes: st.boxes, history: st.history || [],
+    words: {}, offline: true, synthetic: true, nodeValidated: false };
+  selectedBoxes.clear(); txOutputs = null;
+  $("tx-result").hidden = true; $("tx-status").hidden = true;
+  savePlay(); renderPlay(false);
+  $("share-status").textContent = "Replaced the browser chain with the shared synthetic chain. Not node-validated.";
 }
 
-/// Apply a shared state: source, params (form rebuilt from the scan), network.
+/// Shared chains wait for an explicit control; suites keep their own contract.
 async function loadShared(frag) {
-  let st;
-  try { st = decodeShare(frag); } catch (e) { return; }
-  if (typeof st.s !== "string") return;
-  setEditorValue(st.s);
-  if (st.n === "testnet" || st.n === "mainnet") $("write-network").value = st.n;
-  $("params-rows").textContent = "";
-  const needs = Object.entries(st.p || {}).map(([name, tv]) => ({ name, typeHint: tv.type, default: typeof tv.value === "object" ? JSON.stringify(tv.value) : String(tv.value) }));
-  renderParams(needs);
-  setMode("write");
+  const status = $("share-status");
+  $("share-confirm").replaceChildren(); $("share-confirm").hidden = true;
+  try {
+    const st = decodeShare(frag);
+    if (st.k === "play") {
+      setMode("play", { inspectPlay: false });
+      Share.confirmPlay(st, $("share-confirm"), replaceSharedPlay);
+      status.textContent = "Shared synthetic chain ready for review. Your saved chain has not changed.";
+    } else if (st.k === "suite") {
+      $("tests").value = JSON.stringify(st.suite, null, 2);
+      setMode("write"); showTab("tests");
+      status.textContent = "Shared synthetic suite loaded in Write’s Tests area. Run tests uses the contract in this document. Not node-validated.";
+    } else {
+      setEditorValue(st.s);
+      if (st.n === "testnet" || st.n === "mainnet") $("write-network").value = st.n;
+      $("params-rows").textContent = "";
+      const needs = Object.entries(st.p || {}).map(([name, tv]) => ({ name, typeHint: tv.type, default: typeof tv.value === "object" ? JSON.stringify(tv.value) : String(tv.value) }));
+      renderParams(needs);
+      setMode("write");
+      status.textContent = "Shared Write contract loaded.";
+    }
+  } catch (error) { status.textContent = `Share link refused: ${error.message}`; }
+  status.hidden = false;
 }
 
-async function copyText(text, okMessage) {
-  const status = $("build").hidden ? $("export-status") : $("build-status");
+function copyShare(state) {
+  const status = $("share-status");
+  try {
+    const fragment = encodeShare(state);
+    const url = `${location.origin}${location.pathname}#s=${fragment}`;
+    history.replaceState(null, "", `#s=${fragment}`);
+    status.textContent = `Share fragment: ${fragment.length + 3} / ${Share.FRAGMENT_CAP} bytes. Nothing is stored server-side.`;
+    copyText(url, "Share link copied. The document is carried entirely in the URL fragment.", status);
+  } catch (error) { status.textContent = `Share link refused: ${error.message}`; }
+  status.hidden = false;
+}
+
+async function copyText(text, okMessage, fallbackStatus) {
+  const status = fallbackStatus || ($("build").hidden ? $("export-status") : $("build-status"));
   try { await navigator.clipboard.writeText(text); toast(okMessage); }
   catch (e) { status.textContent = text; status.hidden = false; }
 }
@@ -1708,10 +1735,18 @@ function toast(msg) {
   clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2500);
 }
 
-$("share").addEventListener("click", () => {
-  const url = `${location.origin}${location.pathname}#s=${encodeShare()}`;
-  history.replaceState(null, "", `#s=${encodeShare()}`);
-  copyText(url, "Share link copied — it carries the source, parameters and network in the URL fragment (nothing is stored server-side).");
+$("share").addEventListener("click", () => copyShare());
+$("play-share").addEventListener("click", () => copyShare({
+  k: "play", v: 1, height: play.height, network: playNetwork(), boxes: play.boxes,
+  history: play.history, synthetic: true, nodeValidated: false,
+}));
+$("share-tests").addEventListener("click", () => {
+  const { suite, error } = currentSuite();
+  if (error) { $("share-status").textContent = error; $("share-status").hidden = false; return; }
+  copyShare({ k: "suite", v: 1, suite, synthetic: true, nodeValidated: false });
+});
+window.addEventListener("hashchange", () => {
+  if (location.hash.startsWith("#s=")) loadShared(location.hash.slice(3));
 });
 
 /// Fleet SDK: the compiled tree as an ErgoTree with the address, plus the
@@ -1808,7 +1843,10 @@ function currentSuite() {
   } catch (e) {
     return { error: `Scenarios JSON does not parse: ${e.message}` };
   }
-  if (!Array.isArray(scenarios)) return { error: "Scenarios must be a JSON array." };
+  if (!Array.isArray(scenarios)) {
+    try { return { suite: Share.validateSuite(scenarios) }; }
+    catch (error) { return { error: error.message }; }
+  }
   if (!$("read").hidden) {
     if (!lastRead) return { error: "Read a contract first, or switch to Write to test the editor’s source." };
     return { suite: { tree: lastRead.treeHex, network: lastRead.network, scenarios } };
@@ -2190,6 +2228,7 @@ const ergText = (nano) => (Number(nano) / 1e9).toFixed(9).replace(/\.?0+$/, "");
 /// Plain words for a tree, cached per tree.
 async function wordsFor(treeHex) {
   if (play.words[treeHex]) return play.words[treeHex];
+  if (play.offline) return { plain: [], address: "" };
   try {
     const res = await fetch("/api/v1/inspect", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ input: treeHex, network: playNetwork() }) });
     const body = await res.json();
@@ -2197,7 +2236,7 @@ async function wordsFor(treeHex) {
   } catch (e) { /* offline: no words */ }
   return { plain: [], address: "" };
 }
-function playNetwork() { return $("write-network") ? $("write-network").value : "mainnet"; }
+function playNetwork() { return play.network || ($("write-network") ? $("write-network").value : "mainnet"); }
 
 /// Resolve what the user typed as a contract into tree hex.
 async function resolveContract(text) {
@@ -2241,7 +2280,7 @@ async function fundBox(treeHex, nano, tokens, registers, note) {
 
 $("play-fund-toggle").addEventListener("click", () => { $("play-fund").hidden = !$("play-fund").hidden; });
 function playStartHeight() { try { return chainHeight != null ? heightNow() : 1000; } catch (e) { return 1000; } }
-function resetPlay() { play = { height: playStartHeight(), boxes: [], history: [], words: {} }; selectedBoxes.clear(); txOutputs = null; $("tx-result").hidden = true; $("tx-status").hidden = true; savePlay(); renderPlay(); }
+function resetPlay() { play = { height: playStartHeight(), network: playNetwork(), boxes: [], history: [], words: {} }; selectedBoxes.clear(); txOutputs = null; $("tx-result").hidden = true; $("tx-status").hidden = true; savePlay(); renderPlay(); }
 $("play-reset").addEventListener("click", resetPlay);
 for (const b of document.querySelectorAll("[data-advance]")) b.addEventListener("click", () => { play.height += Number(b.dataset.advance); savePlay(); renderPlay(); });
 $("fund-go").addEventListener("click", async () => {
@@ -2258,8 +2297,12 @@ $("fund-go").addEventListener("click", async () => {
   } catch (e) { st.textContent = e.message; st.hidden = false; }
 });
 
-async function renderPlay() {
+let playRenderGeneration = 0;
+async function renderPlay(inspect = true) {
+  const generation = ++playRenderGeneration;
+  const renderedState = play;
   $("play-height").textContent = String(play.height);
+  $("play-network").textContent = playNetwork();
   const list = $("play-boxes");
   list.textContent = "";
   const unspent = play.boxes.filter((b) => !b.spent);
@@ -2267,7 +2310,8 @@ async function renderPlay() {
   for (const b of play.boxes) {
     const card = document.createElement("div");
     card.className = "play-box" + (b.spent ? " spent" : "") + (selectedBoxes.has(b.boxId) ? " selected" : "");
-    const w = await wordsFor(b.ergoTree);
+    const w = inspect ? await wordsFor(b.ergoTree) : { plain: [], address: "" };
+    if (generation !== playRenderGeneration || play !== renderedState) return;
     const toks = (b.tokens || []).map((t) => `${t.amount} × ${t.id.slice(0, 8)}…`).join(", ");
     const regs = Object.entries(b.registers || {}).map(([k, v]) => `${k}=${typeof v.value === "object" ? JSON.stringify(v.value) : v.value}`).join(" ");
     card.innerHTML = `<div class="amount">${ergOf(b.value)}${toks ? ` <span class="meta">+ ${toks}</span>` : ""}</div>
@@ -2363,11 +2407,14 @@ $("tx-send").addEventListener("click", async () => {
       outputs.push({ value: nanoOf(o.erg), ergoTree: tree, tokens: parseTokens(o.tokens, ins[0].boxId), registers: regs });
     }
     const dataInputs = [...document.querySelectorAll(".tx-di:checked")].map((c) => c.value);
-    st.textContent = "Checking with the real rules…"; st.hidden = false; res.hidden = true;
-    const r = await fetch("/api/v1/play", { method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ height: play.height, network: playNetwork(), boxes: play.boxes.filter((b) => !b.spent).map(({ spent, note, ...b }) => b), tx: { inputs: ins, dataInputs, outputs } }) });
+    st.textContent = "Running the synthetic transaction…"; st.hidden = false; res.hidden = true;
+    const request = JSON.parse(JSON.stringify({ height: play.height, network: playNetwork(), boxes: play.boxes.filter((b) => !b.spent).map(({ spent, note, ...b }) => b), tx: { inputs: ins, dataInputs, outputs } }));
+    const chainAtStart = play;
+    const r = await fetch("/api/v1/play", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(request) });
     const body = await r.json();
     if (!r.ok) throw new Error((body.error && body.error.message) || r.status);
+    if (play !== chainAtStart) return;
+    PlayExport.render(request, body, $("play-export"));
     const rows = $("tx-result-rows"); rows.textContent = "";
     for (const i of body.inputs) {
       const tr = document.createElement("tr"); tr.dataset.verdict = (i.verdict === "pass" || i.verdict === "proofAccepted") ? "ok" : "fail";
@@ -2384,7 +2431,7 @@ $("tx-send").addEventListener("click", async () => {
       for (const o of body.outputs) play.boxes.push({ ...o, spent: false });
       play.history.push(`height ${play.height}: spent ${ins.map((i) => i.boxId.slice(0, 8) + "…").join(", ")} → ${body.outputs.length} output(s), tx ${body.txId.slice(0, 8)}…`);
       selectedBoxes.clear(); txOutputs = null; savePlay();
-      st.textContent = "Accepted. The new boxes are below."; st.hidden = false;
+      st.textContent = "Synthetic transaction accepted. The new boxes are below."; st.hidden = false;
       await renderPlay();
       res.hidden = false;
     } else {

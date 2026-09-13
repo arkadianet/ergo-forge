@@ -303,6 +303,10 @@ def command(args, records, root=ROOT):
 
 
 def extras(unit):
+    if unit == 'W02':
+        return [('node', ['node', '--test', 'ui/tests/play-export.test.js'])]
+    if unit == 'W03':
+        return [('node', ['node', '--test', 'ui/tests/share.test.js'])]
     if unit == 'P00':
         return [('python', [sys.executable, '-m', 'unittest', 'discover', '-s', 'scripts', '-p', 'test_roadmap_gate.py']), ('node', ['node', '--test', 'ui/tests/claim-labels.test.js'])]
     if unit == 'P08':

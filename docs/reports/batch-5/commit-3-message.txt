@@ -1,0 +1,9 @@
+feat(ui): save Play results and share chains and suites with confirmation
+
+Download tests and scenarios from immutable Play request snapshots. Keep result
+controls visible after a successful spend. Load full suites in the Tests area
+and require explicit confirmation before replacing a saved Play chain. Render
+shared chains offline and preserve legacy Write links. Add DOM coverage.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

@@ -105,6 +105,10 @@ pub fn router_with(cfg: AppConfig) -> Router {
         .route("/api/v1/point", post(crate::routes::point::point))
         .route("/api/v1/play", post(crate::routes::play::play))
         .route(
+            "/api/v1/play/export",
+            post(crate::routes::play_export::export_route),
+        )
+        .route(
             "/api/v1/compile",
             post(crate::routes::compile::compile_route),
         )

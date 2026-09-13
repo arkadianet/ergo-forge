@@ -11,6 +11,7 @@ pub mod lock;
 pub mod lookup;
 pub mod map;
 pub mod play;
+pub mod play_export;
 pub mod point;
 pub mod replay;
 pub mod test;
