@@ -1,0 +1,129 @@
+[
+  {
+    "command": [
+      "$CARGO_TARGET_DIR/debug/ergo-es",
+      "test",
+      "docs/reports/batch-5/cli-artifacts/pass/contract.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "originalPlayVerdict": "pass",
+    "exportedVerdict": "pass",
+    "cliVerdict": "pass"
+  },
+  {
+    "command": [
+      "$CARGO_TARGET_DIR/debug/ergo-es",
+      "eval",
+      "docs/reports/batch-5/cli-artifacts/pass/scenario.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "originalPlayVerdict": "pass",
+    "exportedVerdict": "pass",
+    "cliVerdict": "pass"
+  },
+  {
+    "command": [
+      "$CARGO_TARGET_DIR/debug/ergo-es",
+      "test",
+      "docs/reports/batch-5/cli-artifacts/fail/contract.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "originalPlayVerdict": "fail",
+    "exportedVerdict": "fail",
+    "cliVerdict": "fail"
+  },
+  {
+    "command": [
+      "$CARGO_TARGET_DIR/debug/ergo-es",
+      "eval",
+      "docs/reports/batch-5/cli-artifacts/fail/scenario.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "originalPlayVerdict": "fail",
+    "exportedVerdict": "fail",
+    "cliVerdict": "fail"
+  },
+  {
+    "command": [
+      "$CARGO_TARGET_DIR/debug/ergo-es",
+      "test",
+      "docs/reports/batch-5/cli-artifacts/error/contract.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "originalPlayVerdict": "error",
+    "exportedVerdict": "error",
+    "cliVerdict": "error"
+  },
+  {
+    "command": [
+      "$CARGO_TARGET_DIR/debug/ergo-es",
+      "eval",
+      "docs/reports/batch-5/cli-artifacts/error/scenario.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "originalPlayVerdict": "error",
+    "exportedVerdict": "error",
+    "cliVerdict": "error"
+  },
+  {
+    "command": [
+      "$CARGO_TARGET_DIR/debug/ergo-es",
+      "test",
+      "docs/reports/batch-5/cli-artifacts/needsProof/contract.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "originalPlayVerdict": "needsProof",
+    "exportedVerdict": "needsProof",
+    "cliVerdict": "needsProof"
+  },
+  {
+    "command": [
+      "$CARGO_TARGET_DIR/debug/ergo-es",
+      "eval",
+      "docs/reports/batch-5/cli-artifacts/needsProof/scenario.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "originalPlayVerdict": "needsProof",
+    "exportedVerdict": "needsProof",
+    "cliVerdict": "needsProof"
+  },
+  {
+    "command": [
+      "$CARGO_TARGET_DIR/debug/ergo-es",
+      "test",
+      "docs/reports/batch-5/cli-artifacts/signed/contract.test.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "originalPlayVerdict": "proofAccepted",
+    "exportedVerdict": "needsProof",
+    "cliVerdict": "needsProof"
+  },
+  {
+    "command": [
+      "$CARGO_TARGET_DIR/debug/ergo-es",
+      "eval",
+      "docs/reports/batch-5/cli-artifacts/signed/scenario.json",
+      "--json"
+    ],
+    "exitCode": 0,
+    "originalPlayVerdict": "proofAccepted",
+    "exportedVerdict": "needsProof",
+    "cliVerdict": "needsProof"
+  },
+  {
+    "command": [
+      "$CARGO_TARGET_DIR/debug/ergo-web"
+    ],
+    "exitCode": 0,
+    "detail": "fixture server; graceful SIGTERM after HTTP checks"
+  }
+]

@@ -1,0 +1,9 @@
+feat(play): export one synthetic input evaluation as a suite or scenario
+
+Reuse Play context construction and preserve ordered boxes, generated output
+IDs, height and extensions. Omit signing material and name unsigned expectations.
+Expose POST /api/v1/play/export under the existing engine and body limits.
+Verify HTTP exports with the unchanged suite and scenario runners.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

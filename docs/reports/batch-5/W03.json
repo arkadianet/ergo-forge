@@ -1,0 +1,138 @@
+{
+  "formatVersion": 1,
+  "results": [
+    {
+      "unit": "scoreboard",
+      "status": "passed"
+    },
+    {
+      "unit": "W00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "W01",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "W03",
+      "status": "passed",
+      "detail": "required tests executed"
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import sys, unittest\ndef names(suite):\n    for test in suite:\n        if isinstance(test, unittest.TestSuite):\n            yield from names(test)\n        else:\n            yield test.id().rsplit('.', 1)[-1].removeprefix('test_')\nloader = unittest.TestLoader()\nsuite = loader.discover('scripts', pattern=sys.argv[1] + '.py')\nif loader.errors:\n    sys.exit('\\n'.join(loader.errors))\nfor name in names(suite):\n    print(name + ': test')\n",
+        "test_roadmap_gate"
+      ],
+      "exitCode": 0,
+      "output": "ci_accepts_only_validated_recorded_stops_not_completion: test\nci_rejects_corrupt_stop_evidence: test\nci_rejects_failed_missing_and_blocked_units: test\nci_reports_future_units_as_not_started_without_running_them: test\ncommand_normalizes_before_printing_recording_and_hashing: test\nabsolute_cargo_target_is_normalized_before_report_hashing: test\ndependencies_are_in_policy_order: test\nextra_commands_cannot_be_omitted: test\nfuture_units_fail_as_unimplemented_not_missing_gate: test\ni01_extras_require_the_verify_dom_test: test\nincomplete_stop_record_is_rejected: test\nmalformed_inputs_still_write_a_failing_report: test\nmissing_evidence_is_distinct_from_product_failure: test\nmissing_scoreboard_is_rejected: test\npolicy_requires_unique_block_and_known_completion: test\npolicy_v2_block_parses: test\npython_targets_require_discovered_executed_unskipped_names: test\nrequired_names_must_be_discovered_and_executed: test\nresolution_requires_exact_policy_record_and_decision: test\nrunner_captures_diagnostics_without_weakening_execution_checks: test\ns01_extras_require_the_checklist_dom_test: test\nscoreboard_cannot_self_attest_changed_measurements: test\nscoreboard_reads_every_baseline_artifact: test\nskipped_tests_are_rejected: test\nstatic_lint_namespace_does_not_relax_frozen_hunt_measurements: test\nthresholds_are_read_from_policy: test\nunknown_unit_is_rejected: test\nw02_and_w03_extras_require_their_dom_tests: test\nzero_test_filter_is_rejected: test\n",
+      "outputSha256": "d6bb7976dcfee76b34ff2a95af8c7ad3f3a729bf0e92b9bc06e6d3fb2fba0c93"
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-b",
+        "-v",
+        "-s",
+        "scripts",
+        "-p",
+        "test_roadmap_gate.py"
+      ],
+      "exitCode": 0,
+      "output": "test_ci_accepts_only_validated_recorded_stops_not_completion (test_roadmap_gate.CiGovernanceTests.test_ci_accepts_only_validated_recorded_stops_not_completion) ... ok\ntest_ci_rejects_corrupt_stop_evidence (test_roadmap_gate.CiGovernanceTests.test_ci_rejects_corrupt_stop_evidence) ... ok\ntest_ci_rejects_failed_missing_and_blocked_units (test_roadmap_gate.CiGovernanceTests.test_ci_rejects_failed_missing_and_blocked_units) ... ok\ntest_ci_reports_future_units_as_not_started_without_running_them (test_roadmap_gate.CiGovernanceTests.test_ci_reports_future_units_as_not_started_without_running_them) ... ok\ntest_command_normalizes_before_printing_recording_and_hashing (test_roadmap_gate.CiGovernanceTests.test_command_normalizes_before_printing_recording_and_hashing) ... ok\ntest_absolute_cargo_target_is_normalized_before_report_hashing (test_roadmap_gate.RoadmapGateTests.test_absolute_cargo_target_is_normalized_before_report_hashing) ... ok\ntest_dependencies_are_in_policy_order (test_roadmap_gate.RoadmapGateTests.test_dependencies_are_in_policy_order) ... ok\ntest_extra_commands_cannot_be_omitted (test_roadmap_gate.RoadmapGateTests.test_extra_commands_cannot_be_omitted) ... ok\ntest_future_units_fail_as_unimplemented_not_missing_gate (test_roadmap_gate.RoadmapGateTests.test_future_units_fail_as_unimplemented_not_missing_gate) ... ok\ntest_i01_extras_require_the_verify_dom_test (test_roadmap_gate.RoadmapGateTests.test_i01_extras_require_the_verify_dom_test) ... ok\ntest_incomplete_stop_record_is_rejected (test_roadmap_gate.RoadmapGateTests.test_incomplete_stop_record_is_rejected) ... ok\ntest_malformed_inputs_still_write_a_failing_report (test_roadmap_gate.RoadmapGateTests.test_malformed_inputs_still_write_a_failing_report) ... ok\ntest_missing_evidence_is_distinct_from_product_failure (test_roadmap_gate.RoadmapGateTests.test_missing_evidence_is_distinct_from_product_failure) ... ok\ntest_missing_scoreboard_is_rejected (test_roadmap_gate.RoadmapGateTests.test_missing_scoreboard_is_rejected) ... ok\ntest_policy_requires_unique_block_and_known_completion (test_roadmap_gate.RoadmapGateTests.test_policy_requires_unique_block_and_known_completion) ... ok\ntest_policy_v2_block_parses (test_roadmap_gate.RoadmapGateTests.test_policy_v2_block_parses) ... ok\ntest_python_targets_require_discovered_executed_unskipped_names (test_roadmap_gate.RoadmapGateTests.test_python_targets_require_discovered_executed_unskipped_names) ... ok\ntest_required_names_must_be_discovered_and_executed (test_roadmap_gate.RoadmapGateTests.test_required_names_must_be_discovered_and_executed) ... ok\ntest_resolution_requires_exact_policy_record_and_decision (test_roadmap_gate.RoadmapGateTests.test_resolution_requires_exact_policy_record_and_decision) ... ok\ntest_runner_captures_diagnostics_without_weakening_execution_checks (test_roadmap_gate.RoadmapGateTests.test_runner_captures_diagnostics_without_weakening_execution_checks) ... ok\ntest_s01_extras_require_the_checklist_dom_test (test_roadmap_gate.RoadmapGateTests.test_s01_extras_require_the_checklist_dom_test) ... ok\ntest_scoreboard_cannot_self_attest_changed_measurements (test_roadmap_gate.RoadmapGateTests.test_scoreboard_cannot_self_attest_changed_measurements) ... ok\ntest_scoreboard_reads_every_baseline_artifact (test_roadmap_gate.RoadmapGateTests.test_scoreboard_reads_every_baseline_artifact) ... ok\ntest_skipped_tests_are_rejected (test_roadmap_gate.RoadmapGateTests.test_skipped_tests_are_rejected) ... ok\ntest_static_lint_namespace_does_not_relax_frozen_hunt_measurements (test_roadmap_gate.RoadmapGateTests.test_static_lint_namespace_does_not_relax_frozen_hunt_measurements) ... ok\ntest_thresholds_are_read_from_policy (test_roadmap_gate.RoadmapGateTests.test_thresholds_are_read_from_policy) ... ok\ntest_unknown_unit_is_rejected (test_roadmap_gate.RoadmapGateTests.test_unknown_unit_is_rejected) ... ok\ntest_w02_and_w03_extras_require_their_dom_tests (test_roadmap_gate.RoadmapGateTests.test_w02_and_w03_extras_require_their_dom_tests) ... ok\ntest_zero_test_filter_is_rejected (test_roadmap_gate.RoadmapGateTests.test_zero_test_filter_is_rejected) ... ok\n\n----------------------------------------------------------------------\nRan 29 tests in 0.707s\n\nOK\n",
+      "outputSha256": "fc50325147aa0759d1c8461c1384e3e532bc89b4bae2c97f4f0d492d20ff7a4e"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "attack",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/attack.rs ($CARGO_TARGET_DIR/release/deps/attack-5547c3799d1fd250)\nattacker_results_are_synthetic_and_unvalidated: test\ndecoy_box_satisfies_every_positional_access: test\ndecoy_carries_each_register_at_its_read_type: test\ndecoy_refuses_token_slots_no_box_could_carry: test\nplay_attacker_reorder_reproduces_use_drain: test\nshift_token_indices_stays_within_the_experiment_limit: test\n\n6 tests, 0 benchmarks\n",
+      "outputSha256": "568a1c52c3ba9f8e68ee2d2e5edd61f36971dbc2703509d1ce2258f1c422cc87"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "attack",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/attack.rs ($CARGO_TARGET_DIR/release/deps/attack-5547c3799d1fd250)\n\nrunning 6 tests\ntest attacker_results_are_synthetic_and_unvalidated ... ok\ntest decoy_refuses_token_slots_no_box_could_carry ... ok\ntest decoy_carries_each_register_at_its_read_type ... ok\ntest decoy_box_satisfies_every_positional_access ... ok\ntest shift_token_indices_stays_within_the_experiment_limit ... ok\ntest play_attacker_reorder_reproduces_use_drain ... ok\n\nsuccesses:\n\nsuccesses:\n    attacker_results_are_synthetic_and_unvalidated\n    decoy_box_satisfies_every_positional_access\n    decoy_carries_each_register_at_its_read_type\n    decoy_refuses_token_slots_no_box_could_carry\n    play_attacker_reorder_reproduces_use_drain\n    shift_token_indices_stays_within_the_experiment_limit\n\ntest result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+      "outputSha256": "ad53fcae4fe94bb8fb6927fe54955a1e95f6cec56a13bb69b1b0dedcce336b89"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-web",
+        "--test",
+        "share_links",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.09s\n     Running tests/share_links.rs ($CARGO_TARGET_DIR/release/deps/share_links-d19cb893f3717a9a)\nshare_link_over_cap_is_refused_with_size: test\nshare_link_roundtrips_play_state: test\n\n2 tests, 0 benchmarks\n",
+      "outputSha256": "3f9dab9e837ddf485e8d203de80ee9f050d8cf0573987f51db7e3575a1570ea3"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-web",
+        "--test",
+        "share_links",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.09s\n     Running tests/share_links.rs ($CARGO_TARGET_DIR/release/deps/share_links-d19cb893f3717a9a)\n\nrunning 2 tests\ntest share_link_roundtrips_play_state ... ok\ntest share_link_over_cap_is_refused_with_size ... ok\n\nsuccesses:\n\nsuccesses:\n    share_link_over_cap_is_refused_with_size\n    share_link_roundtrips_play_state\n\ntest result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s\n\n",
+      "outputSha256": "d6c14cc3a9bf8c5790a6238759accf1a0404dbcfd511bd27a5ba899aa50c6522"
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "ui/tests/share.test.js"
+      ],
+      "exitCode": 0,
+      "output": "TAP version 13\n# Subtest: legacy Write, Play with optional history, and full suites round-trip offline\nok 1 - legacy Write, Play with optional history, and full suites round-trip offline\n  ---\n  duration_ms: 3.709724\n  type: 'test'\n  ...\n# Subtest: both cap refusals give actual encoded bytes and cap, including unicode and \\#s=\nok 2 - both cap refusals give actual encoded bytes and cap, including unicode and \\#s=\n  ---\n  duration_ms: 0.500904\n  type: 'test'\n  ...\n# Subtest: malformed payloads are rejected before use\nok 3 - malformed payloads are rejected before use\n  ---\n  duration_ms: 1.17095\n  type: 'test'\n  ...\n# Subtest: Play requires an explicit confirm control; cancel and loading never replace or save\nok 4 - Play requires an explicit confirm control; cancel and loading never replace or save\n  ---\n  duration_ms: 14.456559\n  type: 'test'\n  ...\n# Subtest: production loader preserves storage until confirmation and loads a suite intact into Tests\nok 5 - production loader preserves storage until confirmation and loads a suite intact into Tests\n  ---\n  duration_ms: 9.092635\n  type: 'test'\n  ...\n# Subtest: production copy controls use codecs for all shapes and show size failures without copying\nok 6 - production copy controls use codecs for all shapes and show size failures without copying\n  ---\n  duration_ms: 8.978808\n  type: 'test'\n  ...\n# Subtest: shared chain rendering stays offline, shows its network, and treats register and history text literally\nok 7 - shared chain rendering stays offline, shows its network, and treats register and history text literally\n  ---\n  duration_ms: 8.067843\n  type: 'test'\n  ...\n# Subtest: clipboard refusal leaves the share URL visible in the active page\nok 8 - clipboard refusal leaves the share URL visible in the active page\n  ---\n  duration_ms: 6.457858\n  type: 'test'\n  ...\n1..8\n# tests 8\n# suites 0\n# pass 8\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 217.530266\n",
+      "outputSha256": "2d8827b262ab01a4af72a48ff518555c1f50c02f38191e20b974b400ae30ff00"
+    }
+  ],
+  "evidenceHashes": {
+    "docs/ingestion-lithos-results.json": "1c43bc46d910b11d4e970ce714657175515a0cf61e1ec420b4c58a3d4e7bc69e",
+    "ergo-sandbox/tests/fixtures/decompile_corpus_expectations.json": "5d2bfc24d758dac520e24968793fe95a87c1cc673d54fe577d4a93b89768aa69",
+    "examples/mutants/answer-key.custody-v1.json": "4d038f5ab7722e954c44c426719237c9df2098e689f54eb4c679f3348b485259",
+    "examples/mutants/answer-key.json": "c3f4208a2f87de533739734dbea079c1a6129ca1e380d051204d081e5cf20bcd",
+    "docs/roadmap-metrics.json": "4cc60a3f4b342aebe85b91a17ff64c7b79d6fcace73ad0518e7c49e3a57c134d"
+  },
+  "policySha256": "075a6ac53551c841b7028a367185c895cb1fdf6d4c56e3f98fe8e7d95faaff03",
+  "ciAccepted": true,
+  "passed": true
+}
