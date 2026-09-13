@@ -449,6 +449,7 @@ function clearCompileError() {
   $("caret").hidden = true;
 }
 function invalidateCompileError() {
+  Verify.invalidate($("verify-result"));
   Checklist.invalidate($("c-checklist"));
   ++compileGeneration;
   clearCompileError();
@@ -1599,17 +1600,25 @@ $("save-project").addEventListener("click", () => {
   downloadProject(editorValue(), collectParams(), $("write-network").value, "contract");
 });
 
-/// contract.es + params.json + contract.test.json, zipped (STORE, no
+/// contract.es + params.json + contract.test.json + contract.lock.json, zipped (STORE, no
 /// compression — a few KB) so the whole project is one download that the
 /// CLI runs unchanged: `ergo-es test contract.test.json`.
-function downloadProject(source, params, network, baseName) {
+async function downloadProject(source, params, network, baseName) {
   let scenarios = [];
   try { const t = JSON.parse($("tests").value); if (Array.isArray(t)) scenarios = t; } catch (e) { /* none */ }
+  let lock;
+  try {
+    lock = await readerRequest("lock", { source, params, network });
+  } catch (error) {
+    toast(`Project export failed: ${error.message}`);
+    return false;
+  }
   const files = [
     ["contract.es", source],
+    ["contract.lock.json", JSON.stringify(lock, null, 2) + "\n"],
     ["params.json", JSON.stringify(params, null, 2) + "\n"],
     ["contract.test.json", JSON.stringify({ source, params, network, scenarios }, null, 2) + "\n"],
-    ["README.md", `# ${baseName}\n\nCompiled and tested with ergo-forge.\n\n    ergo-es compile contract.es --params params.json --network ${network}\n    ergo-es test contract.test.json\n`],
+    ["README.md", `# ${baseName}\n\nExported with ergo-forge. The lock records compilation and static findings; it does not establish deployment provenance. Run the tests below to check the supplied scenarios.\n\n    ergo-es compile contract.es --params params.json --network ${network}\n    ergo-es test contract.test.json\n    ergo-es verify-lock contract.lock.json --source contract.es --params params.json --network ${network}\n`],
   ];
   const blob = new Blob([zipStore(files)], { type: "application/zip" });
   const a = document.createElement("a");
@@ -1617,6 +1626,7 @@ function downloadProject(source, params, network, baseName) {
   a.download = `${baseName}.zip`;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  return true;
 }
 
 /// Minimal ZIP writer (method 0 = STORE). Enough for a handful of text files.
@@ -1642,6 +1652,18 @@ function zipStore(files) {
   let pos = 0; for (const p of total) { out.set(p, pos); pos += p.length; }
   return out;
 }
+
+// Verification always compiles a snapshot of current authored inputs.
+function verifyDeployment() {
+  const generation = compileGeneration;
+  const context = contextGeneration;
+  return Verify.load({ source: editorValue(), params: collectParams(), network: $("write-network").value, target: $("verify-target").value }, $("verify-result"), {
+    isCurrent: () => generation === compileGeneration && context === contextGeneration,
+  });
+}
+$("verify-run").addEventListener("click", verifyDeployment);
+$("verify-target").addEventListener("input", () => Verify.invalidate($("verify-result")));
+Verify.invalidate($("verify-result"));
 
 // ── export: share link, SDK snippets ─────────────────────────────────────
 

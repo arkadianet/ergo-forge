@@ -132,7 +132,7 @@
         </select>
         <button id="open-file" class="secondary" type="button" title="Open a .es file (or a params.json / contract.test.json)">Open…</button>
         <input id="file-input" type="file" accept=".es,.json,text/plain,application/json" multiple hidden>
-        <button id="save-project" class="secondary" type="button" title="Download contract.es + params.json + contract.test.json">Save project</button>
+        <button id="save-project" class="secondary" type="button" title="Download source, parameters, tests and contract.lock.json">Save project</button>
         <select id="write-network" aria-label="network">
           <option value="mainnet" selected>mainnet</option>
           <option value="testnet">testnet</option>
@@ -145,6 +145,14 @@
 sigmaProp(HEIGHT > $unlockHeight)</textarea>
       <pre id="caret" class="caret" hidden></pre>
       <p id="compile-status" class="status" role="status" hidden></p>
+
+      <details id="verify-deployment">
+        <summary>Verify deployment</summary>
+        <label for="verify-target">Target address or ErgoTree hex</label>
+        <input id="verify-target" type="text" spellcheck="false" placeholder="Address or tree hex">
+        <button id="verify-run" class="secondary" type="button">Verify deployment</button>
+        <div id="verify-result" role="status" aria-live="polite"></div>
+      </details>
 
       <div id="params-panel" hidden>
         <h2>Parameters</h2>
@@ -520,6 +528,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
   <script src="evidence-replay.js"></script>
   <script src="attack.js"></script>
   <script src="checklist.js"></script>
+  <script src="verify.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
