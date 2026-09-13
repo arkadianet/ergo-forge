@@ -17,6 +17,8 @@ use crate::{error::ApiError, extract::ApiJson};
 
 #[derive(Serialize)]
 pub struct ConfigDto {
+    #[serde(rename = "costTrace")]
+    pub cost_trace: bool,
     /// True when `/api/v1/lookup` can fetch chain data.
     pub explorer: bool,
     /// Current chain height when an explorer is configured and answers —
@@ -43,6 +45,7 @@ pub async fn config(State(state): State<Arc<AppState>>) -> Json<ConfigDto> {
         }
     }
     Json(ConfigDto {
+        cost_trace: state.cfg.cost_trace,
         explorer: state.cfg.explorer_url.is_some(),
         height,
         network: state

@@ -81,7 +81,11 @@ jobs:
 
       - name: clippy (cost-trace)
         working-directory: ergo-forge
-        run: cargo clippy -p ergo-sandbox --all-targets --features cost-trace -- -D warnings
+        run: cargo clippy -p ergo-sandbox -p ergo-web --all-targets --features cost-trace -- -D warnings
+
+      - name: test web without cost-trace
+        working-directory: ergo-forge
+        run: cargo test -p ergo-web --no-default-features
 
       - name: Lockfile action runner
         working-directory: ergo-forge
@@ -93,7 +97,7 @@ jobs:
 
       - name: test (cost-trace)
         working-directory: ergo-forge
-        run: cargo test -p ergo-sandbox --features cost-trace
+        run: cargo test -p ergo-sandbox -p ergo-web --features cost-trace
 
       - name: Governing roadmap completed prefix
         working-directory: ergo-forge

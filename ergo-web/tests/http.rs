@@ -1154,6 +1154,7 @@ async fn compile_does_not_claim_substituted_offsets_are_authored_positions() {
     }
 }
 
+#[cfg(feature = "cost-trace")]
 #[tokio::test]
 async fn eval_exposes_ranked_reduction_costs_for_success_failure_and_errors() {
     let base = spawn().await;

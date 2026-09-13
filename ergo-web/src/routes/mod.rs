@@ -4,6 +4,7 @@ pub mod compile;
 pub mod compose;
 pub mod eval;
 pub mod examples;
+pub mod explain;
 pub mod health;
 pub mod hunt;
 pub mod inspect;
