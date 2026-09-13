@@ -11,6 +11,8 @@ use ergo_sandbox::eval::Verdict;
 use ergo_sandbox::{compile_source, eval_scenario, inspect, Scenario};
 use ergo_ser::address::NetworkPrefix;
 
+mod deployment;
+
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let Some(cmd) = args.first() else {
@@ -18,6 +20,20 @@ fn main() -> ExitCode {
         return ExitCode::from(2);
     };
     let rest = &args[1..];
+    if matches!(cmd.as_str(), "verify" | "lock" | "verify-lock") {
+        let result = match cmd.as_str() {
+            "verify" => deployment::verify(rest),
+            "lock" => deployment::lock(rest),
+            _ => deployment::verify_lock(rest),
+        };
+        return match result {
+            Ok(code) => ExitCode::from(code),
+            Err(e) => {
+                eprintln!("error: {e}\n{}", ergo_sandbox::identity::LIMITATION);
+                ExitCode::FAILURE
+            }
+        };
+    }
     let result = match cmd.as_str() {
         "compile" => cmd_compile(rest),
         "checklist" => cmd_checklist(rest),
@@ -62,6 +78,22 @@ fn usage() {
         "ergo-es — ErgoScript workbench CLI
 
 USAGE:
+  ergo-es verify <address|treeHex> --source f.es [--params p.json]
+                 [--network mainnet|testnet] [--json]
+      Offline comparison: exit 0 exact bytes, 3 template with differing constants,
+      4 no match, 1 input/engine error. Left constants are compiled; right are target.
+  ergo-es lock <source.es> [--params p.json] [--network mainnet|testnet]
+               [--tree-version N] [--out contract.lock.json]
+      Record exact source SHA-256, typed params, pinned engine and workbench versions,
+      tree bytes, P2S address, tree version and stable static lint digest.
+  ergo-es verify-lock <contract.lock.json> --source f.es [--params p.json]
+                      [--network mainnet|testnet] [--tree-version N] [--json]
+                      [--explorer URL] [--nft tokenId]
+      Recompile with independent inputs (defaults: empty params, mainnet, version 3).
+      Exit 0 local fields current; 5 drift; 6 requested live check unverified; 1 error.
+      Optional live lookup uses --explorer or EXPLORER_URL. Otherwise unverified.
+      Lint digest: SHA-256 of compact JSON sorted [lint id, node id, message] triples.
+      See docs/immutability.md for digest and CI project conventions.
   ergo-es checklist <source-file|source|treeHex|address> [--scenario f.json]
                     [--evidence bundle.json] [--json] [--network mainnet|testnet]
       S00 review questions, with visible unchecked rows and anchored static observations.

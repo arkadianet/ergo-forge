@@ -58,6 +58,7 @@ pub mod hunt;
 pub mod identity;
 pub mod ingest;
 pub mod inspect;
+pub mod lockfile;
 pub mod map;
 pub mod method_names;
 pub mod negative_space;
@@ -70,6 +71,7 @@ pub mod scenario;
 pub mod testsuite;
 pub mod tree;
 pub mod txcheck;
+pub mod verify;
 
 pub use audit::{Finding, Severity};
 pub use compile::{compile_source, compile_source_raw, CompileOutput};

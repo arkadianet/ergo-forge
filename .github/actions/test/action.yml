@@ -8,6 +8,10 @@ inputs:
     description: "Space-separated paths or globs of contract.test.json files."
     required: false
     default: "**/contract.test.json"
+  lockfile:
+    description: "Optional space-separated paths/globs of .lock.json files. Verify sibling <stem>.es and params.json; network/treeVersion come from <stem>.test.json (default mainnet/3). Fail on drift or no matches. Needs an ergo-es that has verify-lock: use version: source, or a release published after it; older binaries fail this step with a compatibility error."
+    required: false
+    default: ""
   version:
     description: "ergo-forge release to use (a tag such as v0.3.0, or 'latest'), or 'source' to build ergo-es from the checked-out ergo-forge workspace (for this repo's own suites)."
     required: false
@@ -82,3 +86,10 @@ runs:
         done
         if [ "$ran" = "0" ]; then echo "::warning::no suites matched '$SUITES'"; fi
         exit $failed
+    - name: Verify lockfiles
+      if: ${{ inputs.lockfile != '' }}
+      shell: bash
+      env:
+        LOCKFILES: ${{ inputs.lockfile }}
+        LOCK_ACTION_PATH: ${{ github.action_path }}
+      run: python3 "$LOCK_ACTION_PATH/verify-lockfiles.py" "$LOCKFILES"

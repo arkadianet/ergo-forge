@@ -1,0 +1,9 @@
+feat: record and verify compilation lockfiles and observed box bytes
+
+Hash exact source text and a stable sorted static finding projection. Compare
+every lock field independently, reuse the workspace engine pin, and expose
+local drift and unverified live status through the CLI. Compare recorded
+boxes through the same bounded NFT lookup and byte comparison as explorers.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

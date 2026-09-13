@@ -1,0 +1,8 @@
+feat: verify compiled source against deployment bytes offline
+
+Reuse identity matching for exact, template and no-match outcomes across the
+library, CLI and budgeted HTTP route. Retain every typed constant difference
+and the identity limitation; test operator near misses and exit codes.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

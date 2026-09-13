@@ -1,0 +1,8 @@
+test: register I01 and I02 gates and retain batch 4 evidence
+
+Register both immutability units in the v2 roadmap and spec, require the Write
+verification DOM test, and retain command exits, gate reports and protected
+boundary checks. Leave the frozen v1 policy and baseline digests unchanged.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

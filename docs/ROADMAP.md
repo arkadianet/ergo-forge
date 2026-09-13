@@ -891,7 +891,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
         "verify_exact_template_and_mismatch_are_distinct",
         "verify_lists_differing_constants"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "I02",
@@ -905,7 +905,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
         "lockfile_detects_source_param_and_engine_drift",
         "lockfile_matches_live_box_bytes"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "W02",

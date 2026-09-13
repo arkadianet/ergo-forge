@@ -1,0 +1,9 @@
+feat: add Write verification and lockfiles in project exports and CI
+
+Render offline verification and complete typed constant differences in Write.
+Generate project locks through a budgeted HTTP route before building STORE
+zips. Add optional lockfile checks to the test action, retaining latest-release
+selection. Document formats, independent build inputs and claim limitations.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg
