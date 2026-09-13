@@ -225,6 +225,38 @@ fn decoy_carries_each_register_at_its_read_type() {
 }
 
 #[test]
+fn decoy_refuses_token_slots_no_box_could_carry() {
+    // The slot indices come from the drafted tree, which the request supplies:
+    // a tree reading tokens(300) must be refused, not synthesised one junk
+    // token per index. No box can carry 301 tokens, so the position is not
+    // decoy-able anyway.
+    let source = "sigmaProp(INPUTS(0).tokens(300)._2 > 0L)";
+    let compiled =
+        ergo_sandbox::compile::compile_source(source, 3, NetworkPrefix::Mainnet).expect("compiles");
+
+    let anyone = "10010101d17300";
+    let req: AttackRequest = serde_json::from_value(json!({
+        "height": 1000,
+        "boxes": [
+            { "boxId": box_id(0), "value": 1000000, "ergoTree": hex::encode(&compiled.tree_bytes),
+              "tokens": [], "registers": {} },
+        ],
+        "tx": {
+            "inputs": [ { "boxId": box_id(0) } ],
+            "dataInputs": [],
+            "outputs": [ { "value": 1000000, "ergoTree": anyone } ],
+        },
+        "operations": [ { "op": "insertDecoy", "atIndex": 0, "targetInput": 0 } ],
+    }))
+    .unwrap();
+    let err = apply_attack(&req).unwrap_err();
+    assert!(
+        err.to_string().contains("carries at most 255"),
+        "over-limit token slot is refused: {err}"
+    );
+}
+
+#[test]
 fn shift_token_indices_stays_within_the_experiment_limit() {
     let anyone = "10010101d17300";
     let draft = json!({

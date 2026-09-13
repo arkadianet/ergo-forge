@@ -223,13 +223,19 @@ fn is_slot(n: &Node, vals: &Vals, want: &str) -> bool {
 
 fn walk_slot(n: &Node, vals: &Vals, want: &str, shape: &mut SlotShape) {
     let d = deref(n, vals);
-    // `<slot>.tokens(i)` — an indexed access whose receiver is the slot's tokens.
+    // `<slot>.tokens(i)` — an indexed access whose receiver is the slot's
+    // tokens. The tokens property lifts as a 0-arg Method (the generic
+    // property-call shape); match the Prop form too for robustness.
     if let Some((obj, idx)) = as_indexed(d) {
-        if let NodeKind::Prop(inner, name) = &deref(obj, vals).kind {
-            if name == "tokens" && is_slot(inner, vals, want) {
-                if let Some(i) = literal_index(idx, vals) {
-                    shape.max_token_index = Some(shape.max_token_index.map_or(i, |m| m.max(i)));
-                }
+        let reads_slot_tokens = match &deref(obj, vals).kind {
+            NodeKind::Prop(inner, name) | NodeKind::Method(inner, name, _) if name == "tokens" => {
+                is_slot(inner, vals, want)
+            }
+            _ => false,
+        };
+        if reads_slot_tokens {
+            if let Some(i) = literal_index(idx, vals) {
+                shape.max_token_index = Some(shape.max_token_index.map_or(i, |m| m.max(i)));
             }
         }
     }
@@ -374,6 +380,18 @@ fn insert_decoy(
     let tree_hex = box_tree(req, &target.box_id)?;
     let testnet = req.network.as_deref() == Some("testnet");
     let shape = slot_shape(&tree_hex, at_index, testnet);
+    // The slot indices come from the drafted script's tree, which the request
+    // supplies: refuse slots no real box could satisfy before synthesising a
+    // token per index. The wire caps a box at MAX_BOX_TOKENS tokens, so a read
+    // beyond that is not a decoy-able position anyway.
+    if let Some(m) = shape.max_token_index {
+        if m >= MAX_BOX_TOKENS {
+            return Err(SandboxError::Scenario(format!(
+                "insertDecoy: the script reads tokens({m}); a box carries at most \
+                 {MAX_BOX_TOKENS} tokens"
+            )));
+        }
+    }
 
     let decoy = build_decoy(&shape, at_index);
     let decoy_id = decoy.box_id.clone().expect("decoy has an id");
@@ -415,10 +433,12 @@ fn build_decoy(shape: &SlotShape, at_index: usize) -> ScenarioBox {
     let seed = format!("input-{at_index}");
     // Over-provision: satisfy the slots the walk found, and a small default set
     // for accesses the decompiler could not recover. A superset of tokens and
-    // registers is exactly what a decoy would carry; it binds no NFT.
-    let slots = shape
-        .max_token_index
-        .map_or(DEFAULT_TOKEN_SLOTS, |m| (m + 1).max(DEFAULT_TOKEN_SLOTS));
+    // registers is exactly what a decoy would carry; it binds no NFT. The
+    // caller rejects slots past MAX_BOX_TOKENS; the clamp keeps this safe
+    // standalone.
+    let slots = shape.max_token_index.map_or(DEFAULT_TOKEN_SLOTS, |m| {
+        (m + 1).clamp(DEFAULT_TOKEN_SLOTS, MAX_BOX_TOKENS)
+    });
     let tokens: Vec<TokenAmount> = (0..slots)
         .map(|i| TokenAmount {
             id: junk_token_id(&seed, i),
@@ -475,16 +495,15 @@ fn swap_data_input(req: &mut PlayRequest, index: usize) -> Result<(), SandboxErr
     Ok(())
 }
 
-/// The widest token shift one experiment may request. Real positional
-/// confusions happen in the first few slots, and a box serialises at most 255
-/// tokens anyway; the cap keeps a hostile `by` from allocating this route into
-/// an out-of-memory kill.
-const MAX_TOKEN_SHIFT: usize = 255;
+/// The most tokens one box may carry: the wire format's cap. Both attacker
+/// experiment bounds hang off it — shifts prepend to a box, and a decoy
+/// carries one junk token per positional slot the script reads.
+const MAX_BOX_TOKENS: usize = 255;
 
 fn shift_token_indices(req: &mut PlayRequest, input: usize, by: usize) -> Result<(), SandboxError> {
-    if by > MAX_TOKEN_SHIFT {
+    if by > MAX_BOX_TOKENS {
         return Err(SandboxError::Scenario(format!(
-            "shiftTokenIndices: by {by} exceeds the experiment limit of {MAX_TOKEN_SHIFT}"
+            "shiftTokenIndices: by {by} exceeds the experiment limit of {MAX_BOX_TOKENS}"
         )));
     }
     let id = req
