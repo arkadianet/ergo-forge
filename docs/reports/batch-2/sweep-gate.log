@@ -1,0 +1,9 @@
+   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge-b2/ergo-sandbox)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.72s
+     Running tests/mutation_corpus.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/mutation_corpus-5e0736bf4edddcf2)
+
+running 1 test
+test deployed_corpus_sweep_is_recorded ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.55s
+

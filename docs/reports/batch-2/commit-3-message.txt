@@ -1,0 +1,7 @@
+Record batch 2 verification commands and environment limitations
+
+Retain the sweep, S02 gate report and complete command exit statuses,
+including the known local seed-corpus mismatch and interrupted initial sweep.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

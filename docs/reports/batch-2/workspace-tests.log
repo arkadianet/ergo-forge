@@ -1,0 +1,286 @@
+   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge-b2/ergo-sandbox)
+   Compiling ergo-web v0.3.0 (/home/rkadias/coding/ergo-forge-b2/ergo-web)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 25.78s
+     Running unittests src/lib.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/ergo_sandbox-76bc11a3ccec096d)
+
+running 32 tests
+test audit::lints::unchecked_get::tests::active_outer_guard_cannot_guard_a_shadowing_lambda_parameter ... ok
+test audit::lints::unchecked_get::tests::aliases_capture_index_bindings_before_shadowing ... ok
+test audit::lints::unchecked_get::tests::box_alias_chains_match_guards_in_both_directions ... ok
+test audit::lints::unchecked_get::tests::boolean_shadowing_hides_and_restores_outer_proofs ... ok
+test audit::lints::unchecked_get::tests::box_shadowing_does_not_inherit_guards_and_restores_outer_alias ... ok
+test audit::lints::unchecked_get::tests::known_box_selectors_are_canonicalised ... ok
+test audit::lints::unchecked_get::tests::lambda_parameters_hide_box_aliases_and_boolean_guards ... ok
+test audit::lints::unchecked_get::tests::unknown_box_binding_can_still_be_guarded_through_a_direct_alias ... ok
+test audit::lints::unchecked_get::tests::unsupported_expressions_are_not_assumed_equal ... ok
+test compile::tests::default_text_is_none_for_values_without_a_parser_form ... ok
+test audit::lints::unchecked_get::tests::unguarded_aliases_and_different_receivers_are_reported ... ok
+test drain::tests::empty_combinations_terminate ... ok
+test drain::tests::mint_probes_omit_zero_amounts_derived_from_templates ... ok
+test drain::tests::declared_padding_rejects_unsourced_duplicate_and_already_committed_fillers ... ok
+test drain::tests::permutations_are_lexicographic_and_capped ... ok
+test drain::tests::declared_edits_are_single_fixed_targets_before_permutation_and_recreations ... ok
+test drain::tests::missing_policy_and_non_victim_allowances_are_explicitly_incomplete ... ok
+test drain::tests::accounting_pins_companions_and_uses_realized_funding_not_data_or_template ... ok
+test drain::tests::minted_supply_and_self_funded_change_cannot_score_and_assets_never_net ... ok
+test drain::tests::conditional_terms_bind_payment_and_stock_without_cross_asset_netting ... ok
+test drain::tests::drain_payouts_omit_zero_token_remainders ... ok
+test drain::tests::synthesis_serde_defaults_make_the_omitted_block_all_off ... ok
+test drain::tests::the_combo_counter_walks_every_combination_exactly_once ... ok
+test drain::tests::the_axis_odometer_walks_the_pinned_order ... ok
+test map::check_relation::scope_tests::nested_lambda_bindings_do_not_leak_or_repair_forward_captures ... ok
+test map::check_relation::scope_tests::existential_forward_capture_cannot_establish_mandatory_facts ... ok
+test map::explorer::tests::explorer_registers_survive_box_and_page_parsing ... ok
+test map::source::tests::absent_registers_are_empty_and_decoded_only_registers_report_a_limit ... ok
+test drain::tests::static_allowances_deduplicate_and_share_source_and_receipt_caps ... ok
+test drain::tests::recognition_is_exact_declared_keys_only_and_ignores_payee_labels ... ok
+test drain::tests::the_decoy_family_is_finite_script_independent_and_includes_the_incident_shape ... ok
+test drain::tests::declared_padding_is_sourced_conserved_and_preserves_state ... ok
+
+test result: ok. 32 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/bin/ergo-es.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/ergo_es-3884ae02c3af3345)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/audit.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/audit-195b124d96f08bf4)
+
+running 43 tests
+test a_fully_lifted_tree_audits_as_complete ... ok
+test a_get_on_a_context_variable_is_low ... ok
+test a_finding_carries_the_ir_id_of_its_node ... ok
+test a_get_on_a_lambda_element_is_medium ... ok
+test a_negated_guard_condition_clears_the_else_branch ... ok
+test a_guard_bound_to_a_val_clears_the_get_in_the_then_branch ... ok
+test a_get_through_an_element_property_chain_is_medium ... ok
+test a_guard_bound_to_a_val_clears_the_get_under_and ... ok
+test a_positional_box_without_reserve_math_is_not_flagged ... ok
+test a_self_get_inside_a_lambda_stays_high ... ok
+test an_unbound_data_input_reserve_read_is_flagged ... ok
+test a_self_successor_pool_is_not_flagged ... ok
+test a_val_guard_does_not_clear_a_get_outside_its_scope ... ok
+test bare_register_get_is_flagged ... ok
+test a_val_guard_under_or_still_proves_nothing ... ok
+test an_or_chain_of_negated_guards_clears_the_tail ... ok
+test a_val_guard_composed_of_two_guards_clears_both_gets ... ok
+test a_negated_guard_condition_does_not_clear_the_then_branch ... ok
+test a_positive_guard_under_or_still_proves_nothing_for_the_right_operand ... ok
+test an_nft_bound_box_is_not_flagged ... ok
+test a_negated_guard_under_or_clears_the_right_operand ... ok
+test a_guarded_lambda_element_get_is_not_flagged ... ok
+test binding_by_the_whole_token_pair_counts ... ok
+test binding_by_the_whole_tokens_collection_counts ... ok
+test a_negated_val_guard_under_or_clears_the_right_operand ... ok
+test children_covers_every_node_of_a_nested_tree ... ok
+test findings_carry_a_readable_snippet ... ok
+test get_or_else_is_never_flagged ... ok
+test is_defined_conditional_guards_the_get ... ok
+test is_defined_conjunction_guards_the_get ... ok
+test is_defined_nested_in_conjunction_still_guards ... ok
+test binding_to_another_positional_box_does_not_count ... ok
+test is_defined_under_or_does_not_guard_the_get ... ok
+test guarded_successor_alias_survives_compilation_and_is_not_reported ... ok
+test negated_is_defined_does_not_guard_the_get ... ok
+test reserves_read_only_from_self_are_not_flagged ... ok
+test two_unguarded_gets_produce_two_findings_with_distinct_nodes ... ok
+test positional_reserves_without_an_nft_are_flagged ... ok
+test the_deployed_use_bank_contract_is_clean ... ok
+test the_deployed_use_lp_swap_contract_is_flagged ... ok
+test unguarded_successor_alias_is_still_reported_after_compilation ... ok
+test the_deployed_use_lp_extract_contract_is_clean ... ok
+test the_incident_corpus_fixed_swap_is_clean ... ok
+
+test result: ok. 43 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/audit_context.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/audit_context-9e780f962f2cc987)
+
+running 7 tests
+test script_identity_cannot_discharge_data_provider_provenance ... ok
+test context_variable_indices_are_not_shared_between_inputs ... ok
+test serialized_discharge_keeps_original_finding_and_names_its_proof ... ok
+test incomplete_or_unproven_context_never_discharges ... ok
+test only_required_same_slot_bindings_discharge ... ok
+test dexy_lp_real_exploit_gap_stays_high_even_with_pool_companion ... ok
+test phoenix_bank_binds_the_proxy_bank_successor ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/claim_contract.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/claim_contract-867a538af62c8c59)
+
+running 3 tests
+test legacy_record_cannot_import_as_verified ... ok
+test legacy_results_are_explicitly_preflight_or_simulation ... ok
+test scenario_reproduction_is_not_confirmation ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+     Running tests/claim_replay.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/claim_replay-1eeca24b641ba3d1)
+
+running 4 tests
+test unknown_policy_cannot_confirm ... ok
+test wrong_companion_or_policy_invalidates_claim ... ok
+test claim_requires_accepted_execution_and_violated_property ... ok
+test offline_replay_reproduces_claim ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+     Running tests/cli_hunt.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/cli_hunt-96f38a1b20e781ff)
+
+running 8 tests
+test validate_tx_command_reports_each_input_and_exits_nonzero_when_preflight_fails ... ok
+test hunt_reports_a_trivially_true_sample_without_node_validation ... ok
+test hunt_honours_a_caller_height ... ok
+test compose_command_prints_source_and_writes_a_suite_with_params ... ok
+test hunt_warns_when_self_is_synthetic_and_probes_error ... ok
+test hunt_reports_the_residual_key_for_p2pk ... ok
+test test_command_prints_a_table_and_exits_nonzero_on_a_failing_case ... ok
+test hunt_mainnet_does_not_read_a_flag_value_as_the_corpus_limit ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s
+
+     Running tests/cli_json.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/cli_json-78217134dfb35b8f)
+
+running 2 tests
+test eval_json_is_one_object_with_the_verdict_and_cost ... ok
+test test_json_lists_every_case_with_expected_and_actual ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cli_match.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/cli_match-99b415b5dbad97d4)
+
+running 1 test
+test match_cli_source_params_json_text_and_errors ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/compile_params.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/compile_params-04d6d589f9b5181b)
+
+running 23 tests
+test a_contract_marker_in_a_comment_or_string_is_not_a_template ... ok
+test a_pubkey_with_surrounding_whitespace_is_still_a_pubkey ... ok
+test a_missing_bare_environment_name_is_reported_as_missing ... ok
+test a_pubkey_parameter_becomes_a_real_prove_dlog ... ok
+test a_bare_identifier_resolves_through_the_environment_too ... ok
+test compile_errors_keep_their_offset ... ok
+test a_sigma_prop_parameter_accepts_a_p2pk_address ... ok
+test a_dollar_identifier_resolves_through_the_environment ... ok
+test a_coll_byte_parameter_is_substituted_as_hex_inside_string_literals ... ok
+test missing_parameters_are_a_structured_error ... ok
+test an_all_caps_string_token_is_a_string_param ... ok
+test integer_types_accept_exact_decimal_strings ... ok
+test scan_finds_names_with_hints_and_ignores_comments ... ok
+test an_eip5_template_compiles_with_its_parameters_applied ... ok
+test an_eip5_template_without_a_default_reports_the_missing_parameter ... ok
+test an_eip5_template_default_fills_a_missing_parameter ... ok
+test scan_reports_each_name_once_and_skips_block_comments ... ok
+test scan_does_not_route_a_commented_marker_to_the_template_path ... ok
+test a_dollar_param_does_not_collide_with_a_val_of_the_same_name ... ok
+test scan_lists_eip5_parameters_with_types_and_defaults ... ok
+test scan_carries_the_template_param_descriptions_and_the_contract_doc ... ok
+test compile_with_map_returns_the_map_for_plain_sources_and_none_for_templates ... ok
+test a_string_parameter_is_substituted_inside_string_literals ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/compose.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/compose-0c1763dbe7a1c00b)
+
+running 20 tests
+test an_empty_spec_or_a_path_without_who_or_conditions_is_rejected ... ok
+test a_mint_rule_is_only_about_outputs ... ok
+test an_inheritance_shaped_spec_composes_to_readable_source_with_params ... ok
+test contradictory_rules_are_refused_not_silently_green ... ok
+test k_of_n_who_and_before_condition ... ok
+test composed_source_compiles_and_behaves_like_the_recipe ... ok
+test kept_funds_may_drop_by_at_most_an_amount ... ok
+test a_tokenless_state_box_may_keep_its_tokens_and_let_none_leave ... ok
+test miner_rule_and_self_register_rule ... ok
+test any_and_all_output_rules_and_output_count ... ok
+test an_output_mints_a_token_named_after_the_first_input ... ok
+test data_input_rule_the_oracle_box_by_token_and_register ... ok
+test a_token_is_conserved_across_outputs ... ok
+test the_contracts_own_token_does_not_open_a_token_gate ... ok
+test a_conserved_token_fits_in_a_single_required_output ... ok
+test output_rule_with_self_script_token_and_register_equal_to_height ... ok
+test payment_and_keep_conditions_allocate_outputs_in_order ... ok
+test time_window_box_age_and_input_count ... ok
+test token_gate_and_fixed_input_count_agree_in_either_order ... ok
+test spender_values_hash_preimage_token_gate_and_paid_total ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/decompile_ast.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/decompile_ast-b97b3cbe689ccef2)
+
+running 6 tests
+test deeply_nested_constant_truncates_instead_of_overflowing ... ok
+test lifted_nodes_carry_shared_preorder_ir_ids ... ok
+test lift_local_ids_are_unique_within_one_tree ... ok
+test lifted_and_decompiled_report_the_same_placeholder_count ... ok
+test lift_then_print_matches_the_fused_render ... ok
+test context_execution_operations_roundtrip_without_placeholders ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/decompile_corpus.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/decompile_corpus-fd4b9d025a16633b)
+
+running 2 tests
+test external_compiled_fixtures_measurement ... ignored, external node checkout; set DC_NODE_CHECKOUT and DC_REPORT
+test bundled_contracts_and_compiled_fixtures_round_trip ... ok
+
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.17s
+
+     Running tests/decompile_robustness.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/decompile_robustness-b90d7ecfb604ed9d)
+
+running 18 tests
+test composite_constants_use_declared_types_including_empty_collections ... ok
+test a_tuple_function_with_mixed_uses_admits_the_fold_arity_gap ... ok
+test references_do_not_leak_from_a_finished_lambda_scope ... ok
+test miner_pubkey_uses_the_case_sensitive_source_name ... ok
+test group_element_constants_keep_their_type ... ok
+test reused_binding_ids_keep_statement_order_and_rhs_scope ... ok
+test unsupported_block_items_are_not_silently_dropped ... ok
+test a_function_used_only_by_folds_keeps_byte_exact_shared_calls ... ok
+test register_zero_retains_its_option_type ... ok
+test collection_index_and_default_keep_the_collection_receiver ... ok
+test unavailable_information_is_always_a_visible_structural_placeholder ... ok
+test dh_tuple_and_constant_substitution_keep_all_operands ... ok
+test source_temporaries_preserve_the_ast_and_do_not_capture_names ... ok
+test signed_numeric_literals_preserve_the_value_before_casting ... ok
+test mixed_boolean_precedence_keeps_the_original_grouping ... ok
+test compiler_retyping_requires_temporary_bindings ... ok
+test signature_operands_are_never_discarded_or_converted_to_boolean ... ok
+test tuple_parameters_outside_fold_keep_their_arity ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/decompile_roundtrip.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/decompile_roundtrip-05385b0f9ce21643)
+
+running 9 tests
+test negation_of_a_constant_renders_as_the_zero_plus_form ... ok
+test mixed_precedence_arithmetic_round_trips ... ok
+test decompile_is_network_aware_for_pk_constants ... ok
+test fold_wire_tuple_lambda_is_unwrapped_to_a_two_arg_lambda ... ok
+test fixture_shapes_are_pinned ... ok
+test logical_not_over_a_register_accessor_is_parenthesized ... ok
+test fixture_trees_decompile_and_recompile_byte_identically ... ok
+test mainnet_corpus_holds_the_exact_floor_when_checkout_present ... ok
+test seed_corpus_holds_the_exact_floor_when_checkout_present ... FAILED
+
+failures:
+
+---- seed_corpus_holds_the_exact_floor_when_checkout_present stdout ----
+
+thread 'seed_corpus_holds_the_exact_floor_when_checkout_present' (8762) panicked at ergo-sandbox/tests/decompile_roundtrip.rs:332:5:
+assertion `left == right` failed: compile corpus size changed — re-check the floor
+  left: 92
+ right: 87
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    seed_corpus_holds_the_exact_floor_when_checkout_present
+
+test result: FAILED. 8 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+error: test failed, to rerun pass `-p ergo-sandbox --test decompile_roundtrip`

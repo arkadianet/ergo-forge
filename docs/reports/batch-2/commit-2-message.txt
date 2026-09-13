@@ -1,0 +1,12 @@
+Register S02 gates and catalogue the new static instruments
+
+Mark S02 implemented in the v2 policy and spec example, cross-check the
+implemented set, and name the lints in vector classes 2, 3, 5 and 9. Keep the
+v1 policy byte-for-byte unchanged. Project only the separate staticLintPairs
+namespace out of the frozen hunt scoreboard and test that historical caps,
+verdicts and membership remain protected. Archive the exact pre-S02 answer
+key under M00 and D00's original digest and compare every live historical field
+to it through a shared inventory-test helper.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

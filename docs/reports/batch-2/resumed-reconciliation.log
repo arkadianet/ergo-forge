@@ -1,0 +1,109 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/audit.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/audit-ab32567643f8a17f)
+
+running 43 tests
+test a_finding_carries_the_ir_id_of_its_node ... ok
+test a_get_on_a_context_variable_is_low ... ok
+test a_get_on_a_lambda_element_is_medium ... ok
+test a_negated_guard_condition_clears_the_else_branch ... ok
+test a_guard_bound_to_a_val_clears_the_get_in_the_then_branch ... ok
+test a_guarded_lambda_element_get_is_not_flagged ... ok
+test a_get_through_an_element_property_chain_is_medium ... ok
+test a_guard_bound_to_a_val_clears_the_get_under_and ... ok
+test a_negated_guard_condition_does_not_clear_the_then_branch ... ok
+test a_self_successor_pool_is_not_flagged ... ok
+test a_positional_box_without_reserve_math_is_not_flagged ... ok
+test a_negated_val_guard_under_or_clears_the_right_operand ... ok
+test a_positive_guard_under_or_still_proves_nothing_for_the_right_operand ... ok
+test a_negated_guard_under_or_clears_the_right_operand ... ok
+test bare_register_get_is_flagged ... ok
+test an_unbound_data_input_reserve_read_is_flagged ... ok
+test a_val_guard_does_not_clear_a_get_outside_its_scope ... ok
+test a_fully_lifted_tree_audits_as_complete ... ok
+test an_or_chain_of_negated_guards_clears_the_tail ... ok
+test a_val_guard_composed_of_two_guards_clears_both_gets ... ok
+test binding_by_the_whole_tokens_collection_counts ... ok
+test an_nft_bound_box_is_not_flagged ... ok
+test children_covers_every_node_of_a_nested_tree ... ok
+test binding_by_the_whole_token_pair_counts ... ok
+test a_self_get_inside_a_lambda_stays_high ... ok
+test a_val_guard_under_or_still_proves_nothing ... ok
+test findings_carry_a_readable_snippet ... ok
+test get_or_else_is_never_flagged ... ok
+test is_defined_conditional_guards_the_get ... ok
+test is_defined_conjunction_guards_the_get ... ok
+test is_defined_nested_in_conjunction_still_guards ... ok
+test binding_to_another_positional_box_does_not_count ... ok
+test guarded_successor_alias_survives_compilation_and_is_not_reported ... ok
+test negated_is_defined_does_not_guard_the_get ... ok
+test is_defined_under_or_does_not_guard_the_get ... ok
+test reserves_read_only_from_self_are_not_flagged ... ok
+test positional_reserves_without_an_nft_are_flagged ... ok
+test two_unguarded_gets_produce_two_findings_with_distinct_nodes ... ok
+test the_deployed_use_bank_contract_is_clean ... ok
+test the_deployed_use_lp_swap_contract_is_flagged ... ok
+test unguarded_successor_alias_is_still_reported_after_compilation ... ok
+test the_deployed_use_lp_extract_contract_is_clean ... ok
+test the_incident_corpus_fixed_swap_is_clean ... ok
+
+test result: ok. 43 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/delegated_reserves.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/delegated_reserves-9d01c78a79b74ca4)
+
+running 11 tests
+test branch_specific_delegation_is_not_decided ... ok
+test findings_are_deduplicated_per_successor_and_keep_other_successors_separate ... ok
+test id_only_slots_explicitly_state_the_unobservable_singleton_assumption ... ok
+test deployed_use_vault_delegates_erg_and_treasury_amount ... ok
+test identity_alone_is_enough_and_only_outputs_are_successors ... ok
+test dust_floors_upper_bounds_and_unrelated_reads_do_not_clear_erg_delegation ... ok
+test dexy_bank_deliberately_delegates_reserves ... ok
+test direct_and_arithmetic_value_bounds_clear_erg_delegation ... ok
+test token_delegation_is_independent_of_erg_and_specific_to_the_slot ... ok
+test gallery_amm_pool_has_local_reserve_constraints ... ok
+test dexy_mint_and_payout_successors_preserve_their_own_reserves ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/mapping_inventory.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/mapping_inventory-046deafa07748924)
+
+running 4 tests
+test inventory_has_32_pinned_cases_and_independent_answers ... ok
+test fixture_constructs_execute_and_unsupported_members_remain ... ok
+test legacy_metrics_are_measured_without_baseline_changes ... ok
+test protected_policy_rejects_unauthorized_additions_and_mutations ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+
+     Running tests/more_lints.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/more_lints-ee286acf8cf1b70a)
+
+running 18 tests
+test code_hooks_cover_global_and_method_deserialisation_ast_forms ... ok
+test identical_height_branches_are_local_and_do_not_imply_success ... ok
+test basic_height_lock_is_an_intentional_permissionless_release ... ok
+test crystalpool_deposit_height_selects_the_same_seller_key ... ok
+test new_absence_lints_do_not_claim_path_proofs ... ok
+test branch_specific_and_negated_identity_comparisons_are_not_decided ... ok
+test height_release_only_follows_result_alternatives ... ok
+test code_authentication_follows_exact_bytes_aliases_and_context_ids ... ok
+test trust_findings_are_per_box_and_reads_outside_scope_are_undecided ... ok
+test sigma_register_provenance_uses_immutable_box_identity ... ok
+test sigma_disjuncts_preserve_conjunctive_authority_and_result_scope ... ok
+test successor_drift_follows_nft_identity_and_self_amount_reads ... ok
+test output_tail_needs_an_upper_bound_sum_or_universal_constraint ... ok
+test successor_drift_requires_the_same_field_and_successor ... ok
+test chaincash_note_authenticates_a_key_without_pinning_reserve_identity ... ok
+test provenance_requires_an_identity_anchor_not_presence_or_spender_data ... ok
+test real_oracles_and_rosen_token_search_bind_data_provenance ... ok
+test real_authorised_locks_and_distinct_crystalpool_branches_are_not_flagged ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/mutation_corpus.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/mutation_corpus-5e0736bf4edddcf2)
+
+running 5 tests
+test bank_template_registers_reach_both_consumers ... ok
+test m4_recorded_seller_only_receipts_score_zero_on_mutant_and_original ... ok
+test new_lint_mutants_are_caught_and_controls_are_clean ... ok
+test deployed_corpus_sweep_is_recorded ... ok
+test the_corpus_is_measured_and_does_not_regress has been running for over 60 seconds

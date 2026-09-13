@@ -1,0 +1,26 @@
+   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge-b2/ergo-sandbox)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.86s
+     Running tests/more_lints.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/more_lints-ee286acf8cf1b70a)
+
+running 18 tests
+test code_hooks_cover_global_and_method_deserialisation_ast_forms ... ok
+test basic_height_lock_is_an_intentional_permissionless_release ... ok
+test crystalpool_deposit_height_selects_the_same_seller_key ... ok
+test branch_specific_and_negated_identity_comparisons_are_not_decided ... ok
+test new_absence_lints_do_not_claim_path_proofs ... ok
+test height_release_only_follows_result_alternatives ... ok
+test code_authentication_follows_exact_bytes_aliases_and_context_ids ... ok
+test sigma_register_provenance_uses_immutable_box_identity ... ok
+test identical_height_branches_are_local_and_do_not_imply_success ... ok
+test trust_findings_are_per_box_and_reads_outside_scope_are_undecided ... ok
+test successor_drift_follows_nft_identity_and_self_amount_reads ... ok
+test sigma_disjuncts_preserve_conjunctive_authority_and_result_scope ... ok
+test provenance_requires_an_identity_anchor_not_presence_or_spender_data ... ok
+test successor_drift_requires_the_same_field_and_successor ... ok
+test output_tail_needs_an_upper_bound_sum_or_universal_constraint ... ok
+test chaincash_note_authenticates_a_key_without_pinning_reserve_identity ... ok
+test real_oracles_and_rosen_token_search_bind_data_provenance ... ok
+test real_authorised_locks_and_distinct_crystalpool_branches_are_not_flagged ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

@@ -1,0 +1,27 @@
+   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge-b2/ergo-sandbox)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.60s
+     Running tests/audit.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/audit-ab32567643f8a17f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 43 filtered out; finished in 0.00s
+
+     Running tests/delegated_reserves.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/delegated_reserves-9d01c78a79b74ca4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.00s
+
+     Running tests/more_lints.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/more_lints-ee286acf8cf1b70a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.00s
+
+     Running tests/mutation_corpus.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/mutation_corpus-5e0736bf4edddcf2)
+
+running 1 test
+test new_lint_mutants_are_caught_and_controls_are_clean ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.01s
+
