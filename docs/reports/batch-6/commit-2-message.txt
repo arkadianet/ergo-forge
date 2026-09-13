@@ -1,0 +1,9 @@
+feat(write): explain selected source from the full scenario value trace
+
+Add feature-independent POST /api/v1/explain. Select the innermost node
+at the first compiler start in the range, or the root for the whole source.
+Return recorded values, trace indices, residuals and explicit missing-map,
+missing-value and truncation outcomes without evaluating extracted code.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

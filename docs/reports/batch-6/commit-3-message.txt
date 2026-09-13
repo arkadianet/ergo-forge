@@ -1,0 +1,10 @@
+feat(ui): show cost by source and explain selected Write expressions
+
+Render exact, ambiguous and unattributed JIT rows with compiler-start links.
+Send selected UTF-8 byte ranges with the full current scenario to Explain.
+Show recorded values, residuals and missing/truncated evidence explicitly;
+reject stale results after editor, parameter or scenario changes. Add DOM
+coverage for both standalone modules and the production Write handlers.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

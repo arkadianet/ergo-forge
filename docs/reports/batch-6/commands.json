@@ -1,0 +1,455 @@
+{
+  "formatVersion": 1,
+  "baseRevision": "1d53b2f",
+  "branch": "v2/batch-6",
+  "cargoTargetDir": "$CARGO_TARGET_DIR",
+  "commands": [
+    {
+      "command": "cargo fmt --all",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.42,
+      "log": "logs/fmt-step1.log"
+    },
+    {
+      "command": "cargo test -p ergo-web --test http --no-run",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 9.94,
+      "log": "logs/build-step1.log"
+    },
+    {
+      "command": "cargo fmt --all",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.45,
+      "log": "logs/fmt-step1-tests.log"
+    },
+    {
+      "command": "cargo test -p ergo-web --test write_cost_explain",
+      "exitStatus": "101",
+      "exitCode": 101,
+      "elapsedSeconds": 1.05,
+      "log": "logs/tests-step1.log"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --features cost-trace --test cost_spans",
+      "exitStatus": "101",
+      "exitCode": 101,
+      "elapsedSeconds": 12.55,
+      "log": "logs/library-step1.log"
+    },
+    {
+      "command": "cargo fmt --all",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.4,
+      "log": "logs/fmt-step1-final.log"
+    },
+    {
+      "command": "cargo test -p ergo-web --test write_cost_explain",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 1.8,
+      "log": "logs/tests-step1-fixed.log"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --features cost-trace --test cost_spans",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.44,
+      "log": "logs/library-step1-fixed.log"
+    },
+    {
+      "command": "cargo test -p ergo-web --no-default-features --test write_cost_explain",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 12.65,
+      "log": "logs/feature-off-step1.log"
+    },
+    {
+      "command": "cargo fmt --all",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.43,
+      "log": "logs/fmt-before-commit1.log"
+    },
+    {
+      "command": "git add ergo-sandbox/src/compile.rs ergo-sandbox/src/lib.rs ergo-sandbox/src/source_positions.rs ergo-sandbox/src/cost_spans.rs ergo-sandbox/tests/cost_spans.rs ergo-web/Cargo.toml ergo-web/src/app.rs ergo-web/src/dto.rs ergo-web/src/routes/eval.rs ergo-web/src/routes/lookup.rs ergo-web/tests/http.rs ergo-web/tests/write_cost_explain.rs .github/workflows/ci.yml",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-add-step1.log"
+    },
+    {
+      "command": "git commit -F docs/reports/batch-6/commit-1-message.txt",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-commit-step1.log"
+    },
+    {
+      "command": "cargo fmt --all",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.51,
+      "log": "logs/fmt-step2.log"
+    },
+    {
+      "command": "cargo test -p ergo-web --test write_cost_explain",
+      "exitStatus": "101",
+      "exitCode": 101,
+      "elapsedSeconds": 3.27,
+      "log": "logs/tests-step2.log"
+    },
+    {
+      "command": "cargo fmt --all",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.44,
+      "log": "logs/fmt-step2-rule.log"
+    },
+    {
+      "command": "cargo test -p ergo-web --test write_cost_explain",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 1.78,
+      "log": "logs/tests-step2-rule.log"
+    },
+    {
+      "command": "cargo fmt --all",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.51,
+      "log": "logs/fmt-step2-final.log"
+    },
+    {
+      "command": "cargo test -p ergo-web --test write_cost_explain",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 2.14,
+      "log": "logs/tests-step2-final.log"
+    },
+    {
+      "command": "cargo test -p ergo-web --lib routes::explain",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 1.97,
+      "log": "logs/tests-step2-residual.log"
+    },
+    {
+      "command": "git add ergo-web/src/routes/explain.rs ergo-web/src/routes/mod.rs ergo-web/src/app.rs ergo-web/tests/write_cost_explain.rs",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-add-step2.log"
+    },
+    {
+      "command": "git commit -F docs/reports/batch-6/commit-2-message.txt",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-commit-step2.log"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 6.98,
+      "log": "logs/clippy-workspace.log"
+    },
+    {
+      "command": "node --test ui/tests/cost-spans.test.js ui/tests/explain.test.js",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.4,
+      "log": "logs/dom-new.log"
+    },
+    {
+      "command": "git add ui/app.js ui/index.html ui/cost-spans.js ui/explain.js ui/tests/cost-spans.test.js ui/tests/explain.test.js",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-add-step3.log"
+    },
+    {
+      "command": "git commit -F docs/reports/batch-6/commit-3-message.txt",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-commit-step3.log"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --features cost-trace",
+      "exitStatus": "101",
+      "exitCode": 101,
+      "elapsedSeconds": 47.48,
+      "log": "logs/sandbox-cost-trace.log"
+    },
+    {
+      "command": "python3 scripts/test_roadmap_gate.py",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.89,
+      "log": "logs/roadmap-tests.log"
+    },
+    {
+      "command": "python3 scripts/test_lockfile_action.py",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.06,
+      "log": "logs/lockfile-action-tests.log"
+    },
+    {
+      "command": "node --test ui/tests/attack.test.js ui/tests/checklist.test.js ui/tests/claim-labels.test.js ui/tests/cost-spans.test.js ui/tests/evidence-replay.test.js ui/tests/explain.test.js ui/tests/play-export.test.js ui/tests/share.test.js ui/tests/verify.test.js",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 19.21,
+      "log": "logs/dom-all.log"
+    },
+    {
+      "command": "cargo clippy -p ergo-sandbox --all-targets --features cost-trace -- -D warnings",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 12.83,
+      "log": "logs/clippy-cost-trace.log"
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require W04 --report docs/reports/batch-6/W04.json",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 20.95,
+      "log": "logs/gate-w04.log"
+    },
+    {
+      "command": "cargo clippy -p ergo-web --all-targets --features cost-trace -- -D warnings",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 10.3,
+      "log": "logs/clippy-web-cost-trace.log"
+    },
+    {
+      "command": "cargo test -p ergo-web --no-default-features",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 20.67,
+      "log": "logs/web-feature-off.log"
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.44,
+      "log": "logs/fmt-check.log"
+    },
+    {
+      "command": "node --test ui/tests/attack.test.js ui/tests/checklist.test.js ui/tests/claim-labels.test.js ui/tests/cost-spans.test.js ui/tests/evidence-replay.test.js ui/tests/explain.test.js ui/tests/play-export.test.js ui/tests/share.test.js ui/tests/verify.test.js",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.62,
+      "log": "logs/dom-final.log"
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require W04 --report docs/reports/batch-6/W04.json",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 1.98,
+      "log": "logs/gate-w04-final.log"
+    },
+    {
+      "command": "git diff --check",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.05,
+      "log": "logs/whitespace.log"
+    },
+    {
+      "command": "node --test ui/tests/attack.test.js ui/tests/checklist.test.js ui/tests/claim-labels.test.js ui/tests/cost-spans.test.js ui/tests/evidence-replay.test.js ui/tests/explain.test.js ui/tests/play-export.test.js ui/tests/share.test.js ui/tests/verify.test.js",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.65,
+      "log": "logs/dom-context-precedence.log"
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require W04 --report docs/reports/batch-6/W04.json",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 1.94,
+      "log": "logs/gate-w04-context-final.log"
+    },
+    {
+      "command": "cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present",
+      "exitStatus": "101",
+      "exitCode": 101,
+      "elapsedSeconds": 928.94,
+      "log": "logs/workspace.log"
+    },
+    {
+      "command": "node --test ui/tests/attack.test.js ui/tests/checklist.test.js ui/tests/claim-labels.test.js ui/tests/cost-spans.test.js ui/tests/evidence-replay.test.js ui/tests/explain.test.js ui/tests/play-export.test.js ui/tests/share.test.js ui/tests/verify.test.js",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.58,
+      "log": "logs/dom-null-scenario.log"
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require W04 --report docs/reports/batch-6/W04.json",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 1.89,
+      "log": "logs/gate-w04-complete.log"
+    },
+    {
+      "command": "cargo fmt --all",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.46,
+      "log": "logs/fmt-frozen-compile.log"
+    },
+    {
+      "command": "git diff 1d53b2f -- ergo-sandbox/src/compile.rs",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.0,
+      "log": "logs/pinned-compile-restored.log"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test property_inventory",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 3.35,
+      "log": "logs/property-inventory-final.log"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --features cost-trace --test cost_spans",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 2.96,
+      "log": "logs/cost-library-final.log"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --features cost-trace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 884.92,
+      "log": "logs/sandbox-cost-trace-known-skip.log"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 25.85,
+      "log": "logs/clippy-workspace-final.log"
+    },
+    {
+      "command": "cargo clippy -p ergo-sandbox --all-targets --features cost-trace -- -D warnings",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 18.55,
+      "log": "logs/clippy-cost-trace-final.log"
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.64,
+      "log": "logs/fmt-check-final.log"
+    },
+    {
+      "command": "git status --short --branch",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.07,
+      "log": "logs/final-status.log"
+    },
+    {
+      "command": "git diff --check",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.07,
+      "log": "logs/whitespace-final.log"
+    },
+    {
+      "command": "cargo test -p ergo-web --no-default-features",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 17.7,
+      "log": "logs/web-feature-off-final.log"
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require W04 --report docs/reports/batch-6/W04.json",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 20.87,
+      "log": "logs/gate-w04-pinned-final.log"
+    },
+    {
+      "command": "cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 902.56,
+      "log": "logs/workspace-final.log"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --features cost-trace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 898.9,
+      "log": "logs/sandbox-cost-trace-final.log"
+    },
+    {
+      "command": "python3 docs/reports/batch-6/check-integrity.py",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.04,
+      "log": "logs/integrity.log"
+    },
+    {
+      "command": "git add docs/ROADMAP.md docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md scripts/roadmap_gate.py scripts/test_roadmap_gate.py docs/write-cost-explain.md docs/reports/batch-6",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-add-step4.log"
+    },
+    {
+      "command": "git add -f docs/reports/batch-6/logs",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-add-logs.log"
+    },
+    {
+      "command": "git commit -F docs/reports/batch-6/commit-4-message.txt",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-commit-step4.log"
+    },
+    {
+      "command": "python3 docs/reports/batch-6/check-integrity.py",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.03,
+      "log": "logs/integrity-final.log"
+    }
+  ],
+  "postSession": [
+    {
+      "command": "cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present",
+      "exitCode": 0,
+      "log": "docs/reports/batch-6/logs/workspace-post-session.log",
+      "note": "Post-session re-verification outside the implementation sandbox."
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --features cost-trace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present --skip the_corpus_is_measured_and_does_not_regress",
+      "exitCode": 0,
+      "log": "docs/reports/batch-6/logs/workspace-post-session.log",
+      "note": "Post-session; the mutation measurement had just passed in the workspace run above."
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require W04 --report docs/reports/batch-6/W04.json",
+      "exitCode": 0,
+      "log": "docs/reports/batch-6/logs/workspace-post-session.log",
+      "note": "Post-session; wrote the committed W04.json."
+    }
+  ]
+}

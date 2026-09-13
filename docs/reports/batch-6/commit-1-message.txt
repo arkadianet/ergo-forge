@@ -1,0 +1,9 @@
+feat(write): attribute diagnostic costs conservatively to compiler positions
+
+Add reconciled exact, ambiguous and unattributed JIT cost rows from the
+existing reduction trace. Validate source-map alignment and authored-source
+identity. Add the default-on web cost-trace feature, optional cost-spans
+route and runtime capability discovery; cover both router states in tests.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg
