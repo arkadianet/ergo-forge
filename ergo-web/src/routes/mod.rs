@@ -1,4 +1,5 @@
 pub mod attack;
+pub mod checklist;
 pub mod compile;
 pub mod compose;
 pub mod eval;

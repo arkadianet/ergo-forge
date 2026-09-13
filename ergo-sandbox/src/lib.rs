@@ -45,6 +45,7 @@ pub mod attack;
 pub mod audit;
 pub mod avl;
 pub mod box_build;
+pub mod checklist;
 pub mod claim;
 pub mod compile;
 pub mod compose;

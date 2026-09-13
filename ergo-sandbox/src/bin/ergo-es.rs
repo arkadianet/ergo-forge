@@ -20,6 +20,7 @@ fn main() -> ExitCode {
     let rest = &args[1..];
     let result = match cmd.as_str() {
         "compile" => cmd_compile(rest),
+        "checklist" => cmd_checklist(rest),
         "replay" => cmd_replay(rest),
         "tree" => cmd_tree(rest),
         "triage" => cmd_triage(rest),
@@ -61,6 +62,11 @@ fn usage() {
         "ergo-es — ErgoScript workbench CLI
 
 USAGE:
+  ergo-es checklist <source-file|source|treeHex|address> [--scenario f.json]
+                    [--evidence bundle.json] [--json] [--network mainnet|testnet]
+      S00 review questions, with visible unchecked rows and anchored static observations.
+      Artifacts use {{vectorIds: [...], scenario: ...}} or {{vectorIds: [...], bundle: ...}}.
+      Raw scenario/bundle files run without attributing a vector. No score or verdict.
   ergo-es replay <bundle.json> [--json]
       Offline full-node validation and declared-property replay; broadcasts nothing.
   ergo-es tree <address|boxId|treeHex> [--json] [--network mainnet|testnet]
@@ -177,6 +183,99 @@ fn read_input(arg: &str) -> Result<String, String> {
 }
 
 // ── compile ──────────────────────────────────────────────────────────────────
+
+fn cmd_checklist(args: &[String]) -> Result<(), String> {
+    use ergo_sandbox::checklist::{self, Artifacts, EvidenceArtifact, ScenarioArtifact};
+    let input = args.first().ok_or("checklist needs a contract input")?;
+    let mut network = NetworkPrefix::Mainnet;
+    let mut artifacts = Artifacts::default();
+    let mut json = false;
+    let mut i = 1;
+    while i < args.len() {
+        match args[i].as_str() {
+            "--json" => json = true,
+            flag @ ("--network" | "--scenario" | "--evidence") => {
+                i += 1;
+                let value = args
+                    .get(i)
+                    .filter(|s| !s.starts_with("--"))
+                    .ok_or_else(|| format!("{flag} needs a value"))?;
+                if flag == "--network" {
+                    network = parse_network(value)?;
+                } else {
+                    let text =
+                        std::fs::read_to_string(value).map_err(|e| format!("{value}: {e}"))?;
+                    let doc: serde_json::Value =
+                        serde_json::from_str(&text).map_err(|e| e.to_string())?;
+                    if flag == "--scenario" {
+                        artifacts.scenario = Some(if doc.get("scenario").is_some() {
+                            serde_json::from_value(doc).map_err(|e| e.to_string())?
+                        } else {
+                            ScenarioArtifact {
+                                vector_ids: vec![],
+                                scenario: serde_json::from_value(doc).map_err(|e| e.to_string())?,
+                            }
+                        });
+                    } else {
+                        artifacts.evidence = Some(if doc.get("bundle").is_some() {
+                            serde_json::from_value(doc).map_err(|e| e.to_string())?
+                        } else {
+                            EvidenceArtifact {
+                                vector_ids: vec![],
+                                bundle: serde_json::from_value(doc).map_err(|e| e.to_string())?,
+                            }
+                        });
+                    }
+                }
+            }
+            flag => return Err(format!("unknown checklist option `{flag}`")),
+        }
+        i += 1;
+    }
+    let input = read_input(input)?;
+    let result = ergo_sandbox::decompile::with_large_stack(move || {
+        let bytes = checklist::resolve_input(&input, network)?;
+        checklist::checklist(&bytes, network, &artifacts)
+    })?;
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&result).map_err(|e| e.to_string())?
+        );
+    } else {
+        println!("Static review checklist. Findings set review priority; no vulnerability or safety verdict.\n");
+        for row in &result.rows {
+            println!(
+                "[{}] {} ({})\n  {}",
+                row.provenance.label(),
+                row.title,
+                row.id,
+                row.answer
+            );
+            for f in &row.findings {
+                println!(
+                    "  [static] {} · node {} · IR {:?}: {}\n    {}",
+                    f.lint, f.anchor.node_id, f.anchor.ir_id, f.text, f.snippet
+                );
+            }
+            for fingerprint in &row.artifact_fingerprints {
+                println!("  artifact: {fingerprint}");
+            }
+        }
+        for artifact in result.artifacts {
+            println!(
+                "\n[{}] artifact {}\n  {}",
+                artifact.provenance.label(),
+                artifact.fingerprint,
+                artifact.answer
+            );
+            if artifact.vector_ids.is_empty() {
+                println!("  No vector association supplied; rows remain unchanged.");
+            }
+        }
+    }
+    Ok(())
+}
 
 fn cmd_ingest(args: &[String]) -> Result<(), String> {
     use ergo_sandbox::ingest::{ingest_directory, IngestOptions, Status};

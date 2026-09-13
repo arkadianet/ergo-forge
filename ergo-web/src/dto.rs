@@ -12,6 +12,16 @@ pub struct InspectRequest {
     pub network: Option<String>,
 }
 
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChecklistRequest {
+    pub input: Option<String>,
+    pub source: Option<String>,
+    pub network: Option<String>,
+    #[serde(flatten)]
+    pub artifacts: ergo_sandbox::checklist::Artifacts,
+}
+
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FindingDto {
