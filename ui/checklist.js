@@ -30,7 +30,7 @@ const Checklist = (() => {
     root.replaceChildren();
     root.hidden = false;
     element(root, "p", "Static observations set review priority; they do not establish vulnerabilities. Unchecked questions remain open. Artifact associations are caller-supplied.", "hint");
-    if (response.completeness && response.completeness !== "Complete") {
+    if (response.completeness && response.completeness !== "complete") {
       element(root, "p", "Recovery is partial. Static observations cover only the recovered code; missing findings prove nothing.", "hint");
     }
     const list = element(root, "ul", null, "checklist-rows");

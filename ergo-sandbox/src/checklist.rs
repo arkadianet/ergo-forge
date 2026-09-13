@@ -127,7 +127,10 @@ pub struct Checklist {
     pub claim: ClaimMetadata,
     pub tree_hex: String,
     pub address: String,
-    pub completeness: audit::Completeness,
+    /// Same wire form as inspect: `"complete"` or `"partial"`.
+    pub completeness: &'static str,
+    pub raw_placeholders: usize,
+    pub truncated: bool,
     pub rows: Vec<Row>,
     pub artifacts: Vec<ArtifactResult>,
 }
@@ -341,6 +344,13 @@ pub fn checklist(
             result: json!({"status":result["status"], "nodeValidated":result["nodeValidated"], "scope":result["scope"], "claim":result["claim"], "reason":result["reason"], "inputProvenance":result["inputProvenance"], "contextProvenance":result["contextProvenance"]}),
         });
     }
+    let (completeness, raw_placeholders, truncated) = match audit.completeness {
+        audit::Completeness::Complete => ("complete", 0, false),
+        audit::Completeness::Partial {
+            raw_placeholders,
+            truncated,
+        } => ("partial", raw_placeholders, truncated),
+    };
     let rows = vectors.into_iter().map(|v| {
         let findings: Vec<Observation> = audit.findings.iter()
             .filter(|f| v.instrument.iter().any(|i| i.strip_prefix("lint:") == Some(f.lint)))
@@ -367,7 +377,9 @@ pub fn checklist(
         claim: ClaimMetadata::STATIC,
         tree_hex,
         address: ergo_ser::address::encode_p2s(network, bytes),
-        completeness: audit.completeness,
+        completeness,
+        raw_placeholders,
+        truncated,
         rows,
         artifacts,
     })

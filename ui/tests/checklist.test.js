@@ -16,7 +16,7 @@ function page() {
 }
 function response() {
   return {
-    method: "static-analysis", nodeValidated: false, completeness: "Complete",
+    method: "static-analysis", nodeValidated: false, completeness: "complete",
     rows: catalogue.vectors.map(v => ({ id: v.id, title: v.title, class: v.class, answer: "Unchecked. No supplied experiment or static observation.", provenance: "unchecked", findings: [], artifactFingerprints: [] })),
     artifacts: [],
   };

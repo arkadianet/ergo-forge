@@ -141,8 +141,26 @@ commits were created. Observed exits:
 | `cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present` | 0 |
 | `python3 scripts/roadmap_gate.py --require S01 --report docs/reports/batch-3/S01.json` | 0 |
 | `python3 scripts/roadmap_gate.py --require W06 --report docs/reports/batch-3/W06.json` | 0 |
+| After review fixes: `node --test ui/tests/*.test.js` (17 passed) | 0 |
+| After review fixes: `cargo test -p ergo-web --test checklist --test negative_space` | 0 |
+| After review fixes: `cargo test -p ergo-sandbox --test checklist_cli` | 0 |
+| After review fixes: `cargo clippy --workspace --all-targets -- -D warnings` | 0 |
+| After review fixes: `python3 scripts/test_roadmap_gate.py` | 0 |
 
 The full workspace command that ended with SIGTERM inside the session therefore
-has an observed passing run here. The committed `S01.json` and `W06.json` are
-the reports from this run; the session's interrupted first W06 attempt is kept
-as `W06-initial-interrupted.json`.
+has an observed passing run here. Its filtered output, together with both gate
+runs, is committed as [`logs/workspace-post-session.log`](logs/workspace-post-session.log)
+and recorded as the `postSession` entry of `commands.json` and the final line
+of `commands.jsonl`. The committed gate reports written by that run, before
+this note was added, hash as:
+
+| Report | SHA-256 |
+|---|---|
+| `S01.json` | `d7f47430b7dddc397f1ef30186136ca97835d0f68ca3ab3ded90ff107fa545fd` |
+| `W06.json` | `610964a8ec19a56bf601b566cbba2a5555424d505660cb24f0925556634799a7` |
+
+The session's interrupted first W06 attempt is kept as
+`W06-initial-interrupted.json`. Two review follow-ups after this run changed
+only `ui/checklist.js`, its DOM test, and the checklist's `completeness` wire
+form (now the same lowercase `complete`/`partial` as inspect); the affected
+suites were re-run and their exits are recorded in the table below.

@@ -162,5 +162,13 @@
       "subprocessReturnCode": -15,
       "report": "docs/reports/batch-3/W06-initial-interrupted.json"
     }
+  ],
+  "postSession": [
+    {
+      "command": "cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present",
+      "exitCode": 0,
+      "log": "docs/reports/batch-3/logs/workspace-post-session.log",
+      "note": "Post-session re-verification outside the implementation sandbox; the same log records the S01 and W06 gate runs (exit 0) that wrote the committed S01.json and W06.json."
+    }
   ]
 }
