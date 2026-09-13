@@ -14,8 +14,8 @@ COMMANDS = [
     ('clippy', ['cargo', 'clippy', '--workspace', '--all-targets', '--', '-D', 'warnings']),
     ('python', ['python3', '-m', 'unittest', 'discover', '-s', 'scripts', '-p', 'test_*.py']),
     ('workspace', ['cargo', 'test', '--workspace', '--release']),
-    ('through-completed', ['python3', 'scripts/roadmap_gate.py', '--through-completed', '--report', str(OUT / 'through-completed.json')]),
-    ('ci', ['python3', 'scripts/roadmap_gate.py', '--ci', '--report', str(OUT / 'ci.json')]),
+    ('through-completed', ['python3', 'scripts/roadmap_gate.py', '--through-completed', '--report', str((OUT / 'through-completed.json').relative_to(ROOT))]),
+    ('ci', ['python3', 'scripts/roadmap_gate.py', '--ci', '--report', str((OUT / 'ci.json').relative_to(ROOT))]),
 ]
 
 def main():

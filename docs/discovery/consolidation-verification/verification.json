@@ -67,7 +67,7 @@
         "scripts/roadmap_gate.py",
         "--through-completed",
         "--report",
-        "/home/rkadias/coding/ergo-forge/docs/discovery/consolidation-verification/through-completed.json"
+        "docs/discovery/consolidation-verification/through-completed.json"
       ],
       "exitCode": 0,
       "outputSha256": "8fb874c68d7559310382cef55ba8509f838a7a8f7c0f35d8a4e517429d269799"
@@ -79,7 +79,7 @@
         "scripts/roadmap_gate.py",
         "--ci",
         "--report",
-        "/home/rkadias/coding/ergo-forge/docs/discovery/consolidation-verification/ci.json"
+        "docs/discovery/consolidation-verification/ci.json"
       ],
       "exitCode": 0,
       "outputSha256": "fe91d214af957a81703eea1969913d11d9984d2ecd44b2eb38c60655ad7eb9a6"

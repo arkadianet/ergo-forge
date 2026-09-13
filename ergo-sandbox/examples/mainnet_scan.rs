@@ -133,9 +133,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
     println!("\n=== SIZE DISTRIBUTION (bytes) ===");
     for (k, v) in &size_hist {
-        if *v > n / 200 {
-            println!("  {k:5}-{:<5} {v}", k + 127);
-        }
+        println!("  {k:5}-{:<5} {v}", k + 127);
     }
     Ok(())
 }
