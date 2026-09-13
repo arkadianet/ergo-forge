@@ -38,7 +38,7 @@ registrations in the separate v2 policy below. The [v1 queue archive](reports/RO
 preserves the old ledger and P/M text. Later completion records and baseline
 scoreboard prose in this file remain historical records, not a second queue.
 
-W00 adopts the plan at `a57df087df85813c7f90a6f6f9ad6aaf5b4597cd`.
+W00 adopts the plan at `11d9a1c0986c5943d5b421e42271e1277d23528c`.
 The scoreboard re-anchors artifact identities at that commit without rerunning
 measurements; its original measurement revision and hashes remain recorded.
 The completed prefix stays M04 and M05's recorded stop stays in force.
@@ -789,7 +789,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
 ```json
 {
   "schemaVersion": 1,
-  "baselineRev": "a57df087df85813c7f90a6f6f9ad6aaf5b4597cd",
+  "baselineRev": "11d9a1c0986c5943d5b421e42271e1277d23528c",
   "completedThrough": null,
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,

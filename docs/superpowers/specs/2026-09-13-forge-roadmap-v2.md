@@ -209,7 +209,7 @@ To be installed by W00 as a **separate `roadmap-policy:v2` block** in `docs/ROAD
 ```json
 {
   "schemaVersion": 1,
-  "baselineRev": "a57df08",
+  "baselineRev": "11d9a1c0986c5943d5b421e42271e1277d23528c",
   "completedThrough": "M04",
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,

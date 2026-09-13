@@ -30,9 +30,9 @@ class RoadmapGateTests(unittest.TestCase):
         spec = (gate.ROOT / 'docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md').read_text()
         expected = json.loads(re.search(r'```json\n(.*?)\n```', spec, re.S)[1])['newUnits']
         self.assertEqual(len(expected), 20)
-        self.assertEqual(v2['baselineRev'], 'a57df087df85813c7f90a6f6f9ad6aaf5b4597cd')
+        self.assertEqual(v2['baselineRev'], '11d9a1c0986c5943d5b421e42271e1277d23528c')
         self.assertIsNone(v2['completedThrough'])
-        self.assertEqual(v1['completedThrough'], 'M04')
+        self.assertEqual(v1['completedThrough'], 'D02')
         self.assertEqual([{k: v for k, v in u.items() if k != 'implemented'} for u in v2['units']], expected)
         for key in ['schemaVersion', 'maxActiveImplementationBranches', 'maxOpenImplementationPrs',
                     'thresholds', 'frozenPreflight', 'scoreboard', 'stopRecords']:
@@ -49,7 +49,7 @@ class RoadmapGateTests(unittest.TestCase):
         self.assertEqual(parsed['units'][0]['depends'], ['P08'])
         broken = cross.replace('"depends": ["P08"],\n      "days": 1', '"depends": ["absent"],\n      "days": 1')
         self.assert_status('missing-gate', lambda: gate.policy_v2_from(broken, v1))
-        self.assertEqual(gate.completed_units([v1, v2]), gate.select_units(v1, 'M04'))
+        self.assertEqual(gate.completed_units([v1, v2]), gate.select_units(v1, 'D02'))
         completed = copy.deepcopy(v2)
         completed['completedThrough'] = 'S00'
         self.assertEqual([u['id'] for u in gate.completed_units([v1, completed])][-2:], ['W00', 'S00'])
