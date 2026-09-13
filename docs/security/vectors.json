@@ -1,0 +1,476 @@
+{
+  "schemaVersion": 1,
+  "classes": [
+    {
+      "id": "positional-binding",
+      "title": "Positional binding without identity"
+    },
+    {
+      "id": "successor-reserves",
+      "title": "Unbound successor and reserves"
+    },
+    {
+      "id": "unconstrained-outputs",
+      "title": "Unconstrained outputs"
+    },
+    {
+      "id": "oracle-trust",
+      "title": "Oracle and data-input trust"
+    },
+    {
+      "id": "attacker-context",
+      "title": "Attacker-controlled context"
+    },
+    {
+      "id": "token-indices",
+      "title": "Token index games"
+    },
+    {
+      "id": "arithmetic",
+      "title": "Arithmetic"
+    },
+    {
+      "id": "immobilisation",
+      "title": "Immobilisation"
+    },
+    {
+      "id": "sigma-propositions",
+      "title": "Sigma-proposition mistakes"
+    },
+    {
+      "id": "height-ordering",
+      "title": "Height and ordering"
+    },
+    {
+      "id": "multi-instance",
+      "title": "Multi-instance composition"
+    },
+    {
+      "id": "deployment-upgrades",
+      "title": "Deployment drift and upgrade hooks"
+    }
+  ],
+  "vectors": [
+    {
+      "id": "positional-reserve-binding",
+      "class": "positional-binding",
+      "title": "A decoy supplies the reserves",
+      "mechanism": "A transaction author chooses the order of inputs, outputs and data inputs. Reading reserves at a position without checking the identity of that same box lets a decoy supply the before-state used by a value constraint. Another input can then release real reserves while the arithmetic holds only for the decoy.",
+      "instrument": [
+        "lint:unbound-box-reserves",
+        "scenario",
+        "drain",
+        "node-validated"
+      ],
+      "examples": {
+        "exhibits": [
+          {
+            "path": "examples/incidents/use-lp-drain.deployed-swap.test.json",
+            "notes": "Historical swap tree and reproduced context; SELF is input 1.",
+            "pointer": "/tree"
+          }
+        ],
+        "control": [
+          {
+            "path": "examples/incidents/fixed/use-lp-swap.es",
+            "notes": "Counterfactual swap binds the pool NFT on the input and successor it reads."
+          }
+        ]
+      },
+      "notes": "The incident suites are synthetic script reductions. Separate P05 claim-replay and P06 drain-promotion fixtures supply full validation under recorded premises and a declared property. The lint observes positional reserve reads, including INPUTS(i), OUTPUTS(i) and dataInputs(i); it does not prove identity enforcement on every branch or singleton supply. Drain searches its existing bounded families and records caps; a miss is not safe.",
+      "incident": "Historical USE/DexyGold reproduction, 2026-09-08, tx 5371373d346aade57f684ead23f386e3441ffb2cb7a860babe96e3c5048b2725; examples/incidents/README.md"
+    },
+    {
+      "id": "successor-reserve-drift",
+      "class": "successor-reserves",
+      "title": "The script continues while its reserves leave",
+      "mechanism": "Requiring the successor to use the same script preserves code but does not by itself preserve value or token amounts. If the reserve bound is removed, the successor can remain recognisable while the transaction directs the missing assets elsewhere. A companion contract may supply the missing restriction, so a local absence needs a review of the whole spend.",
+      "instrument": [
+        "lint:delegated-reserves",
+        "scenario"
+      ],
+      "examples": {
+        "exhibits": [
+          {
+            "path": "examples/mutants/mutants.json",
+            "notes": "M1 removes the vesting remainder value bound; the mutant is classified keyed-insider.",
+            "pointer": "/mutants/0/mutatedSource"
+          }
+        ],
+        "control": [
+          {
+            "path": "examples/contracts/recipes/vesting.es",
+            "notes": "The remainder value bound is present for the partial-vesting path."
+          }
+        ]
+      },
+      "notes": "The mutant witness and original are already measured in the mutation corpus. This example does not enter the keyless proven denominator. delegated-reserves checks recognised ERG and token-amount relationships; it does not check register carry-forward or prove economic bounds."
+    },
+    {
+      "id": "successor-register-drift",
+      "class": "successor-reserves",
+      "title": "A successor rewrites a register",
+      "mechanism": "A continuation can preserve script, value and tokens while replacing state in a register. Later spends then read the altered state as SELF and may grant an extra withdrawal or use a different authority. Carrying the registers that define the invariant closes this particular rewrite.",
+      "instrument": [
+        "scenario",
+        "manual"
+      ],
+      "examples": {
+        "exhibits": [
+          {
+            "path": "examples/contracts/vectors/successor-register-drift/vulnerable.es",
+            "notes": "Authored counterexample; accepts the adversarial suite context."
+          }
+        ],
+        "control": [
+          {
+            "path": "examples/contracts/vectors/successor-register-drift/fixed.es",
+            "notes": "Refuses that same context; accepts the intended control context."
+          }
+        ]
+      },
+      "notes": "The pair changes R4 from 1 to 999 while all guarded assets continue. A reviewer checks which registers each spending path consumes and whether an authorised transition constrains their successor values. No current lint decides register drift; successor_field_drift is future work.",
+      "suites": {
+        "vulnerable": "examples/contracts/vectors/successor-register-drift/contract.test.json",
+        "fixed": "examples/contracts/vectors/successor-register-drift/fixed.test.json"
+      }
+    },
+    {
+      "id": "unconstrained-output-tail",
+      "class": "unconstrained-outputs",
+      "title": "A payment check leaves the remaining output value free",
+      "mechanism": "A script that checks the value at OUTPUTS(0) can leave the intended continuing pot at another index without a value bound. Once the checked payment is satisfied, the rest of the input value can be assigned to other outputs, including attacker change or an excessive miner fee. Checking one payment is insufficient when the declared policy also requires reserves to continue.",
+      "instrument": [
+        "scenario",
+        "manual"
+      ],
+      "examples": {
+        "exhibits": [
+          {
+            "path": "examples/mutants/mutants.json",
+            "notes": "M3 redirects the subscription pot value guard to OUTPUTS(0), leaving OUTPUTS(1) without its value bound.",
+            "pointer": "/mutants/2/mutatedSource"
+          }
+        ],
+        "control": [
+          {
+            "path": "examples/contracts/recipes/subscription.es",
+            "notes": "The original checks the payment and the remaining pot separately."
+          }
+        ]
+      },
+      "notes": "The M3 fixture is keyed-insider, not a keyless finding. A reviewer accounts for every permitted release, change destination and fee across all outputs; output count alone does not prove correct payment. There is no unconstrained_outputs lint yet. The original is a control for this removed bound, not a claim that every output is constrained."
+    },
+    {
+      "id": "oracle-box-mismatch",
+      "class": "oracle-trust",
+      "title": "The rate is read from a different box than the authenticated oracle",
+      "mechanism": "An oracle NFT check authenticates only the box on which it is enforced. If pricing reads a different data input, the spender can supply an arbitrary rate while leaving the genuine oracle beside it. A manipulated rate can change how many assets leave for a payment.",
+      "instrument": [
+        "lint:trust-assumptions",
+        "scenario",
+        "drain"
+      ],
+      "examples": {
+        "exhibits": [
+          {
+            "path": "examples/mutants/mutants.json",
+            "notes": "M8 reads the rate from data input 1 after authenticating data input 0.",
+            "pointer": "/mutants/7/mutatedSource"
+          }
+        ],
+        "control": [
+          {
+            "path": "examples/contracts/protocols/bank/bank.es",
+            "notes": "The authored bank reads and authenticates data input 0."
+          }
+        ]
+      },
+      "notes": "The existing mutation corpus records the M8 witness and bounded search. trust-assumptions recognises selected box-id and token-id anchors for extracted data-input registers. It does not verify NFT issuance, freshness, epochs or the oracle publication process."
+    },
+    {
+      "id": "stale-oracle-epoch",
+      "class": "oracle-trust",
+      "title": "An authentic oracle carries an obsolete observation",
+      "mechanism": "Identity alone does not make an oracle observation timely. A still-available authenticated box from an earlier epoch can supply a rate inappropriate for the current action and change the assets released. The consumer must relate the publication height and epoch to its declared acceptance window.",
+      "instrument": [
+        "scenario",
+        "manual"
+      ],
+      "examples": {
+        "exhibits": [
+          {
+            "path": "examples/contracts/vectors/stale-oracle-epoch/vulnerable.es",
+            "notes": "Authored counterexample; accepts the adversarial suite context."
+          }
+        ],
+        "control": [
+          {
+            "path": "examples/contracts/vectors/stale-oracle-epoch/fixed.es",
+            "notes": "Refuses that same context; accepts the intended control context."
+          }
+        ]
+      },
+      "notes": "The synthetic oracle has an NFT and a price above the floor in both scenarios; the old publication and epoch are refused only by the fixed consumer. A reviewer checks the real oracle protocol’s epoch definition, update authority and availability assumptions. The five-block window and ten-block epochs here are teaching constants, not recommended oracle parameters.",
+      "suites": {
+        "vulnerable": "examples/contracts/vectors/stale-oracle-epoch/contract.test.json",
+        "fixed": "examples/contracts/vectors/stale-oracle-epoch/fixed.test.json"
+      }
+    },
+    {
+      "id": "unauthenticated-context-code",
+      "class": "attacker-context",
+      "title": "The spender selects the program that authorises the spend",
+      "mechanism": "Context extensions and getVar values are supplied with the spending input. Executing deserialised code from those bytes without authenticating the bytes lets the spender substitute a program that returns true. A Boolean or sigma condition derived entirely from that extension can then release the box without the intended restriction.",
+      "instrument": [
+        "scenario",
+        "manual"
+      ],
+      "examples": {
+        "exhibits": [
+          {
+            "path": "examples/contracts/vectors/unauthenticated-context-code/vulnerable.es",
+            "notes": "Authored counterexample; accepts the adversarial suite context."
+          }
+        ],
+        "control": [
+          {
+            "path": "examples/contracts/vectors/unauthenticated-context-code/fixed.es",
+            "notes": "Refuses that same context; accepts the intended control context."
+          }
+        ]
+      },
+      "notes": "The vulnerable example executes Boolean bytes from variable 1; the fixed example requires the exact serialized HEIGHT >= 100 expression (92a304c801) before execution. A reviewer traces getVar, getVarFromInput, executeFromVar, deserialisation and substConstants back to an immutable or explicitly authorised code identity, including which input supplies the extension. unchecked-get only observes missing-option handling; it does not authenticate code. M05 remains stopped and supplies no general code-authentication instrument.",
+      "suites": {
+        "vulnerable": "examples/contracts/vectors/unauthenticated-context-code/contract.test.json",
+        "fixed": "examples/contracts/vectors/unauthenticated-context-code/fixed.test.json"
+      }
+    },
+    {
+      "id": "token-slot-substitution",
+      "class": "token-indices",
+      "title": "A junk token occupies the identity slot",
+      "mechanism": "Token positions are local to each box and do not identify an asset across boxes. Checking an amount at a slot while omitting the corresponding identifier permits a different token to occupy that slot. Prepending junk can shift later amount reads, while dropping the successor NFT binding can release the protocol identity itself.",
+      "instrument": [
+        "scenario",
+        "manual"
+      ],
+      "examples": {
+        "exhibits": [
+          {
+            "path": "examples/mutants/mutants.json",
+            "notes": "M5 removes preservation of the bank token pair at slot 0.",
+            "pointer": "/mutants/4/mutatedSource"
+          }
+        ],
+        "control": [
+          {
+            "path": "examples/contracts/protocols/bank/bank.es",
+            "notes": "The original carries the NFT pair and binds both other token identifiers."
+          }
+        ]
+      },
+      "notes": "The frozen M5 row is a visible search miss; listing this vector does not claim the current drain family can find first-token replacement. A reviewer follows each identifier and amount together, checks collection sizes and supply assumptions, and tests prepended tokens. No general token-index detector exists."
+    },
+    {
+      "id": "rounded-payment",
+      "class": "arithmetic",
+      "title": "Early division rounds the required payment down",
+      "mechanism": "Integer division discards a remainder, so dividing before multiplying can understate what the receiver must be paid. A one-sided inequality with that rounded value may repeatedly accept a small underpayment even when it resembles the intended invariant. Intermediate fixed-width multiplication can also throw on overflow and prevent a spend rather than wrapping into a useful balance.",
+      "instrument": [
+        "scenario",
+        "manual"
+      ],
+      "examples": {
+        "exhibits": [
+          {
+            "path": "examples/contracts/vectors/rounded-payment/vulnerable.es",
+            "notes": "Authored counterexample; accepts the adversarial suite context."
+          }
+        ],
+        "control": [
+          {
+            "path": "examples/contracts/vectors/rounded-payment/fixed.es",
+            "notes": "Refuses that same context; accepts the intended control context."
+          }
+        ]
+      },
+      "notes": "The pair compares a payment of 2,000,000 against two thirds of 3,000,002; only the prematurely rounded version accepts. The fixed comparison widens to BigInt before multiplication and requires at least 2,000,002. A reviewer checks truncation direction, units, precision, both invariant directions where required, signed ranges and overflow for every intermediate operation. This is one arithmetic witness, not a numeric solver or an overflow-liveness proof.",
+      "suites": {
+        "vulnerable": "examples/contracts/vectors/rounded-payment/contract.test.json",
+        "fixed": "examples/contracts/vectors/rounded-payment/fixed.test.json"
+      }
+    },
+    {
+      "id": "missing-self-register",
+      "class": "immobilisation",
+      "title": "An absent SELF register makes a spending path throw",
+      "mechanism": "An unguarded Option.get throws when the expected register is absent or has the wrong type. If every ordinary spending path depends on that immutable SELF state, the box can lose its intended spending route. Cost ceilings, minimum box value, serialized size limits and storage rent are additional constraints on whether a proposed transition can occur or preserve value.",
+      "instrument": [
+        "lint:unchecked-get",
+        "hunt",
+        "scenario",
+        "node-validated",
+        "manual"
+      ],
+      "examples": {
+        "exhibits": [
+          {
+            "path": "examples/contracts/basics/unguarded-register-read.es",
+            "notes": "The absent SELF R4 read throws."
+          }
+        ],
+        "control": [
+          {
+            "path": "examples/contracts/basics/guarded-register-read.es",
+            "notes": "The same absent register is explicitly refused without an unguarded read."
+          }
+        ]
+      },
+      "notes": "The guarded control removes the unchecked read; it does not make an already malformed box spendable. Hunt samples three heights and two output shapes, without context variables; it has no general cost-limit or missing-register campaign. Full validation of supplied canonical requests checks consensus constraints; the P03 node_validation target includes output-constraint-rejection, aggregate-cost-rejection and storage-rent-acceptance. A reviewer checks that a valid creation path establishes required SELF fields, estimates worst-case cost and box size, funds outputs under the supplied parameters, and reviews storage-rent eligibility and its effect on reserves. The named P03 cases are not blanket liveness certification."
+    },
+    {
+      "id": "zero-threshold",
+      "class": "sigma-propositions",
+      "title": "A threshold of zero removes the requirement",
+      "mechanism": "atLeast with k equal to zero can succeed without satisfying any member proposition. A constant-true disjunct creates the same escape from the other branches. Reading an authorisation key or sigma proposition from a register that the spender can replace can similarly let the spender choose the authority for release.",
+      "instrument": [
+        "scenario",
+        "hunt",
+        "manual"
+      ],
+      "examples": {
+        "exhibits": [
+          {
+            "path": "examples/contracts/vectors/zero-threshold/vulnerable.es",
+            "notes": "Authored counterexample; accepts the adversarial suite context."
+          }
+        ],
+        "control": [
+          {
+            "path": "examples/contracts/vectors/zero-threshold/fixed.es",
+            "notes": "Refuses that same context; accepts the intended control context."
+          }
+        ]
+      },
+      "notes": "The pair requires zero versus one satisfied height proposition and refuses the same early-height context only in the fixed version. It isolates threshold semantics without wallet proofs. A reviewer checks every OR branch, threshold range and the origin and update rules of any register-supplied key. There is no trivial_sigma_branch lint yet; the current hunt only reports the samples it reduces.",
+      "suites": {
+        "vulnerable": "examples/contracts/vectors/zero-threshold/contract.test.json",
+        "fixed": "examples/contracts/vectors/zero-threshold/fixed.test.json"
+      }
+    },
+    {
+      "id": "permissionless-height-release",
+      "class": "height-ordering",
+      "title": "A height bound becomes the whole spending condition",
+      "mechanism": "A lower height bound without an owner requirement permits any spender once that bound is met. Missing upper bounds can leave orders valid beyond their intended window, and miners can choose transaction ordering and inclusion within the chain’s permitted context. Competing spends or front-running may consume a box first and change which quoted action is available.",
+      "instrument": [
+        "lint:height-guards",
+        "hunt",
+        "scenario",
+        "manual"
+      ],
+      "examples": {
+        "exhibits": [
+          {
+            "path": "examples/contracts/basics/height-lock.es",
+            "notes": "A permissionless lower-bound release shape, intentionally simple."
+          }
+        ],
+        "control": [
+          {
+            "path": "examples/contracts/recipes/time-lock.es",
+            "notes": "The owner proposition remains required after the height bound."
+          }
+        ]
+      },
+      "notes": "These are contrasting release policies, not a vulnerability finding on the basic recipe. height-guards recognises narrow lower-bound-only alternatives and identical conditional branches; it cannot prove deadline completeness or simulate mempool order. A reviewer checks intended lower and upper bounds, authorised parties, race assumptions and cancellation rules against the protocol policy."
+    },
+    {
+      "id": "shared-payment-across-instances",
+      "class": "multi-instance",
+      "title": "Two instances count the same payment",
+      "mechanism": "Each input script runs in the context of the whole transaction. If two instances independently require a single output to pay at least their own value, both may count that same output while the second instance’s value leaves elsewhere. The constraint needs aggregate accounting or an explicit rule that only one instance may appear.",
+      "instrument": [
+        "scenario",
+        "manual"
+      ],
+      "examples": {
+        "exhibits": [
+          {
+            "path": "examples/contracts/vectors/shared-payment-across-instances/vulnerable.es",
+            "notes": "Authored counterexample; accepts the adversarial suite context."
+          }
+        ],
+        "control": [
+          {
+            "path": "examples/contracts/vectors/shared-payment-across-instances/fixed.es",
+            "notes": "Refuses that same context; accepts the intended control context."
+          }
+        ]
+      },
+      "notes": "Both input indices are tested in the shared context, using distinct input creation heights and one payment to a fixed public key; the other output is unrestricted attacker receipt. The fixed teaching contract permits one matching-script input, so it refuses the duplicate-instance context and accepts the ordinary single-instance spend. A reviewer checks how instances and obligations are distinguished, whether a singleton assumption is established, and whether one output discharges more than one payment. The drain multi-instance axis S03 is not implemented.",
+      "suites": {
+        "vulnerable": "examples/contracts/vectors/shared-payment-across-instances/contract.test.json",
+        "fixed": "examples/contracts/vectors/shared-payment-across-instances/fixed.test.json"
+      }
+    },
+    {
+      "id": "mutable-upgrade-digest",
+      "class": "deployment-upgrades",
+      "title": "A continuation replaces its future upgrade target",
+      "mechanism": "A script hash stored in a register can authorise a later change of guarding code. If an ordinary continuation can rewrite that register without the intended approval, the next spend can select different code while following the apparent upgrade rule. Preserving the current script alone does not preserve this future authority.",
+      "instrument": [
+        "scenario",
+        "manual"
+      ],
+      "examples": {
+        "exhibits": [
+          {
+            "path": "examples/contracts/vectors/mutable-upgrade-digest/vulnerable.es",
+            "notes": "Authored counterexample; accepts the adversarial suite context."
+          }
+        ],
+        "control": [
+          {
+            "path": "examples/contracts/vectors/mutable-upgrade-digest/fixed.es",
+            "notes": "Refuses that same context; accepts the intended control context."
+          }
+        ]
+      },
+      "notes": "The pair uses a synthetic R4 digest and changes it during a same-script continuation; the fixed branch carries the old digest. A reviewer identifies who can write the digest, the authorised upgrade procedure and whether every continuation preserves or authorises it. trust-assumptions currently covers extracted data-input provenance, not SELF upgrade hooks; I04 is future work.",
+      "suites": {
+        "vulnerable": "examples/contracts/vectors/mutable-upgrade-digest/contract.test.json",
+        "fixed": "examples/contracts/vectors/mutable-upgrade-digest/fixed.test.json"
+      }
+    },
+    {
+      "id": "deployment-constant-drift",
+      "class": "deployment-upgrades",
+      "title": "Compiled constants differ from the reviewed deployment",
+      "mechanism": "Changing a compiled constant can change the ErgoTree bytes and address even when the source template is unchanged. Compiler settings such as constant segregation and tree version also belong to byte identity. A user funding a different script can obtain an earlier release or an unusable route instead of the policy they reviewed.",
+      "instrument": [
+        "manual"
+      ],
+      "examples": {
+        "exhibits": [
+          {
+            "path": "examples/contracts/vectors/deployment-constant-drift/vulnerable.es",
+            "notes": "Authored counterexample; accepts the adversarial suite context."
+          }
+        ],
+        "control": [
+          {
+            "path": "examples/contracts/vectors/deployment-constant-drift/fixed.es",
+            "notes": "Refuses that same context; accepts the intended control context."
+          }
+        ]
+      },
+      "notes": "The pair illustrates an unintended release-height constant of 100 versus the reviewed 200; both suites share height 150 as the differing context. Its scenario result illustrates the semantic effect only. A reviewer recompiles the exact source and parameters with the pinned engine, checks tree version and constant-segregation settings, and compares full serialized bytes and the decoded address using the existing identity utilities. A template match with differing constants is not deployment equivalence; the planned verify-deployment CLI is not available. There is no universal fixed constant-segregation mode: exact bytes must match the intended deployment.",
+      "suites": {
+        "vulnerable": "examples/contracts/vectors/deployment-constant-drift/contract.test.json",
+        "fixed": "examples/contracts/vectors/deployment-constant-drift/fixed.test.json"
+      }
+    }
+  ]
+}

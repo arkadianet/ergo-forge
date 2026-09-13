@@ -13,6 +13,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 MARKER = '<!-- roadmap-policy:v1 -->'
+V2_MARKER = '<!-- roadmap-policy:v2 -->'
 
 
 class GateError(Exception):
@@ -41,14 +42,23 @@ def load_json(path):
 
 
 def policy_from(text):
-    require(text.count(MARKER) == 1, 'expected one roadmap policy block', 'missing-gate')
-    match = re.search(re.escape(MARKER) + r'\s*```json\s*(.*?)\s*```\s*<!-- /roadmap-policy:v1 -->', text, re.S)
+    return _policy_from(text, MARKER)
+
+
+def policy_v2_from(text, v1):
+    return _policy_from(text, V2_MARKER, v1['units'])
+
+
+def _policy_from(text, marker, previous=()):
+    require(text.count(marker) == 1, 'expected one roadmap policy block', 'missing-gate')
+    end = marker.replace('<!-- ', '<!-- /')
+    match = re.search(re.escape(marker) + r'\s*```json\s*(.*?)\s*```\s*' + re.escape(end), text, re.S)
     require(match is not None, 'malformed roadmap policy block', 'missing-gate')
     try:
         policy = json.loads(match.group(1))
         require(policy['schemaVersion'] == 1, 'unknown policy version', 'missing-gate')
         units = policy['units']
-        seen = set()
+        seen = {u['id'] for u in previous}
         for unit in units:
             require(unit['id'] not in seen, 'duplicate unit', 'missing-gate')
             require(set(unit['depends']) <= seen, 'non-prefix dependency', 'missing-gate')
@@ -57,7 +67,7 @@ def policy_from(text):
             require(type(unit['implemented']) is bool and unit['days'] > 0, 'invalid unit registration', 'missing-gate')
             require(bool(unit['package']) and bool(unit['target']), 'missing target', 'missing-gate')
             seen.add(unit['id'])
-        require(policy['completedThrough'] is None or policy['completedThrough'] in seen, 'unknown completed unit', 'missing-gate')
+        require(policy['completedThrough'] is None or policy['completedThrough'] in {u['id'] for u in units}, 'unknown completed unit', 'missing-gate')
         require(all(type(v) is int and v >= 0 for v in policy['thresholds'].values()), 'invalid thresholds', 'missing-gate')
         require(re.fullmatch(r'[0-9a-f]{40}', policy['baselineRev']) is not None, 'invalid baseline revision', 'missing-gate')
         for key in ['frozenPreflight', 'scoreboard', 'stopRecords']:
@@ -69,6 +79,23 @@ def policy_from(text):
 
 def load_policy(root=ROOT):
     return policy_from(read(root / 'docs/ROADMAP.md').decode())
+
+
+def load_policies(root=ROOT):
+    text = read(root / 'docs/ROADMAP.md').decode()
+    v1 = policy_from(text)
+    return [v1, policy_v2_from(text, v1)]
+
+
+def union_policy(policies):
+    return {**policies[0], 'units': [u for policy in policies for u in policy['units']]}
+
+
+def completed_units(policies):
+    union = union_policy(policies)
+    needed = {u['id'] for p in policies if p['completedThrough'] is not None
+              for u in select_units(union, p['completedThrough'])}
+    return [u for u in union['units'] if u['id'] in needed]
 
 
 def select_units(policy, requested=None, all_goals=False):
@@ -100,14 +127,17 @@ def scoreboard(policy, root=ROOT):
     paths = policy['scoreboard']
     metrics = load_json(root / paths['path'])
     rev = policy['baselineRev']
-    require(metrics['sourceCommit'] == rev, 'scoreboard source commit differs')
+    measurement_rev = metrics['sourceCommit']
+    require(re.fullmatch(r'[0-9a-f]{40}', measurement_rev) is not None, 'invalid measurement revision')
     require(metrics['harnessVersion'] == 'roadmap-policy:v1', 'unknown scoreboard producer')
     frozen = policy['frozenPreflight']
     evidence = {}
     baselines = {}
+    anchored = {}
     for path in [paths['ingestion'], paths['decompiler'], paths['history'], frozen['artifact']]:
-        original = baseline_bytes(root, rev, path)
+        original = baseline_bytes(root, measurement_rev, path)
         require(metrics['baselineArtifactSha256'].get(path) == sha(original), f'wrong baseline identity: {path}')
+        anchored[path] = json.loads(baseline_bytes(root, rev, path))
         current = read(root / path)
         evidence[path] = sha(current)
         baselines[path] = json.loads(original)
@@ -127,6 +157,8 @@ def scoreboard(policy, root=ROOT):
         for row in value.get('baselineRepairs', {}).values():
             row.pop('note', None)
         return value
+    for path, original in baselines.items():
+        require(measured(anchored[path]) == measured(original), f'plan base changed measurement: {path}')
     require(measured(corpus) == measured(baselines[frozen['artifact']]), 'frozen corpus data changed')
     rows = corpus['perMutant']
     controls = corpus['negativeControls']
@@ -243,6 +275,8 @@ def check_test_output(output, names, kind='rust'):
         require(match is not None and int(match.group(1)) > 0, 'missing/zero Python test evidence', 'missing-gate')
         require('skipped=' not in output and 'expected failures=' not in output, 'skipped Python test', 'missing-gate')
         require(re.search(r'^OK$', output, re.M) is not None, 'Python product failure')
+        passed = set(re.findall(r'^test_(\w+) \([^\n]+\) \.\.\. ok$', output, re.M))
+        require(set(names) <= passed, 'required Python test did not execute successfully', 'missing-gate')
 
 
 def portable_output(text, root=ROOT):
@@ -273,6 +307,29 @@ def extras(unit):
 
 def run_unit(unit, records, root=ROOT):
     require(unit['implemented'], 'registered product unit is not implemented', 'unimplemented')
+    if unit['package'] == 'scripts':
+        read(root / 'scripts' / (unit['target'] + '.py'))
+        discover = '''import sys, unittest
+def names(suite):
+    for test in suite:
+        if isinstance(test, unittest.TestSuite):
+            yield from names(test)
+        else:
+            yield test.id().rsplit('.', 1)[-1].removeprefix('test_')
+loader = unittest.TestLoader()
+suite = loader.discover('scripts', pattern=sys.argv[1] + '.py')
+if loader.errors:
+    sys.exit('\\n'.join(loader.errors))
+for name in names(suite):
+    print(name + ': test')
+'''
+        listed = command([sys.executable, '-c', discover, unit['target']], records, root)
+        require(listed.returncode == 0, 'Python test discovery failed')
+        check_discovery(listed.stdout, unit['tests'])
+        result = command([sys.executable, '-m', 'unittest', 'discover', '-b', '-v', '-s', 'scripts', '-p', unit['target'] + '.py'], records, root)
+        require(result.returncode == 0, 'Python test command failed')
+        check_test_output(result.stdout, unit['tests'], 'python')
+        return
     target = root / unit['package'] / 'tests' / (unit['target'] + '.rs')
     read(target)
     cargo = ['cargo', 'test', '--release', '-p', unit['package'], '--test', unit['target'], '--']
@@ -307,16 +364,22 @@ def main(argv=None):
     args = parser.parse_args(argv)
     report = {'formatVersion':1, 'results':[], 'commands':[], 'evidenceHashes':{}}
     try:
-        policy = load_policy()
-        selected = [] if args.scoreboard_only else select_units(policy, args.require if args.require else policy['completedThrough'], args.all_goals or args.ci)
-        report['policySha256'] = sha(json.dumps(policy, sort_keys=True).encode())
-        report['evidenceHashes'] = scoreboard(policy)
+        policies = load_policies()
+        policy = union_policy(policies)
+        future_ids = {u['id'] for p in policies[1:] for u in p['units']}
+        selected = ([] if args.scoreboard_only else completed_units(policies) if args.through_completed
+                    else select_units(policy, args.require, args.all_goals or args.ci))
+        report['policySha256'] = sha(json.dumps(policies, sort_keys=True).encode())
+        for p in policies:
+            report['evidenceHashes'].update(scoreboard(p))
         stops = stop_records(policy)
         report['results'].append(dict(unit='scoreboard', status='passed'))
         states = {}
         for unit in selected:
             try:
                 require(not any(r['unitOrProposal'] == unit['id'] for r in stops), 'recorded stop blocks this unit', 'stopped')
+                require(unit['implemented'] or not args.ci or unit['id'] not in future_ids,
+                        'registered future unit has not started', 'not-started')
                 require(unit['implemented'], 'registered product unit is not implemented', 'unimplemented')
                 require(all(states[d] == 'passed' for d in unit['depends']), 'dependency did not pass', 'blocked')
                 run_unit(unit, report['commands'])
@@ -328,7 +391,7 @@ def main(argv=None):
             print(f"{unit['id']}: {status}: {detail}", flush=True)
     except (GateError, KeyError, TypeError, ValueError, IndexError, AttributeError, ArithmeticError) as e:
         report['results'].append(dict(unit='policy/evidence', status=e.status if isinstance(e, GateError) else 'missing-gate', detail=str(e)))
-    report['ciAccepted'] = bool(report['results']) and all(r['status'] in {'passed', 'stopped'} for r in report['results'])
+    report['ciAccepted'] = bool(report['results']) and all(r['status'] in {'passed', 'stopped', 'not-started'} for r in report['results'])
     report['passed'] = bool(report['results']) and all(r['status'] == 'passed' for r in report['results'])
     output = args.report or ROOT / 'target-p00/roadmap-gates' / ((args.require or ('ci' if args.ci else 'all-goals' if args.all_goals else 'scoreboard' if args.scoreboard_only else 'through-completed')) + '.json')
     output.parent.mkdir(parents=True, exist_ok=True)

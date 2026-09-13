@@ -1,0 +1,18 @@
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
+    Finished `release` profile [optimized] target(s) in 0.81s
+     Running tests/decompile_corpus.rs (<home>/coding/ergo-forge/target-p00/release/deps/decompile_corpus-a032bb77c5f756f7)
+
+running 1 test
+test bundled_contracts_and_compiled_fixtures_round_trip ... ok
+
+successes:
+
+---- bundled_contracts_and_compiled_fixtures_round_trip stdout ----
+363 entries in 257.301991ms: {"byte-identical": 262, "initial-compile-failed": 10, "recompiles-but-differs": 91}
+
+
+successes:
+    bundled_contracts_and_compiled_fixtures_round_trip
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.26s
+

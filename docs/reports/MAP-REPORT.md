@@ -118,4 +118,4 @@ All three mutation-corpus tests passed, including
 mutants, and answer key are unchanged. `git diff --check` also passed.
 
 The isolated `target-map` directory and temporary measurement logs were removed
-after verification. This report is intentionally not committed. No push or PR.
+after verification.

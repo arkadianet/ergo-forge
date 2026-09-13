@@ -108,8 +108,10 @@ The [P05 offline replay command](docs/claim-replay.md) then evaluates the declar
 extraction property and binds any confirmed violation to the complete bundle.
 It does not establish historical state or infer protocol intent.
 
-The [governing roadmap](docs/ROADMAP.md) and [record-only scoreboard](docs/roadmap-metrics.json)
+The [governing roadmap v2](docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md) and [record-only scoreboard](docs/roadmap-metrics.json)
 separate recovery coverage, sampled preflight detection, and node-validated claims.
+The [attack-vector catalogue](docs/security/VECTORS.md) links review questions to
+existing instruments, example contracts and explicit manual checks.
 
 Example scenario (`sigmaProp(HEIGHT > 100)` failing at height 99):
 
@@ -183,8 +185,9 @@ release.
 
 ## Status
 
-The only active build queue is [docs/ROADMAP.md](docs/ROADMAP.md). Earlier phase
-records are historical; their remaining-work lists authorize no new work.
+The active build queue is [roadmap v2](docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md).
+[docs/ROADMAP.md](docs/ROADMAP.md) retains the executable policy, completed gates
+and historical scoreboard. Earlier phase records authorize no new work.
 
 Engine crates are consumed from `arkadianet/ergo` via pinned git
 revisions (`Cargo.toml`) — bump deliberately, the node is the oracle.

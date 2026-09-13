@@ -1,0 +1,20 @@
+{
+  "formatVersion": 1,
+  "results": [
+    {
+      "unit": "scoreboard",
+      "status": "passed"
+    }
+  ],
+  "commands": [],
+  "evidenceHashes": {
+    "docs/ingestion-lithos-results.json": "1c43bc46d910b11d4e970ce714657175515a0cf61e1ec420b4c58a3d4e7bc69e",
+    "ergo-sandbox/tests/fixtures/decompile_corpus_expectations.json": "5d2bfc24d758dac520e24968793fe95a87c1cc673d54fe577d4a93b89768aa69",
+    "examples/mutants/answer-key.custody-v1.json": "4d038f5ab7722e954c44c426719237c9df2098e689f54eb4c679f3348b485259",
+    "examples/mutants/answer-key.json": "e7f31518f021dca2d74ce4267126313f1624f091b6cedda0246e8115ead3c3d5",
+    "docs/roadmap-metrics.json": "4cc60a3f4b342aebe85b91a17ff64c7b79d6fcace73ad0518e7c49e3a57c134d"
+  },
+  "policySha256": "c3ba990a5baa491a3e99ecfe8fd4bb7d19241a82d7e04bf6cd6ba01f73d81ae6",
+  "ciAccepted": true,
+  "passed": true
+}

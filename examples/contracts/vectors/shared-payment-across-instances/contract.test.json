@@ -1,0 +1,80 @@
+{
+  "source": "sigmaProp(OUTPUTS(0).value >= SELF.value && OUTPUTS(0).propositionBytes == fromBase16(\"0008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798\"))\n",
+  "scenarios": [
+    {
+      "name": "adversarial context",
+      "expect": "pass",
+      "height": 100,
+      "selfIndex": 0,
+      "inputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "$self",
+          "creationHeight": 90
+        },
+        {
+          "value": 10000000,
+          "ergoTree": "$self",
+          "creationHeight": 91
+        }
+      ],
+      "outputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "0008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+        },
+        {
+          "value": 10000000,
+          "ergoTree": "10010101d17300"
+        }
+      ]
+    },
+    {
+      "name": "adversarial context 2",
+      "expect": "pass",
+      "height": 100,
+      "selfIndex": 1,
+      "inputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "$self",
+          "creationHeight": 90
+        },
+        {
+          "value": 10000000,
+          "ergoTree": "$self",
+          "creationHeight": 91
+        }
+      ],
+      "outputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "0008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+        },
+        {
+          "value": 10000000,
+          "ergoTree": "10010101d17300"
+        }
+      ]
+    },
+    {
+      "name": "intended context",
+      "expect": "pass",
+      "height": 100,
+      "selfIndex": 0,
+      "inputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "$self",
+          "creationHeight": 90
+        }
+      ],
+      "outputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "0008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+        }
+      ]
+    }
+  ]
+}

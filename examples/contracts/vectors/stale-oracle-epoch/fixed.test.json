@@ -1,0 +1,61 @@
+{
+  "source": "{\n  val oracle = CONTEXT.dataInputs(0)\n  sigmaProp(oracle.tokens(0)._1 == fromBase16(\"0101010101010101010101010101010101010101010101010101010101010101\") &&\n    oracle.R4[Long].get >= 100L && oracle.R5[Int].get == HEIGHT / 10 &&\n    oracle.creationInfo._1 >= HEIGHT - 5 && oracle.creationInfo._1 <= HEIGHT)\n}\n",
+  "scenarios": [
+    {
+      "name": "adversarial context",
+      "expect": "fail",
+      "height": 100,
+      "dataInputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "10010101d17300",
+          "creationHeight": 10,
+          "tokens": [
+            {
+              "id": "0101010101010101010101010101010101010101010101010101010101010101",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 500
+            },
+            "R5": {
+              "type": "Int",
+              "value": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "intended context",
+      "expect": "pass",
+      "height": 100,
+      "dataInputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "10010101d17300",
+          "creationHeight": 100,
+          "tokens": [
+            {
+              "id": "0101010101010101010101010101010101010101010101010101010101010101",
+              "amount": 1
+            }
+          ],
+          "registers": {
+            "R4": {
+              "type": "Long",
+              "value": 500
+            },
+            "R5": {
+              "type": "Int",
+              "value": 10
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

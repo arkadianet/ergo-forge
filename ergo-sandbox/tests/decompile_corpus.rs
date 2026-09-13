@@ -258,9 +258,21 @@ fn bundled_contracts_and_compiled_fixtures_round_trip() {
                 )
             })
             .collect();
-        let expected: BTreeMap<String, Value> =
+        let mut expected: BTreeMap<String, Value> =
             serde_json::from_str(include_str!("fixtures/decompile_corpus_expectations.json"))
                 .unwrap();
+        // S00 adds authored examples separately from the hash-pinned v1 corpus.
+        // Retain exact membership/outcomes for both inventories.
+        let vectors: BTreeMap<String, Value> =
+            serde_json::from_str(include_str!("fixtures/vector_decompile_expectations.json"))
+                .unwrap();
+        for (id, outcome) in vectors {
+            assert!(id.starts_with("examples/contracts/vectors/"), "{id}");
+            assert!(
+                expected.insert(id.clone(), outcome).is_none(),
+                "baseline override: {id}"
+            );
+        }
         assert_eq!(actual.len(), rows.len(), "duplicate measurement IDs");
         assert_eq!(
             actual.keys().collect::<Vec<_>>(),

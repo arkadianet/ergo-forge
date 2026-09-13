@@ -1,0 +1,15 @@
+{
+  "source": "sigmaProp(HEIGHT >= 100)\n",
+  "scenarios": [
+    {
+      "name": "adversarial context",
+      "expect": "pass",
+      "height": 150
+    },
+    {
+      "name": "intended context",
+      "expect": "pass",
+      "height": 200
+    }
+  ]
+}
