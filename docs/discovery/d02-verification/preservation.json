@@ -1,0 +1,63 @@
+{
+  "baseCommit": "1291e53902243fa02820709c65d836a002703c72",
+  "policyDifference": "D02 registration and its completedThrough only",
+  "d02Registration": {
+    "id": "D02",
+    "depends": [
+      "D01"
+    ],
+    "days": 3,
+    "package": "ergo-sandbox",
+    "target": "property_evaluation",
+    "tests": [
+      "four_property_families_match_independent_operands",
+      "guards_missing_fields_and_overflow_preserve_unknowns",
+      "bounded_response_requires_a_complete_accepted_linked_trace",
+      "property_evaluation_requires_fresh_node_acceptance"
+    ],
+    "implemented": true
+  },
+  "m00Anchor": "41729240759244bd3edc833e31359bfe50d8430f0b5a2e27ebc727706363cd10",
+  "preservedFilesSha256": {
+    "ergo-sandbox/src/properties/schema.rs": "495a208b7354263d75f47d0af1097ee10c51d81c51a8957aa8d381f6ea87f030",
+    "ergo-sandbox/tests/fixtures/mapping/manifest.json": "7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f",
+    "docs/discovery/original-policy.json": "46f295bbcbc99324bea21000755259828d663cac68753cec80779d1d642249b0",
+    "docs/discovery/permitted-d00-resolution.json": "9657cd03e5639911635d460db685ed573f1f985c785ebb34a357f2ed8ef28286",
+    "docs/roadmap-stops.json": "bb2f027b58ae71563d6f4102d58506510825cfc4a1f79d00959269021808baac",
+    "ergo-sandbox/tests/fixtures/properties/authored-inputs.json": "ac4bbed03a2c944689489313938dfaa1ce5a4bb2baa5caec3d47f92cf4d98dfe",
+    "ergo-sandbox/tests/fixtures/properties/cases/ambiguous_role.fixture": "d8c8c9424c61062bf21e942ed206c3616ec3b45fb284714c8603784f6cf3d569",
+    "ergo-sandbox/tests/fixtures/properties/cases/arithmetic_overflow.fixture": "37eeca4f7b12980b03303990effccc856904bf24807ebe8f5706bc00a3c1b274",
+    "ergo-sandbox/tests/fixtures/properties/cases/bounded_response_control_1.fixture": "5c5c1ae38e865190b17bd6e4cce244a673b78a1d2bebdf9ed458a0b7957140b6",
+    "ergo-sandbox/tests/fixtures/properties/cases/bounded_response_control_2.fixture": "77fa289009100157f2c4c2624ba0c574c8b723de222bbc2cec7b916a5bbb9ac2",
+    "ergo-sandbox/tests/fixtures/properties/cases/bounded_response_violation_1.fixture": "378ee8c47eeae50bf80e6487142b07e2e7f7acb1673253943440131a00156d2c",
+    "ergo-sandbox/tests/fixtures/properties/cases/bounded_response_violation_2.fixture": "dfa2b49ae8e96fce415fd8a720ab8aac2ceb6a1f4b7cad12732b6f9caa44a167",
+    "ergo-sandbox/tests/fixtures/properties/cases/continuation_control_1.fixture": "6b67160001206a392dad129cd73eb0950ddb6684cbde58a1d5f7b6f8ada43bf8",
+    "ergo-sandbox/tests/fixtures/properties/cases/continuation_control_2.fixture": "507e588a146eceff85d9eec2ae4dab44844480846ff8b6e47fb786c5a1fab773",
+    "ergo-sandbox/tests/fixtures/properties/cases/continuation_violation_1.fixture": "65b367c31fbab1c282630ad0a93b9ac0c06990ceba0b84d6e46e7a3f3d3b40ec",
+    "ergo-sandbox/tests/fixtures/properties/cases/continuation_violation_2.fixture": "5b82dc43e20423b5a2d3d3eee3b05567e14df45d2368203a8799152777ae3889",
+    "ergo-sandbox/tests/fixtures/properties/cases/false_guard.fixture": "2207c69bd86500dc27d5891c544d32ba86e58ba8f8da80ea2bc2de41529e95ee",
+    "ergo-sandbox/tests/fixtures/properties/cases/issuance_control_1.fixture": "392ea0b29c3e1abcbbb01944b1f0a3bd5e12950521d13659ce7b14c44fc7c8f9",
+    "ergo-sandbox/tests/fixtures/properties/cases/issuance_control_2.fixture": "271075eebb758e91ce6019c78e91d74af05b97dddde549cee17675d6aeb101a8",
+    "ergo-sandbox/tests/fixtures/properties/cases/issuance_violation_1.fixture": "b9b2a2e4482f4d4804665471728c5b45e3efeb43fd4035a9a84c7d0e98059ecd",
+    "ergo-sandbox/tests/fixtures/properties/cases/issuance_violation_2.fixture": "0efa259637d0508317855b6d4a633eb5024ac011d684709cd84f380d4447b492",
+    "ergo-sandbox/tests/fixtures/properties/cases/missing_role.fixture": "7d463960d53dd83bd11da6052d5a087d9c01388a82ddcb2af364f75a3a3be887",
+    "ergo-sandbox/tests/fixtures/properties/cases/reserve_control_1.fixture": "8f17ca82c1c3ffcccab701ea1f728563b1d837d4abd4d7310786927388311a4c",
+    "ergo-sandbox/tests/fixtures/properties/cases/reserve_control_2.fixture": "6124e1b876b5b148131598b1ac29ec1107405272c773f91393db869e70cfb062",
+    "ergo-sandbox/tests/fixtures/properties/cases/reserve_violation_1.fixture": "7307f2cbc1f434b435ba9f697b94b0637dc0d2e503f19e9ef5aa74e9fd101710",
+    "ergo-sandbox/tests/fixtures/properties/cases/reserve_violation_2.fixture": "a538d51489682683fa1ad1c43cd1a13ad8f82f2ce64a285dac24ccc5f453db5e",
+    "ergo-sandbox/tests/fixtures/properties/cases/short_response_horizon.fixture": "1836da8e8236459e01fece574f38fe588e2d784e6285051af32d3bcb6abe3181",
+    "ergo-sandbox/tests/fixtures/properties/cases/unbounded_eventuality.fixture": "4617c41c425b3f64a71df51c4fa4c2f32cdb34a5267c73cde1d57b42bd8abcab",
+    "ergo-sandbox/tests/fixtures/properties/cases/unsupported_dynamic_expression.fixture": "49c77095feaada982cec46a3a2e233a14e50ea5666e2e9453046cf31abcab199",
+    "ergo-sandbox/tests/fixtures/properties/cases/wrong_register_type.fixture": "0be2ae490b3f8b0c9fe1474e8fd3aa98e023597d801513e4205f9bd044aea348",
+    "ergo-sandbox/tests/fixtures/properties/expected.json": "311f160e08a8875de546263474fb10ec621e881b34afc28bb65323db32c7f319",
+    "ergo-sandbox/tests/fixtures/properties/legacy-results-raw.fixture": "9a2031b9324ab62b9bb91f7cf6960aa8a00209148b1b2eca0c1dfbd6323ea451",
+    "ergo-sandbox/tests/fixtures/properties/legacy-results.json": "726769c5c7baf12443a3d5ce287e29ee67d924fd600ffe156c217fe59518616a",
+    "ergo-sandbox/tests/fixtures/properties/manifest.json": "72609b827694feca9fb78ae440afc69644abb29238d9fd48dd7fe3467658304f",
+    "ergo-sandbox/tests/fixtures/properties/transfer-registration.json": "4b8a0ba4b393b155cb4324caa0698452dc601a3e849590a813536321a97f1ead"
+  },
+  "trackedChanges": [
+    "docs/ROADMAP.md",
+    "ergo-sandbox/src/properties/mod.rs",
+    "ergo-sandbox/tests/mapping_inventory.rs"
+  ]
+}

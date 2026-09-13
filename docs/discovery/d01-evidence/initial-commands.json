@@ -1,0 +1,30 @@
+[
+  {
+    "name": "fmt",
+    "command": "CARGO_TARGET_DIR=./target-p00 cargo fmt --all -- --check",
+    "exitCode": 0,
+    "elapsedSeconds": 0.348,
+    "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "clippy",
+    "command": "CARGO_TARGET_DIR=./target-p00 cargo clippy --workspace --all-targets -- -D warnings",
+    "exitCode": 0,
+    "elapsedSeconds": 6.0,
+    "outputSha256": "0c93ff5eb3bf890f47bc8c3c4dbc67f02f0df0679a45f9596f62821c896c576d"
+  },
+  {
+    "name": "property-schema",
+    "command": "CARGO_TARGET_DIR=./target-p00 cargo test -p ergo-sandbox --release --test property_schema -- --show-output",
+    "exitCode": 0,
+    "elapsedSeconds": 1.905,
+    "outputSha256": "c067db86617d41c741a0d6c37b35ea0b36c92d1034d7e97700aa886f0a2380df"
+  },
+  {
+    "name": "require-before-completion",
+    "command": "CARGO_TARGET_DIR=./target-p00 python3 scripts/roadmap_gate.py --require D01",
+    "exitCode": 1,
+    "elapsedSeconds": 88.515,
+    "outputSha256": "8c75118c18c94eeb8fd850710d256cfc86579da89635edcd66d24391505cb2d7"
+  }
+]

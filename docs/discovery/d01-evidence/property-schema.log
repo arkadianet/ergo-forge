@@ -1,0 +1,28 @@
+   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+    Finished `release` profile [optimized] target(s) in 1.88s
+     Running tests/property_schema.rs (target-p00/release/deps/property_schema-cdd530dfc605cc5b)
+
+running 3 tests
+test bindings_never_infer_missing_roles_or_authority ... ok
+test declaration_identity_binds_all_semantic_premises ... ok
+test property_versions_units_and_limits_fail_closed ... ok
+
+successes:
+
+---- bindings_never_infer_missing_roles_or_authority stdout ----
+missing/ambiguous roles unresolved; exact collections/IDs/scripts/tokens; empty all-matches retained; no inferred signer or successor
+
+---- declaration_identity_binds_all_semantic_premises stdout ----
+normalized immutable SHA-256 binds every declaration premise; input round-trip never imports status; model assertions confer no contract-defect authority
+
+---- property_versions_units_and_limits_fail_closed stdout ----
+strict v1 inputs; 32 nodes/8 roles/16 boxes/8 tokens/8 transactions; horizon 1..4; no execution or verdict authority
+
+
+successes:
+    bindings_never_infer_missing_roles_or_authority
+    declaration_identity_binds_all_semantic_premises
+    property_versions_units_and_limits_fail_closed
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

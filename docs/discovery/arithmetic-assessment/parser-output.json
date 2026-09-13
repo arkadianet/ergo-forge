@@ -1,0 +1,165 @@
+{
+  "attemptsSha256": "98122415da92688944ad875f64aaf2bf039980187d0d7c6d72e7588067d51984",
+  "results": [
+    {
+      "diagnostic": "invalid declaration: unknown variant `mul`, expected one of `boolean`, `and`, `or`, `not`, `bytes`, `read-bytes`, `bytes-eq`, `integer`, `count`, `sum-erg`, `sum-token`, `register`, `height`, `eq`, `lt`, `le`, `gt`, `ge`, `add`, `sub`, `scale` at line 1 column 843",
+      "id": "A01",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "12af99b9bf21dc506c28c23dd5c56ece7eb4cfcfd872585c6fbffec8de111eec",
+      "syntaxAccepted": false,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": "invalid declaration: unknown variant `mul`, expected one of `boolean`, `and`, `or`, `not`, `bytes`, `read-bytes`, `bytes-eq`, `integer`, `count`, `sum-erg`, `sum-token`, `register`, `height`, `eq`, `lt`, `le`, `gt`, `ge`, `add`, `sub`, `scale` at line 1 column 997",
+      "id": "A02",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "12af99b9bf21dc506c28c23dd5c56ece7eb4cfcfd872585c6fbffec8de111eec",
+      "syntaxAccepted": false,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": "invalid declaration: unknown variant `mul`, expected one of `boolean`, `and`, `or`, `not`, `bytes`, `read-bytes`, `bytes-eq`, `integer`, `count`, `sum-erg`, `sum-token`, `register`, `height`, `eq`, `lt`, `le`, `gt`, `ge`, `add`, `sub`, `scale` at line 1 column 743",
+      "id": "A03",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "12af99b9bf21dc506c28c23dd5c56ece7eb4cfcfd872585c6fbffec8de111eec",
+      "syntaxAccepted": false,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": "invalid declaration: unknown variant `mul`, expected one of `boolean`, `and`, `or`, `not`, `bytes`, `read-bytes`, `bytes-eq`, `integer`, `count`, `sum-erg`, `sum-token`, `register`, `height`, `eq`, `lt`, `le`, `gt`, `ge`, `add`, `sub`, `scale` at line 1 column 974",
+      "id": "A04",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "12af99b9bf21dc506c28c23dd5c56ece7eb4cfcfd872585c6fbffec8de111eec",
+      "syntaxAccepted": false,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": null,
+      "id": "B01",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "ed3a7e24920c0efe571a998e27d02ad560981eb5150b7b0393471359a39967d0",
+      "syntaxAccepted": true,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": "invalid declaration: unknown variant `mul`, expected one of `boolean`, `and`, `or`, `not`, `bytes`, `read-bytes`, `bytes-eq`, `integer`, `count`, `sum-erg`, `sum-token`, `register`, `height`, `eq`, `lt`, `le`, `gt`, `ge`, `add`, `sub`, `scale` at line 1 column 238",
+      "id": "B02",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "ed3a7e24920c0efe571a998e27d02ad560981eb5150b7b0393471359a39967d0",
+      "syntaxAccepted": false,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": "invalid declaration: unknown variant `mul`, expected one of `boolean`, `and`, `or`, `not`, `bytes`, `read-bytes`, `bytes-eq`, `integer`, `count`, `sum-erg`, `sum-token`, `register`, `height`, `eq`, `lt`, `le`, `gt`, `ge`, `add`, `sub`, `scale` at line 1 column 846",
+      "id": "B03",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "ed3a7e24920c0efe571a998e27d02ad560981eb5150b7b0393471359a39967d0",
+      "syntaxAccepted": false,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": "invalid declaration: unknown variant `nominal-price`, expected one of `boolean`, `and`, `or`, `not`, `bytes`, `read-bytes`, `bytes-eq`, `integer`, `count`, `sum-erg`, `sum-token`, `register`, `height`, `eq`, `lt`, `le`, `gt`, `ge`, `add`, `sub`, `scale` at line 1 column 1011",
+      "id": "B04",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "ed3a7e24920c0efe571a998e27d02ad560981eb5150b7b0393471359a39967d0",
+      "syntaxAccepted": false,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": null,
+      "id": "V01",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "683a5d672f6215de9034a82434ed25e3900573a3ce563f7d3de9aec69c837bfb",
+      "syntaxAccepted": true,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": "invalid declaration: unknown variant `div`, expected one of `boolean`, `and`, `or`, `not`, `bytes`, `read-bytes`, `bytes-eq`, `integer`, `count`, `sum-erg`, `sum-token`, `register`, `height`, `eq`, `lt`, `le`, `gt`, `ge`, `add`, `sub`, `scale` at line 1 column 461",
+      "id": "V02",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "683a5d672f6215de9034a82434ed25e3900573a3ce563f7d3de9aec69c837bfb",
+      "syntaxAccepted": false,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": "invalid declaration: unknown variant `authorized-by`, expected one of `boolean`, `and`, `or`, `not`, `bytes`, `read-bytes`, `bytes-eq`, `integer`, `count`, `sum-erg`, `sum-token`, `register`, `height`, `eq`, `lt`, `le`, `gt`, `ge`, `add`, `sub`, `scale` at line 1 column 34",
+      "id": "V03",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "683a5d672f6215de9034a82434ed25e3900573a3ce563f7d3de9aec69c837bfb",
+      "syntaxAccepted": false,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": null,
+      "id": "U01",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "3356e0ecc4b2685a0cce24241f4dc29808898143687b64be6cb19e035da2a23f",
+      "syntaxAccepted": true,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": "invalid declaration: unknown variant `register-bytes`, expected one of `boolean`, `and`, `or`, `not`, `bytes`, `read-bytes`, `bytes-eq`, `integer`, `count`, `sum-erg`, `sum-token`, `register`, `height`, `eq`, `lt`, `le`, `gt`, `ge`, `add`, `sub`, `scale` at line 1 column 265",
+      "id": "U02",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "3356e0ecc4b2685a0cce24241f4dc29808898143687b64be6cb19e035da2a23f",
+      "syntaxAccepted": false,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": "invalid declaration: unknown variant `register-bytes`, expected one of `boolean`, `and`, `or`, `not`, `bytes`, `read-bytes`, `bytes-eq`, `integer`, `count`, `sum-erg`, `sum-token`, `register`, `height`, `eq`, `lt`, `le`, `gt`, `ge`, `add`, `sub`, `scale` at line 1 column 270",
+      "id": "U03",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "3356e0ecc4b2685a0cce24241f4dc29808898143687b64be6cb19e035da2a23f",
+      "syntaxAccepted": false,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": null,
+      "id": "R01",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "fee6f76b20241d5a5c809cdc531a673046fff818938c6ab2cb5d25f4cdc88876",
+      "syntaxAccepted": true,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": null,
+      "id": "R02",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "fee6f76b20241d5a5c809cdc531a673046fff818938c6ab2cb5d25f4cdc88876",
+      "syntaxAccepted": true,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": "invalid declaration: unknown variant `avl-insert-matches`, expected one of `boolean`, `and`, `or`, `not`, `bytes`, `read-bytes`, `bytes-eq`, `integer`, `count`, `sum-erg`, `sum-token`, `register`, `height`, `eq`, `lt`, `le`, `gt`, `ge`, `add`, `sub`, `scale` at line 1 column 57",
+      "id": "R03",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "fee6f76b20241d5a5c809cdc531a673046fff818938c6ab2cb5d25f4cdc88876",
+      "syntaxAccepted": false,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": null,
+      "id": "X01",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "81acaa28e67b3a549fea31f8beb5251bbe5e550d172c9a76fba60ffd3438e798",
+      "syntaxAccepted": true,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": "invalid declaration: unknown variant `mirrored-group-registers`, expected one of `boolean`, `and`, `or`, `not`, `bytes`, `read-bytes`, `bytes-eq`, `integer`, `count`, `sum-erg`, `sum-token`, `register`, `height`, `eq`, `lt`, `le`, `gt`, `ge`, `add`, `sub`, `scale` at line 1 column 76",
+      "id": "X02",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "81acaa28e67b3a549fea31f8beb5251bbe5e550d172c9a76fba60ffd3438e798",
+      "syntaxAccepted": false,
+      "transactionValidation": "not attempted"
+    },
+    {
+      "diagnostic": "invalid declaration: unknown variant `prove-dh-tuple`, expected one of `boolean`, `and`, `or`, `not`, `bytes`, `read-bytes`, `bytes-eq`, `integer`, `count`, `sum-erg`, `sum-token`, `register`, `height`, `eq`, `lt`, `le`, `gt`, `ge`, `add`, `sub`, `scale` at line 1 column 35",
+      "id": "X03",
+      "semanticSupport": "not established by parsing",
+      "sourceSha256": "81acaa28e67b3a549fea31f8beb5251bbe5e550d172c9a76fba60ffd3438e798",
+      "syntaxAccepted": false,
+      "transactionValidation": "not attempted"
+    }
+  ]
+}

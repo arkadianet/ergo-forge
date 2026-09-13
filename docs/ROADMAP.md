@@ -1,5 +1,9 @@
 # ergo-forge — governing roadmap
 
+**Date convention:** Historical dates below are local (Australia/Brisbane, UTC+10).
+The discovery date 2026-09-11 corresponds to authoring on 2026-09-10 UTC.
+See the [repository record date convention](DATE-CONVENTION.md); new records use UTC.
+
 **This document replaces `docs/superpowers/specs/2026-09-08-drain-hunt-roadmap.md` as the governing plan.** That document and the per-phase specifications are historical design and measurement records. They do not authorize additional work. Where they conflict with this plan, this plan wins. The architecture rationale is in [ARCHITECTURE-REVIEW-CODEX.md, sections 1–7](ARCHITECTURE-REVIEW-CODEX.md); this document defines the executable queue, not another review.
 
 Baseline: main `ee4ac6a874531872c27828d94e21e4fe7a1d7f7c`, inspected 2026-09-09. No benchmarks were rerun to write this plan. The committed artifacts, not remembered headlines or uncommitted reports, supply the scoreboard below.
@@ -183,6 +187,19 @@ The queue is **P00 → P01 → P02 → P03 → P04 → P05 → P06 → P07 → P
 
 ## 4. Gates a harness can read
 
+D00 scheduling decision (2026-09-11): register only D00, retaining the complete
+proposed D00–D04 queue in discovery section 5.3. CI cannot enforce gates for
+unregistered units; this is the accepted scheduling cost. Its acceptance rules
+are unchanged. The [governing decision](discovery/D00-DECISION.md) resolves the
+historical D00 registration stop while preserving both blockers and evidence.
+M00 retains its original manifest bytes and digest. Its anchor projects onto
+original P-era units **and original resolution entries**; a separately pinned
+original policy authenticates every original P/M registration and P05 resolution.
+Only the exact D00 registration, corresponding completion advancement and exact
+D00 resolution are permitted additions. All other protected changes are rejected
+by executable mutation regressions. Later registrations require a new decision.
+
+
 The following JSON block is the **policy source**, not illustrative pseudocode. P00 adds a small standard-library Python runner that extracts the uniquely marked block from this file. Do not duplicate its thresholds in test code. Tests load the same block and the fixture manifests; the runner validates schema, verifies required test names are discovered, rejects ignored/zero-test runs, runs dependencies, and exits nonzero on any unmet requirement. New paths and test names in this section are planned deliverables, not files claimed to exist today.
 
 <!-- roadmap-policy:v1 -->
@@ -190,7 +207,7 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
 {
   "schemaVersion": 1,
   "baselineRev": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
-  "completedThrough": "M04",
+  "completedThrough": "D02",
   "maxActiveImplementationBranches": 1,
   "maxOpenImplementationPrs": 1,
   "units": [
@@ -455,6 +472,68 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
         "final_metrics_preserve_all_members_and_unsupported_ceiling"
       ],
       "implemented": false
+    },
+    {
+      "id": "D00",
+      "depends": [
+        "M04"
+      ],
+      "days": 2,
+      "package": "ergo-sandbox",
+      "target": "property_inventory",
+      "tests": [
+        "property_inventory_pins_24_cases_and_independent_answers",
+        "reference_executions_and_legacy_results_are_reproduced",
+        "transfer_registration_and_exposure_are_accounted"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "D01",
+      "depends": [
+        "D00"
+      ],
+      "days": 2,
+      "package": "ergo-sandbox",
+      "target": "property_schema",
+      "tests": [
+        "property_versions_units_and_limits_fail_closed",
+        "bindings_never_infer_missing_roles_or_authority",
+        "declaration_identity_binds_all_semantic_premises"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "D02",
+      "depends": [
+        "D01"
+      ],
+      "days": 3,
+      "package": "ergo-sandbox",
+      "target": "property_evaluation",
+      "tests": [
+        "four_property_families_match_independent_operands",
+        "guards_missing_fields_and_overflow_preserve_unknowns",
+        "bounded_response_requires_a_complete_accepted_linked_trace",
+        "property_evaluation_requires_fresh_node_acceptance"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "D03",
+      "depends": [
+        "D02"
+      ],
+      "days": 3,
+      "package": "ergo-sandbox",
+      "target": "property_replay",
+      "tests": [
+        "all_registered_property_dispositions_match",
+        "property_replay_rejects_tampered_claims_and_premises",
+        "legacy_replay_bytes_and_semantics_remain_unchanged",
+        "registered_author_cases_show_usefulness_beyond_extraction"
+      ],
+      "implemented": false
     }
   ],
   "thresholds": {
@@ -499,6 +578,12 @@ The following JSON block is the **policy source**, not illustrative pseudocode. 
       "recordSha256": "0639e75daaab01d5a67ebb25a797b0cdbbba197474c0b0fec29815706ed67986",
       "decision": "docs/P05-DECISION.md",
       "decisionSha256": "cbc1096d4d208a900c2be4c7091ba49feb2bf1722e8dca77f2d3567ad4d02aa2"
+    },
+    {
+      "unit": "D00",
+      "recordSha256": "026d54998eb717de27922d8b10b4268fa07a24e49aa2b79466cd4106945280f3",
+      "decision": "docs/discovery/D00-DECISION.md",
+      "decisionSha256": "9293e9a6f50a11fa9d5b07c89dc2b2b8bbba9a027e8657830882ec4bd4609f8e"
     }
   ]
 }
@@ -759,3 +844,68 @@ and [stop record](roadmap-stops.json). M05 remains unimplemented and
 `completedThrough` remains M04. No policy registration, pinned answer, historical
 claim, action disposition, numeric threshold or frozen capability changes.
 The separate counterexample diagnostic grants no M05 capability authority.
+
+D00 author-authorized registration attempt stopped on 2026-09-11. The exact
+proposed D00–D04 append makes the current all-goal CI reject unfinished D units
+and fails M00's frozen-policy projection. See the [D00 report](discovery/D00.md),
+[design amendment](superpowers/specs/2026-09-11-discovery-capability-design.md#d00-attempted-registration-amendment--2026-09-11-stopped)
+and appended [stop record](roadmap-stops.json). The temporary diagnostic append
+was restored; no D units are registered or implemented in the governing policy.
+The completed prefix remains M04, all P/M flags and baseline fields remain
+unchanged, and M05's stop remains. Reopening requires an explicit registration/CI
+scheduling decision and M00 projection integration preserving the original
+digest, followed by the original D00 inventory and gates. This records a
+registration boundary, not a property measurement or a passing D00 gate.
+
+
+D00 author-authorized incremental implementation record — 2026-09-11:
+D00 alone is registered and implemented following its three direct inventory
+gates. `completedThrough` advances to D00, whose dependency is M04; M05 remains
+stopped and is not a D00 dependency. The [D00 record](discovery/D00.md) reports
+final prefix and CI verification. D01–D04 remain proposed and unregistered, so
+CI cannot enforce their gates. No later capability is implemented. The exact
+policy-pinned D00 resolution retains both historical registration blockers and
+all evidence; the [historical report](discovery/D00-STOP.md) remains unchanged.
+M00's original policy digest and manifest bytes survive the narrowly authorized
+projection extension. All original P/M registrations and P05 resolution are
+separately authenticated, and real mutation checks reject other protected changes.
+The synthetic inventory is complete; absent independent semantic review and a
+transfer pair mean incomplete semantic measurement and no utility claim.
+
+
+D01 author-authorized implementation record — 2026-09-11:
+D01 alone is added after the committed D00 inventory under section 4's
+incremental registration rule. Its exact proposed dependency, two-day ceiling,
+package, target and three test names are retained. The strict opt-in declaration
+schema, normalized immutable identity and explicit role binding checks confer no
+execution or property-result authority. Only D01's flag and `completedThrough`
+advance, after its direct tests and all predecessors passed. See the
+[D01 report](discovery/D01.md) for final gates and preservation evidence.
+D00's 24 rows, hashes and null transfer registration are unchanged. M00's original
+anchor remains unchanged; exact permitted-additions authentication now covers
+D01 while rejecting prior-field mutations and later-unit appends. M05 remains
+stopped. D02–D04 are unregistered; capability 1 can remain the endpoint and no
+capability 2/3 work is planned by this change.
+
+
+D02 author-authorized implementation record — 2026-09-11:
+D02 alone is registered with the unchanged D01 dependency, three-day ceiling,
+package, target and four test names. Fresh per-step node validation now supports
+checked supplied-trace linkage and the four bounded property families, including
+response horizons 1–4. Only D02's implementation flag and `completedThrough`
+advance. See the [D02 report](discovery/D02.md) for authority limits, adversarial
+checks and real gate output. The D00/D01 pins, schema, M00 anchor, frozen data
+and M05 stop remain unchanged. Exact permitted-additions authentication covers
+D02 and retains earlier mutation/append rejections. D03/D04 remain unregistered;
+capability 1 may remain the endpoint, with no capability 2/3 work planned here.
+
+
+D03 author-authorized attempted implementation — 2026-09-11:
+D03 alone is registered with the exact proposed D02 dependency, three-day ceiling,
+package, target and four tests. The first required run measured 24/24 synthetic
+dispositions and 16/16 applicable supported guards, but failed author usefulness:
+the frozen transfer denominator is null. D03 is stopped and unimplemented;
+`completedThrough` remains D02. The full failed target and command report are
+retained, with a separate passing replay correctness prefix. See
+[the D03 report](discovery/D03.md). This does not waive or pass its utility gate.
+D04 remains unregistered and unattempted. Capabilities 2 and 3 are not scheduled.

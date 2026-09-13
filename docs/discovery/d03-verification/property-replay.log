@@ -1,0 +1,37 @@
+    Finished `release` profile [optimized] target(s) in 0.07s
+     Running tests/property_replay.rs (target-p00/release/deps/property_replay-b3e52e06f28ef5dc)
+
+running 4 tests
+test property_replay_rejects_tampered_claims_and_premises ... ok
+test legacy_replay_bytes_and_semantics_remain_unchanged ... ok
+test registered_author_cases_show_usefulness_beyond_extraction ... FAILED
+test all_registered_property_dispositions_match ... ok
+
+successes:
+
+---- all_registered_property_dispositions_match stdout ----
+D03 agreement=24/24 transfer denominator=null utility=null; no contract defects adjudicated
+
+
+successes:
+    all_registered_property_dispositions_match
+    legacy_replay_bytes_and_semantics_remain_unchanged
+    property_replay_rejects_tampered_claims_and_premises
+
+failures:
+
+---- registered_author_cases_show_usefulness_beyond_extraction stdout ----
+
+thread 'registered_author_cases_show_usefulness_beyond_extraction' (20) panicked at ergo-sandbox/tests/property_replay.rs:61:5:
+assertion `left == right` failed: Frozen transfer registration is ungrounded; utility remains null. Synthetic agreement cannot substitute.
+  left: Null
+ right: Number(2)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    registered_author_cases_show_usefulness_beyond_extraction
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+error: test failed, to rerun pass `-p ergo-sandbox --test property_replay`

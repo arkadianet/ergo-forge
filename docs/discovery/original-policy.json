@@ -1,0 +1,315 @@
+{
+  "schemaVersion": 1,
+  "baselineRev": "ee4ac6a874531872c27828d94e21e4fe7a1d7f7c",
+  "completedThrough": "M04",
+  "maxActiveImplementationBranches": 1,
+  "maxOpenImplementationPrs": 1,
+  "units": [
+    {
+      "id": "P00",
+      "depends": [],
+      "days": 2,
+      "package": "ergo-sandbox",
+      "target": "claim_contract",
+      "tests": [
+        "scenario_reproduction_is_not_confirmation",
+        "legacy_results_are_explicitly_preflight_or_simulation",
+        "legacy_record_cannot_import_as_verified"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "P01",
+      "depends": [
+        "P00"
+      ],
+      "days": 3,
+      "package": "ergo-sandbox",
+      "target": "evidence_provenance",
+      "tests": [
+        "synthetic_binding_survives_export_and_import",
+        "structural_match_does_not_establish_deployment",
+        "missing_registers_are_not_empty_registers",
+        "changing_any_premise_invalidates_cached_evidence"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "P02",
+      "depends": [
+        "P01"
+      ],
+      "days": 4,
+      "package": "ergo-sandbox",
+      "target": "evidence_wire",
+      "tests": [
+        "wire_box_id_matches_full_serialization",
+        "transaction_id_and_message_use_node_bytes_to_sign",
+        "legacy_box_missing_reference_cannot_be_promoted",
+        "invalid_tree_never_becomes_empty_bytes"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "P03",
+      "depends": [
+        "P02"
+      ],
+      "days": 6,
+      "package": "ergo-sandbox",
+      "target": "node_validation",
+      "tests": [
+        "full_pipeline_matches_pinned_node_vectors",
+        "incomplete_context_is_not_node_acceptance",
+        "accepted_execution_cannot_be_deserialized_or_fabricated"
+      ],
+      "caseIds": [
+        "accepted-keyless-spend",
+        "duplicate-input-rejection",
+        "future-output-rejection",
+        "canonical-encoding-rejection",
+        "output-constraint-rejection",
+        "aggregate-cost-rejection",
+        "missing-utxo-rejection",
+        "storage-rent-acceptance",
+        "reemission-rule-rejection"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "P04",
+      "depends": [
+        "P03"
+      ],
+      "days": 3,
+      "package": "ergo-sandbox",
+      "target": "transaction_proofs",
+      "tests": [
+        "owned_p2pk_funding_signs_actual_transaction",
+        "changed_transaction_invalidates_proof",
+        "declared_public_key_without_proof_is_not_acceptance",
+        "replay_bundle_contains_no_secret"
+      ],
+      "fixtureManifest": "ergo-sandbox/tests/fixtures/evidence/proof-manifest.json",
+      "caseIds": [
+        "owned-p2pk-with-keyless-companion"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "P05",
+      "depends": [
+        "P04"
+      ],
+      "days": 4,
+      "package": "ergo-sandbox",
+      "target": "claim_replay",
+      "tests": [
+        "claim_requires_accepted_execution_and_violated_property",
+        "unknown_policy_cannot_confirm",
+        "offline_replay_reproduces_claim",
+        "wrong_companion_or_policy_invalidates_claim"
+      ],
+      "implemented": true,
+      "fixtureManifest": "ergo-sandbox/tests/fixtures/evidence/claim-manifest.json",
+      "caseIds": [
+        "use-incident",
+        "sale-mutant-unpaid",
+        "sale-fixed-paid",
+        "sale-fixed-unpaid"
+      ],
+      "positiveCaseIds": [
+        "use-incident",
+        "sale-mutant-unpaid"
+      ],
+      "negativeCaseIds": [
+        "sale-fixed-paid",
+        "sale-fixed-unpaid"
+      ]
+    },
+    {
+      "id": "P06",
+      "depends": [
+        "P05"
+      ],
+      "days": 4,
+      "package": "ergo-sandbox",
+      "target": "drain_promotion",
+      "tests": [
+        "generated_public_incident_candidate_promotes",
+        "unbacked_synthetic_material_stays_preflight",
+        "missing_funding_proof_blocks_promotion",
+        "associated_lint_is_not_the_confirmed_claim"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "P07",
+      "depends": [
+        "P06"
+      ],
+      "days": 4,
+      "package": "ergo-sandbox",
+      "target": "obligation_reports",
+      "tests": [
+        "duplicate_observations_keep_all_anchors_in_one_obligation",
+        "suppression_invalidates_on_premise_change",
+        "conditional_discharge_exports_the_full_premise_set",
+        "curated_precision_has_positive_and_negative_controls"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "P08",
+      "depends": [
+        "P07"
+      ],
+      "days": 3,
+      "package": "ergo-web",
+      "target": "evidence_replay",
+      "tests": [
+        "http_and_cli_replay_have_identical_semantic_results",
+        "historical_and_hypothetical_state_labels_are_visible",
+        "legacy_preflight_does_not_use_node_claim_badge",
+        "replay_request_never_fetches_or_broadcasts"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "M00",
+      "depends": [
+        "P08"
+      ],
+      "days": 3,
+      "package": "ergo-sandbox",
+      "target": "mapping_inventory",
+      "tests": [
+        "inventory_has_32_pinned_cases_and_independent_answers",
+        "legacy_metrics_are_measured_without_baseline_changes",
+        "fixture_constructs_execute_and_unsupported_members_remain"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "M01",
+      "depends": [
+        "M00"
+      ],
+      "days": 2,
+      "package": "ergo-sandbox",
+      "target": "mapping_artifacts",
+      "tests": [
+        "discovery_cannot_import_as_required_execution",
+        "premise_changes_invalidate_imported_proofs",
+        "raw_provenance_and_legacy_map_bytes_survive"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "M02",
+      "depends": [
+        "M01"
+      ],
+      "days": 3,
+      "package": "ergo-sandbox",
+      "target": "mapping_discovery",
+      "tests": [
+        "supported_reference_recall_and_all_site_accounting",
+        "false_hints_never_become_required_relations",
+        "caps_missing_pages_and_computed_identities_stay_unresolved"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "M03",
+      "depends": [
+        "M02"
+      ],
+      "days": 4,
+      "package": "ergo-sandbox",
+      "target": "mapping_necessity",
+      "tests": [
+        "exact_guarded_necessity_matches_pinned_answers",
+        "alternatives_dead_checks_and_self_do_not_prove_cospend",
+        "satisfying_omission_and_relaxed_controls_use_full_validator",
+        "unsupported_anchors_and_cyclic_proofs_are_rejected"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "M04",
+      "depends": [
+        "M03"
+      ],
+      "days": 3,
+      "package": "ergo-sandbox",
+      "target": "mapping_actions",
+      "tests": [
+        "alternative_action_sets_are_checked_separately",
+        "data_outputs_and_unrelated_inputs_cannot_satisfy_spend",
+        "accepted_omission_refutes_only_matching_claim_and_premises"
+      ],
+      "implemented": true
+    },
+    {
+      "id": "M05",
+      "depends": [
+        "M04"
+      ],
+      "days": 4,
+      "package": "ergo-sandbox",
+      "target": "mapping_context_code",
+      "tests": [
+        "authenticated_config_code_requires_same_input_execution",
+        "optional_wrong_scope_and_mutable_config_do_not_promote",
+        "all_four_omission_families_replay_and_refute",
+        "final_metrics_preserve_all_members_and_unsupported_ceiling"
+      ],
+      "implemented": false
+    }
+  ],
+  "thresholds": {
+    "ingestRows": 28,
+    "ingestCompiledFloor": 26,
+    "wireBoxFixturesMin": 2,
+    "wireTransactionFixturesMin": 1,
+    "nodeVectorCasesMin": 8,
+    "acceptedBundlesMin": 3,
+    "confirmedPropertyClaimsMin": 2,
+    "claimFamiliesMin": 2,
+    "publicIncidentClaimMin": 1,
+    "acceptedNonviolatingControlMin": 1,
+    "promotedGeneratedCandidatesMin": 1,
+    "benignPrecisionCases": 6,
+    "benignConfirmedViolationsMax": 0,
+    "positivePrecisionCases": 2,
+    "positivePrecisionClaimsMin": 2,
+    "duplicateInputAnchors": 12,
+    "duplicateOutputGroups": 1,
+    "duplicateOutputAnchors": 12
+  },
+  "frozenPreflight": {
+    "artifact": "examples/mutants/answer-key.json",
+    "cases": 8,
+    "proven": 5,
+    "attributable": 4,
+    "confounded": 0,
+    "maxProbes": 50000,
+    "maxPermutations": 120
+  },
+  "stopRecords": "docs/roadmap-stops.json",
+  "scoreboard": {
+    "path": "docs/roadmap-metrics.json",
+    "ingestion": "docs/ingestion-lithos-results.json",
+    "decompiler": "ergo-sandbox/tests/fixtures/decompile_corpus_expectations.json",
+    "history": "examples/mutants/answer-key.custody-v1.json"
+  },
+  "resolvedStopRecords": [
+    {
+      "unit": "P05",
+      "recordSha256": "0639e75daaab01d5a67ebb25a797b0cdbbba197474c0b0fec29815706ed67986",
+      "decision": "docs/P05-DECISION.md",
+      "decisionSha256": "cbc1096d4d208a900c2be4c7091ba49feb2bf1722e8dca77f2d3567ad4d02aa2"
+    }
+  ]
+}

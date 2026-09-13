@@ -1,0 +1,24 @@
+   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge/ergo-sandbox)
+    Finished `release` profile [optimized] target(s) in 1.99s
+     Running tests/property_replay_boundary.rs (target-p00/release/deps/property_replay_boundary-5f0531dd62ea1817)
+
+running 4 tests
+test fresh_replay_and_bad_author_assertion_do_not_create_defect_attribution ... ok
+test property_replay_rejects_tampered_claims_and_premises ... ok
+test legacy_replay_bytes_and_semantics_remain_unchanged ... ok
+test all_registered_property_dispositions_match ... ok
+
+successes:
+
+---- all_registered_property_dispositions_match stdout ----
+D03 agreement=24/24 transfer denominator=null utility=null; no contract defects adjudicated
+
+
+successes:
+    all_registered_property_dispositions_match
+    fresh_replay_and_bad_author_assertion_do_not_create_defect_attribution
+    legacy_replay_bytes_and_semantics_remain_unchanged
+    property_replay_rejects_tampered_claims_and_premises
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

@@ -1,0 +1,244 @@
+{
+  "reviewer": "implementing assistant; not independent semantic review",
+  "rows": [
+    {
+      "id": "A01",
+      "family": "amm",
+      "syntaxAccepted": false,
+      "expressionNodesInSketch": 30,
+      "blockers": [
+        "runtime multiplication",
+        "unestablished i128 bound / alternative encoding"
+      ],
+      "soleArithmetic": null,
+      "qualifies": false
+    },
+    {
+      "id": "A02",
+      "family": "amm",
+      "syntaxAccepted": false,
+      "expressionNodesInSketch": 30,
+      "blockers": [
+        "runtime multiplication",
+        "unestablished i128 bound / alternative encoding"
+      ],
+      "soleArithmetic": null,
+      "qualifies": false
+    },
+    {
+      "id": "A03",
+      "family": "amm",
+      "syntaxAccepted": false,
+      "expressionNodesInSketch": 29,
+      "blockers": [
+        "runtime multiplication"
+      ],
+      "soleArithmetic": true,
+      "qualifies": true
+    },
+    {
+      "id": "A04",
+      "family": "amm",
+      "syntaxAccepted": false,
+      "expressionNodesInSketch": 29,
+      "blockers": [
+        "runtime multiplication"
+      ],
+      "soleArithmetic": true,
+      "qualifies": true
+    },
+    {
+      "id": "B01",
+      "family": "bank",
+      "syntaxAccepted": true,
+      "expressionNodesInSketch": 8,
+      "blockers": [],
+      "soleArithmetic": false,
+      "qualifies": false
+    },
+    {
+      "id": "B02",
+      "family": "bank",
+      "syntaxAccepted": false,
+      "expressionNodesInSketch": 12,
+      "blockers": [
+        "runtime multiplication",
+        "price unit relationship",
+        "unestablished i128 bound / alternative encoding"
+      ],
+      "soleArithmetic": null,
+      "qualifies": false
+    },
+    {
+      "id": "B03",
+      "family": "bank",
+      "syntaxAccepted": false,
+      "expressionNodesInSketch": 31,
+      "blockers": [
+        "runtime multiplication/minimum/division",
+        "omitted zero-circulation branch",
+        "branch expansion may exceed 32 nodes",
+        "price units",
+        "Long intermediate semantics"
+      ],
+      "soleArithmetic": false,
+      "qualifies": false
+    },
+    {
+      "id": "B04",
+      "family": "bank",
+      "syntaxAccepted": false,
+      "expressionNodesInSketch": 31,
+      "blockers": [
+        "internal nominal price not an observed output",
+        "conditional/zero branch",
+        "runtime arithmetic",
+        "units"
+      ],
+      "soleArithmetic": false,
+      "qualifies": false
+    },
+    {
+      "id": "V01",
+      "family": "vesting",
+      "syntaxAccepted": true,
+      "expressionNodesInSketch": 6,
+      "blockers": [],
+      "soleArithmetic": false,
+      "qualifies": false
+    },
+    {
+      "id": "V02",
+      "family": "vesting",
+      "syntaxAccepted": false,
+      "expressionNodesInSketch": 20,
+      "blockers": [
+        "runtime multiplication/division"
+      ],
+      "soleArithmetic": true,
+      "qualifies": true
+    },
+    {
+      "id": "V03",
+      "family": "vesting",
+      "syntaxAccepted": false,
+      "expressionNodesInSketch": 4,
+      "blockers": [
+        "authorization proof observation"
+      ],
+      "soleArithmetic": false,
+      "qualifies": false
+    },
+    {
+      "id": "U01",
+      "family": "auction",
+      "syntaxAccepted": true,
+      "expressionNodesInSketch": 8,
+      "blockers": [
+        "existing-bid SigmaProp/fallback predicate",
+        "branch discrimination"
+      ],
+      "soleArithmetic": false,
+      "qualifies": false
+    },
+    {
+      "id": "U02",
+      "family": "auction",
+      "syntaxAccepted": false,
+      "expressionNodesInSketch": 10,
+      "blockers": [
+        "dynamic SigmaProp recipient/fallback",
+        "branch discrimination"
+      ],
+      "soleArithmetic": false,
+      "qualifies": false
+    },
+    {
+      "id": "U03",
+      "family": "auction",
+      "syntaxAccepted": false,
+      "expressionNodesInSketch": 10,
+      "blockers": [
+        "dynamic SigmaProp recipient/fallback",
+        "whole-token-bundle observation",
+        "branch discrimination"
+      ],
+      "soleArithmetic": false,
+      "qualifies": false
+    },
+    {
+      "id": "R01",
+      "family": "registry",
+      "syntaxAccepted": true,
+      "expressionNodesInSketch": 4,
+      "blockers": [
+        "public/registrar branch discrimination"
+      ],
+      "soleArithmetic": false,
+      "qualifies": false
+    },
+    {
+      "id": "R02",
+      "family": "registry",
+      "syntaxAccepted": true,
+      "expressionNodesInSketch": 4,
+      "blockers": [
+        "public/registrar branch discrimination",
+        "recipient identity omitted from projection"
+      ],
+      "soleArithmetic": false,
+      "qualifies": false
+    },
+    {
+      "id": "R03",
+      "family": "registry",
+      "syntaxAccepted": false,
+      "expressionNodesInSketch": 2,
+      "blockers": [
+        "AVL state and insertion semantics",
+        "context variable reads",
+        "branch discrimination"
+      ],
+      "soleArithmetic": false,
+      "qualifies": false
+    },
+    {
+      "id": "X01",
+      "family": "mixer",
+      "syntaxAccepted": true,
+      "expressionNodesInSketch": 8,
+      "blockers": [
+        "partner/owner branch discrimination",
+        "full-mix identity omitted from projection"
+      ],
+      "soleArithmetic": false,
+      "qualifies": false
+    },
+    {
+      "id": "X02",
+      "family": "mixer",
+      "syntaxAccepted": false,
+      "expressionNodesInSketch": 2,
+      "blockers": [
+        "GroupElement register observations",
+        "branch discrimination",
+        "output identities"
+      ],
+      "soleArithmetic": false,
+      "qualifies": false
+    },
+    {
+      "id": "X03",
+      "family": "mixer",
+      "syntaxAccepted": false,
+      "expressionNodesInSketch": 2,
+      "blockers": [
+        "DH proof observation",
+        "GroupElement register observations",
+        "branch discrimination"
+      ],
+      "soleArithmetic": false,
+      "qualifies": false
+    }
+  ]
+}

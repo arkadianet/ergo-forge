@@ -1,0 +1,870 @@
+{
+  "version": "property-expected:v1",
+  "authorship": "Authored by Codex separately from any property evaluator, before node or extraction output inspection; not independent human adjudication.",
+  "cases": [
+    {
+      "id": "reserve_violation_1",
+      "family": "reserve",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "reserveBefore": 10000000,
+        "reserveAfter": 10000000,
+        "liabilityBefore": 5000000,
+        "liabilityAfter": 7000000,
+        "left": 0,
+        "right": 2000000,
+        "units": "nanoERG; R4 declares fixed-scale liabilities at 1 nanoERG per unit"
+      },
+      "expectedDisposition": "violated",
+      "explanation": "Compare reserve increase to fixed-scale liability increase; explicit external funding and change are excluded from the reserve role. The contract enforces only a minimum output value.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "reserve_violation_2",
+      "family": "reserve",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "reserveBefore": 10000000,
+        "reserveAfter": 9000000,
+        "liabilityBefore": 5000000,
+        "liabilityAfter": 5000000,
+        "left": -1000000,
+        "right": 0,
+        "units": "nanoERG; R4 declares fixed-scale liabilities at 1 nanoERG per unit"
+      },
+      "expectedDisposition": "violated",
+      "explanation": "Compare reserve increase to fixed-scale liability increase; explicit external funding and change are excluded from the reserve role. The contract enforces only a minimum output value.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "reserve_control_1",
+      "family": "reserve",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "reserveBefore": 10000000,
+        "reserveAfter": 12000000,
+        "liabilityBefore": 5000000,
+        "liabilityAfter": 7000000,
+        "left": 2000000,
+        "right": 2000000,
+        "units": "nanoERG; R4 declares fixed-scale liabilities at 1 nanoERG per unit"
+      },
+      "expectedDisposition": "holds-on-execution",
+      "explanation": "Compare reserve increase to fixed-scale liability increase; explicit external funding and change are excluded from the reserve role. The contract enforces only a minimum output value.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "reserve_control_2",
+      "family": "reserve",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "reserveBefore": 10000000,
+        "reserveAfter": 10000000,
+        "liabilityBefore": 5000000,
+        "liabilityAfter": 5000000,
+        "left": 0,
+        "right": 0,
+        "units": "nanoERG; R4 declares fixed-scale liabilities at 1 nanoERG per unit"
+      },
+      "expectedDisposition": "holds-on-execution",
+      "explanation": "Compare reserve increase to fixed-scale liability increase; explicit external funding and change are excluded from the reserve role. The contract enforces only a minimum output value.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "issuance_violation_1",
+      "family": "issuance",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "mint": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "inputSupply": 0,
+        "outputSupply": 11,
+        "delta": 11,
+        "quota": 10,
+        "authority": "No required authority input for this quota declaration; node issuance uses first spending input ID."
+      },
+      "expectedDisposition": "violated",
+      "explanation": "This is accepted over-issuance versus an author quota, not a claim about human consent or unauthorized minting. Zero previous supply is explicit in the transaction input inventory.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "issuance_violation_2",
+      "family": "issuance",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "mint": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "inputSupply": 0,
+        "outputSupply": 21,
+        "delta": 21,
+        "quota": 20,
+        "authority": "No required authority input for this quota declaration; node issuance uses first spending input ID."
+      },
+      "expectedDisposition": "violated",
+      "explanation": "This is accepted over-issuance versus an author quota, not a claim about human consent or unauthorized minting. Zero previous supply is explicit in the transaction input inventory.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "issuance_control_1",
+      "family": "issuance",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "mint": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "inputSupply": 0,
+        "outputSupply": 10,
+        "delta": 10,
+        "quota": 10,
+        "authority": "No required authority input for this quota declaration; node issuance uses first spending input ID."
+      },
+      "expectedDisposition": "holds-on-execution",
+      "explanation": "This is accepted over-issuance versus an author quota, not a claim about human consent or unauthorized minting. Zero previous supply is explicit in the transaction input inventory.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "issuance_control_2",
+      "family": "issuance",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "mint": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "inputSupply": 0,
+        "outputSupply": 19,
+        "delta": 19,
+        "quota": 20,
+        "authority": "No required authority input for this quota declaration; node issuance uses first spending input ID."
+      },
+      "expectedDisposition": "holds-on-execution",
+      "explanation": "This is accepted over-issuance versus an author quota, not a claim about human consent or unauthorized minting. Zero previous supply is explicit in the transaction input inventory.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "continuation_violation_1",
+      "family": "continuation",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "state": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "successors": {
+          "collection": "outputs",
+          "selector": {
+            "sourceId": "continuation"
+          },
+          "cardinality": "all-matches"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "inputStateTag": 7,
+        "successorCount": 0,
+        "requiredCount": 1,
+        "successorScripts": [],
+        "successorRegisterTags": [],
+        "left": 0,
+        "right": 1
+      },
+      "expectedDisposition": "violated",
+      "explanation": "Spending the explicit state input requires exactly one output with the same exact script; the state input has R4=7. The permissive contract checks only input value. No NFT uniqueness is inferred.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "continuation_violation_2",
+      "family": "continuation",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "state": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "successors": {
+          "collection": "outputs",
+          "selector": {
+            "sourceId": "continuation"
+          },
+          "cardinality": "all-matches"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "inputStateTag": 7,
+        "successorCount": 2,
+        "requiredCount": 1,
+        "successorScripts": [
+          "continuation",
+          "continuation"
+        ],
+        "successorRegisterTags": [
+          7,
+          7
+        ],
+        "left": 2,
+        "right": 1
+      },
+      "expectedDisposition": "violated",
+      "explanation": "Spending the explicit state input requires exactly one output with the same exact script; the state input has R4=7. The permissive contract checks only input value. No NFT uniqueness is inferred.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "continuation_control_1",
+      "family": "continuation",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "state": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "successors": {
+          "collection": "outputs",
+          "selector": {
+            "sourceId": "continuation"
+          },
+          "cardinality": "all-matches"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "inputStateTag": 7,
+        "successorCount": 1,
+        "requiredCount": 1,
+        "successorScripts": [
+          "continuation"
+        ],
+        "successorRegisterTags": [
+          7
+        ],
+        "left": 1,
+        "right": 1
+      },
+      "expectedDisposition": "holds-on-execution",
+      "explanation": "Spending the explicit state input requires exactly one output with the same exact script; the state input has R4=7. The permissive contract checks only input value. No NFT uniqueness is inferred.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "continuation_control_2",
+      "family": "continuation",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "state": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "successors": {
+          "collection": "outputs",
+          "selector": {
+            "sourceId": "continuation"
+          },
+          "cardinality": "all-matches"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "inputStateTag": 7,
+        "successorCount": 1,
+        "requiredCount": 1,
+        "successorScripts": [
+          "continuation"
+        ],
+        "successorRegisterTags": [
+          7
+        ],
+        "left": 1,
+        "right": 1
+      },
+      "expectedDisposition": "holds-on-execution",
+      "explanation": "Spending the explicit state input requires exactly one output with the same exact script; the state input has R4=7. The permissive contract checks only input value. No NFT uniqueness is inferred.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "bounded_response_violation_1",
+      "family": "bounded_response",
+      "expectedReferenceAcceptance": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ],
+      "expectedBindings": {
+        "state": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "successor": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "triggerIndex": 0,
+        "triggerPending": 1,
+        "K": 2,
+        "goalAtSuccessors": [
+          false,
+          false
+        ],
+        "R4ByOutput": [
+          1,
+          1,
+          1
+        ],
+        "firstGoalIndex": null
+      },
+      "expectedDisposition": "violated",
+      "explanation": "At the pending trigger, promise service within two subsequent accepted actions. R4 zero means serviced. All three steps must later pass D02 linked checking; individual D00 acceptance is insufficient.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "bounded_response_violation_2",
+      "family": "bounded_response",
+      "expectedReferenceAcceptance": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ],
+      "expectedBindings": {
+        "state": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "successor": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "triggerIndex": 0,
+        "triggerPending": 1,
+        "K": 2,
+        "goalAtSuccessors": [
+          false,
+          false
+        ],
+        "R4ByOutput": [
+          1,
+          1,
+          1
+        ],
+        "firstGoalIndex": null
+      },
+      "expectedDisposition": "violated",
+      "explanation": "At the pending trigger, promise service within two subsequent accepted actions. R4 zero means serviced. All three steps must later pass D02 linked checking; individual D00 acceptance is insufficient.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "bounded_response_control_1",
+      "family": "bounded_response",
+      "expectedReferenceAcceptance": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ],
+      "expectedBindings": {
+        "state": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "successor": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "triggerIndex": 0,
+        "triggerPending": 1,
+        "K": 2,
+        "goalAtSuccessors": [
+          true,
+          true
+        ],
+        "R4ByOutput": [
+          1,
+          0,
+          0
+        ],
+        "firstGoalIndex": 1
+      },
+      "expectedDisposition": "holds-on-execution",
+      "explanation": "At the pending trigger, promise service within two subsequent accepted actions. R4 zero means serviced. All three steps must later pass D02 linked checking; individual D00 acceptance is insufficient.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "bounded_response_control_2",
+      "family": "bounded_response",
+      "expectedReferenceAcceptance": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ],
+      "expectedBindings": {
+        "state": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "successor": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "triggerIndex": 0,
+        "triggerPending": 1,
+        "K": 2,
+        "goalAtSuccessors": [
+          false,
+          true
+        ],
+        "R4ByOutput": [
+          1,
+          1,
+          0
+        ],
+        "firstGoalIndex": 2
+      },
+      "expectedDisposition": "holds-on-execution",
+      "explanation": "At the pending trigger, promise service within two subsequent accepted actions. R4 zero means serviced. All three steps must later pass D02 linked checking; individual D00 acceptance is insufficient.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "missing_role",
+      "family": "boundary",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "position": 9
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "afterMatches": []
+      },
+      "expectedDisposition": "unresolved",
+      "explanation": "Required exactly-one output position 9 is absent; never default its value to zero.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "ambiguous_role",
+      "family": "boundary",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "sourceId": "reserve"
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "afterMatches": [
+          0,
+          1
+        ]
+      },
+      "expectedDisposition": "unresolved",
+      "explanation": "Both outputs have the exact reserve script; exactly-one is unresolved, never select the first.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "wrong_register_type",
+      "family": "boundary",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "required": "Long",
+        "actual": "Boolean",
+        "field": "outputs[0].R4"
+      },
+      "expectedDisposition": "unresolved",
+      "explanation": "R4 exists with Boolean type; a Long read is unresolved.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "arithmetic_overflow",
+      "family": "boundary",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "leftInput": "10000000",
+        "multiplier": "170141183460469231731687303715884105727",
+        "mathematicalProduct": "1701411834604692317316873037158841057270000000",
+        "ceiling": "170141183460469231731687303715884105727"
+      },
+      "expectedDisposition": "unresolved",
+      "explanation": "Multiplication exceeds signed 128-bit result ceiling; do not wrap or report false.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "false_guard",
+      "family": "boundary",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": false,
+      "operands": {
+        "guard": false,
+        "assertionNotEvaluated": true
+      },
+      "expectedDisposition": "not-applicable",
+      "explanation": "Inactive guard is not a nonviolating control and gives no applicable coverage.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "short_response_horizon",
+      "family": "boundary",
+      "expectedReferenceAcceptance": [
+        "accepted",
+        "accepted"
+      ],
+      "expectedBindings": {
+        "state": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "successor": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "K": 2,
+        "subsequentActions": 1,
+        "goalObserved": false
+      },
+      "expectedDisposition": "unresolved",
+      "explanation": "Only one of two required successor actions exists; incomplete horizon cannot refute response.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "unbounded_eventuality",
+      "family": "boundary",
+      "expectedReferenceAcceptance": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ],
+      "expectedBindings": {
+        "state": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "successor": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "horizon": null
+      },
+      "expectedDisposition": "unsupported-property",
+      "explanation": "An unbounded eventual-service promise requires semantics outside finite v1, not timeout evidence.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    },
+    {
+      "id": "unsupported_dynamic_expression",
+      "family": "boundary",
+      "expectedReferenceAcceptance": [
+        "accepted"
+      ],
+      "expectedBindings": {
+        "before": {
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        },
+        "after": {
+          "collection": "outputs",
+          "selector": {
+            "position": 0
+          },
+          "cardinality": "exactly-one"
+        }
+      },
+      "expectedGuard": true,
+      "operands": {
+        "operator": "execute-extension"
+      },
+      "expectedDisposition": "unsupported-property",
+      "explanation": "Dynamic expression execution is outside the finite property vocabulary, regardless of node acceptance.",
+      "defectAttribution": "unadjudicated author assertion; a refutation alone does not establish a contract defect",
+      "reviewStatus": "independent-human-review-missing"
+    }
+  ]
+}

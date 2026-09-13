@@ -1,0 +1,3 @@
+$ CARGO_TARGET_DIR=./target-p00 cargo fmt --all -- --check
+
+exit: 0

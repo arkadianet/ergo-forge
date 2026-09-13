@@ -1,0 +1,147 @@
+[
+  {
+    "name": "fmt",
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "environment": {
+      "CARGO_TARGET_DIR": "./target-p00"
+    },
+    "startUtc": "2026-09-10T15:45:12.372662+00:00",
+    "exitCode": 0,
+    "log": "docs/discovery/d00-verification/final/fmt.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "clippy",
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "environment": {
+      "CARGO_TARGET_DIR": "./target-p00"
+    },
+    "startUtc": "2026-09-10T15:45:12.727792+00:00",
+    "exitCode": 0,
+    "log": "docs/discovery/d00-verification/final/clippy.log",
+    "sha256": "29dcaf3c895bb4e19115355b803a00866686656f7401386fc518a68737dd2414"
+  },
+  {
+    "name": "property-inventory",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "ergo-sandbox",
+      "--release",
+      "--test",
+      "property_inventory",
+      "--",
+      "--show-output"
+    ],
+    "environment": {
+      "CARGO_TARGET_DIR": "./target-p00"
+    },
+    "startUtc": "2026-09-10T15:45:13.054370+00:00",
+    "exitCode": 0,
+    "log": "docs/discovery/d00-verification/final/property-inventory.log",
+    "sha256": "931f49488cd0f6290d7c5dc881ea9fc87601bc0001001b6925bc746f21a8a418"
+  },
+  {
+    "name": "workspace",
+    "command": [
+      "cargo",
+      "test",
+      "--workspace",
+      "--release"
+    ],
+    "environment": {
+      "CARGO_TARGET_DIR": "./target-p00"
+    },
+    "startUtc": "2026-09-10T15:45:13.193759+00:00",
+    "exitCode": 0,
+    "log": "docs/discovery/d00-verification/final/workspace.log",
+    "sha256": "474ce4d76566ff054f2e526e7b208ba03bbd5c8314ec7f03700484000eacd5e3"
+  },
+  {
+    "name": "python",
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "scripts",
+      "-p",
+      "test_roadmap_gate.py"
+    ],
+    "environment": {
+      "CARGO_TARGET_DIR": "./target-p00"
+    },
+    "startUtc": "2026-09-10T15:49:24.026087+00:00",
+    "exitCode": 0,
+    "log": "docs/discovery/d00-verification/final/python.log",
+    "sha256": "fce3f3d3161392ea7fbd91278cf8a03f9b749ececeb4b41ff84263882fc6c2a7"
+  },
+  {
+    "name": "require-d00",
+    "command": [
+      "python3",
+      "scripts/roadmap_gate.py",
+      "--require",
+      "D00",
+      "--report",
+      "docs/discovery/d00-verification/final/require-d00.json"
+    ],
+    "environment": {
+      "CARGO_TARGET_DIR": "./target-p00"
+    },
+    "startUtc": "2026-09-10T15:49:24.128403+00:00",
+    "exitCode": 0,
+    "log": "docs/discovery/d00-verification/final/require-d00.log",
+    "sha256": "b7dcc0191de40649e6cafa4146ef6a725ddf0a26e7af067d01b52b05385e2da3"
+  },
+  {
+    "name": "through-completed",
+    "command": [
+      "python3",
+      "scripts/roadmap_gate.py",
+      "--through-completed",
+      "--report",
+      "docs/discovery/d00-verification/through-completed.json"
+    ],
+    "environment": {
+      "CARGO_TARGET_DIR": "./target-p00"
+    },
+    "startUtc": "2026-09-10T15:41:17.157661+00:00",
+    "exitCode": 0,
+    "log": "docs/discovery/d00-verification/through-completed.log",
+    "sha256": "7f32d573f9f8e16f0be14040782c1c7b83161a20fe728e1fc995711036a174c0"
+  },
+  {
+    "name": "ci",
+    "command": [
+      "python3",
+      "scripts/roadmap_gate.py",
+      "--ci",
+      "--report",
+      "docs/discovery/d00-verification/ci.json"
+    ],
+    "environment": {
+      "CARGO_TARGET_DIR": "./target-p00"
+    },
+    "startUtc": "2026-09-10T15:42:54.240974+00:00",
+    "exitCode": 0,
+    "log": "docs/discovery/d00-verification/ci.log",
+    "sha256": "ad86b16e5d54015e83bbcdae610457b21f95953dce4d8290fda9a84197c4549a"
+  }
+]

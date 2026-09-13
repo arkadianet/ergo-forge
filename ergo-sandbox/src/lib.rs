@@ -59,6 +59,7 @@ pub mod inspect;
 pub mod map;
 pub mod method_names;
 pub mod play;
+pub mod properties;
 pub mod prove;
 pub mod recognize;
 pub mod rent;

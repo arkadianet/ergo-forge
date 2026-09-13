@@ -1,0 +1,34 @@
+{
+  "attemptCommit": "a996b4eacd9767b067d22a0eab82cbd0e529c9a3",
+  "dirtyTree": " M docs/ROADMAP.md\n M ergo-sandbox/src/properties/mod.rs\n M ergo-sandbox/tests/mapping_inventory.rs\n?? docs/discovery/d03-verification/\n?? ergo-sandbox/src/properties/replay.rs\n?? ergo-sandbox/tests/property_replay.rs\n?? ergo-sandbox/tests/property_replay_support/\n",
+  "evidenceHashes": {
+    "docs/ROADMAP.md": "a885fbdb00871588c9beae6f4f55f183c39002b98936e4c33d71022681ebc98e",
+    "ergo-sandbox/src/properties/replay.rs": "fb435a2d8ef3e1b6f29ed51af204fb6c3f0df47082db2601b70aaa234af8c971",
+    "ergo-sandbox/src/properties/evaluate.rs": "07e916bd4141af459c702efad19a2daf219c6b92a0d5b7c9396458ef641b124e",
+    "ergo-sandbox/src/properties/schema.rs": "495a208b7354263d75f47d0af1097ee10c51d81c51a8957aa8d381f6ea87f030",
+    "ergo-sandbox/src/properties/trace.rs": "b0df8a09cfe390b5bde37dd5dc3c8113504c0fee8d5532d66d5723db69289f46",
+    "ergo-sandbox/tests/property_replay.rs": "08694e16bf0dadfb175b15605ba5a306c99cf2d72d735c02eb1b1c9e9888f53e",
+    "ergo-sandbox/tests/property_replay_support/mod.rs": "a8f4eebf76d160e05e827c9b8d5c074a223117a33a6951a555333e7212bf9ace",
+    "ergo-sandbox/tests/mapping_inventory.rs": "a49e88a57291d013d329a679b2c4ee8e9d0026cb3183ff1b1245b011c9250e56",
+    "Cargo.lock": "49e2df016b7f2ff40d28a6a39d38f8a8b952cecaa437d687b0bd67d92f7109c8"
+  },
+  "startedUnix": 1789060423.986933,
+  "developmentDiagnostic": {
+    "path": "docs/discovery/d03-verification/development.log",
+    "exitCode": 101,
+    "sha256": "2d333e89022a989dc759b070d70da284a881e645dfb24461b0a95035451c7132",
+    "limitation": "First development evaluation printed agreement and utility failure but did not persist per-case rows. Retained as incomplete attempt evidence; no checkpoint pass is claimed."
+  },
+  "command": [
+    "python3",
+    "scripts/roadmap_gate.py",
+    "--require",
+    "D03",
+    "--report",
+    "docs/discovery/D03-command-report.json"
+  ],
+  "exitCode": 1,
+  "finishedUnix": 1789060521.3628182,
+  "reportSha256": "15761d5bd942ed2d3ce039d90d320d60389173d7570f852ad99d7a5618cbf3c7",
+  "logSha256": "527e075bedc380f6cd63fb725c2d1535f0bdacfc64fc82302fc320a7c13130ba"
+}

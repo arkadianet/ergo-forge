@@ -1,0 +1,2811 @@
+{
+  "version": "property-authoring:v1",
+  "sources": {
+    "reserve": "sigmaProp(OUTPUTS(0).value >= 1000000L)",
+    "issuance": "sigmaProp(OUTPUTS.size >= 1)",
+    "continuation": "sigmaProp(SELF.value >= 1000000L)",
+    "bounded_response": "sigmaProp(OUTPUTS(0).R4[Long].isDefined)",
+    "funding": "sigmaProp(true)"
+  },
+  "cases": [
+    {
+      "id": "reserve_violation_1",
+      "family": "reserve",
+      "inputs": [
+        {
+          "sourceId": "reserve",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 5000000
+            }
+          ],
+          "tokens": []
+        },
+        {
+          "sourceId": "funding",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 0
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "reserve",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 7000000
+              }
+            ],
+            "tokens": []
+          },
+          {
+            "sourceId": "funding",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "reserve_violation_1",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "before": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "after": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "ge",
+          "args": [
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "after",
+                  "field": "value",
+                  "unit": "nanoERG"
+                },
+                {
+                  "op": "read",
+                  "role": "before",
+                  "field": "value",
+                  "unit": "nanoERG"
+                }
+              ]
+            },
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "after",
+                  "field": "R4:Long",
+                  "unit": "nanoERG"
+                },
+                {
+                  "op": "read",
+                  "role": "before",
+                  "field": "R4:Long",
+                  "unit": "nanoERG"
+                }
+              ]
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "reserve"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "reserve_violation_2",
+      "family": "reserve",
+      "inputs": [
+        {
+          "sourceId": "reserve",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 5000000
+            }
+          ],
+          "tokens": []
+        },
+        {
+          "sourceId": "funding",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 0
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "reserve",
+            "value": 9000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 5000000
+              }
+            ],
+            "tokens": []
+          },
+          {
+            "sourceId": "funding",
+            "value": 11000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "reserve_violation_2",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "before": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "after": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "ge",
+          "args": [
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "after",
+                  "field": "value",
+                  "unit": "nanoERG"
+                },
+                {
+                  "op": "read",
+                  "role": "before",
+                  "field": "value",
+                  "unit": "nanoERG"
+                }
+              ]
+            },
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "after",
+                  "field": "R4:Long",
+                  "unit": "nanoERG"
+                },
+                {
+                  "op": "read",
+                  "role": "before",
+                  "field": "R4:Long",
+                  "unit": "nanoERG"
+                }
+              ]
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "reserve"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "reserve_control_1",
+      "family": "reserve",
+      "inputs": [
+        {
+          "sourceId": "reserve",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 5000000
+            }
+          ],
+          "tokens": []
+        },
+        {
+          "sourceId": "funding",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 0
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "reserve",
+            "value": 12000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 7000000
+              }
+            ],
+            "tokens": []
+          },
+          {
+            "sourceId": "funding",
+            "value": 8000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "reserve_control_1",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "before": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "after": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "ge",
+          "args": [
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "after",
+                  "field": "value",
+                  "unit": "nanoERG"
+                },
+                {
+                  "op": "read",
+                  "role": "before",
+                  "field": "value",
+                  "unit": "nanoERG"
+                }
+              ]
+            },
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "after",
+                  "field": "R4:Long",
+                  "unit": "nanoERG"
+                },
+                {
+                  "op": "read",
+                  "role": "before",
+                  "field": "R4:Long",
+                  "unit": "nanoERG"
+                }
+              ]
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "reserve"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "reserve_control_2",
+      "family": "reserve",
+      "inputs": [
+        {
+          "sourceId": "reserve",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 5000000
+            }
+          ],
+          "tokens": []
+        },
+        {
+          "sourceId": "funding",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 0
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "reserve",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 5000000
+              }
+            ],
+            "tokens": []
+          },
+          {
+            "sourceId": "funding",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "reserve_control_2",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "before": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "after": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "ge",
+          "args": [
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "after",
+                  "field": "value",
+                  "unit": "nanoERG"
+                },
+                {
+                  "op": "read",
+                  "role": "before",
+                  "field": "value",
+                  "unit": "nanoERG"
+                }
+              ]
+            },
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "after",
+                  "field": "R4:Long",
+                  "unit": "nanoERG"
+                },
+                {
+                  "op": "read",
+                  "role": "before",
+                  "field": "R4:Long",
+                  "unit": "nanoERG"
+                }
+              ]
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "reserve"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "issuance_violation_1",
+      "family": "issuance",
+      "inputs": [
+        {
+          "sourceId": "issuance",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 0
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "issuance",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": [
+              {
+                "id": "first-input-id",
+                "amount": 11
+              }
+            ]
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "issuance_violation_1",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "mint": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "le",
+          "args": [
+            {
+              "op": "read",
+              "role": "mint",
+              "field": "token:first-input-id",
+              "unit": "token-units"
+            },
+            {
+              "op": "literal",
+              "value": "10",
+              "unit": "token-units"
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "issuance"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "issuance_violation_2",
+      "family": "issuance",
+      "inputs": [
+        {
+          "sourceId": "issuance",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 0
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "issuance",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": [
+              {
+                "id": "first-input-id",
+                "amount": 21
+              }
+            ]
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "issuance_violation_2",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "mint": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "le",
+          "args": [
+            {
+              "op": "read",
+              "role": "mint",
+              "field": "token:first-input-id",
+              "unit": "token-units"
+            },
+            {
+              "op": "literal",
+              "value": "20",
+              "unit": "token-units"
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "issuance"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "issuance_control_1",
+      "family": "issuance",
+      "inputs": [
+        {
+          "sourceId": "issuance",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 0
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "issuance",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": [
+              {
+                "id": "first-input-id",
+                "amount": 10
+              }
+            ]
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "issuance_control_1",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "mint": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "le",
+          "args": [
+            {
+              "op": "read",
+              "role": "mint",
+              "field": "token:first-input-id",
+              "unit": "token-units"
+            },
+            {
+              "op": "literal",
+              "value": "10",
+              "unit": "token-units"
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "issuance"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "issuance_control_2",
+      "family": "issuance",
+      "inputs": [
+        {
+          "sourceId": "issuance",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 0
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "issuance",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": [
+              {
+                "id": "first-input-id",
+                "amount": 19
+              }
+            ]
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "issuance_control_2",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "mint": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "le",
+          "args": [
+            {
+              "op": "read",
+              "role": "mint",
+              "field": "token:first-input-id",
+              "unit": "token-units"
+            },
+            {
+              "op": "literal",
+              "value": "20",
+              "unit": "token-units"
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "issuance"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "continuation_violation_1",
+      "family": "continuation",
+      "inputs": [
+        {
+          "sourceId": "continuation",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 7
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "funding",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "continuation_violation_1",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "state": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "successors": {
+            "collection": "outputs",
+            "selector": {
+              "sourceId": "continuation"
+            },
+            "cardinality": "all-matches"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "and",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "op": "count",
+                  "role": "successors",
+                  "unit": "count"
+                },
+                {
+                  "op": "literal",
+                  "value": "1",
+                  "unit": "count"
+                }
+              ]
+            },
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "state",
+                  "field": "R4:Long",
+                  "unit": "state-tag"
+                },
+                {
+                  "op": "literal",
+                  "value": "7",
+                  "unit": "state-tag"
+                }
+              ]
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "continuation"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "continuation_violation_2",
+      "family": "continuation",
+      "inputs": [
+        {
+          "sourceId": "continuation",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 7
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "continuation",
+            "value": 5000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 7
+              }
+            ],
+            "tokens": []
+          },
+          {
+            "sourceId": "continuation",
+            "value": 5000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 7
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "continuation_violation_2",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "state": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "successors": {
+            "collection": "outputs",
+            "selector": {
+              "sourceId": "continuation"
+            },
+            "cardinality": "all-matches"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "and",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "op": "count",
+                  "role": "successors",
+                  "unit": "count"
+                },
+                {
+                  "op": "literal",
+                  "value": "1",
+                  "unit": "count"
+                }
+              ]
+            },
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "state",
+                  "field": "R4:Long",
+                  "unit": "state-tag"
+                },
+                {
+                  "op": "literal",
+                  "value": "7",
+                  "unit": "state-tag"
+                }
+              ]
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "continuation"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "continuation_control_1",
+      "family": "continuation",
+      "inputs": [
+        {
+          "sourceId": "continuation",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 7
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "continuation",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 7
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "continuation_control_1",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "state": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "successors": {
+            "collection": "outputs",
+            "selector": {
+              "sourceId": "continuation"
+            },
+            "cardinality": "all-matches"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "and",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "op": "count",
+                  "role": "successors",
+                  "unit": "count"
+                },
+                {
+                  "op": "literal",
+                  "value": "1",
+                  "unit": "count"
+                }
+              ]
+            },
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "state",
+                  "field": "R4:Long",
+                  "unit": "state-tag"
+                },
+                {
+                  "op": "literal",
+                  "value": "7",
+                  "unit": "state-tag"
+                }
+              ]
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "continuation"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "continuation_control_2",
+      "family": "continuation",
+      "inputs": [
+        {
+          "sourceId": "continuation",
+          "value": 12000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 7
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "continuation",
+            "value": 12000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 7
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "continuation_control_2",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "state": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "successors": {
+            "collection": "outputs",
+            "selector": {
+              "sourceId": "continuation"
+            },
+            "cardinality": "all-matches"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "and",
+          "args": [
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "op": "count",
+                  "role": "successors",
+                  "unit": "count"
+                },
+                {
+                  "op": "literal",
+                  "value": "1",
+                  "unit": "count"
+                }
+              ]
+            },
+            {
+              "op": "eq",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "state",
+                  "field": "R4:Long",
+                  "unit": "state-tag"
+                },
+                {
+                  "op": "literal",
+                  "value": "7",
+                  "unit": "state-tag"
+                }
+              ]
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "continuation"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "bounded_response_violation_1",
+      "family": "bounded_response",
+      "inputs": [
+        {
+          "sourceId": "bounded_response",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 1
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "bounded_response",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 1
+              }
+            ],
+            "tokens": []
+          }
+        ],
+        [
+          {
+            "sourceId": "bounded_response",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 1
+              }
+            ],
+            "tokens": []
+          }
+        ],
+        [
+          {
+            "sourceId": "bounded_response",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 1
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "bounded_response_violation_1",
+        "revision": 1,
+        "scope": "bounded-response",
+        "roles": {
+          "state": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "successor": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "eq",
+          "args": [
+            {
+              "op": "read",
+              "role": "successor",
+              "field": "R4:Long",
+              "unit": "request-state"
+            },
+            {
+              "op": "literal",
+              "value": "0",
+              "unit": "request-state"
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "bounded_response"
+        ],
+        "trigger": {
+          "op": "eq",
+          "args": [
+            {
+              "op": "read",
+              "role": "successor",
+              "field": "R4:Long",
+              "unit": "request-state"
+            },
+            {
+              "op": "literal",
+              "value": "1",
+              "unit": "request-state"
+            }
+          ]
+        },
+        "horizon": 2,
+        "schedule": {
+          "height": [
+            100,
+            101,
+            102
+          ],
+          "action": [
+            "request",
+            "tick",
+            "tick"
+          ],
+          "restriction": "One supplied transaction per hypothetical block; no fairness or eventual-service premise."
+        }
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "bounded_response_violation_2",
+      "family": "bounded_response",
+      "inputs": [
+        {
+          "sourceId": "bounded_response",
+          "value": 11000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 1
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "bounded_response",
+            "value": 11000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 1
+              }
+            ],
+            "tokens": []
+          }
+        ],
+        [
+          {
+            "sourceId": "bounded_response",
+            "value": 11000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 1
+              }
+            ],
+            "tokens": []
+          }
+        ],
+        [
+          {
+            "sourceId": "bounded_response",
+            "value": 11000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 1
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "bounded_response_violation_2",
+        "revision": 1,
+        "scope": "bounded-response",
+        "roles": {
+          "state": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "successor": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "eq",
+          "args": [
+            {
+              "op": "read",
+              "role": "successor",
+              "field": "R4:Long",
+              "unit": "request-state"
+            },
+            {
+              "op": "literal",
+              "value": "0",
+              "unit": "request-state"
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "bounded_response"
+        ],
+        "trigger": {
+          "op": "eq",
+          "args": [
+            {
+              "op": "read",
+              "role": "successor",
+              "field": "R4:Long",
+              "unit": "request-state"
+            },
+            {
+              "op": "literal",
+              "value": "1",
+              "unit": "request-state"
+            }
+          ]
+        },
+        "horizon": 2,
+        "schedule": {
+          "height": [
+            100,
+            101,
+            102
+          ],
+          "action": [
+            "request",
+            "tick",
+            "tick"
+          ],
+          "restriction": "One supplied transaction per hypothetical block; no fairness or eventual-service premise."
+        }
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "bounded_response_control_1",
+      "family": "bounded_response",
+      "inputs": [
+        {
+          "sourceId": "bounded_response",
+          "value": 12000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 1
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "bounded_response",
+            "value": 12000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 1
+              }
+            ],
+            "tokens": []
+          }
+        ],
+        [
+          {
+            "sourceId": "bounded_response",
+            "value": 12000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": []
+          }
+        ],
+        [
+          {
+            "sourceId": "bounded_response",
+            "value": 12000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "bounded_response_control_1",
+        "revision": 1,
+        "scope": "bounded-response",
+        "roles": {
+          "state": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "successor": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "eq",
+          "args": [
+            {
+              "op": "read",
+              "role": "successor",
+              "field": "R4:Long",
+              "unit": "request-state"
+            },
+            {
+              "op": "literal",
+              "value": "0",
+              "unit": "request-state"
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "bounded_response"
+        ],
+        "trigger": {
+          "op": "eq",
+          "args": [
+            {
+              "op": "read",
+              "role": "successor",
+              "field": "R4:Long",
+              "unit": "request-state"
+            },
+            {
+              "op": "literal",
+              "value": "1",
+              "unit": "request-state"
+            }
+          ]
+        },
+        "horizon": 2,
+        "schedule": {
+          "height": [
+            100,
+            101,
+            102
+          ],
+          "action": [
+            "request",
+            "tick",
+            "tick"
+          ],
+          "restriction": "One supplied transaction per hypothetical block; no fairness or eventual-service premise."
+        }
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "bounded_response_control_2",
+      "family": "bounded_response",
+      "inputs": [
+        {
+          "sourceId": "bounded_response",
+          "value": 13000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 1
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "bounded_response",
+            "value": 13000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 1
+              }
+            ],
+            "tokens": []
+          }
+        ],
+        [
+          {
+            "sourceId": "bounded_response",
+            "value": 13000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 1
+              }
+            ],
+            "tokens": []
+          }
+        ],
+        [
+          {
+            "sourceId": "bounded_response",
+            "value": 13000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "bounded_response_control_2",
+        "revision": 1,
+        "scope": "bounded-response",
+        "roles": {
+          "state": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "successor": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "eq",
+          "args": [
+            {
+              "op": "read",
+              "role": "successor",
+              "field": "R4:Long",
+              "unit": "request-state"
+            },
+            {
+              "op": "literal",
+              "value": "0",
+              "unit": "request-state"
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "bounded_response"
+        ],
+        "trigger": {
+          "op": "eq",
+          "args": [
+            {
+              "op": "read",
+              "role": "successor",
+              "field": "R4:Long",
+              "unit": "request-state"
+            },
+            {
+              "op": "literal",
+              "value": "1",
+              "unit": "request-state"
+            }
+          ]
+        },
+        "horizon": 2,
+        "schedule": {
+          "height": [
+            100,
+            101,
+            102
+          ],
+          "action": [
+            "request",
+            "tick",
+            "tick"
+          ],
+          "restriction": "One supplied transaction per hypothetical block; no fairness or eventual-service premise."
+        }
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "missing_role",
+      "family": "boundary",
+      "inputs": [
+        {
+          "sourceId": "reserve",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 5000000
+            }
+          ],
+          "tokens": []
+        },
+        {
+          "sourceId": "funding",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 0
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "reserve",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 5000000
+              }
+            ],
+            "tokens": []
+          },
+          {
+            "sourceId": "funding",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "missing_role",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "before": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "after": {
+            "collection": "outputs",
+            "selector": {
+              "position": 9
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "ge",
+          "args": [
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "after",
+                  "field": "value",
+                  "unit": "nanoERG"
+                },
+                {
+                  "op": "read",
+                  "role": "before",
+                  "field": "value",
+                  "unit": "nanoERG"
+                }
+              ]
+            },
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "after",
+                  "field": "R4:Long",
+                  "unit": "nanoERG"
+                },
+                {
+                  "op": "read",
+                  "role": "before",
+                  "field": "R4:Long",
+                  "unit": "nanoERG"
+                }
+              ]
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "reserve"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "ambiguous_role",
+      "family": "boundary",
+      "inputs": [
+        {
+          "sourceId": "reserve",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 5000000
+            }
+          ],
+          "tokens": []
+        },
+        {
+          "sourceId": "funding",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 0
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "reserve",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 5000000
+              }
+            ],
+            "tokens": []
+          },
+          {
+            "sourceId": "reserve",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "ambiguous_role",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "before": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "after": {
+            "collection": "outputs",
+            "selector": {
+              "sourceId": "reserve"
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "ge",
+          "args": [
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "after",
+                  "field": "value",
+                  "unit": "nanoERG"
+                },
+                {
+                  "op": "read",
+                  "role": "before",
+                  "field": "value",
+                  "unit": "nanoERG"
+                }
+              ]
+            },
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "after",
+                  "field": "R4:Long",
+                  "unit": "nanoERG"
+                },
+                {
+                  "op": "read",
+                  "role": "before",
+                  "field": "R4:Long",
+                  "unit": "nanoERG"
+                }
+              ]
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "reserve"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "wrong_register_type",
+      "family": "boundary",
+      "inputs": [
+        {
+          "sourceId": "reserve",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 5000000
+            }
+          ],
+          "tokens": []
+        },
+        {
+          "sourceId": "funding",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 0
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "reserve",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Boolean",
+                "value": true
+              }
+            ],
+            "tokens": []
+          },
+          {
+            "sourceId": "funding",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "wrong_register_type",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "before": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "after": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "ge",
+          "args": [
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "after",
+                  "field": "value",
+                  "unit": "nanoERG"
+                },
+                {
+                  "op": "read",
+                  "role": "before",
+                  "field": "value",
+                  "unit": "nanoERG"
+                }
+              ]
+            },
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "after",
+                  "field": "R4:Long",
+                  "unit": "nanoERG"
+                },
+                {
+                  "op": "read",
+                  "role": "before",
+                  "field": "R4:Long",
+                  "unit": "nanoERG"
+                }
+              ]
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "reserve"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "arithmetic_overflow",
+      "family": "boundary",
+      "inputs": [
+        {
+          "sourceId": "reserve",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 5000000
+            }
+          ],
+          "tokens": []
+        },
+        {
+          "sourceId": "funding",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 0
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "reserve",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 5000000
+              }
+            ],
+            "tokens": []
+          },
+          {
+            "sourceId": "funding",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "arithmetic_overflow",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "before": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "after": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "ge",
+          "args": [
+            {
+              "op": "mul-literal",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "after",
+                  "field": "value",
+                  "unit": "nanoERG"
+                },
+                {
+                  "op": "literal",
+                  "value": "170141183460469231731687303715884105727",
+                  "unit": "scalar"
+                }
+              ]
+            },
+            {
+              "op": "literal",
+              "value": "0",
+              "unit": "nanoERG"
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "reserve"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "false_guard",
+      "family": "boundary",
+      "inputs": [
+        {
+          "sourceId": "reserve",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 5000000
+            }
+          ],
+          "tokens": []
+        },
+        {
+          "sourceId": "funding",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 0
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "reserve",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 5000000
+              }
+            ],
+            "tokens": []
+          },
+          {
+            "sourceId": "funding",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "false_guard",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "before": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "after": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": false
+        },
+        "assertion": {
+          "op": "ge",
+          "args": [
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "after",
+                  "field": "value",
+                  "unit": "nanoERG"
+                },
+                {
+                  "op": "read",
+                  "role": "before",
+                  "field": "value",
+                  "unit": "nanoERG"
+                }
+              ]
+            },
+            {
+              "op": "sub",
+              "args": [
+                {
+                  "op": "read",
+                  "role": "after",
+                  "field": "R4:Long",
+                  "unit": "nanoERG"
+                },
+                {
+                  "op": "read",
+                  "role": "before",
+                  "field": "R4:Long",
+                  "unit": "nanoERG"
+                }
+              ]
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "reserve"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "short_response_horizon",
+      "family": "boundary",
+      "inputs": [
+        {
+          "sourceId": "bounded_response",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 1
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "bounded_response",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 1
+              }
+            ],
+            "tokens": []
+          }
+        ],
+        [
+          {
+            "sourceId": "bounded_response",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 1
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "short_response_horizon",
+        "revision": 1,
+        "scope": "bounded-response",
+        "roles": {
+          "state": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "successor": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "eq",
+          "args": [
+            {
+              "op": "read",
+              "role": "successor",
+              "field": "R4:Long",
+              "unit": "request-state"
+            },
+            {
+              "op": "literal",
+              "value": "0",
+              "unit": "request-state"
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "bounded_response"
+        ],
+        "trigger": {
+          "op": "eq",
+          "args": [
+            {
+              "op": "read",
+              "role": "successor",
+              "field": "R4:Long",
+              "unit": "request-state"
+            },
+            {
+              "op": "literal",
+              "value": "1",
+              "unit": "request-state"
+            }
+          ]
+        },
+        "horizon": 2,
+        "schedule": {
+          "height": [
+            100,
+            101
+          ],
+          "action": [
+            "request",
+            "tick"
+          ],
+          "restriction": "One supplied transaction per hypothetical block; no fairness or eventual-service premise."
+        }
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "unbounded_eventuality",
+      "family": "boundary",
+      "inputs": [
+        {
+          "sourceId": "bounded_response",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 1
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "bounded_response",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 1
+              }
+            ],
+            "tokens": []
+          }
+        ],
+        [
+          {
+            "sourceId": "bounded_response",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 1
+              }
+            ],
+            "tokens": []
+          }
+        ],
+        [
+          {
+            "sourceId": "bounded_response",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 1
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "unbounded_eventuality",
+        "revision": 1,
+        "scope": "eventual",
+        "roles": {
+          "state": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "successor": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "eq",
+          "args": [
+            {
+              "op": "read",
+              "role": "successor",
+              "field": "R4:Long",
+              "unit": "request-state"
+            },
+            {
+              "op": "literal",
+              "value": "0",
+              "unit": "request-state"
+            }
+          ]
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "bounded_response"
+        ],
+        "trigger": {
+          "op": "eq",
+          "args": [
+            {
+              "op": "read",
+              "role": "successor",
+              "field": "R4:Long",
+              "unit": "request-state"
+            },
+            {
+              "op": "literal",
+              "value": "1",
+              "unit": "request-state"
+            }
+          ]
+        },
+        "horizon": null,
+        "schedule": {
+          "height": [
+            100,
+            101,
+            102
+          ],
+          "action": [
+            "request",
+            "tick",
+            "tick"
+          ],
+          "restriction": "One supplied transaction per hypothetical block; no fairness or eventual-service premise."
+        }
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    },
+    {
+      "id": "unsupported_dynamic_expression",
+      "family": "boundary",
+      "inputs": [
+        {
+          "sourceId": "reserve",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 5000000
+            }
+          ],
+          "tokens": []
+        },
+        {
+          "sourceId": "funding",
+          "value": 10000000,
+          "registers": [
+            {
+              "type": "Long",
+              "value": 0
+            }
+          ],
+          "tokens": []
+        }
+      ],
+      "steps": [
+        [
+          {
+            "sourceId": "reserve",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 5000000
+              }
+            ],
+            "tokens": []
+          },
+          {
+            "sourceId": "funding",
+            "value": 10000000,
+            "registers": [
+              {
+                "type": "Long",
+                "value": 0
+              }
+            ],
+            "tokens": []
+          }
+        ]
+      ],
+      "property": {
+        "draftVocabulary": "author-property-design:v1",
+        "id": "unsupported_dynamic_expression",
+        "revision": 1,
+        "scope": "transition",
+        "roles": {
+          "before": {
+            "collection": "inputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          },
+          "after": {
+            "collection": "outputs",
+            "selector": {
+              "position": 0
+            },
+            "cardinality": "exactly-one"
+          }
+        },
+        "guard": {
+          "op": "boolean",
+          "value": true
+        },
+        "assertion": {
+          "op": "execute-extension",
+          "input": 0,
+          "variable": 0
+        },
+        "authorizationPremises": [
+          "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+        ],
+        "sourceReferences": [
+          "reserve"
+        ]
+      },
+      "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+      "publicationStatus": "public-synthetic-authored",
+      "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility."
+    }
+  ]
+}

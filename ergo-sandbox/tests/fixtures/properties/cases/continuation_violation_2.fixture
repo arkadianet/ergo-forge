@@ -1,0 +1,312 @@
+{
+  "authoring": {
+    "exposure": "Author supplied all witnesses and answers before node/extraction inspection; regression only, no discovery eligibility.",
+    "family": "continuation",
+    "id": "continuation_violation_2",
+    "inputs": [
+      {
+        "registers": [
+          {
+            "type": "Long",
+            "value": 7
+          }
+        ],
+        "sourceId": "continuation",
+        "tokens": [],
+        "value": 10000000
+      }
+    ],
+    "property": {
+      "assertion": {
+        "args": [
+          {
+            "args": [
+              {
+                "op": "count",
+                "role": "successors",
+                "unit": "count"
+              },
+              {
+                "op": "literal",
+                "unit": "count",
+                "value": "1"
+              }
+            ],
+            "op": "eq"
+          },
+          {
+            "args": [
+              {
+                "field": "R4:Long",
+                "op": "read",
+                "role": "state",
+                "unit": "state-tag"
+              },
+              {
+                "op": "literal",
+                "unit": "state-tag",
+                "value": "7"
+              }
+            ],
+            "op": "eq"
+          }
+        ],
+        "op": "and"
+      },
+      "authorizationPremises": [
+        "No signature identity is inferred. These synthetic keyless contracts deliberately do not enforce the entire author assertion."
+      ],
+      "draftVocabulary": "author-property-design:v1",
+      "guard": {
+        "op": "boolean",
+        "value": true
+      },
+      "id": "continuation_violation_2",
+      "revision": 1,
+      "roles": {
+        "state": {
+          "cardinality": "exactly-one",
+          "collection": "inputs",
+          "selector": {
+            "position": 0
+          }
+        },
+        "successors": {
+          "cardinality": "all-matches",
+          "collection": "outputs",
+          "selector": {
+            "sourceId": "continuation"
+          }
+        }
+      },
+      "scope": "transition",
+      "sourceReferences": [
+        "continuation"
+      ]
+    },
+    "publicationStatus": "public-synthetic-authored",
+    "rootPremises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state.",
+    "steps": [
+      [
+        {
+          "registers": [
+            {
+              "type": "Long",
+              "value": 7
+            }
+          ],
+          "sourceId": "continuation",
+          "tokens": [],
+          "value": 5000000
+        },
+        {
+          "registers": [
+            {
+              "type": "Long",
+              "value": 7
+            }
+          ],
+          "sourceId": "continuation",
+          "tokens": [],
+          "value": 5000000
+        }
+      ]
+    ]
+  },
+  "family": "continuation",
+  "id": "continuation_violation_2",
+  "references": [
+    {
+      "index": 0,
+      "inputSpecs": [
+        {
+          "boxId": "6b7e9d840e4e345f39bfc8253b2dc1e10bb5258b64e0aa4457cc379f2227ca03",
+          "bytes": "80ade20410010580897ad192c1a77300640001050ecc73e11429424e4d63d60f9cd4c5b9be1f379847b8c928eb63e1a75fd2e0d49d00"
+        }
+      ],
+      "legacyProperty": {
+        "attackerPublicKeys": [],
+        "inputs": [
+          {
+            "boxId": "6b7e9d840e4e345f39bfc8253b2dc1e10bb5258b64e0aa4457cc379f2227ca03",
+            "role": "protected"
+          }
+        ],
+        "objective": {
+          "terms": []
+        },
+        "version": "recognized-attacker-receipts-v1"
+      },
+      "outputBoxes": [
+        {
+          "document": {
+            "boxId": "a2c93392a2b9ad380a0282926141cc37684b9d60f5a586cfa154cd910d6bd91c",
+            "bytes": "c096b10210010580897ad192c1a77300640001050e19ee47fda307a3b7170c4eb2b5a64aae64f710e7fb28495bc6508f3bb6b5a95900",
+            "ergoTree": "10010580897ad192c1a77300"
+          },
+          "origin": "hypothetical",
+          "record": null
+        },
+        {
+          "document": {
+            "boxId": "327e3e364419650d9ac38b665911a05144810b3f13614c093b19832402c6723f",
+            "bytes": "c096b10210010580897ad192c1a77300640001050e19ee47fda307a3b7170c4eb2b5a64aae64f710e7fb28495bc6508f3bb6b5a95901",
+            "ergoTree": "10010580897ad192c1a77300"
+          },
+          "origin": "hypothetical",
+          "record": null
+        }
+      ],
+      "outputSpecs": [
+        {
+          "creationHeight": 100,
+          "ergoTree": "10010580897ad192c1a77300",
+          "registers": "01050e",
+          "tokens": [],
+          "value": 5000000
+        },
+        {
+          "creationHeight": 100,
+          "ergoTree": "10010580897ad192c1a77300",
+          "registers": "01050e",
+          "tokens": [],
+          "value": 5000000
+        }
+      ],
+      "request": {
+        "blockContext": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "activatedScriptVersion": 0,
+            "height": 100,
+            "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+            "preHeaderNBits": 117586360,
+            "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+            "preHeaderTimestamp": 1700000000000,
+            "preHeaderVersion": 1,
+            "preHeaderVotes": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "case": {
+          "deploymentIdentity": "unknown",
+          "formatVersion": 1,
+          "nodeValidated": false,
+          "premises": {
+            "assumptions": {
+              "D00RootAndSchedule": {
+                "origin": "hypothetical",
+                "status": "present",
+                "value": {
+                  "case": "continuation_violation_2",
+                  "height": 100,
+                  "linkageStatus": "not-checked-D00",
+                  "origin": "hypothetical",
+                  "premises": "Explicit hypothetical external UTXOs; no historical availability or validated initialization. Each step has a separately supplied context and state."
+                }
+              }
+            },
+            "boxes": {
+              "origin": "hypothetical",
+              "status": "present",
+              "value": [
+                {
+                  "document": {
+                    "boxId": "6b7e9d840e4e345f39bfc8253b2dc1e10bb5258b64e0aa4457cc379f2227ca03",
+                    "bytes": "80ade20410010580897ad192c1a77300640001050ecc73e11429424e4d63d60f9cd4c5b9be1f379847b8c928eb63e1a75fd2e0d49d00",
+                    "ergoTree": "10010580897ad192c1a77300"
+                  },
+                  "origin": "hypothetical",
+                  "record": null
+                }
+              ]
+            },
+            "constants": {
+              "reason": "binding origins not supplied",
+              "status": "missing"
+            },
+            "context": {
+              "reason": "execution context not supplied",
+              "status": "missing"
+            },
+            "engineRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
+            "source": {
+              "reason": "source identity not supplied",
+              "status": "missing"
+            },
+            "targetBytes": {
+              "origin": "hypothetical",
+              "status": "present",
+              "value": "10010580897ad192c1a77300"
+            }
+          }
+        },
+        "formatVersion": 1,
+        "headers": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": []
+        },
+        "localPolicy": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "maxTransactionSize": 524288
+          }
+        },
+        "networkRules": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "description": "authored keyless/rent vector",
+            "mode": "disabled",
+            "reason": "explicit hypothetical network without EIP-27"
+          }
+        },
+        "parameters": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": {
+            "dataInputCost": 100,
+            "inputCost": 2000,
+            "maxBlockCost": 8001091,
+            "maxBlockSize": 524288,
+            "maxBoxSize": 4096,
+            "maxTokensPerBox": 122,
+            "minValuePerByte": 360,
+            "outputCost": 100,
+            "storageFeeFactor": 1250000,
+            "storagePeriod": 1051200,
+            "tokenAccessCost": 100
+          }
+        },
+        "priorBlockCost": {
+          "origin": "hypothetical",
+          "status": "present",
+          "value": 0
+        },
+        "transactionBytes": "016b7e9d840e4e345f39bfc8253b2dc1e10bb5258b64e0aa4457cc379f2227ca030000000002c096b10210010580897ad192c1a77300640001050ec096b10210010580897ad192c1a77300640001050e"
+      },
+      "transactionId": "19ee47fda307a3b7170c4eb2b5a64aae64f710e7fb28495bc6508f3bb6b5a959"
+    }
+  ],
+  "sources": {
+    "bounded_response": "sigmaProp(OUTPUTS(0).R4[Long].isDefined)",
+    "continuation": "sigmaProp(SELF.value >= 1000000L)",
+    "funding": "sigmaProp(true)",
+    "issuance": "sigmaProp(OUTPUTS.size >= 1)",
+    "reserve": "sigmaProp(OUTPUTS(0).value >= 1000000L)"
+  },
+  "treeHexBySource": {
+    "bounded_response": "10010400d1e6c6b2a57300000405",
+    "continuation": "10010580897ad192c1a77300",
+    "funding": "10010101d17300",
+    "issuance": "10010402d192b1a57300",
+    "reserve": "100204000580897ad192c1b2a57300007301"
+  },
+  "version": "property-reference:v1"
+}

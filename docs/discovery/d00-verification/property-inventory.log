@@ -1,0 +1,27 @@
+    Finished `release` profile [optimized] target(s) in 0.10s
+     Running tests/property_inventory.rs (target-p00/release/deps/property_inventory-62b039648753cfa3)
+
+running 3 tests
+test property_inventory_pins_24_cases_and_independent_answers ... ok
+test transfer_registration_and_exposure_are_accounted ... ok
+test reference_executions_and_legacy_results_are_reproduced ... ok
+
+successes:
+
+---- property_inventory_pins_24_cases_and_independent_answers stdout ----
+manifest sha256=72609b827694feca9fb78ae440afc69644abb29238d9fd48dd7fe3467658304f; answers sha256=311f160e08a8875de546263474fb10ec621e881b34afc28bb65323db32c7f319; 24 pinned rows: 8 authored violations, 8 controls, 8 boundaries; independent semantic review incomplete
+
+---- transfer_registration_and_exposure_are_accounted stdout ----
+transfer planned 2; denominator null; no accepted pair, independent reviewer or utility credit; checkpoint must cancel capabilities 2 and 3 for this arc if this registration remains
+
+---- reference_executions_and_legacy_results_are_reproduced stdout ----
+35 individually accepted references / 24 rows; legacy extraction statuses {"accepted-nonviolating": 33, "confirmed-violation": 2}; legacy-results sha256=9a2031b9324ab62b9bb91f7cf6960aa8a00209148b1b2eca0c1dfbd6323ea451; no linked-trace or new-property evaluation
+
+
+successes:
+    property_inventory_pins_24_cases_and_independent_answers
+    reference_executions_and_legacy_results_are_reproduced
+    transfer_registration_and_exposure_are_accounted
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

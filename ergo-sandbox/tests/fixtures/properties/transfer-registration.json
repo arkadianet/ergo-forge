@@ -1,0 +1,19 @@
+{
+  "version": "property-transfer:v1",
+  "plannedCases": 2,
+  "denominator": null,
+  "cases": [],
+  "nominationCeilingPersonHours": 4,
+  "operatorExposure": [
+    "Existing local P05 sale and USE fixture inventories inspected. Sale is already an extraction reference; no pair of independently grounded non-extraction guarantees and violating/control executions was supplied.",
+    "All synthetic cases and their answers are author-exposed; none qualifies as transfer or discovery."
+  ],
+  "reviewer": null,
+  "semanticMeasurement": "incomplete-independent-review-missing",
+  "utilityPass": false,
+  "reason": "No defensible two-case transfer pair available under current local evidence and publication scope. Do not relabel synthetic or extraction cases to fill it.",
+  "checkpointConsequence": "Cancel capabilities 2 and 3 for this arc at the checkpoint; capability 1 regression tooling may remain if correctness gates pass.",
+  "authorHoursPerCase": null,
+  "reviewerHoursPerCase": null,
+  "effortAccounting": "No independent reviewer effort supplied; no invented per-case timing."
+}

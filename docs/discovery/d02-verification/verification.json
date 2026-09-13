@@ -1,0 +1,66 @@
+{
+  "workspaceTotals": {
+    "passed": 494,
+    "failed": 0,
+    "ignored": 1
+  },
+  "sourceSha256": {
+    "docs/ROADMAP.md": "7512a83daa108f7e5ffb9113cc4c0536b129439755f2aef97928dae5b6f094ef",
+    "docs/discovery/D02.md": "2fb187a6f818ecb084156f2851d3958fa7983f6c7e321897712f0c217e85ba12",
+    "ergo-sandbox/src/properties/mod.rs": "05cf8c64a4492ccf4105bdb7131eace93255b49a8c921f0bb6112f411cc33e05",
+    "ergo-sandbox/src/properties/evaluate.rs": "07e916bd4141af459c702efad19a2daf219c6b92a0d5b7c9396458ef641b124e",
+    "ergo-sandbox/src/properties/trace.rs": "b0df8a09cfe390b5bde37dd5dc3c8113504c0fee8d5532d66d5723db69289f46",
+    "ergo-sandbox/tests/property_evaluation.rs": "989755c1fe8be36e4de1ca2c68543e2f5322094705164e0f71f2a30e15b93815",
+    "ergo-sandbox/tests/mapping_inventory.rs": "055ea0f42ccb3fdf3f20b3ac9129735425ec3aa56eca5a3ce982ac094fe7778a"
+  },
+  "commands": {
+    "fmt": {
+      "command": "CARGO_TARGET_DIR=./target-p00 cargo fmt --all -- --check",
+      "exit": 0,
+      "log": "fmt.log",
+      "sha256": "ee1ec979780b89ddd7e47a31760e4d67538e88e74e649943aaea4d68e74d66b4"
+    },
+    "clippy": {
+      "command": "CARGO_TARGET_DIR=./target-p00 cargo clippy --workspace --all-targets -- -D warnings",
+      "exit": 0,
+      "log": "clippy.log",
+      "sha256": "cf7fbe9cd7045ca2467c241aeb9d00707bbc8f0b0af30ddd785d006c8b8d76da"
+    },
+    "property-evaluation": {
+      "command": "CARGO_TARGET_DIR=./target-p00 cargo test -p ergo-sandbox --test property_evaluation --release -- --show-output",
+      "exit": 0,
+      "log": "property-evaluation.log",
+      "sha256": "03548676ae7665ebabbf1480790af8ec6d3573db09936e116c6ad8e0ab03c583"
+    },
+    "workspace": {
+      "command": "CARGO_TARGET_DIR=./target-p00 cargo test --workspace --release",
+      "exit": 0,
+      "log": "workspace.log",
+      "sha256": "9362afccb07097bd034a28fb86d7d0c8b2883f57120f061d35b9dab10db2ab42"
+    },
+    "python": {
+      "command": "CARGO_TARGET_DIR=./target-p00 python3 -m unittest discover -s scripts -p test_roadmap_gate.py",
+      "exit": 0,
+      "log": "python.log",
+      "sha256": "cd02bf8870a4d6ad38d8e3cc633c6f03dc50785dc32179ac548e6cc237e98762"
+    },
+    "require": {
+      "command": "CARGO_TARGET_DIR=./target-p00 python3 scripts/roadmap_gate.py --require D02",
+      "exit": 0,
+      "log": "require.log",
+      "sha256": "9a9f050389500f5e3e44c19f9fe15030358b75357c5ce5d993e68672882d72e7"
+    },
+    "through-completed": {
+      "command": "CARGO_TARGET_DIR=./target-p00 python3 scripts/roadmap_gate.py --through-completed",
+      "exit": 0,
+      "log": "through-completed.log",
+      "sha256": "a489b985e8852a149544a606ee7d6ec5884c6d8543a75a4d7a72c9603eee0b13"
+    },
+    "ci": {
+      "command": "CARGO_TARGET_DIR=./target-p00 python3 scripts/roadmap_gate.py --ci",
+      "exit": 0,
+      "log": "ci.log",
+      "sha256": "97e2ec71d961d8bff7abaef9c3577ad8c05d1cb2d19d2872a64f54d8d686f056"
+    }
+  }
+}

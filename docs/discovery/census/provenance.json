@@ -1,0 +1,55 @@
+{
+  "status": "reproduced supplied export; acquisition provenance incomplete",
+  "snapshotHeight": null,
+  "snapshotDate": null,
+  "originalQuery": null,
+  "originalExclusions": null,
+  "originalForgeRevision": null,
+  "missingReason": "Not present in recovered artifacts; requested from author. No inference from mtime or current revision.",
+  "rerunDateUtc": "2026-09-10",
+  "rerunForgeRevision": "c717f82f6b5848761faec0b26a1e87ab7d479134",
+  "rerunDirty": true,
+  "networkContact": false,
+  "exports": {
+    "/tmp/sweep/all_trees.txt": {
+      "sha256": "84acc14d88d0612787f78df7bd71fc16450bf48b8911cec5f54284b12e139472",
+      "bytes": 375394810
+    },
+    "/tmp/sweep/top2000.txt": {
+      "sha256": "4a82a393448db52260201aa7979a7c5d80c65f0006fb005ec8082f09e3374c72",
+      "bytes": 3151412
+    }
+  },
+  "runs": [
+    {
+      "command": "target-p00/release/examples/mainnet_scan < /tmp/sweep/all_trees.txt",
+      "exitCode": 0,
+      "output": "rerun-all.txt"
+    },
+    {
+      "command": "target-p00/release/examples/mainnet_scan < /tmp/sweep/top2000.txt",
+      "exitCode": 0,
+      "output": "rerun-top2000.txt"
+    }
+  ],
+  "topCohort": {
+    "rowsMatchFullExport": true,
+    "cutoffBoxCount": 6,
+    "maximumExcludedBoxCount": 6,
+    "originalTieBreak": null
+  },
+  "artifacts": {
+    "FULLSCAN.progress": "a53745448d6651031fe9080cffd7b5f5b78e56ea55894a855861a86771cacf1f",
+    "FULLSCAN.txt": "bce894614986117ea559b90c72d87f013bd4651b7b8a6e04bf8924871ea8485c",
+    "FULLSCAN2.progress": "a53745448d6651031fe9080cffd7b5f5b78e56ea55894a855861a86771cacf1f",
+    "FULLSCAN2.txt": "65e253375857a198b967067869fe1e5bc81f4901a0f2608906a605546571b11b",
+    "REPORT.md": "ac1f296e7624c743120c1f23f791d9d0b8a07be3807d31aeb01522a4cd66f026",
+    "mainnet_scan.rs.original": "bef884f09b7a506029aaff6801479bb570ce65c62ae425f823391704828ed662",
+    "real_property_probe.rs.original": "b5bd6b8d4dd7ee2c51a9b70691ba69a781e113961d8588616e02c4b84c98dfb8",
+    "rerun-all.progress": "a53745448d6651031fe9080cffd7b5f5b78e56ea55894a855861a86771cacf1f",
+    "rerun-all.txt": "b8602adb88a407a13951c393075283e8bf57cadb67b8538549699c927c5b1b3f",
+    "rerun-top2000.progress": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rerun-top2000.txt": "55609238e4855d5b3f761431a36a79ceb9feef27c03c9ddb69135901f4c7cdd9"
+  },
+  "rerunScannerSha256": "00b840d44c55fae8f908f23579f81dfeb9c427d55b999fadfeb4bd98454df496"
+}

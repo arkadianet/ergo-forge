@@ -1,0 +1,56 @@
+$ CARGO_TARGET_DIR=./target-p00 python3 -m unittest discover -s scripts -p test_roadmap_gate.py
+A: stopped: recorded stop blocks this unit
+scoreboard: passed
+A: stopped: recorded stop blocks this unit
+report: <tmp>/tmpdiwjv9pg/report.json
+A: stopped: recorded stop blocks this unit
+scoreboard: passed
+A: stopped: recorded stop blocks this unit
+report: <tmp>/tmp9d68q6fg/report.json
+A: stopped: recorded stop blocks this unit
+scoreboard: passed
+A: stopped: recorded stop blocks this unit
+report: <tmp>/tmph82mq3f0/report.json
+A: unimplemented: registered product unit is not implemented
+..scoreboard: passed
+A: unimplemented: registered product unit is not implemented
+report: <tmp>/tmpu0euiqy7/report.json
+policy/evidence: missing-gate: stop evidence hash mismatch
+report: <tmp>/tmpaxon5yko/ci.json
+A: failed: test failure
+scoreboard: passed
+A: failed: test failure
+report: <tmp>/tmp5wie9j1o/report.json
+A: missing-gate: test failure
+scoreboard: passed
+A: missing-gate: test failure
+report: <tmp>/tmp2oijm0yd/report.json
+A: stopped: recorded stop blocks this unit
+B: unimplemented: registered product unit is not implemented
+scoreboard: passed
+A: stopped: recorded stop blocks this unit
+B: unimplemented: registered product unit is not implemented
+report: <tmp>/tmp1hqchl9c/report.json
+A: stopped: recorded stop blocks this unit
+B: blocked: dependency did not pass
+scoreboard: passed
+A: stopped: recorded stop blocks this unit
+B: blocked: dependency did not pass
+report: <tmp>/tmpspd5x95q/report.json
+A: passed: required tests executed
+..................
+----------------------------------------------------------------------
+Ran 20 tests in 0.047s
+
+OK
+scoreboard: passed
+A: passed: required tests executed
+report: <tmp>/tmpay9vzkq0/report.json
+policy/evidence: missing-gate: 'list' object has no attribute 'values'
+report: <tmp>/tmprq4oo4ya/nested/report.json
+policy/evidence: missing-gate: 'NoneType' object has no attribute 'keys'
+report: <tmp>/tmp4tny2z2r/nested/report.json
+policy/evidence: missing-gate: division by zero
+report: <tmp>/tmpta28rj73/nested/report.json
+
+exit: 0
