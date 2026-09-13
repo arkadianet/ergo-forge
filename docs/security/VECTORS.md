@@ -49,12 +49,12 @@ ID: `successor-reserve-drift`.
 
 Requiring the successor to use the same script preserves code but does not by itself preserve value or token amounts. If the reserve bound is removed, the successor can remain recognisable while the transaction directs the missing assets elsewhere. A companion contract may supply the missing restriction, so a local absence needs a review of the whole spend.
 
-Instruments: `lint:delegated-reserves`, `scenario`.
+Instruments: `lint:successor-field-drift`, `lint:delegated-reserves`, `scenario`.
 
 - Exhibits the mechanism: [examples/mutants/mutants.json](../../examples/mutants/mutants.json) (JSON pointer `/mutants/0/mutatedSource`). M1 removes the vesting remainder value bound; the mutant is classified keyed-insider.
 - Control: [examples/contracts/recipes/vesting.es](../../examples/contracts/recipes/vesting.es). The remainder value bound is present for the partial-vesting path.
 
-The mutant witness and original are already measured in the mutation corpus. This example does not enter the keyless proven denominator. delegated-reserves checks recognised ERG and token-amount relationships; it does not check register carry-forward or prove economic bounds.
+The mutant witness and original are already measured in the mutation corpus. This example does not enter the keyless proven denominator. delegated-reserves checks recognised ERG and token-amount relationships; it does not check register carry-forward or prove economic bounds. successor-field-drift reuses that successor/reserve syntax and additionally checks SELF-read amounts and registers; intentional transitions remain LOW observations.
 
 ### A successor rewrites a register
 
@@ -62,14 +62,14 @@ ID: `successor-register-drift`.
 
 A continuation can preserve script, value and tokens while replacing state in a register. Later spends then read the altered state as SELF and may grant an extra withdrawal or use a different authority. Carrying the registers that define the invariant closes this particular rewrite.
 
-Instruments: `scenario`, `manual`.
+Instruments: `lint:successor-field-drift`, `scenario`, `manual`.
 
 - Exhibits the mechanism: [examples/contracts/vectors/successor-register-drift/vulnerable.es](../../examples/contracts/vectors/successor-register-drift/vulnerable.es). Authored counterexample; accepts the adversarial suite context.
 - Control: [examples/contracts/vectors/successor-register-drift/fixed.es](../../examples/contracts/vectors/successor-register-drift/fixed.es). Refuses that same context; accepts the intended control context.
 
 Suites: [examples/contracts/vectors/successor-register-drift/contract.test.json](../../examples/contracts/vectors/successor-register-drift/contract.test.json), [examples/contracts/vectors/successor-register-drift/fixed.test.json](../../examples/contracts/vectors/successor-register-drift/fixed.test.json).
 
-The pair changes R4 from 1 to 999 while all guarded assets continue. A reviewer checks which registers each spending path consumes and whether an authorised transition constrains their successor values. No current lint decides register drift; successor_field_drift is future work.
+The pair changes R4 from 1 to 999 while all guarded assets continue. A reviewer checks which registers each spending path consumes and whether an authorised transition constrains their successor values. successor-field-drift observes missing recognised register relationships; authorised resets and complex transitions remain manual review.
 
 ## 3. Unconstrained outputs
 
@@ -79,12 +79,12 @@ ID: `unconstrained-output-tail`.
 
 A script that checks the value at OUTPUTS(0) can leave the intended continuing pot at another index without a value bound. Once the checked payment is satisfied, the rest of the input value can be assigned to other outputs, including attacker change or an excessive miner fee. Checking one payment is insufficient when the declared policy also requires reserves to continue.
 
-Instruments: `scenario`, `manual`.
+Instruments: `lint:unconstrained-outputs`, `scenario`, `manual`.
 
 - Exhibits the mechanism: [examples/mutants/mutants.json](../../examples/mutants/mutants.json) (JSON pointer `/mutants/2/mutatedSource`). M3 redirects the subscription pot value guard to OUTPUTS(0), leaving OUTPUTS(1) without its value bound.
 - Control: [examples/contracts/recipes/subscription.es](../../examples/contracts/recipes/subscription.es). The original checks the payment and the remaining pot separately.
 
-The M3 fixture is keyed-insider, not a keyless finding. A reviewer accounts for every permitted release, change destination and fee across all outputs; output count alone does not prove correct payment. There is no unconstrained_outputs lint yet. The original is a control for this removed bound, not a claim that every output is constrained.
+The M3 fixture is keyed-insider, not a keyless finding. A reviewer accounts for every permitted release, change destination and fee across all outputs; output count alone does not prove correct payment. unconstrained-outputs reports positional output checks without a recognised output-count upper bound, total-value comparison or tail constraint; LOW is observation priority. The original is a control for this removed bound, not a claim that every output is constrained.
 
 ## 4. Oracle and data-input trust
 
@@ -124,14 +124,14 @@ ID: `unauthenticated-context-code`.
 
 Context extensions and getVar values are supplied with the spending input. Executing deserialised code from those bytes without authenticating the bytes lets the spender substitute a program that returns true. A Boolean or sigma condition derived entirely from that extension can then release the box without the intended restriction.
 
-Instruments: `scenario`, `manual`.
+Instruments: `lint:unauthenticated-code-execution`, `scenario`, `manual`.
 
 - Exhibits the mechanism: [examples/contracts/vectors/unauthenticated-context-code/vulnerable.es](../../examples/contracts/vectors/unauthenticated-context-code/vulnerable.es). Authored counterexample; accepts the adversarial suite context.
 - Control: [examples/contracts/vectors/unauthenticated-context-code/fixed.es](../../examples/contracts/vectors/unauthenticated-context-code/fixed.es). Refuses that same context; accepts the intended control context.
 
 Suites: [examples/contracts/vectors/unauthenticated-context-code/contract.test.json](../../examples/contracts/vectors/unauthenticated-context-code/contract.test.json), [examples/contracts/vectors/unauthenticated-context-code/fixed.test.json](../../examples/contracts/vectors/unauthenticated-context-code/fixed.test.json).
 
-The vulnerable example executes Boolean bytes from variable 1; the fixed example requires the exact serialized HEIGHT >= 100 expression (92a304c801) before execution. A reviewer traces getVar, getVarFromInput, executeFromVar, deserialisation and substConstants back to an immutable or explicitly authorised code identity, including which input supplies the extension. unchecked-get only observes missing-option handling; it does not authenticate code. M05 remains stopped and supplies no general code-authentication instrument.
+The vulnerable example executes Boolean bytes from variable 1; the fixed example requires the exact serialized HEIGHT >= 100 expression (92a304c801) before execution. A reviewer traces getVar, getVarFromInput, executeFromVar, deserialisation and substConstants back to an immutable or explicitly authorised code identity, including which input supplies the extension. unchecked-get only observes missing-option handling; it does not authenticate code. M05 remains stopped and supplies no general code-authentication instrument. unauthenticated-code-execution now observes unanchored execution/template bytes in the lifted AST; it does not reopen M05, prove enforcement, or authenticate arbitrary companion data.
 
 ## 6. Token index games
 
@@ -188,14 +188,14 @@ ID: `zero-threshold`.
 
 atLeast with k equal to zero can succeed without satisfying any member proposition. A constant-true disjunct creates the same escape from the other branches. Reading an authorisation key or sigma proposition from a register that the spender can replace can similarly let the spender choose the authority for release.
 
-Instruments: `scenario`, `hunt`, `manual`.
+Instruments: `lint:trivial-sigma-branch`, `scenario`, `hunt`, `manual`.
 
 - Exhibits the mechanism: [examples/contracts/vectors/zero-threshold/vulnerable.es](../../examples/contracts/vectors/zero-threshold/vulnerable.es). Authored counterexample; accepts the adversarial suite context.
 - Control: [examples/contracts/vectors/zero-threshold/fixed.es](../../examples/contracts/vectors/zero-threshold/fixed.es). Refuses that same context; accepts the intended control context.
 
 Suites: [examples/contracts/vectors/zero-threshold/contract.test.json](../../examples/contracts/vectors/zero-threshold/contract.test.json), [examples/contracts/vectors/zero-threshold/fixed.test.json](../../examples/contracts/vectors/zero-threshold/fixed.test.json).
 
-The pair requires zero versus one satisfied height proposition and refuses the same early-height context only in the fixed version. It isolates threshold semantics without wallet proofs. A reviewer checks every OR branch, threshold range and the origin and update rules of any register-supplied key. There is no trivial_sigma_branch lint yet; the current hunt only reports the samples it reduces.
+The pair requires zero versus one satisfied height proposition and refuses the same early-height context only in the fixed version. It isolates threshold semantics without wallet proofs. A reviewer checks every OR branch, threshold range and the origin and update rules of any register-supplied key. The hunt reports only the samples it reduces. trivial-sigma-branch observes constant/zero-threshold results and writable-data direct disjuncts at LOW review priority; it does not prove reachability.
 
 ## 10. Height and ordering
 

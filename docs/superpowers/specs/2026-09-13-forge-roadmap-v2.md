@@ -217,7 +217,7 @@ To be installed by W00 as a **separate `roadmap-policy:v2` block** in `docs/ROAD
     {"id": "W00", "depends": [], "days": 1, "package": "scripts", "target": "test_roadmap_gate", "tests": ["policy_v2_block_parses", "scoreboard_reads_every_baseline_artifact"]},
     {"id": "S00", "depends": ["W00"], "days": 2, "package": "ergo-sandbox", "target": "vector_catalogue", "tests": ["every_vector_has_examples_or_is_marked_manual", "every_named_instrument_exists"]},
     {"id": "W01", "depends": ["W00"], "days": 5, "package": "ergo-sandbox", "target": "attack", "tests": ["play_attacker_reorder_reproduces_use_drain", "decoy_box_satisfies_every_positional_access", "attacker_results_are_synthetic_and_unvalidated"]},
-    {"id": "S02", "depends": ["S00"], "days": 4, "package": "ergo-sandbox", "target": "mutation_corpus", "tests": ["new_lint_mutants_are_caught_and_controls_are_clean", "deployed_corpus_sweep_is_recorded"]},
+    {"id": "S02", "implemented": true, "depends": ["S00"], "days": 4, "package": "ergo-sandbox", "target": "mutation_corpus", "tests": ["new_lint_mutants_are_caught_and_controls_are_clean", "deployed_corpus_sweep_is_recorded"]},
     {"id": "S01", "depends": ["S00", "S02"], "days": 3, "package": "ergo-web", "target": "checklist", "tests": ["checklist_defaults_to_unchecked", "checklist_answer_carries_provenance", "checklist_never_emits_a_score"]},
     {"id": "W06", "depends": ["S01"], "days": 2, "package": "ergo-web", "target": "negative_space", "tests": ["negative_space_lines_have_anchors", "negative_space_is_labelled_static"]},
     {"id": "I01", "depends": ["W00"], "days": 2, "package": "ergo-sandbox", "target": "verify_deployment", "tests": ["verify_exact_template_and_mismatch_are_distinct", "verify_lists_differing_constants"]},

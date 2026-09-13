@@ -847,7 +847,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
         "new_lint_mutants_are_caught_and_controls_are_clean",
         "deployed_corpus_sweep_is_recorded"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "S01",

@@ -33,14 +33,20 @@ class RoadmapGateTests(unittest.TestCase):
         self.assertEqual(v2['baselineRev'], '11d9a1c0986c5943d5b421e42271e1277d23528c')
         self.assertIsNone(v2['completedThrough'])
         self.assertEqual(v1['completedThrough'], 'D02')
-        self.assertEqual([{k: v for k, v in u.items() if k != 'implemented'} for u in v2['units']], expected)
+        self.assertEqual([{k: v for k, v in u.items() if k != 'implemented'} for u in v2['units']],
+                         [{k: v for k, v in u.items() if k != 'implemented'} for u in expected])
+        for example in expected:
+            if 'implemented' in example:
+                actual = next(u for u in v2['units'] if u['id'] == example['id'])
+                self.assertEqual(actual['implemented'], example['implemented'])
+        self.assertTrue(next(u for u in expected if u['id'] == 'S02')['implemented'])
         for key in ['schemaVersion', 'maxActiveImplementationBranches', 'maxOpenImplementationPrs',
                     'thresholds', 'frozenPreflight', 'scoreboard', 'stopRecords']:
             self.assertEqual(v2[key], v1[key])
         union = gate.union_policy([v1, v2])
         for unit in v2['units']:
             self.assertEqual(gate.select_units(union, unit['id'])[-1], unit)
-        self.assertTrue(all(not u['implemented'] for u in v2['units'] if u['id'] not in {'W00', 'S00', 'W01'}))
+        self.assertEqual({u['id'] for u in v2['units'] if u['implemented']}, {'W00', 'S00', 'W01', 'S02'})
         archived = (gate.ROOT / 'docs/reports/ROADMAP-v1-queue.md').read_text()
         self.assertIn(original_doc[original_doc.index('## 2. '):original_doc.index('## 4. ')], archived)
         self.assert_status('missing-gate', lambda: gate.policy_v2_from(current_doc + gate.V2_MARKER, v1))
@@ -92,6 +98,33 @@ class RoadmapGateTests(unittest.TestCase):
                         gate.run_unit(unit, [], root)
         self.assert_status('missing-gate', lambda: gate.check_test_output(
             'test_unrelated (sample.Sample.test_unrelated) ... ok\nRan 1 test\nOK\n', ['sample'], 'python'))
+
+    def test_static_lint_namespace_does_not_relax_frozen_hunt_measurements(self):
+        real_load = gate.load_json
+        path = gate.ROOT / self.policy['frozenPreflight']['artifact']
+        current = real_load(path)
+        self.assertIn('staticLintPairs', current)
+        for change in ['static-only', 'cap', 'verdict', 'membership', 'unknown-field']:
+            mutated = copy.deepcopy(current)
+            if change == 'static-only':
+                # Static counts are independently enforced by S02; the legacy
+                # scoreboard must not treat them as a changed hunt measurement.
+                mutated['staticLintPairs']['perMutant'][0]['mutantFindings'] = 99
+            elif change == 'cap':
+                mutated['caps']['maxProbes'] += 1
+            elif change == 'verdict':
+                mutated['perMutant'][0]['synthesisOn']['verdict'] = 'changed'
+            elif change == 'membership':
+                mutated['perMutant'].pop()
+            else:
+                mutated['unregisteredMeasurement'] = {}
+            with self.subTest(change=change), patch.object(gate, 'load_json', side_effect=lambda p: (
+                mutated if p == path else real_load(p)
+            )):
+                if change == 'static-only':
+                    gate.scoreboard(self.policy)
+                else:
+                    self.assert_status('failed', lambda: gate.scoreboard(self.policy))
 
     def test_unknown_unit_is_rejected(self):
         self.assert_status('missing-gate', lambda: gate.select_units(self.policy, 'NOT-A-UNIT'))

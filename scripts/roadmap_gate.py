@@ -144,11 +144,13 @@ def scoreboard(policy, root=ROOT):
         if path != frozen['artifact']:
             require(current == original, f'frozen baseline changed: {path}')
     corpus = load_json(root / frozen['artifact'])
-    # The only mutable fields are explicitly identified narratives. Everything
-    # else (including every numeric value, verdict, cap, objective, and witness)
-    # must equal the committed measurement.
+    # S02 appends a separate static-only measurement namespace. Its pairs and
+    # counts are checked by S02's executable gate, not added to the frozen hunt
+    # denominator. Every historical field still equals the committed measurement
+    # except for the explicitly identified narratives below.
     def measured(value):
         value = json.loads(json.dumps(value))
+        value.pop('staticLintPairs', None)
         for key in ['denominatorNote', 'foundNote', 'negativeControlsNote', 'missTable']:
             value.pop(key, None)
         for row in value.get('escalatedFindings', []):
