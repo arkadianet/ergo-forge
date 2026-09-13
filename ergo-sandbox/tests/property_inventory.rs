@@ -1,4 +1,5 @@
 //! Frozen D00 inputs/answers and measured existing APIs. No property evaluator.
+mod baseline_support;
 mod property_support;
 use ergo_primitives::writer::VlqWriter;
 use ergo_sandbox::evidence::{
@@ -90,7 +91,7 @@ fn property_inventory_pins_24_cases_and_independent_answers() {
     let workspace = root().join("../../../..");
     for (path, digest) in m["baselineArtifacts"].as_object().unwrap() {
         assert_eq!(
-            &json!(sha(&std::fs::read(workspace.join(path)).unwrap())),
+            &json!(sha(&baseline_support::historical_bytes(&workspace, path))),
             digest,
             "baseline {path}"
         );

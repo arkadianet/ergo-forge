@@ -927,3 +927,266 @@ fn the_corpus_is_measured_and_does_not_regress() {
         assert_measurement(&format!("{id} negative control"), c, kr);
     }
 }
+
+/// S02 measures syntax recognition separately from the historical hunt rate.
+#[test]
+fn new_lint_mutants_are_caught_and_controls_are_clean() {
+    let corpus: Value = serde_json::from_str(CORPUS).unwrap();
+    let answer: Value = serde_json::from_str(ANSWER_KEY).unwrap();
+    let pairs = corpus["staticLintPairs"]["pairs"].as_array().unwrap();
+    let recorded = answer["staticLintPairs"]["perMutant"].as_array().unwrap();
+    assert_eq!(pairs.len(), recorded.len());
+    let mut ids = BTreeSet::new();
+    let mut covered = BTreeSet::new();
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap();
+    for pair in pairs {
+        let id = pair["id"].as_str().unwrap();
+        assert!(ids.insert(id), "duplicate {id}");
+        let expected = recorded
+            .iter()
+            .find(|r| r["id"] == id)
+            .expect("recorded pair");
+        let lint = pair["lint"].as_str().unwrap();
+        covered.insert(lint);
+        assert_eq!(expected["lint"], lint);
+        assert_eq!(expected["version"], pair["version"]);
+        let original = pair["originalSource"].as_str().unwrap();
+        let mutant = pair["mutatedSource"].as_str().unwrap();
+        let find = pair["diff"]["find"].as_str().unwrap();
+        assert_eq!(original.matches(find).count(), 1, "{id}: unique mutation");
+        assert_eq!(
+            original.replacen(find, pair["diff"]["replace"].as_str().unwrap(), 1),
+            mutant
+        );
+        assert_ne!(original, mutant);
+        assert_eq!(expected["mutantFindings"], 1);
+        assert_eq!(expected["controlFindings"], 0);
+        for (source, path, count) in [
+            (original, "originalPath", "controlFindings"),
+            (mutant, "mutatedPath", "mutantFindings"),
+        ] {
+            assert_eq!(
+                std::fs::read_to_string(root.join(pair[path].as_str().unwrap())).unwrap(),
+                source
+            );
+            let compiled =
+                ergo_sandbox::compile_source(source, 3, ergo_ser::address::NetworkPrefix::Mainnet)
+                    .expect(id);
+            for inline in [false, true] {
+                let lifted = ergo_sandbox::lift_tree(&compiled.ergo_tree, inline);
+                let audit = ergo_sandbox::audit::audit(&lifted);
+                assert_eq!(
+                    audit.completeness,
+                    ergo_sandbox::audit::Completeness::Complete,
+                    "{id}"
+                );
+                let findings: Vec<_> = audit.findings.iter().filter(|f| f.lint == lint).collect();
+                assert_eq!(
+                    findings.len() as u64,
+                    expected[count].as_u64().unwrap(),
+                    "{id} {count}: {findings:?}"
+                );
+                for finding in findings {
+                    assert!(finding.ir_id.is_some(), "{id}: anchor");
+                    assert!(finding.snippet.chars().count() <= ergo_sandbox::audit::SNIPPET_MAX);
+                    let record = serde_json::to_value(finding).unwrap();
+                    assert_eq!(record["method"], "static-analysis");
+                    assert_eq!(record["nodeValidated"], false);
+                    assert_eq!(record["severityMeaning"], "review-priority");
+                }
+            }
+        }
+    }
+    assert_eq!(
+        covered,
+        BTreeSet::from([
+            "unconstrained-outputs",
+            "successor-field-drift",
+            "trivial-sigma-branch",
+            "unauthenticated-code-execution"
+        ])
+    );
+}
+
+/// A review must cover the actual corpus and every currently reported S02 site.
+#[test]
+fn deployed_corpus_sweep_is_recorded() {
+    use sha2::{Digest, Sha256};
+    use std::path::Path;
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
+    let corpus_root = root.join("examples/contracts");
+    let report = root.join("docs/reports/batch-2");
+    let bytes = std::fs::read(report.join("audit-sweep.json")).unwrap();
+    let sweep: Value = serde_json::from_slice(&bytes).expect("completed sweep JSON");
+    let review: Value =
+        serde_json::from_slice(&std::fs::read(report.join("site-review.json")).unwrap()).unwrap();
+    let doc = std::fs::read_to_string(root.join("docs/audit-sweep.md")).unwrap();
+    assert_eq!(review["sweepSha256"], hex::encode(Sha256::digest(&bytes)));
+    assert_eq!(review["method"], "static-analysis");
+    assert_eq!(sweep["treeVersion"], 3);
+    let lints = BTreeSet::from([
+        "unconstrained-outputs",
+        "successor-field-drift",
+        "trivial-sigma-branch",
+        "unauthenticated-code-execution",
+    ]);
+    assert_eq!(
+        review["decisions"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(String::as_str)
+            .collect::<BTreeSet<_>>(),
+        lints
+    );
+    fn discover(dir: &Path, base: &Path, paths: &mut BTreeSet<String>) {
+        for entry in std::fs::read_dir(dir).unwrap() {
+            let entry = entry.unwrap();
+            let path = entry.path();
+            if entry.file_type().unwrap().is_dir() {
+                discover(&path, base, paths);
+            } else if path.extension().is_some_and(|e| e == "es") {
+                paths.insert(path.strip_prefix(base).unwrap().to_str().unwrap().into());
+            }
+        }
+    }
+    let mut actual_paths = BTreeSet::new();
+    discover(&corpus_root, &corpus_root, &mut actual_paths);
+    let records = sweep["results"].as_array().unwrap();
+    let paths: BTreeSet<_> = records
+        .iter()
+        .map(|r| r["contract"].as_str().unwrap().to_owned())
+        .collect();
+    assert!(!paths.is_empty());
+    assert_eq!(paths.len(), records.len(), "no duplicate records");
+    assert_eq!(paths, actual_paths, "no missing/new corpus files");
+    assert_eq!(sweep["contracts"], records.len());
+    let mut reported = BTreeMap::new();
+    let mut status_counts = BTreeMap::<String, usize>::new();
+    for row in records {
+        let contract = row["contract"].as_str().unwrap();
+        let source = std::fs::read(corpus_root.join(contract)).unwrap();
+        assert_eq!(
+            row["sourceSha256"],
+            hex::encode(Sha256::digest(&source)),
+            "{contract}"
+        );
+        let params: BTreeMap<String, TypedValue> =
+            serde_json::from_value(row["params"].clone()).unwrap();
+        let network = match row["network"].as_str().unwrap() {
+            "mainnet" => ergo_ser::address::NetworkPrefix::Mainnet,
+            "testnet" => ergo_ser::address::NetworkPrefix::Testnet,
+            other => panic!("unknown network {other}"),
+        };
+        let compiled = ergo_sandbox::compile::compile_with_params(
+            std::str::from_utf8(&source).unwrap(),
+            &params,
+            3,
+            network,
+        );
+        *status_counts
+            .entry(row["status"].as_str().unwrap().into())
+            .or_default() += 1;
+        if row["status"] == "failed" {
+            assert_eq!(
+                row["stage"], "compile",
+                "{contract}: review a changed failure stage"
+            );
+            assert_eq!(
+                compiled.unwrap_err().to_string(),
+                row["error"].as_str().unwrap(),
+                "{contract}"
+            );
+            assert!(row["findings"].as_array().unwrap().is_empty());
+            assert!(doc.contains(&format!("| `{contract}` |")));
+            continue;
+        }
+        let compiled = compiled.expect(contract);
+        assert_eq!(
+            row["treeSha256"],
+            hex::encode(Sha256::digest(&compiled.tree_bytes)),
+            "{contract}"
+        );
+        let lifted = ergo_sandbox::lift_tree(&compiled.ergo_tree, false);
+        assert_eq!(row["rawPlaceholders"], lifted.raw_placeholders);
+        assert_eq!(row["truncated"], lifted.truncated);
+        let audit = ergo_sandbox::audit::audit(&lifted);
+        assert_eq!(
+            row["status"],
+            match audit.completeness {
+                ergo_sandbox::audit::Completeness::Complete => "complete",
+                ergo_sandbox::audit::Completeness::Partial { .. } => "partial",
+            }
+        );
+        let observed: Vec<_> = audit
+            .findings
+            .iter()
+            .filter(|f| lints.contains(f.lint))
+            .map(|f| {
+                json!({
+                    "lint": f.lint, "severity": f.severity.label(), "nodeId": f.node_id,
+                    "irId": f.ir_id, "snippet": f.snippet, "message": f.message,
+                })
+            })
+            .collect();
+        let recorded: Vec<_> = row["findings"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|f| lints.contains(f["lint"].as_str().unwrap()))
+            .cloned()
+            .collect();
+        assert_eq!(
+            observed, recorded,
+            "{contract}: rerun and review changed sites"
+        );
+        for finding in observed {
+            let key = (
+                contract.to_owned(),
+                finding["lint"].as_str().unwrap().to_owned(),
+                finding["nodeId"].as_u64().unwrap(),
+            );
+            assert!(reported.insert(key, finding).is_none());
+        }
+    }
+    assert_eq!(
+        sweep["byStatus"],
+        serde_json::to_value(status_counts).unwrap()
+    );
+    assert!(!reported.is_empty(), "no empty sweep can satisfy the gate");
+    let mut reviewed = BTreeSet::new();
+    for row in review["sites"].as_array().unwrap() {
+        let contract = row["contract"].as_str().unwrap();
+        let lint = row["lint"].as_str().unwrap();
+        let node = row["nodeId"].as_u64().unwrap();
+        let key = (contract.to_owned(), lint.to_owned(), node);
+        assert!(reviewed.insert(key.clone()), "duplicate review");
+        let finding = reported.get(&key).expect("reviewed site still reports");
+        let outcome = row["outcome"].as_str().unwrap();
+        assert!(matches!(outcome, "true-positive" | "benign"));
+        let reason = row["reason"].as_str().unwrap();
+        assert!(!reason.trim().is_empty());
+        assert!(
+            doc.contains(&format!(
+                "| `{contract}` | `{lint}` | {node} | {outcome} | {reason} |"
+            )),
+            "every reason must be in docs/audit-sweep.md"
+        );
+        let decision = &review["decisions"][lint];
+        assert_eq!(decision["reviewPriority"], finding["severity"]);
+        assert!(doc.contains(decision["decision"].as_str().unwrap()));
+        if outcome == "benign" {
+            assert_eq!(
+                finding["severity"], "LOW",
+                "benign pattern must ship as observation"
+            );
+        }
+    }
+    assert_eq!(
+        reviewed,
+        reported.into_keys().collect(),
+        "every reported site reviewed exactly once"
+    );
+}

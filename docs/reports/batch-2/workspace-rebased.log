@@ -1,0 +1,122 @@
+== full suite 14:05:32
+     Running unittests src/lib.rs ($CARGO_TARGET_DIR/debug/deps/ergo_sandbox-76bc11a3ccec096d)
+test result: ok. 32 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running unittests src/bin/ergo-es.rs ($CARGO_TARGET_DIR/debug/deps/ergo_es-3884ae02c3af3345)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/attack.rs ($CARGO_TARGET_DIR/debug/deps/attack-97aaf292c7506aac)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/audit.rs ($CARGO_TARGET_DIR/debug/deps/audit-195b124d96f08bf4)
+test result: ok. 43 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/audit_context.rs ($CARGO_TARGET_DIR/debug/deps/audit_context-9e780f962f2cc987)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/claim_contract.rs ($CARGO_TARGET_DIR/debug/deps/claim_contract-867a538af62c8c59)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+     Running tests/claim_replay.rs ($CARGO_TARGET_DIR/debug/deps/claim_replay-1eeca24b641ba3d1)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+     Running tests/cli_hunt.rs ($CARGO_TARGET_DIR/debug/deps/cli_hunt-96f38a1b20e781ff)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.45s
+     Running tests/cli_json.rs ($CARGO_TARGET_DIR/debug/deps/cli_json-78217134dfb35b8f)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/cli_match.rs ($CARGO_TARGET_DIR/debug/deps/cli_match-99b415b5dbad97d4)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/compile_params.rs ($CARGO_TARGET_DIR/debug/deps/compile_params-04d6d589f9b5181b)
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/compose.rs ($CARGO_TARGET_DIR/debug/deps/compose-0c1763dbe7a1c00b)
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/decompile_ast.rs ($CARGO_TARGET_DIR/debug/deps/decompile_ast-b97b3cbe689ccef2)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/decompile_corpus.rs ($CARGO_TARGET_DIR/debug/deps/decompile_corpus-fd4b9d025a16633b)
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.05s
+     Running tests/decompile_robustness.rs ($CARGO_TARGET_DIR/debug/deps/decompile_robustness-b90d7ecfb604ed9d)
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/decompile_roundtrip.rs ($CARGO_TARGET_DIR/debug/deps/decompile_roundtrip-05385b0f9ce21643)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.21s
+     Running tests/delegated_reserves.rs ($CARGO_TARGET_DIR/debug/deps/delegated_reserves-0049cecfe2605568)
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/drain.rs ($CARGO_TARGET_DIR/debug/deps/drain-a587fae7e43b0e13)
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 47.09s
+     Running tests/drain_promotion.rs ($CARGO_TARGET_DIR/debug/deps/drain_promotion-1a4eafd2d804d913)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.03s
+     Running tests/evidence_provenance.rs ($CARGO_TARGET_DIR/debug/deps/evidence_provenance-6279ded19698364d)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+     Running tests/evidence_wire.rs ($CARGO_TARGET_DIR/debug/deps/evidence_wire-f9ca542c54b2ac21)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/hot_spots.rs ($CARGO_TARGET_DIR/debug/deps/hot_spots-f639f4dc7fb50cb7)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/hunt.rs ($CARGO_TARGET_DIR/debug/deps/hunt-8038c0be4d44b697)
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/identity.rs ($CARGO_TARGET_DIR/debug/deps/identity-d7eaadb79846ffcd)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+     Running tests/ingest.rs ($CARGO_TARGET_DIR/debug/deps/ingest-9a59f52ffb9032b7)
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/map.rs ($CARGO_TARGET_DIR/debug/deps/map-c3de162f75160169)
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+     Running tests/mapping_actions.rs ($CARGO_TARGET_DIR/debug/deps/mapping_actions-622fd0d9fc4c595a)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.47s
+     Running tests/mapping_artifacts.rs ($CARGO_TARGET_DIR/debug/deps/mapping_artifacts-382d7f33179b30c1)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+     Running tests/mapping_context_boundary.rs ($CARGO_TARGET_DIR/debug/deps/mapping_context_boundary-61b2bebf312b38ed)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running tests/mapping_discovery.rs ($CARGO_TARGET_DIR/debug/deps/mapping_discovery-73b01e2d7bd0d26b)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+     Running tests/mapping_inventory.rs ($CARGO_TARGET_DIR/debug/deps/mapping_inventory-f6048100916e9e99)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+     Running tests/mapping_necessity.rs ($CARGO_TARGET_DIR/debug/deps/mapping_necessity-88beae7c308c26b2)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+     Running tests/method_sweep.rs ($CARGO_TARGET_DIR/debug/deps/method_sweep-91836e4d1ac72d18)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+     Running tests/more_lints.rs ($CARGO_TARGET_DIR/debug/deps/more_lints-daff6d8031bc25ad)
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/mutation_corpus.rs ($CARGO_TARGET_DIR/debug/deps/mutation_corpus-d249f4aea675b5ca)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 787.57s
+     Running tests/node_validation.rs ($CARGO_TARGET_DIR/debug/deps/node_validation-2db5a0b67406d036)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/obligation_reports.rs ($CARGO_TARGET_DIR/debug/deps/obligation_reports-faafc363a9c19b1a)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+     Running tests/payment_reserves.rs ($CARGO_TARGET_DIR/debug/deps/payment_reserves-3626131eca09286f)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/play.rs ($CARGO_TARGET_DIR/debug/deps/play-432bab585fd5d216)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/proofs.rs ($CARGO_TARGET_DIR/debug/deps/proofs-a556daeceeb5f2b7)
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/property_evaluation.rs ($CARGO_TARGET_DIR/debug/deps/property_evaluation-31916abcc0fb3b56)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+     Running tests/property_inventory.rs ($CARGO_TARGET_DIR/debug/deps/property_inventory-084dba8a70e2982e)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+     Running tests/property_replay_boundary.rs ($CARGO_TARGET_DIR/debug/deps/property_replay_boundary-847e249fa0c87498)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+     Running tests/property_schema.rs ($CARGO_TARGET_DIR/debug/deps/property_schema-b402642672b4d57e)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running tests/recognize.rs ($CARGO_TARGET_DIR/debug/deps/recognize-f4287d780e542da1)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/rent.rs ($CARGO_TARGET_DIR/debug/deps/rent-65e9a0bc6b1d0069)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/sandbox_eval.rs ($CARGO_TARGET_DIR/debug/deps/sandbox_eval-75ae46c51f516316)
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/testsuite.rs ($CARGO_TARGET_DIR/debug/deps/testsuite-22e8472d542ae703)
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/transaction_proofs.rs ($CARGO_TARGET_DIR/debug/deps/transaction_proofs-b597196e4304bbf9)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running tests/tree.rs ($CARGO_TARGET_DIR/debug/deps/tree-29fee86d46fc2c00)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/triage.rs ($CARGO_TARGET_DIR/debug/deps/triage-fcd4913da558a07b)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.62s
+     Running tests/txcheck.rs ($CARGO_TARGET_DIR/debug/deps/txcheck-4136b3ac20645e9f)
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/vault_corpus.rs ($CARGO_TARGET_DIR/debug/deps/vault_corpus-00f71cf05665f353)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/vector_catalogue.rs ($CARGO_TARGET_DIR/debug/deps/vector_catalogue-b9ffca7a0241e0aa)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+     Running unittests src/lib.rs ($CARGO_TARGET_DIR/debug/deps/ergo_web-58a61400bbf06183)
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.46s
+     Running unittests src/main.rs ($CARGO_TARGET_DIR/debug/deps/ergo_web-5f03d3a11e4efa70)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/evidence_replay.rs ($CARGO_TARGET_DIR/debug/deps/evidence_replay-1f84eb8193967d89)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.44s
+     Running tests/http.rs ($CARGO_TARGET_DIR/debug/deps/http-de5d928124428075)
+test result: ok. 51 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+     Running tests/map.rs ($CARGO_TARGET_DIR/debug/deps/map-3720d2a9f2f3f122)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.38s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+EXIT suite 0

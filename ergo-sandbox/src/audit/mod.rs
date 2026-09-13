@@ -27,6 +27,10 @@ const LINTS: &[fn(&Node) -> Vec<Finding>] = &[
     lints::unbound_box_reserves,
     lints::delegated_reserves,
     lints::height_guards,
+    lints::unconstrained_outputs,
+    lints::successor_field_drift,
+    lints::trivial_sigma_branch,
+    lints::unauthenticated_code_execution,
     lints::trust_assumptions,
 ];
 

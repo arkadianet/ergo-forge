@@ -1,5 +1,6 @@
 //! M00 locks an independently authored denominator before any extractor exists.
 //! These are fixture gates, not a required-relations proof API.
+mod baseline_support;
 mod mapping_support;
 use mapping_support::*;
 use serde_json::{json, Value};
@@ -224,8 +225,9 @@ fn legacy_metrics_are_measured_without_baseline_changes() {
         .parent()
         .unwrap();
     for (path, digest) in m["baselineArtifacts"].as_object().unwrap() {
+        let baseline = baseline_support::historical_bytes(workspace, path);
         assert_eq!(
-            sha(&std::fs::read(workspace.join(path)).unwrap()),
+            sha(&baseline),
             digest.as_str().unwrap(),
             "baseline changed: {path}"
         );

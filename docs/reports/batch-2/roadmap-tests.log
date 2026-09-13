@@ -1,0 +1,82 @@
+M05: stopped: recorded stop blocks this unit
+scoreboard: passed
+M05: stopped: recorded stop blocks this unit
+report: <tmp>/tmp2n5qt5zm/report.json
+M05: stopped: recorded stop blocks this unit
+scoreboard: passed
+M05: stopped: recorded stop blocks this unit
+report: <tmp>/tmpc8js31k5/report.json
+M05: stopped: recorded stop blocks this unit
+scoreboard: passed
+M05: stopped: recorded stop blocks this unit
+report: <tmp>/tmp7fjpiu_s/report.json
+M05: unimplemented: registered product unit is not implemented
+..scoreboard: passed
+M05: unimplemented: registered product unit is not implemented
+report: <tmp>/tmpisfo8ivo/report.json
+policy/evidence: missing-gate: stop evidence hash mismatch
+report: <tmp>/tmp78qydsa5/ci.json
+A: failed: test failure
+scoreboard: passed
+A: failed: test failure
+report: <tmp>/tmpc6zldxnm/report.json
+A: missing-gate: test failure
+scoreboard: passed
+A: missing-gate: test failure
+report: <tmp>/tmpjjo5r5y2/report.json
+A: stopped: recorded stop blocks this unit
+B: unimplemented: registered product unit is not implemented
+scoreboard: passed
+A: stopped: recorded stop blocks this unit
+B: unimplemented: registered product unit is not implemented
+report: <tmp>/tmpyljt2q2p/report.json
+A: stopped: recorded stop blocks this unit
+B: blocked: dependency did not pass
+scoreboard: passed
+A: stopped: recorded stop blocks this unit
+B: blocked: dependency did not pass
+report: <tmp>/tmpk_5hr4z4/report.json
+A: passed: required tests executed
+.scoreboard: passed
+A: passed: required tests executed
+report: <tmp>/tmpo8_h3330/report.json
+future: not-started: registered future unit has not started
+later: not-started: registered future unit has not started
+scoreboard: passed
+future: not-started: registered future unit has not started
+later: not-started: registered future unit has not started
+report: <tmp>/tmpg2ntg40j/report.json
+future: unimplemented: registered product unit is not implemented
+later: unimplemented: registered product unit is not implemented
+scoreboard: passed
+future: unimplemented: registered product unit is not implemented
+later: unimplemented: registered product unit is not implemented
+report: <tmp>/tmp3lvbx6ua/report.json
+future: unimplemented: registered product unit is not implemented
+................E....
+======================================================================
+ERROR: test_scoreboard_reads_every_baseline_artifact (__main__.RoadmapGateTests.test_scoreboard_reads_every_baseline_artifact)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/rkadias/coding/ergo-forge-b2/scripts/test_roadmap_gate.py", line 67, in test_scoreboard_reads_every_baseline_artifact
+    evidence = gate.scoreboard(policy)
+  File "/home/rkadias/coding/ergo-forge-b2/scripts/roadmap_gate.py", line 162, in scoreboard
+    require(measured(corpus) == measured(baselines[frozen['artifact']]), 'frozen corpus data changed')
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/rkadias/coding/ergo-forge-b2/scripts/roadmap_gate.py", line 27, in require
+    raise GateError(status, message)
+roadmap_gate.GateError: frozen corpus data changed
+
+----------------------------------------------------------------------
+Ran 24 tests in 0.353s
+
+FAILED (errors=1)
+scoreboard: passed
+future: unimplemented: registered product unit is not implemented
+report: <tmp>/tmpq99a7aj1/report.json
+policy/evidence: missing-gate: 'list' object has no attribute 'values'
+report: <tmp>/tmpkkwrcwct/nested/report.json
+policy/evidence: missing-gate: 'NoneType' object has no attribute 'keys'
+report: <tmp>/tmpw8cayq5r/nested/report.json
+policy/evidence: missing-gate: division by zero
+report: <tmp>/tmpdgs7vm6i/nested/report.json

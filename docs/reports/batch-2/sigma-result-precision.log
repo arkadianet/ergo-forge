@@ -1,0 +1,9 @@
+   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge-b2/ergo-sandbox)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.56s
+     Running tests/more_lints.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/more_lints-ee286acf8cf1b70a)
+
+running 1 test
+test sigma_disjuncts_preserve_conjunctive_authority_and_result_scope ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 17 filtered out; finished in 0.01s
+

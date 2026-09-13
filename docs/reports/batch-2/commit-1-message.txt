@@ -1,0 +1,14 @@
+Add four S02 static lints with versioned pairs and reviewed sweep
+
+Recognise output tails, successor field drift, trivial sigma alternatives and
+unanchored dynamic code bytes over the lifted AST. Reuse identity/reserve
+helpers and keep findings at review-priority authority. Add nine mechanical
+mutant/control pairs and precision controls; review all 87 sweep sites with a
+recompiling corpus gate. Keep the old hunt measurements unchanged.
+
+Five existing audit fixtures now expect the exact additional output-tail
+observation; the standalone context-variable test remains unchanged after
+narrowing writable sigma analysis to direct disjuncts.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

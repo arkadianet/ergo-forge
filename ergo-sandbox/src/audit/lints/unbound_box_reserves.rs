@@ -43,6 +43,11 @@
 //! `b.tokens(0) == x`, and the whole collection `b.tokens == x.tokens`. All
 //! three pin `tokens(0)`, which is where a singleton NFT is kept by convention.
 //!
+//! Scope: vector class 1 includes positional output reserves. Classes 2/3
+//! also need successor-field and output-tail observations, supplied separately
+//! by `successor_field_drift` and `unconstrained_outputs`; identity binding here
+//! does not establish either property. This lint's recognition is unchanged.
+//!
 //! Known gaps (deliberate): an NFT held at a token index other than 0, and a
 //! box identified by an `exists`/`forall` search over the inputs rather than by
 //! a fixed index, are not recognised — such a contract is a false positive.

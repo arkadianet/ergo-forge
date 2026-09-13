@@ -1357,5 +1357,76 @@
    },
    "note": "HISTORICAL fixture-repair measurement (not the current synthesis baseline): Before the fixture repair, all 29448 probes were invalid on both mutant and control, previously misreported as script rejections. Template input/output references now use $amm-pool. The witness already used $amm-pool in both places. Probe counts, hits, verdicts, and caps are unchanged; corrected rejection counts are recorded in the rows above. Roles and objective are unchanged."
   }
- }
+ },
+ "staticLintPairs": {
+ "schemaVersion": 1,
+ "recorded": "2026-09-13",
+ "runner": "ergo-sandbox/tests/mutation_corpus.rs",
+ "methodology": "Compile versioned mechanical mutant/control pairs with tree version 3, lift both rendering modes, assert exact per-lint occurrence counts. Static observations only; legacy hunt methodology/caps and measurements are unchanged.",
+ "perMutant": [
+  {
+   "id": "S02-01-v1",
+   "version": 1,
+   "lint": "unconstrained-outputs",
+   "mutantFindings": 1,
+   "controlFindings": 0
+  },
+  {
+   "id": "S02-02-v1",
+   "version": 1,
+   "lint": "successor-field-drift",
+   "mutantFindings": 1,
+   "controlFindings": 0
+  },
+  {
+   "id": "S02-03-v1",
+   "version": 1,
+   "lint": "successor-field-drift",
+   "mutantFindings": 1,
+   "controlFindings": 0
+  },
+  {
+   "id": "S02-04-v1",
+   "version": 1,
+   "lint": "successor-field-drift",
+   "mutantFindings": 1,
+   "controlFindings": 0
+  },
+  {
+   "id": "S02-05-v1",
+   "version": 1,
+   "lint": "trivial-sigma-branch",
+   "mutantFindings": 1,
+   "controlFindings": 0
+  },
+  {
+   "id": "S02-06-v1",
+   "version": 1,
+   "lint": "trivial-sigma-branch",
+   "mutantFindings": 1,
+   "controlFindings": 0
+  },
+  {
+   "id": "S02-07-v1",
+   "version": 1,
+   "lint": "trivial-sigma-branch",
+   "mutantFindings": 1,
+   "controlFindings": 0
+  },
+  {
+   "id": "S02-08-v1",
+   "version": 1,
+   "lint": "unauthenticated-code-execution",
+   "mutantFindings": 1,
+   "controlFindings": 0
+  },
+  {
+   "id": "S02-09-v1",
+   "version": 1,
+   "lint": "unauthenticated-code-execution",
+   "mutantFindings": 1,
+   "controlFindings": 0
+  }
+ ]
+}
 }

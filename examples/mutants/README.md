@@ -31,3 +31,24 @@
   never enter the rate's denominator.
 - Originals are negative controls: expected `notUnderProbes` in both
   configurations. A `drainable` original is escalated, never tuned away.
+
+## S02 static lint pairs (v1)
+
+`mutants.json.staticLintPairs` and `answer-key.json.staticLintPairs` add a
+separate syntax-recognition measurement. Nine pairs under `s02/v1/` cover
+output tails, successor ERG/token/register fields, constant/writable sigma
+alternatives, and context execution/template substitution. Each original and
+mutant is compiled and lifted in both rendering modes. The harness checks the
+mechanical diff, versioned files, one expected observation on the mutant and
+zero for that lint on its control. Other lints can still report on a control.
+
+These are static observations, with no witness or execution claim. They do not
+enter the historical hunt's proven denominator, detection rate or caps. The
+historical records above remain unchanged. A correction to a committed fixture
+requires a new version and a new answer-key row; never silently rewrite v1.
+`answer-key.pre-s02.json` retains the exact previous answer-key bytes under
+M00 and D00's unchanged pinned digest. Both inventory gates also require every
+historical field of the live answer key to equal that archive; only the new static
+namespace is outside the frozen hunt measurement.
+Direct AST precision tests in `more_lints.rs` additionally cover deserialisation
+forms the pinned compiler does not emit, labelled separately from compiled pairs.

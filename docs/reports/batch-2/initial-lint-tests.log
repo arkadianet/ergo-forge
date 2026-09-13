@@ -1,0 +1,98 @@
+   Compiling ergo-sandbox v0.3.0 (/home/rkadias/coding/ergo-forge-b2/ergo-sandbox)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.87s
+     Running tests/audit.rs (/home/rkadias/coding/ergo-forge/target-p00/debug/deps/audit-ab32567643f8a17f)
+
+running 43 tests
+test a_fully_lifted_tree_audits_as_complete ... ok
+test a_finding_carries_the_ir_id_of_its_node ... ok
+test a_get_on_a_context_variable_is_low ... FAILED
+test a_get_on_a_lambda_element_is_medium ... ok
+test a_negated_guard_condition_does_not_clear_the_then_branch ... ok
+test a_guard_bound_to_a_val_clears_the_get_in_the_then_branch ... ok
+test a_guarded_lambda_element_get_is_not_flagged ... ok
+test a_get_through_an_element_property_chain_is_medium ... ok
+test a_negated_guard_under_or_clears_the_right_operand ... ok
+test a_negated_guard_condition_clears_the_else_branch ... ok
+test a_guard_bound_to_a_val_clears_the_get_under_and ... ok
+test a_positive_guard_under_or_still_proves_nothing_for_the_right_operand ... ok
+test a_self_get_inside_a_lambda_stays_high ... ok
+test a_negated_val_guard_under_or_clears_the_right_operand ... ok
+test a_positional_box_without_reserve_math_is_not_flagged ... ok
+test a_self_successor_pool_is_not_flagged ... FAILED
+test an_unbound_data_input_reserve_read_is_flagged ... ok
+test bare_register_get_is_flagged ... ok
+test an_or_chain_of_negated_guards_clears_the_tail ... ok
+test children_covers_every_node_of_a_nested_tree ... ok
+test binding_to_another_positional_box_does_not_count ... ok
+test an_nft_bound_box_is_not_flagged ... FAILED
+test findings_carry_a_readable_snippet ... ok
+test is_defined_conditional_guards_the_get ... ok
+test binding_by_the_whole_token_pair_counts ... FAILED
+test is_defined_conjunction_guards_the_get ... ok
+test get_or_else_is_never_flagged ... FAILED
+test reserves_read_only_from_self_are_not_flagged ... ok
+test negated_is_defined_does_not_guard_the_get ... ok
+test guarded_successor_alias_survives_compilation_and_is_not_reported ... ok
+test binding_by_the_whole_tokens_collection_counts ... FAILED
+test is_defined_under_or_does_not_guard_the_get ... ok
+test two_unguarded_gets_produce_two_findings_with_distinct_nodes ... ok
+test positional_reserves_without_an_nft_are_flagged ... ok
+test the_deployed_use_bank_contract_is_clean ... ok
+test a_val_guard_does_not_clear_a_get_outside_its_scope ... ok
+test is_defined_nested_in_conjunction_still_guards ... ok
+test a_val_guard_under_or_still_proves_nothing ... ok
+test a_val_guard_composed_of_two_guards_clears_both_gets ... ok
+test the_deployed_use_lp_swap_contract_is_flagged ... ok
+test unguarded_successor_alias_is_still_reported_after_compilation ... ok
+test the_incident_corpus_fixed_swap_is_clean ... ok
+test the_deployed_use_lp_extract_contract_is_clean ... ok
+
+failures:
+
+---- a_get_on_a_context_variable_is_low stdout ----
+
+thread 'a_get_on_a_context_variable_is_low' (735) panicked at ergo-sandbox/tests/audit.rs:129:5:
+assertion `left == right` failed: [Finding { triage: Triage { format_version: 2, claim: ClaimMetadata { method: "static-analysis", provenance: "supplied-code; deployment identity not established", node_validated: false }, state: "unconfirmed", consensus_reducer_consulted: false, explanation: "Static finding only; the consensus reducer has not been consulted.", evidence: StaticOnly }, lint: "trivial-sigma-branch", severity: Low, node_id: 0, ir_id: Some(1), message: "A result alternative depends only on literals and writable context/register data without a recognised box identity binding. Review whether permissionless release or spender-selected authority is intended; evaluation and proofs can still fail, and this syntax observation is not evidence of exploitability.", snippet: "getVar[Int](0).get > 5" }, Finding { triage: Triage { format_version: 2, claim: ClaimMetadata { method: "static-analysis", provenance: "supplied-code; deployment identity not established", node_validated: false }, state: "unconfirmed", consensus_reducer_consulted: false, explanation: "Static finding only; the consensus reducer has not been consulted.", evidence: StaticOnly }, lint: "unchecked-get", severity: Low, node_id: 2, ir_id: Some(2), message: "Option.get on context variable 0 with no isDefined guard — the spender must supply it or the script throws; not a lock, since the spender controls the extension.", snippet: "getVar[Int](0).get" }]
+  left: 2
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- a_self_successor_pool_is_not_flagged stdout ----
+
+thread 'a_self_successor_pool_is_not_flagged' (748) panicked at ergo-sandbox/tests/audit.rs:354:5:
+assertion failed: lints_of("{ val succ = OUTPUTS(0);          sigmaProp(succ.propositionBytes == SELF.propositionBytes && succ.value >= SELF.value) }").is_empty()
+
+---- an_nft_bound_box_is_not_flagged stdout ----
+
+thread 'an_nft_bound_box_is_not_flagged' (752) panicked at ergo-sandbox/tests/audit.rs:344:5:
+assertion failed: lints_of("{ val lp = INPUTS(0); val out = OUTPUTS(0);          sigmaProp(lp.tokens(0)._1 == fromBase16(\"aabb\") && out.tokens(0)._1 == fromBase16(\"aabb\")          && out.value - lp.value >= 0L) }").is_empty()
+
+---- binding_by_the_whole_token_pair_counts stdout ----
+
+thread 'binding_by_the_whole_token_pair_counts' (756) panicked at ergo-sandbox/tests/audit.rs:470:5:
+assertion failed: lints_of("{ val lp = INPUTS(0); val out = OUTPUTS(0); \
+         sigmaProp(lp.tokens(0)._1 == fromBase16(\"aabb\") && out.tokens(0) == lp.tokens(0) \
+         && out.value - lp.value >= 0L) }").is_empty()
+
+---- get_or_else_is_never_flagged stdout ----
+
+thread 'get_or_else_is_never_flagged' (761) panicked at ergo-sandbox/tests/audit.rs:63:5:
+assertion failed: lints_of("sigmaProp(OUTPUTS(0).R4[Long].getOrElse(0L) > 5L)").is_empty()
+
+---- binding_by_the_whole_tokens_collection_counts stdout ----
+
+thread 'binding_by_the_whole_tokens_collection_counts' (757) panicked at ergo-sandbox/tests/audit.rs:481:5:
+assertion failed: lints_of("{ val out = OUTPUTS(0); sigmaProp(out.tokens == SELF.tokens && out.value > SELF.value) }").is_empty()
+
+
+failures:
+    a_get_on_a_context_variable_is_low
+    a_self_successor_pool_is_not_flagged
+    an_nft_bound_box_is_not_flagged
+    binding_by_the_whole_token_pair_counts
+    binding_by_the_whole_tokens_collection_counts
+    get_or_else_is_never_flagged
+
+test result: FAILED. 37 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p ergo-sandbox --test audit`

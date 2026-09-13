@@ -59,6 +59,14 @@ pub fn trust_assumptions(root: &Node) -> Vec<Finding> {
         .collect()
 }
 
+/// Reuse the same immutable box-id/token-id anchors for sigma data provenance.
+pub(super) fn bound_boxes(root: &Node, vals: &Vals) -> HashSet<String> {
+    let mut bound = HashSet::new();
+    scan(root, vals, &mut bound, &mut BTreeMap::new());
+    bound.insert("SELF".into());
+    bound
+}
+
 fn literal_index(n: &Node, vals: &Vals) -> bool {
     match &deref(n, vals).kind {
         NodeKind::Int(i) => *i >= 0,
@@ -69,7 +77,7 @@ fn literal_index(n: &Node, vals: &Vals) -> bool {
 
 /// An explicitly recognised immutable anchor, never an arbitrary expression
 /// merely because no positional read was found inside it.
-fn anchor(n: &Node, vals: &Vals, depth: u32) -> bool {
+pub(super) fn anchor(n: &Node, vals: &Vals, depth: u32) -> bool {
     if depth == 0 {
         return false;
     }

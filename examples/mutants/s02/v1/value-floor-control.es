@@ -1,0 +1,1 @@
+{ val out = OUTPUTS(0); sigmaProp(out.propositionBytes == SELF.propositionBytes && out.value >= SELF.value && out.tokens(1)._1 == SELF.tokens(1)._1 && out.tokens(1)._2 >= SELF.tokens(1)._2 && out.R4[Long].get == SELF.R4[Long].get) }

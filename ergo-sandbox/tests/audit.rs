@@ -60,7 +60,11 @@ fn is_defined_conditional_guards_the_get() {
 
 #[test]
 fn get_or_else_is_never_flagged() {
-    assert!(lints_of("sigmaProp(OUTPUTS(0).R4[Long].getOrElse(0L) > 5L)").is_empty());
+    // getOrElse handles the option; its positional check still leaves a tail.
+    assert_eq!(
+        lints_of("sigmaProp(OUTPUTS(0).R4[Long].getOrElse(0L) > 5L)"),
+        vec!["unconstrained-outputs"]
+    );
 }
 
 #[test]
@@ -338,23 +342,23 @@ fn positional_reserves_without_an_nft_are_flagged() {
         .all(|x| x.severity == ergo_sandbox::Severity::High));
 }
 
-/// The same tree with the LP pinned by its NFT is clean.
+/// The LP identity is bound; the separate output-tail observation remains.
 #[test]
 fn an_nft_bound_box_is_not_flagged() {
-    assert!(lints_of(
+    assert_eq!(lints_of(
         "{ val lp = INPUTS(0); val out = OUTPUTS(0);          sigmaProp(lp.tokens(0)._1 == fromBase16(\"aabb\") && out.tokens(0)._1 == fromBase16(\"aabb\")          && out.value - lp.value >= 0L) }"
     )
-    .is_empty());
+    , vec!["unconstrained-outputs"]);
 }
 
 /// A self-validating pool: reserves on SELF and on the output that carries
 /// SELF's own script. Nothing here is substitutable.
 #[test]
 fn a_self_successor_pool_is_not_flagged() {
-    assert!(lints_of(
+    assert_eq!(lints_of(
         "{ val succ = OUTPUTS(0);          sigmaProp(succ.propositionBytes == SELF.propositionBytes && succ.value >= SELF.value) }"
     )
-    .is_empty());
+    , vec!["unconstrained-outputs"]);
 }
 
 /// SigmaUSD-style: reserve maths on SELF alone. SELF is never positional.
@@ -467,21 +471,23 @@ fn the_incident_corpus_fixed_swap_is_clean() {
 /// equality does — the oracle-pool refresh shape.
 #[test]
 fn binding_by_the_whole_token_pair_counts() {
-    assert!(lints_of(
-        "{ val lp = INPUTS(0); val out = OUTPUTS(0); \
+    assert_eq!(
+        lints_of(
+            "{ val lp = INPUTS(0); val out = OUTPUTS(0); \
          sigmaProp(lp.tokens(0)._1 == fromBase16(\"aabb\") && out.tokens(0) == lp.tokens(0) \
          && out.value - lp.value >= 0L) }"
-    )
-    .is_empty());
+        ),
+        vec!["unconstrained-outputs"]
+    );
 }
 
 /// So does an equality on the whole `tokens` collection.
 #[test]
 fn binding_by_the_whole_tokens_collection_counts() {
-    assert!(lints_of(
+    assert_eq!(lints_of(
         "{ val out = OUTPUTS(0); sigmaProp(out.tokens == SELF.tokens && out.value > SELF.value) }"
     )
-    .is_empty());
+    , vec!["unconstrained-outputs"]);
 }
 
 #[test]

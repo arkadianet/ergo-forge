@@ -1,0 +1,405 @@
+[
+  {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "ergo-sandbox",
+      "--test",
+      "audit",
+      "--test",
+      "more_lints",
+      "--test",
+      "delegated_reserves"
+    ],
+    "exitCode": 101,
+    "log": "initial-lint-tests.log",
+    "seconds": 8.91
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "ergo-sandbox",
+      "--test",
+      "mutation_corpus",
+      "new_lint_mutants_are_caught_and_controls_are_clean",
+      "--",
+      "--exact"
+    ],
+    "exitCode": 0,
+    "log": "mutant-pairs.log",
+    "seconds": 0.77
+  },
+  {
+    "command": [
+      "cargo",
+      "run",
+      "--release",
+      "-p",
+      "ergo-sandbox",
+      "--example",
+      "audit_sweep"
+    ],
+    "exitCode": null,
+    "log": "sweep-initial.log",
+    "note": "Interrupted session; no completed process exit observed and initial output was empty. Superseded by sweep-final.log with observed exit 0."
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "ergo-sandbox",
+      "--test",
+      "audit",
+      "--test",
+      "more_lints",
+      "--test",
+      "delegated_reserves"
+    ],
+    "exitCode": 0,
+    "log": "existing-lint-tests.log",
+    "seconds": 8.8
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "ergo-sandbox",
+      "--test",
+      "more_lints"
+    ],
+    "exitCode": 0,
+    "log": "lint-precision.log",
+    "seconds": 0.93
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "ergo-sandbox",
+      "--test",
+      "audit",
+      "--test",
+      "more_lints",
+      "--test",
+      "delegated_reserves",
+      "--test",
+      "mutation_corpus",
+      "new_lint_mutants_are_caught_and_controls_are_clean"
+    ],
+    "exitCode": 0,
+    "log": "lint-step.log",
+    "seconds": 2.64
+  },
+  {
+    "command": [
+      "bash",
+      "-c",
+      "cargo run --release -p ergo-sandbox --example audit_sweep > docs/reports/batch-2/audit-sweep.json"
+    ],
+    "exitCode": 0,
+    "log": "sweep-final.log",
+    "seconds": 12.35
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "ergo-sandbox",
+      "--test",
+      "mutation_corpus",
+      "deployed_corpus_sweep_is_recorded",
+      "--",
+      "--exact"
+    ],
+    "exitCode": 0,
+    "log": "sweep-gate.log",
+    "seconds": 1.29
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/render_vectors.py"
+    ],
+    "exitCode": 0,
+    "log": "render-vectors.log",
+    "seconds": 0.03
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/render_vectors.py"
+    ],
+    "exitCode": 0,
+    "log": "render-vectors-final.log",
+    "seconds": 0.03
+  },
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exitCode": 0,
+    "log": "fmt.log",
+    "seconds": 0.39
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/test_roadmap_gate.py"
+    ],
+    "exitCode": 1,
+    "log": "roadmap-tests.log",
+    "seconds": 0.43
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exitCode": 0,
+    "log": "clippy.log",
+    "seconds": 6.19
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/test_roadmap_gate.py"
+    ],
+    "exitCode": 0,
+    "log": "roadmap-tests-final.log",
+    "seconds": 0.78
+  },
+  {
+    "command": [
+      "git",
+      "add",
+      "ergo-sandbox/src/audit",
+      "ergo-sandbox/tests/audit.rs",
+      "ergo-sandbox/tests/more_lints.rs",
+      "ergo-sandbox/tests/mutation_corpus.rs",
+      "examples/mutants",
+      "docs/audit-sweep.md",
+      "docs/reports/batch-2/audit-sweep.json",
+      "docs/reports/batch-2/site-review.json",
+      "docs/reports/batch-2/sweep-final.log"
+    ],
+    "exitCode": 128,
+    "log": "stage-lints.log",
+    "seconds": 0.0
+  },
+  {
+    "command": [
+      "git",
+      "commit",
+      "-F",
+      "/tmp/s02-commit-1.txt"
+    ],
+    "exitCode": 128,
+    "log": "commit-lints.log",
+    "seconds": 0.01
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--workspace"
+    ],
+    "exitCode": 101,
+    "log": "workspace-tests.log",
+    "seconds": 28.46
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--workspace",
+      "--",
+      "--skip",
+      "seed_corpus_holds_the_exact_floor_when_checkout_present"
+    ],
+    "exitCode": 101,
+    "log": "workspace-with-known-skip.log",
+    "seconds": 60.7
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exitCode": 0,
+    "log": "final-diff-check.log",
+    "seconds": 0.01
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "ergo-sandbox",
+      "--test",
+      "mapping_inventory",
+      "legacy_metrics_are_measured_without_baseline_changes",
+      "--",
+      "--exact"
+    ],
+    "exitCode": 0,
+    "log": "mapping-baseline.log",
+    "seconds": 0.94
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/roadmap_gate.py",
+      "--require",
+      "S02",
+      "--report",
+      "docs/reports/batch-2/S02.json"
+    ],
+    "exitCode": 0,
+    "log": "roadmap-S02.log",
+    "seconds": 191.79
+  },
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exitCode": 0,
+    "log": "fmt-final.log",
+    "seconds": 0.63
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exitCode": 0,
+    "log": "clippy-final.log",
+    "seconds": 1.23
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/test_roadmap_gate.py"
+    ],
+    "exitCode": 0,
+    "log": "roadmap-tests-complete.log",
+    "seconds": 1.41
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exitCode": 0,
+    "log": "post-review-diff-check.log",
+    "seconds": 0.01
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "ergo-sandbox",
+      "--test",
+      "more_lints",
+      "sigma_disjuncts_preserve_conjunctive_authority_and_result_scope",
+      "--",
+      "--exact"
+    ],
+    "exitCode": 0,
+    "log": "sigma-result-precision.log",
+    "seconds": 0.6
+  },
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exitCode": 0,
+    "log": "fmt-complete.log",
+    "seconds": 0.41
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exitCode": 0,
+    "log": "clippy-complete.log",
+    "seconds": 0.35
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--workspace",
+      "--",
+      "--skip",
+      "seed_corpus_holds_the_exact_floor_when_checkout_present"
+    ],
+    "exitCode": 101,
+    "log": "workspace-with-known-skip-final.log",
+    "seconds": 938.68
+  },
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exitCode": 0,
+    "log": "fmt-baselines.log",
+    "seconds": 0.99
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "ergo-sandbox",
+      "--test",
+      "mapping_inventory",
+      "--test",
+      "property_inventory"
+    ],
+    "exitCode": 0,
+    "log": "inventory-baselines.log",
+    "seconds": 6.2
+  }
+]
