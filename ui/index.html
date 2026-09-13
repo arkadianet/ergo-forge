@@ -137,12 +137,14 @@
           <option value="mainnet" selected>mainnet</option>
           <option value="testnet">testnet</option>
         </select>
+        <button id="explain-run" class="secondary" type="button">Explain selection</button>
         <button id="compile">Compile</button>
       </div>
       <label for="editor" class="hint">ErgoScript source. <code>$name</code> constants become a form below. Ctrl+Enter compiles.</label>
       <textarea id="editor" rows="14" spellcheck="false">// Funds unlock after a block height.
 // $unlockHeight: Int
 sigmaProp(HEIGHT > $unlockHeight)</textarea>
+      <section aria-label="Expression explanation"><div id="explain-result" aria-live="polite"><p>Select an expression and click Explain selection to run it in the current scenario.</p></div></section>
       <pre id="caret" class="caret" hidden></pre>
       <p id="compile-status" class="status" role="status" hidden></p>
 
@@ -488,9 +490,13 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
         <dt>error</dt><dd><code id="eval-error"></code></dd>
         <dt>address</dt><dd><code id="eval-address"></code></dd>
       </dl>
+      <section aria-labelledby="cost-spans-title">
+        <h3 id="cost-spans-title">Cost by source</h3>
+        <div id="cost-spans" aria-live="polite"></div>
+      </section>
       <section class="cost-hot-spots" aria-labelledby="cost-hot-spots-title">
         <h3 id="cost-hot-spots-title">Cost hot spots</h3>
-        <p class="hint">Operations ranked by cost in this scenario’s reduction. Shares use the recorded trace, in JIT units; proof verification is excluded. Operations have no source locations.</p>
+        <p class="hint">Operations ranked by cost in this scenario’s reduction. Shares use the recorded trace, in JIT units; proof verification is excluded. This ranking groups operation labels; source attribution is shown above.</p>
         <p id="cost-hot-spots-summary" class="hint"></p>
         <div class="cost-table-scroll">
           <table id="cost-hot-spots-table">
@@ -536,6 +542,8 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
   <script src="attack.js"></script>
   <script src="checklist.js"></script>
   <script src="verify.js"></script>
+  <script src="cost-spans.js"></script>
+  <script src="explain.js"></script>
   <script src="play-export.js"></script>
   <script src="share.js"></script>
   <script src="app.js"></script>

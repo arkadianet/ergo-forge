@@ -1915,6 +1915,36 @@ $("export-tests").addEventListener("click", async () => {
   status.hidden = false;
 });
 
+// ── Write source diagnostics ─────────────────────────────────────────────
+let diagnosticsGeneration = 0;
+function invalidateWriteDiagnostics() {
+  ++diagnosticsGeneration;
+  CostSpans.invalidate($("cost-spans"));
+  Explain.invalidate($("explain-result"));
+  markValues([], false);
+  $("eval-why").hidden = true;
+  $("eval-result").hidden = true;
+}
+editor.on("change", invalidateWriteDiagnostics);
+for (const id of ["scenario", "params-rows", "write-network"]) {
+  for (const event of ["input", "change"]) $(id).addEventListener(event, invalidateWriteDiagnostics);
+}
+async function explainSelection() {
+  const root = $("explain-result");
+  const source = editorValue();
+  const generation = diagnosticsGeneration, context = contextGeneration;
+  try {
+    if (editor.listSelections().length !== 1) throw new Error("Select one source range at a time.");
+    const range = Explain.selection(source, editor.indexFromPos(editor.getCursor("from")), editor.indexFromPos(editor.getCursor("to")));
+    const request = Explain.payload(JSON.parse($("scenario").value), source, collectParams(), $("write-network").value, range);
+    return await Explain.load(request, root, {
+      isCurrent: () => generation === diagnosticsGeneration && context === contextGeneration && source === editorValue(),
+      onSelect: span => { if (generation === diagnosticsGeneration && context === contextGeneration) selectInEditor(span.offset, ""); },
+    });
+  } catch (e) { Explain.invalidate(root, e.message); }
+}
+$("explain-run").addEventListener("click", explainSelection);
+
 // ── scenario eval ────────────────────────────────────────────────────────
 
 const EVAL_VERDICTS = {
@@ -1971,11 +2001,13 @@ async function runScenario() {
     } else {
       if (!lastCompiled) { status.textContent = "Compile something in Write mode first, or give the scenario a source or tree."; status.hidden = false; return; }
       scenario.source = editor.getValue();
-      const params = collectParams();
-      if (Object.keys(params).length) scenario.params = params;
-      scenario.network = scenario.network || $("write-network").value;
       scenario.fromEditor = true;
     }
+  }
+  // Run and Explain use the same explicit scenario overrides.
+  if ($("read").hidden && scenario?.source === editorValue() && scenario.tree == null) {
+    scenario.params ??= collectParams();
+    scenario.network ||= $("write-network").value;
   }
   evalInFlight = true;
   $("run").disabled = true;
@@ -1983,6 +2015,9 @@ async function runScenario() {
   status.hidden = false;
   result.hidden = true;
   const contextAtStart = contextGeneration;
+  const diagnosticsAtStart = diagnosticsGeneration;
+  const editorSource = editorValue();
+  const fromEditor = $("read").hidden && scenario?.source === editorSource;
   try {
     const res = await fetch("/api/v1/eval", {
       method: "POST",
@@ -1990,7 +2025,7 @@ async function runScenario() {
       body: JSON.stringify(scenario),
     });
     const body = await res.json();
-    if (contextAtStart !== contextGeneration) return;
+    if (contextAtStart !== contextGeneration || diagnosticsAtStart !== diagnosticsGeneration) return;
     if (!res.ok) {
       status.textContent = `Error: ${(body.error && body.error.message) || res.status}`;
       return;
@@ -2002,11 +2037,17 @@ async function runScenario() {
     v.className = `hunt-verdict ${cls}`;
     $("eval-cost").textContent = `${body.cost} / ${body.costLimit} block units`;
     renderHotSpots(body.hotSpots || [], body.verdict);
+    CostSpans.render(body.costSpans, $("cost-spans"), {
+      partial: body.verdict === "error",
+      onSelect: fromEditor ? span => {
+        if (diagnosticsAtStart === diagnosticsGeneration && contextAtStart === contextGeneration && editorSource === editorValue()) selectInEditor(span.offset, "");
+      } : undefined,
+    });
     $("eval-reduced").textContent = body.reducedTo || "—";
     $("eval-error").textContent = body.error || "—";
     $("eval-address").textContent = body.address;
-    markValues(body.values || [], scenario.fromEditor === true);
-    explainFailure(body, scenario.fromEditor === true);
+    markValues(body.values || [], fromEditor);
+    explainFailure(body, fromEditor);
     const list = $("eval-trace");
     list.textContent = "";
     for (const t of body.trace) {
@@ -2019,6 +2060,7 @@ async function runScenario() {
   } catch (e) {
     status.textContent = `Request failed: ${e}`;
   } finally {
+    if (contextAtStart !== contextGeneration || diagnosticsAtStart !== diagnosticsGeneration) status.hidden = true;
     evalInFlight = false;
     $("run").disabled = false;
   }
