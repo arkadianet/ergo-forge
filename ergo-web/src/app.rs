@@ -94,6 +94,8 @@ pub fn router_with(cfg: AppConfig) -> Router {
         .route("/api/v2/attack", post(crate::routes::attack::attack_route))
         .route("/api/v2/replay", post(crate::routes::replay::replay_route))
         .route("/api/v1/inspect", post(crate::routes::inspect::inspect))
+        .route("/api/v1/lock", post(crate::routes::lock::lock_route))
+        .route("/api/v1/verify", post(crate::routes::verify::verify_route))
         .route(
             "/api/v1/checklist",
             post(crate::routes::checklist::checklist_route),
