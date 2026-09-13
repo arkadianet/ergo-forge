@@ -1,0 +1,697 @@
+{
+  "formatVersion": 1,
+  "results": [
+    {
+      "unit": "scoreboard",
+      "status": "passed"
+    },
+    {
+      "unit": "P00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P01",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P02",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P03",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P04",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P05",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P06",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P07",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P08",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M01",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M02",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M03",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M04",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M05",
+      "status": "stopped",
+      "detail": "recorded stop blocks this unit"
+    },
+    {
+      "unit": "W00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "S00",
+      "status": "not-started",
+      "detail": "registered future unit has not started"
+    },
+    {
+      "unit": "W01",
+      "status": "not-started",
+      "detail": "registered future unit has not started"
+    },
+    {
+      "unit": "S02",
+      "status": "not-started",
+      "detail": "registered future unit has not started"
+    },
+    {
+      "unit": "S01",
+      "status": "not-started",
+      "detail": "registered future unit has not started"
+    },
+    {
+      "unit": "W06",
+      "status": "not-started",
+      "detail": "registered future unit has not started"
+    },
+    {
+      "unit": "I01",
+      "status": "not-started",
+      "detail": "registered future unit has not started"
+    },
+    {
+      "unit": "I02",
+      "status": "not-started",
+      "detail": "registered future unit has not started"
+    },
+    {
+      "unit": "W02",
+      "status": "not-started",
+      "detail": "registered future unit has not started"
+    },
+    {
+      "unit": "W03",
+      "status": "not-started",
+      "detail": "registered future unit has not started"
+    },
+    {
+      "unit": "W04",
+      "status": "not-started",
+      "detail": "registered future unit has not started"
+    },
+    {
+      "unit": "S04",
+      "status": "not-started",
+      "detail": "registered future unit has not started"
+    },
+    {
+      "unit": "I04",
+      "status": "not-started",
+      "detail": "registered future unit has not started"
+    },
+    {
+      "unit": "I03",
+      "status": "not-started",
+      "detail": "registered future unit has not started"
+    },
+    {
+      "unit": "W05",
+      "status": "not-started",
+      "detail": "registered future unit has not started"
+    },
+    {
+      "unit": "S05",
+      "status": "not-started",
+      "detail": "registered future unit has not started"
+    },
+    {
+      "unit": "X01",
+      "status": "not-started",
+      "detail": "registered future unit has not started"
+    },
+    {
+      "unit": "S03",
+      "status": "not-started",
+      "detail": "registered future unit has not started"
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "claim_contract",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ring v0.17.14\n   Compiling rustls v0.23.43\n   Compiling rustls-webpki v0.103.15\n   Compiling ureq v3.4.1\n   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 21.67s\n     Running tests/claim_contract.rs (<home>/coding/ergo-forge/target-p00/release/deps/claim_contract-67314c4a30c78ca0)\nlegacy_record_cannot_import_as_verified: test\nlegacy_results_are_explicitly_preflight_or_simulation: test\nscenario_reproduction_is_not_confirmation: test\n\n3 tests, 0 benchmarks\n",
+      "outputSha256": "ec422ef69e2054aed1f0dc2999395680411df3968d36589ec44a6ecd3ad69fb5"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "claim_contract",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/claim_contract.rs (<home>/coding/ergo-forge/target-p00/release/deps/claim_contract-67314c4a30c78ca0)\n\nrunning 3 tests\ntest legacy_record_cannot_import_as_verified ... ok\ntest legacy_results_are_explicitly_preflight_or_simulation ... ok\ntest scenario_reproduction_is_not_confirmation ... ok\n\nsuccesses:\n\n---- legacy_record_cannot_import_as_verified stdout ----\nstored confirmed records and imported authority fields rejected; replay request required\n\n---- legacy_results_are_explicitly_preflight_or_simulation stdout ----\npositive and negative legacy envelopes: explicit method/provenance, nodeValidated=false\n\n---- scenario_reproduction_is_not_confirmation stdout ----\nformatVersion=2 state=reproduced-in-scenario preflightPassed=true nodeValidated=false\n\n\nsuccesses:\n    legacy_record_cannot_import_as_verified\n    legacy_results_are_explicitly_preflight_or_simulation\n    scenario_reproduction_is_not_confirmation\n\ntest result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s\n\n",
+      "outputSha256": "66b668cfddd4d8206bc3d7b5cff1693c6c533d84e75dfdc80397b8fe4e9bd421"
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_roadmap_gate.py"
+      ],
+      "exitCode": 0,
+      "output": "M05: stopped: recorded stop blocks this unit\nscoreboard: passed\nM05: stopped: recorded stop blocks this unit\nreport: <tmp>/tmpn88nytju/report.json\nM05: stopped: recorded stop blocks this unit\nscoreboard: passed\nM05: stopped: recorded stop blocks this unit\nreport: <tmp>/tmpr1hoqxkd/report.json\nM05: stopped: recorded stop blocks this unit\nscoreboard: passed\nM05: stopped: recorded stop blocks this unit\nreport: <tmp>/tmp_3f_34j0/report.json\nM05: unimplemented: registered product unit is not implemented\n..scoreboard: passed\nM05: unimplemented: registered product unit is not implemented\nreport: <tmp>/tmpoz12bjwd/report.json\npolicy/evidence: missing-gate: stop evidence hash mismatch\nreport: <tmp>/tmpwcpfk4qn/ci.json\nA: failed: test failure\nscoreboard: passed\nA: failed: test failure\nreport: <tmp>/tmpns882ch7/report.json\nA: missing-gate: test failure\nscoreboard: passed\nA: missing-gate: test failure\nreport: <tmp>/tmpvn6101jk/report.json\nA: stopped: recorded stop blocks this unit\nB: unimplemented: registered product unit is not implemented\nscoreboard: passed\nA: stopped: recorded stop blocks this unit\nB: unimplemented: registered product unit is not implemented\nreport: <tmp>/tmpm5844pc0/report.json\nA: stopped: recorded stop blocks this unit\nB: blocked: dependency did not pass\nscoreboard: passed\nA: stopped: recorded stop blocks this unit\nB: blocked: dependency did not pass\nreport: <tmp>/tmpsa4419f8/report.json\nA: passed: required tests executed\n.scoreboard: passed\nA: passed: required tests executed\nreport: <tmp>/tmpprhsm8j0/report.json\nfuture: not-started: registered future unit has not started\nlater: not-started: registered future unit has not started\nscoreboard: passed\nfuture: not-started: registered future unit has not started\nlater: not-started: registered future unit has not started\nreport: <tmp>/tmpu6bab_u0/report.json\nfuture: unimplemented: registered product unit is not implemented\nlater: unimplemented: registered product unit is not implemented\nscoreboard: passed\nfuture: unimplemented: registered product unit is not implemented\nlater: unimplemented: registered product unit is not implemented\nreport: <tmp>/tmpypj_nmhz/report.json\nfuture: unimplemented: registered product unit is not implemented\n.....................\n----------------------------------------------------------------------\nRan 24 tests in 0.541s\n\nOK\nscoreboard: passed\nfuture: unimplemented: registered product unit is not implemented\nreport: <tmp>/tmpcdielog_/report.json\npolicy/evidence: missing-gate: 'list' object has no attribute 'values'\nreport: <tmp>/tmprnz6ko06/nested/report.json\npolicy/evidence: missing-gate: 'NoneType' object has no attribute 'keys'\nreport: <tmp>/tmptdvten3d/nested/report.json\npolicy/evidence: missing-gate: division by zero\nreport: <tmp>/tmpy2fz8jjq/nested/report.json\n",
+      "outputSha256": "5a1d0a33f4fb5734734da5df377eec0f7e05dcf9d2804073d82653bc21fc89d0"
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "ui/tests/claim-labels.test.js"
+      ],
+      "exitCode": 0,
+      "output": "TAP version 13\n# Subtest: Read and Write render synthetic warning for spendableByAnyone\nok 1 - Read and Write render synthetic warning for spendableByAnyone\n  ---\n  duration_ms: 14.66702\n  type: 'test'\n  ...\n# Subtest: Read and Write render synthetic warning for movableByAnyone\nok 2 - Read and Write render synthetic warning for movableByAnyone\n  ---\n  duration_ms: 4.470302\n  type: 'test'\n  ...\n# Subtest: Read and Write render synthetic warning for notUnderProbes\nok 3 - Read and Write render synthetic warning for notUnderProbes\n  ---\n  duration_ms: 8.472324\n  type: 'test'\n  ...\n# Subtest: Read and Write render synthetic warning for requiresProof\nok 4 - Read and Write render synthetic warning for requiresProof\n  ---\n  duration_ms: 3.264236\n  type: 'test'\n  ...\n# Subtest: Preflight renders success and failure with signature counts, including the legacy alias\nok 5 - Preflight renders success and failure with signature counts, including the legacy alias\n  ---\n  duration_ms: 6.900701\n  type: 'test'\n  ...\n# Subtest: stored v1 confirmation never renders as verified\nok 6 - stored v1 confirmation never renders as verified\n  ---\n  duration_ms: 3.888846\n  type: 'test'\n  ...\n# Subtest: production Read and Write handlers render both signs of synthetic hunt\nok 7 - production Read and Write handlers render both signs of synthetic hunt\n  ---\n  duration_ms: 9.498077\n  type: 'test'\n  ...\n1..7\n# tests 7\n# suites 0\n# pass 7\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 229.155916\n",
+      "outputSha256": "c09126c2b3647b0ae48f72d63712d61e8b15cbd4a07848a03ed2fea35aab594c"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "evidence_provenance",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 1.29s\n     Running tests/evidence_provenance.rs (<home>/coding/ergo-forge/target-p00/release/deps/evidence_provenance-83344e4e24342818)\nchanging_any_premise_invalidates_cached_evidence: test\nmissing_registers_are_not_empty_registers: test\nstructural_match_does_not_establish_deployment: test\nsynthetic_binding_survives_export_and_import: test\n\n4 tests, 0 benchmarks\n",
+      "outputSha256": "2345d643f4801939cf814790d42e61fd05741dee4801ebf60c67e3e556df1e80"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "evidence_provenance",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/evidence_provenance.rs (<home>/coding/ergo-forge/target-p00/release/deps/evidence_provenance-83344e4e24342818)\n\nrunning 4 tests\ntest missing_registers_are_not_empty_registers ... ok\ntest structural_match_does_not_establish_deployment ... ok\ntest changing_any_premise_invalidates_cached_evidence ... ok\ntest synthetic_binding_survives_export_and_import ... ok\n\nsuccesses:\n\n---- changing_any_premise_invalidates_cached_evidence stdout ----\nall case premises and comparison dependencies are bound; stale cache entries return no result\n\n---- synthetic_binding_survives_export_and_import stdout ----\nrecorded inventory: 28 rows retained; recorded binding values/origins retained; missing source text/target bytes not invented\n\n\nsuccesses:\n    changing_any_premise_invalidates_cached_evidence\n    missing_registers_are_not_empty_registers\n    structural_match_does_not_establish_deployment\n    synthetic_binding_survives_export_and_import\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s\n\n",
+      "outputSha256": "de7753afc9ee727caf545a1bca64fee0c3a2b235f3c68dfb286e347d8add40c9"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "evidence_wire",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 1.19s\n     Running tests/evidence_wire.rs (<home>/coding/ergo-forge/target-p00/release/deps/evidence_wire-f372c6c7d4dbbdaa)\ninvalid_tree_never_becomes_empty_bytes: test\nlegacy_box_missing_reference_cannot_be_promoted: test\ntransaction_id_and_message_use_node_bytes_to_sign: test\nwire_box_id_matches_full_serialization: test\n\n4 tests, 0 benchmarks\n",
+      "outputSha256": "df777386861f91c7915ed0d517404559bf19e3ee36a960e494361095d0a0f774"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "evidence_wire",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.10s\n     Running tests/evidence_wire.rs (<home>/coding/ergo-forge/target-p00/release/deps/evidence_wire-f372c6c7d4dbbdaa)\n\nrunning 4 tests\ntest legacy_box_missing_reference_cannot_be_promoted ... ok\ntest invalid_tree_never_becomes_empty_bytes ... ok\ntest transaction_id_and_message_use_node_bytes_to_sign ... ok\ntest wire_box_id_matches_full_serialization ... ok\n\nsuccesses:\n\n---- transaction_id_and_message_use_node_bytes_to_sign stdout ----\n1 pinned transactions use node bytes_to_sign; proof/extension changes and canonical output references checked\n\n---- wire_box_id_matches_full_serialization stdout ----\n2 pinned full boxes retain bytes/IDs/references; claimed ID mismatches are rejected\n\n\nsuccesses:\n    invalid_tree_never_becomes_empty_bytes\n    legacy_box_missing_reference_cannot_be_promoted\n    transaction_id_and_message_use_node_bytes_to_sign\n    wire_box_id_matches_full_serialization\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+      "outputSha256": "2a02d75b2c2f713d2bf4f25c3301d70b6ad79b7b071431ed4e88a6b9d114a602"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "node_validation",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 1.83s\n     Running tests/node_validation.rs (<home>/coding/ergo-forge/target-p00/release/deps/node_validation-71785e616645c29a)\naccepted_execution_cannot_be_deserialized_or_fabricated: test\nfull_pipeline_matches_pinned_node_vectors: test\nincomplete_context_is_not_node_acceptance: test\n\n3 tests, 0 benchmarks\n",
+      "outputSha256": "9e774fc822f7a342fd3f1c0f0a6d81ea50e17056e6aa5adfb6bea27a647960e4"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "node_validation",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/node_validation.rs (<home>/coding/ergo-forge/target-p00/release/deps/node_validation-71785e616645c29a)\n\nrunning 3 tests\ntest accepted_execution_cannot_be_deserialized_or_fabricated ... ok\ntest incomplete_context_is_not_node_acceptance ... ok\ntest full_pipeline_matches_pinned_node_vectors ... ok\n\nsuccesses:\n\nsuccesses:\n    accepted_execution_cannot_be_deserialized_or_fabricated\n    full_pipeline_matches_pinned_node_vectors\n    incomplete_context_is_not_node_acceptance\n\ntest result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+      "outputSha256": "6a6d278f85784b41a41dbdd607b580ca5a99eaf28e3fbea26f9d46df80b68386"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "transaction_proofs",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 1.89s\n     Running tests/transaction_proofs.rs (<home>/coding/ergo-forge/target-p00/release/deps/transaction_proofs-fe647ec940042bb0)\nchanged_transaction_invalidates_proof: test\ndeclared_public_key_without_proof_is_not_acceptance: test\nowned_p2pk_funding_signs_actual_transaction: test\nreplay_bundle_contains_no_secret: test\n\n4 tests, 0 benchmarks\n",
+      "outputSha256": "546105ce31e494309a0a6fe8196c5af81b5737b729059cecf97cc41f94cf4d10"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "transaction_proofs",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/transaction_proofs.rs (<home>/coding/ergo-forge/target-p00/release/deps/transaction_proofs-fe647ec940042bb0)\n\nrunning 4 tests\ntest declared_public_key_without_proof_is_not_acceptance ... ok\ntest replay_bundle_contains_no_secret ... ok\ntest owned_p2pk_funding_signs_actual_transaction ... ok\ntest changed_transaction_invalidates_proof ... ok\n\nsuccesses:\n\nsuccesses:\n    changed_transaction_invalidates_proof\n    declared_public_key_without_proof_is_not_acceptance\n    owned_p2pk_funding_signs_actual_transaction\n    replay_bundle_contains_no_secret\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+      "outputSha256": "dbd8ec23073ba91678b1acd55f9a3f64348dae6d3c4f7d640414fd3c22ed1bb6"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "claim_replay",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 2.17s\n     Running tests/claim_replay.rs (<home>/coding/ergo-forge/target-p00/release/deps/claim_replay-d79525742826db59)\nclaim_requires_accepted_execution_and_violated_property: test\noffline_replay_reproduces_claim: test\nunknown_policy_cannot_confirm: test\nwrong_companion_or_policy_invalidates_claim: test\n\n4 tests, 0 benchmarks\n",
+      "outputSha256": "afa4244f46d79adc02d13ced636c9a8bd007794c09aa504749244c98cdb30806"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "claim_replay",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/claim_replay.rs (<home>/coding/ergo-forge/target-p00/release/deps/claim_replay-d79525742826db59)\n\nrunning 4 tests\ntest unknown_policy_cannot_confirm ... ok\ntest wrong_companion_or_policy_invalidates_claim ... ok\ntest claim_requires_accepted_execution_and_violated_property ... ok\ntest offline_replay_reproduces_claim ... ok\n\nsuccesses:\n\n---- claim_requires_accepted_execution_and_violated_property stdout ----\naccepted bundles: 3; positive claims: 2; families: 2; accepted nonviolating controls: 1; negative-control claims: 0; recorded-input cases: 1; hypothetical-input cases: 3\n\n---- offline_replay_reproduces_claim stdout ----\nepoch parameters: {\"dataInputCost\":100,\"inputCost\":2407,\"maxBlockCost\":8001091,\"maxBlockSize\":1271009,\"maxBoxSize\":4096,\"maxTokensPerBox\":122,\"minValuePerByte\":360,\"outputCost\":298,\"storageFeeFactor\":1250000,\"storagePeriod\":1051200,\"tokenAccessCost\":100}\nindex 0: accepted 10ff5c82991eb44853b7aaf6da95372d9c006e8a18c18809ca9a9a5405356b68, total cost 14059\nindex 1: accepted ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1, total cost 100833\nindex 2: accepted 2b5a56dc2714ebcd1eceaef086edfcc12d4d63eb30ca8a42257ad7df04b57b60, total cost 123759\nindex 3: accepted 6a4d184c397f1b4159d1ca0065d987e41efc23a563c5f0800003dcc50eedb641, total cost 136478\nindex 4: accepted 30c1cacc7f4e30f1b52f1f1da35ae93750bf9187461eb374ecf9d9f9ade3d719, total cost 194317\nindex 5: accepted 5371373d346aade57f684ead23f386e3441ffb2cb7a860babe96e3c5048b2725, total cost 216345\n\n\nsuccesses:\n    claim_requires_accepted_execution_and_violated_property\n    offline_replay_reproduces_claim\n    unknown_policy_cannot_confirm\n    wrong_companion_or_policy_invalidates_claim\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s\n\n",
+      "outputSha256": "ce65d0c8cbf3c95d402322e888b4d23341e5ab3045111c5c7f8d43c5657cd36d"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "drain_promotion",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 2.09s\n     Running tests/drain_promotion.rs (<home>/coding/ergo-forge/target-p00/release/deps/drain_promotion-86b4cb15231631ee)\nassociated_lint_is_not_the_confirmed_claim: test\ngenerated_public_incident_candidate_promotes: test\nmissing_funding_proof_blocks_promotion: test\nunbacked_synthetic_material_stays_preflight: test\n\n4 tests, 0 benchmarks\n",
+      "outputSha256": "84af45f95c853418b0ba5c7ddc15d4796c99c71aab6546501e6edde4e8969111"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "drain_promotion",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/drain_promotion.rs (<home>/coding/ergo-forge/target-p00/release/deps/drain_promotion-86b4cb15231631ee)\n\nrunning 4 tests\ntest unbacked_synthetic_material_stays_preflight ... ok\ntest generated_public_incident_candidate_promotes ... ok\ntest missing_funding_proof_blocks_promotion ... ok\ntest associated_lint_is_not_the_confirmed_claim ... ok\n\nsuccesses:\n\n---- unbacked_synthetic_material_stays_preflight stdout ----\nepoch parameters: {\"dataInputCost\":100,\"inputCost\":2407,\"maxBlockCost\":8001091,\"maxBlockSize\":1271009,\"maxBoxSize\":4096,\"maxTokensPerBox\":122,\"minValuePerByte\":360,\"outputCost\":298,\"storageFeeFactor\":1250000,\"storagePeriod\":1051200,\"tokenAccessCost\":100}\nindex 0: accepted 10ff5c82991eb44853b7aaf6da95372d9c006e8a18c18809ca9a9a5405356b68, total cost 14059\nindex 1: accepted ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1, total cost 100833\nindex 2: accepted 2b5a56dc2714ebcd1eceaef086edfcc12d4d63eb30ca8a42257ad7df04b57b60, total cost 123759\nindex 3: accepted 6a4d184c397f1b4159d1ca0065d987e41efc23a563c5f0800003dcc50eedb641, total cost 136478\nindex 4: accepted 30c1cacc7f4e30f1b52f1f1da35ae93750bf9187461eb374ecf9d9f9ade3d719, total cost 194317\nindex 5: accepted 5371373d346aade57f684ead23f386e3441ffb2cb7a860babe96e3c5048b2725, total cost 216345\n\n---- generated_public_incident_candidate_promotes stdout ----\nepoch parameters: {\"dataInputCost\":100,\"inputCost\":2407,\"maxBlockCost\":8001091,\"maxBlockSize\":1271009,\"maxBoxSize\":4096,\"maxTokensPerBox\":122,\"minValuePerByte\":360,\"outputCost\":298,\"storageFeeFactor\":1250000,\"storagePeriod\":1051200,\"tokenAccessCost\":100}\nindex 0: accepted 10ff5c82991eb44853b7aaf6da95372d9c006e8a18c18809ca9a9a5405356b68, total cost 14059\nindex 1: accepted ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1, total cost 100833\nindex 2: accepted 2b5a56dc2714ebcd1eceaef086edfcc12d4d63eb30ca8a42257ad7df04b57b60, total cost 123759\nindex 3: accepted 6a4d184c397f1b4159d1ca0065d987e41efc23a563c5f0800003dcc50eedb641, total cost 136478\nindex 4: accepted 30c1cacc7f4e30f1b52f1f1da35ae93750bf9187461eb374ecf9d9f9ade3d719, total cost 194317\nindex 5: accepted 5371373d346aade57f684ead23f386e3441ffb2cb7a860babe96e3c5048b2725, total cost 216345\n\n---- missing_funding_proof_blocks_promotion stdout ----\nepoch parameters: {\"dataInputCost\":100,\"inputCost\":2407,\"maxBlockCost\":8001091,\"maxBlockSize\":1271009,\"maxBoxSize\":4096,\"maxTokensPerBox\":122,\"minValuePerByte\":360,\"outputCost\":298,\"storageFeeFactor\":1250000,\"storagePeriod\":1051200,\"tokenAccessCost\":100}\nindex 0: accepted 10ff5c82991eb44853b7aaf6da95372d9c006e8a18c18809ca9a9a5405356b68, total cost 14059\nindex 1: accepted ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1, total cost 100833\nindex 2: accepted 2b5a56dc2714ebcd1eceaef086edfcc12d4d63eb30ca8a42257ad7df04b57b60, total cost 123759\nindex 3: accepted 6a4d184c397f1b4159d1ca0065d987e41efc23a563c5f0800003dcc50eedb641, total cost 136478\nindex 4: accepted 30c1cacc7f4e30f1b52f1f1da35ae93750bf9187461eb374ecf9d9f9ade3d719, total cost 194317\nindex 5: accepted 5371373d346aade57f684ead23f386e3441ffb2cb7a860babe96e3c5048b2725, total cost 216345\n\n---- associated_lint_is_not_the_confirmed_claim stdout ----\nepoch parameters: {\"dataInputCost\":100,\"inputCost\":2407,\"maxBlockCost\":8001091,\"maxBlockSize\":1271009,\"maxBoxSize\":4096,\"maxTokensPerBox\":122,\"minValuePerByte\":360,\"outputCost\":298,\"storageFeeFactor\":1250000,\"storagePeriod\":1051200,\"tokenAccessCost\":100}\nindex 0: accepted 10ff5c82991eb44853b7aaf6da95372d9c006e8a18c18809ca9a9a5405356b68, total cost 14059\nindex 1: accepted ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1, total cost 100833\nindex 2: accepted 2b5a56dc2714ebcd1eceaef086edfcc12d4d63eb30ca8a42257ad7df04b57b60, total cost 123759\nindex 3: accepted 6a4d184c397f1b4159d1ca0065d987e41efc23a563c5f0800003dcc50eedb641, total cost 136478\nindex 4: accepted 30c1cacc7f4e30f1b52f1f1da35ae93750bf9187461eb374ecf9d9f9ade3d719, total cost 194317\nindex 5: accepted 5371373d346aade57f684ead23f386e3441ffb2cb7a860babe96e3c5048b2725, total cost 216345\n\n\nsuccesses:\n    associated_lint_is_not_the_confirmed_claim\n    generated_public_incident_candidate_promotes\n    missing_funding_proof_blocks_promotion\n    unbacked_synthetic_material_stays_preflight\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s\n\n",
+      "outputSha256": "926b93bcb33f186121ba55a9fca4ca38835f7c496d2817605b57f51438f4f09e"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "obligation_reports",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 2.08s\n     Running tests/obligation_reports.rs (<home>/coding/ergo-forge/target-p00/release/deps/obligation_reports-c0f2e7b0ec212eb3)\nconditional_discharge_exports_the_full_premise_set: test\ncurated_precision_has_positive_and_negative_controls: test\nduplicate_observations_keep_all_anchors_in_one_obligation: test\nsuppression_invalidates_on_premise_change: test\n\n4 tests, 0 benchmarks\n",
+      "outputSha256": "b9240ef61cd977c2ebfba8dd3c85ff64c6fb3198e54961b4517465b76f4e22ab"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "obligation_reports",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/obligation_reports.rs (<home>/coding/ergo-forge/target-p00/release/deps/obligation_reports-c0f2e7b0ec212eb3)\n\nrunning 4 tests\ntest duplicate_observations_keep_all_anchors_in_one_obligation ... ok\ntest suppression_invalidates_on_premise_change ... ok\ntest conditional_discharge_exports_the_full_premise_set ... ok\ntest curated_precision_has_positive_and_negative_controls ... ok\n\nsuccesses:\n\n---- duplicate_observations_keep_all_anchors_in_one_obligation stdout ----\nduplicate: 12 anchors -> 1 obligation; all lift-local anchors retained; unknowns separate\n\n---- suppression_invalidates_on_premise_change stdout ----\nsuppression: constants, companion code, deployment state, policy and source changes invalidate; stale reasons and anchors retained\n\n---- conditional_discharge_exports_the_full_premise_set stdout ----\nconditional discharge: full case, both executing scripts, membership, singleton evidence, recovery gaps and reason survive export; omission controls remain unresolved\n\n---- curated_precision_has_positive_and_negative_controls stdout ----\nmalformed-optional-witness-rejection: 0 confirmed violations; 1 obligations\nmissing-candidate-output-register-rejection: 0 confirmed violations; 1 obligations\nwell-formed-self-register: 0 confirmed violations; 1 obligations\nfixed-recipient-paid-output: 0 confirmed violations; 1 obligations\nrequired-companion-identity-binding: 0 confirmed violations; 1 obligations\nintended-permissionless-height-release: 0 confirmed violations; 1 obligations\nuse-incident: 1 confirmed violations; 1 obligations\nsale-mutant-unpaid: 1 confirmed violations; 1 obligations\ncurated precision: 2/2 positives retained, 0/6 benign falsely confirmed; 6 benign static anchors retained; manifest 034a652bbdadb5b569fa9b74504316a6e7cbb54d9b8a02018a480561304ce76e\n\n\nsuccesses:\n    conditional_discharge_exports_the_full_premise_set\n    curated_precision_has_positive_and_negative_controls\n    duplicate_observations_keep_all_anchors_in_one_obligation\n    suppression_invalidates_on_premise_change\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s\n\n",
+      "outputSha256": "5c43fa7fe563349e80ac89a58146448d6ccb667a799c1375123c4e5a08a6974d"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-web",
+        "--test",
+        "evidence_replay",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling rustls-webpki v0.103.15\n   Compiling rustls v0.23.43\n   Compiling tokio-rustls v0.26.4\n   Compiling ureq v3.4.1\n   Compiling hyper-rustls v0.27.9\n   Compiling reqwest v0.12.28\n   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n   Compiling ergo-web v0.3.0 (<repo>/ergo-web)\n    Finished `release` profile [optimized] target(s) in 17.54s\n     Running tests/evidence_replay.rs (<home>/coding/ergo-forge/target-p00/release/deps/evidence_replay-224d16615cf94622)\nhistorical_and_hypothetical_state_labels_are_visible: test\nhttp_and_cli_replay_have_identical_semantic_results: test\nlegacy_preflight_does_not_use_node_claim_badge: test\nreplay_request_never_fetches_or_broadcasts: test\n\n4 tests, 0 benchmarks\n",
+      "outputSha256": "54a8075c865ac50a8bc238abdf40b26ab8078d0ea7b7a6f4f3fa6c26a97fac3a"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-web",
+        "--test",
+        "evidence_replay",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.09s\n     Running tests/evidence_replay.rs (<home>/coding/ergo-forge/target-p00/release/deps/evidence_replay-224d16615cf94622)\n\nrunning 4 tests\n   Compiling ring v0.17.14\ntest replay_request_never_fetches_or_broadcasts ... ok\n   Compiling rustls v0.23.43\n   Compiling rustls-webpki v0.103.15\n   Compiling ureq v3.4.1\n   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 22.77s\ntest http_and_cli_replay_have_identical_semantic_results ... ok\ntest legacy_preflight_does_not_use_node_claim_badge ... ok\ntest historical_and_hypothetical_state_labels_are_visible ... ok\n\nsuccesses:\n\nsuccesses:\n    historical_and_hypothetical_state_labels_are_visible\n    http_and_cli_replay_have_identical_semantic_results\n    legacy_preflight_does_not_use_node_claim_badge\n    replay_request_never_fetches_or_broadcasts\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 23.09s\n\n",
+      "outputSha256": "0cb3e0cd840eafd7f77b180508d7541f768d1ebf0f4e8c3b1fc5154846a984de"
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "ui/tests/evidence-replay.test.js"
+      ],
+      "exitCode": 0,
+      "output": "TAP version 13\n# Subtest: historical_and_hypothetical_state_labels_are_visible\nok 1 - historical_and_hypothetical_state_labels_are_visible\n  ---\n  duration_ms: 21183.482749\n  type: 'test'\n  ...\n# Subtest: legacy_preflight_does_not_use_node_claim_badge\nok 2 - legacy_preflight_does_not_use_node_claim_badge\n  ---\n  duration_ms: 4.140174\n  type: 'test'\n  ...\n# Subtest: saved verdicts are discarded and errors clear earlier claims\nok 3 - saved verdicts are discarded and errors clear earlier claims\n  ---\n  duration_ms: 6.273607\n  type: 'test'\n  ...\n1..3\n# tests 3\n# suites 0\n# pass 3\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 21378.284846\n",
+      "outputSha256": "dcca93bfb09450b4d28ebb339457f6f2661936ea8d99aebf680c760797bb035d"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "mapping_inventory",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 1.37s\n     Running tests/mapping_inventory.rs (<home>/coding/ergo-forge/target-p00/release/deps/mapping_inventory-5046a3df6ee52135)\nfixture_constructs_execute_and_unsupported_members_remain: test\ninventory_has_32_pinned_cases_and_independent_answers: test\nlegacy_metrics_are_measured_without_baseline_changes: test\n\n3 tests, 0 benchmarks\n",
+      "outputSha256": "277c0e900401e5eea20660a29ecd4ea046c2b6c48e2f887d8f2e5c431d4c1bea"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "mapping_inventory",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/mapping_inventory.rs (<home>/coding/ergo-forge/target-p00/release/deps/mapping_inventory-5046a3df6ee52135)\n\nrunning 3 tests\ntest inventory_has_32_pinned_cases_and_independent_answers ... ok\ntest legacy_metrics_are_measured_without_baseline_changes ... ok\ntest fixture_constructs_execute_and_unsupported_members_remain ... ok\n\nsuccesses:\n\n---- inventory_has_32_pinned_cases_and_independent_answers stdout ----\nevidence <repo>/ergo-sandbox/tests/fixtures/mapping/manifest.json sha256=7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f\nevidence <repo>/ergo-sandbox/tests/fixtures/mapping/expected.json sha256=291923d76f2de8a69deec82cc049d233d87d91f816295312ed89f9291e13405e\n32 cases / 16 paired families; missing, duplicate, altered fixture and altered answer rejected\n\n---- legacy_metrics_are_measured_without_baseline_changes stdout ----\nevidence <repo>/ergo-sandbox/tests/fixtures/mapping/legacy-results.json sha256=76f8c817944be882fbc4f726d7016ffd55d244c307a68b85729804d8a98f2150\n{\"actionSetAccuracy\":null,\"caseAccounting\":{\"denominator\":32,\"meaning\":\"fixture harness accounting, not mapping completeness\",\"numerator\":32},\"closedFixtureReachability\":{\"denominator\":31,\"denominatorIds\":[\"literal_spend-positive/B\",\"literal_spend-control/B\",\"self_alias-positive/B\",\"action_alternatives-positive/B\",\"action_alternatives-positive/C\",\"action_alternatives-control/B\",\"action_alternatives-control/C\",\"data_only-positive/B\",\"data_only-control/B\",\"output_only-positive/B\",\"output_only-control/B\",\"dead_check-positive/B\",\"dead_check-control/B\",\"script_identity-positive/B\",\"script_identity-control/C\",\"token_identity-positive/B\",\"token_identity-positive/C\",\"token_identity-control/B\",\"token_identity-control/C\",\"tokenless-positive/B\",\"exists_literal-positive/B\",\"exists_literal-control/B\",\"computed_index-positive/B\",\"computed_index-control/B\",\"register_identity-positive/B\",\"register_identity-positive/C\",\"register_identity-control/C\",\"register_identity-control/U\",\"context_code-positive/B\",\"context_code-control/B\",\"snapshot_collision-positive/B\"],\"numerator\":4,\"numeratorIds\":[\"token_identity-positive/B\",\"token_identity-positive/C\",\"token_identity-control/B\",\"token_identity-control/C\"],\"rate\":0.12903225806451613},\"dynamicTupleRecovery\":{\"denominator\":15,\"denominatorIds\":[\"self_alias-positive/[\\\"A\\\",\\\"B\\\"]\",\"token_identity-positive/[\\\"A\\\",\\\"B\\\"]\",\"token_identity-positive/[\\\"A\\\",\\\"C\\\"]\",\"token_identity-control/[\\\"A\\\",\\\"B\\\"]\",\"token_identity-control/[\\\"A\\\",\\\"C\\\"]\",\"exists_literal-positive/[\\\"A\\\",\\\"B\\\"]\",\"exists_literal-control/[\\\"A\\\",\\\"B\\\"]\",\"computed_index-positive/[\\\"A\\\",\\\"B\\\"]\",\"computed_index-control/[\\\"A\\\",\\\"B\\\"]\",\"register_identity-positive/[\\\"A\\\",\\\"B\\\"]\",\"register_identity-positive/[\\\"A\\\",\\\"C\\\"]\",\"register_identity-control/[\\\"A\\\",\\\"C\\\"]\",\"register_identity-control/[\\\"A\\\",\\\"U\\\"]\",\"context_code-positive/[\\\"A\\\",\\\"B\\\"]\",\"context_code-control/[\\\"A\\\",\\\"B\\\"]\"],\"numerator\":0,\"numeratorIds\":[],\"rate\":0.0},\"falseProposal\":{\"adjudicatedIds\":[],\"denominator\":21,\"falseIds\":[],\"meaning\":\"unresolved targets remain unadjudicated; never call this zero false proposals\",\"numerator\":0,\"rate\":null,\"unadjudicatedIds\":[\"literal_spend-positive/edge/0\",\"literal_spend-control/edge/0\",\"action_alternatives-positive/edge/0\",\"action_alternatives-control/edge/0\",\"data_only-positive/edge/0\",\"data_only-control/edge/0\",\"output_only-positive/edge/0\",\"output_only-control/edge/0\",\"dead_check-positive/edge/0\",\"script_identity-positive/edge/0\",\"script_identity-control/edge/0\",\"token_identity-positive/edge/0\",\"tokenless-positive/edge/0\",\"tokenless-control/edge/0\",\"register_identity-positive/edge/0\",\"register_identity-positive/edge/1\",\"register_identity-control/edge/0\",\"register_identity-control/edge/1\",\"context_code-positive/edge/0\",\"context_code-control/edge/0\",\"snapshot_collision-positive/edge/0\"]},\"legacySiteObservation\":{\"denominator\":52,\"denominatorIds\":[\"literal_spend-positive/site/0\",\"literal_spend-positive/site/1\",\"literal_spend-control/site/0\",\"literal_spend-control/site/1\",\"self_alias-positive/site/0\",\"self_alias-control/site/0\",\"action_alternatives-positive/site/0\",\"action_alternatives-positive/site/1\",\"action_alternatives-positive/site/2\",\"action_alternatives-control/site/0\",\"action_alternatives-control/site/1\",\"action_alternatives-control/site/2\",\"data_only-positive/site/0\",\"data_only-positive/site/1\",\"data_only-control/site/0\",\"output_only-positive/site/0\",\"output_only-positive/site/1\",\"output_only-control/site/0\",\"dead_check-positive/site/0\",\"dead_check-positive/site/1\",\"dead_check-control/site/0\",\"script_identity-positive/site/0\",\"script_identity-control/site/0\",\"token_identity-positive/site/0\",\"token_identity-control/site/0\",\"tokenless-positive/site/0\",\"tokenless-positive/site/1\",\"tokenless-control/site/0\",\"exists_literal-positive/site/0\",\"exists_literal-control/site/0\",\"computed_index-positive/site/0\",\"computed_index-control/site/0\",\"register_identity-positive/site/0\",\"register_identity-positive/site/1\",\"register_identity-positive/site/2\",\"register_identity-control/site/0\",\"register_identity-control/site/1\",\"context_code-positive/site/0\",\"context_code-positive/site/1\",\"context_code-positive/site/2\",\"context_code-control/site/0\",\"context_code-control/site/1\",\"context_code-control/site/2\",\"context_scope-positive/site/0\",\"context_scope-positive/site/1\",\"context_scope-control/site/0\",\"context_scope-control/site/1\",\"avl_identity-positive/site/0\",\"avl_identity-control/site/0\",\"snapshot_collision-positive/site/0\",\"snapshot_collision-positive/site/1\",\"snapshot_collision-control/site/0\"],\"numerator\":35,\"numeratorIds\":[\"literal_spend-positive/site/0\",\"literal_spend-positive/site/1\",\"literal_spend-control/site/0\",\"literal_spend-control/site/1\",\"action_alternatives-positive/site/0\",\"action_alternatives-positive/site/1\",\"action_alternatives-positive/site/2\",\"action_alternatives-control/site/0\",\"action_alternatives-control/site/1\",\"action_alternatives-control/site/2\",\"data_only-positive/site/0\",\"data_only-positive/site/1\",\"data_only-control/site/0\",\"output_only-positive/site/0\",\"output_only-positive/site/1\",\"output_only-control/site/0\",\"dead_check-positive/site/0\",\"dead_check-positive/site/1\",\"script_identity-positive/site/0\",\"script_identity-control/site/0\",\"token_identity-positive/site/0\",\"tokenless-positive/site/0\",\"tokenless-positive/site/1\",\"tokenless-control/site/0\",\"register_identity-positive/site/0\",\"register_identity-positive/site/1\",\"register_identity-positive/site/2\",\"register_identity-control/site/0\",\"register_identity-control/site/1\",\"context_code-positive/site/0\",\"context_code-positive/site/1\",\"context_code-control/site/0\",\"context_code-control/site/1\",\"snapshot_collision-positive/site/0\",\"snapshot_collision-positive/site/1\"],\"rate\":0.6730769230769231},\"m02SupportedReachability\":{\"denominator\":23,\"denominatorIds\":[\"literal_spend-positive/B\",\"literal_spend-control/B\",\"self_alias-positive/B\",\"action_alternatives-positive/B\",\"action_alternatives-positive/C\",\"action_alternatives-control/B\",\"action_alternatives-control/C\",\"data_only-positive/B\",\"data_only-control/B\",\"output_only-positive/B\",\"output_only-control/B\",\"dead_check-positive/B\",\"dead_check-control/B\",\"script_identity-positive/B\",\"script_identity-control/C\",\"token_identity-positive/B\",\"token_identity-positive/C\",\"token_identity-control/B\",\"token_identity-control/C\",\"tokenless-positive/B\",\"exists_literal-positive/B\",\"exists_literal-control/B\",\"snapshot_collision-positive/B\"],\"numerator\":4,\"numeratorIds\":[\"token_identity-positive/B\",\"token_identity-positive/C\",\"token_identity-control/B\",\"token_identity-control/C\"],\"rate\":0.17391304347826086},\"necessityRecall\":null,\"omissionRefutation\":null,\"promotedFalseRelation\":{\"denominator\":0,\"numerator\":0,\"rate\":null,\"reason\":\"no relation API exists\"},\"unavailableReason\":\"legacy API produces neither checked necessities, action checks nor node-accepted omission witnesses; whole-chain denominator unknown\",\"wholeDeployedProtocolCompleteness\":null}\n\n---- fixture_constructs_execute_and_unsupported_members_remain stdout ----\n67 real engine vectors across 32 cases; 18 unsupported members retained: [String(\"literal_spend-control\"), String(\"self_alias-control\"), String(\"action_alternatives-control\"), String(\"data_only-control\"), String(\"output_only-control\"), String(\"dead_check-control\"), String(\"script_identity-control\"), String(\"token_identity-control\"), String(\"tokenless-control\"), String(\"exists_literal-control\"), String(\"computed_index-positive\"), String(\"computed_index-control\"), String(\"register_identity-control\"), String(\"context_code-control\"), String(\"context_scope-control\"), String(\"avl_identity-positive\"), String(\"avl_identity-control\"), String(\"snapshot_collision-control\")]; scenario reduction only, no node acceptance or necessity certification\nevidence <repo>/ergo-sandbox/tests/fixtures/mapping/manifest.json sha256=7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f\nevidence <repo>/ergo-sandbox/tests/fixtures/mapping/expected.json sha256=291923d76f2de8a69deec82cc049d233d87d91f816295312ed89f9291e13405e\n\n\nsuccesses:\n    fixture_constructs_execute_and_unsupported_members_remain\n    inventory_has_32_pinned_cases_and_independent_answers\n    legacy_metrics_are_measured_without_baseline_changes\n\ntest result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s\n\n",
+      "outputSha256": "fffa597bf8e943ea2a37b1c1882b64d713af04b82b4c123213fa100d78bf9618"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "mapping_artifacts",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 1.96s\n     Running tests/mapping_artifacts.rs (<home>/coding/ergo-forge/target-p00/release/deps/mapping_artifacts-f2978e8975cbeca2)\ndiscovery_cannot_import_as_required_execution: test\npremise_changes_invalidate_imported_proofs: test\nraw_provenance_and_legacy_map_bytes_survive: test\n\n3 tests, 0 benchmarks\n",
+      "outputSha256": "4d7b29147b2dc4772167c950dfcc7f8ff16877f86427ded90171197d96928511"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "mapping_artifacts",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/mapping_artifacts.rs (<home>/coding/ergo-forge/target-p00/release/deps/mapping_artifacts-f2978e8975cbeca2)\n\nrunning 3 tests\ntest discovery_cannot_import_as_required_execution ... ok\ntest premise_changes_invalidate_imported_proofs ... ok\ntest raw_provenance_and_legacy_map_bytes_survive ... ok\n\nsuccesses:\n\n---- raw_provenance_and_legacy_map_bytes_survive stdout ----\n<repo>/ergo-sandbox/tests/fixtures/mapping/m01-discovery.json sha256=8b2062c899b4870e426e450c8d8f8c838863f50147156f2c949fd1d011d84051\n<repo>/ergo-sandbox/tests/fixtures/mapping/m01-relations.json sha256=82e14eee51b5f47d10887d737345c4310695b42a192f9131a5a3a95b9b1b7273\n<repo>/ergo-sandbox/tests/fixtures/mapping/m01-mapping-results.json sha256=df74b66f0056d44ad7ce935e420a3df91ac8ec0c0819c8c9d7019bfcba6c11ff\n\n\nsuccesses:\n    discovery_cannot_import_as_required_execution\n    premise_changes_invalidate_imported_proofs\n    raw_provenance_and_legacy_map_bytes_survive\n\ntest result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s\n\n",
+      "outputSha256": "3f9b0de44c1e1aecb3b259daf9221040562a3e3339167a45e51683774bd2e716"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "mapping_discovery",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 1.91s\n     Running tests/mapping_discovery.rs (<home>/coding/ergo-forge/target-p00/release/deps/mapping_discovery-25ae5dac94359712)\ncaps_missing_pages_and_computed_identities_stay_unresolved: test\nfalse_hints_never_become_required_relations: test\nsupported_reference_recall_and_all_site_accounting: test\n\n3 tests, 0 benchmarks\n",
+      "outputSha256": "be56f30dc0133f420842aa5eafa6689fad0d6bfaf724b3cc826faec59eb61b2d"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "mapping_discovery",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/mapping_discovery.rs (<home>/coding/ergo-forge/target-p00/release/deps/mapping_discovery-25ae5dac94359712)\n\nrunning 3 tests\ntest caps_missing_pages_and_computed_identities_stay_unresolved ... ok\ntest false_hints_never_become_required_relations ... ok\ntest supported_reference_recall_and_all_site_accounting ... ok\n\nsuccesses:\n\n---- caps_missing_pages_and_computed_identities_stay_unresolved stdout ----\ntree/node/box/comparison caps, missing pages, unknown inventory/snapshot, unsupported queries, duplicate/inconsistent source, parse failure and all four computed/AVL members exercised\n\n---- false_hints_never_become_required_relations stdout ----\nfalse proposals retained: {\"adjudicatedIds\":[\"literal_spend-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0\",\"literal_spend-control/3c8d0008bfccb2ea0207bf34d79732252bf13be0bc25117ba9731c49d4194986/candidate/0\",\"self_alias-positive/beca2179b9c609bfc7affd1142bd600f7bbe501f58204b225f37872c000c7493/candidate/0\",\"action_alternatives-positive/47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4/candidate/0\",\"action_alternatives-positive/47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4/candidate/1\",\"action_alternatives-control/47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4/candidate/0\",\"action_alternatives-control/47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4/candidate/1\",\"data_only-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0\",\"data_only-control/2ddff834dd3c35b850e7a936b39c58713c7501990a616787d0824861bf286c9e/candidate/0\",\"output_only-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0\",\"output_only-control/9dbe05e5b43786a449a5223a2b44b28a94191d75b1c4b9ee2b38cd6fcbb9d870/candidate/0\",\"dead_check-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0\",\"dead_check-control/a2d74007ec59679a0e3d62fff05dcbf4c34327de1af24114c1f1218dc177c589/candidate/0\",\"script_identity-positive/86929e1d9b506e70d75220b073ed3fafe4ba0bc6228fa5b013621651a6940570/candidate/0\",\"script_identity-control/ef971bec31181025b3c12a505a67c12f484f078ea2e4008a18882d8a6ef3b9e7/candidate/0\",\"token_identity-positive/c52a3277b56d747d8cdc5167cea2559ff888daecef4b8decaa2fa2b48d900ef8/candidate/0\",\"token_identity-positive/c52a3277b56d747d8cdc5167cea2559ff888daecef4b8decaa2fa2b48d900ef8/candidate/1\",\"token_identity-control/652ce0ee6908274f54715bff0ecc0b3bd2e6966f6e845cdd4a0946eafdff3773/candidate/0\",\"token_identity-control/652ce0ee6908274f54715bff0ecc0b3bd2e6966f6e845cdd4a0946eafdff3773/candidate/1\",\"tokenless-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0\",\"exists_literal-positive/beca2179b9c609bfc7affd1142bd600f7bbe501f58204b225f37872c000c7493/candidate/0\",\"exists_literal-control/94b248456afa410e9b53f87e4ae088fae39ba016429c127bb2eced4434e1e504/candidate/0\",\"register_identity-positive/23fada8730f7e9a997ca8c4eecd34c57ed3e3302a51ab4a8f4b4d5cb2fd3f11e/candidate/0\",\"context_code-positive/6157443719cfa5ad79bb4e6c82bca94752ec712286301b0079593fe9eee5a3fb/candidate/0\",\"context_code-control/05eeca589a4488dc0ca4d38aceafc7a9e7a15fee71a4b580dfb553a96a1138dc/candidate/0\",\"snapshot_collision-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0\",\"snapshot_collision-control/452e000a4fc9e06284bb509e7b96ce4a90abebaa2b489d700715528311b2fc4a/candidate/0\",\"snapshot_collision-control/452e000a4fc9e06284bb509e7b96ce4a90abebaa2b489d700715528311b2fc4a/candidate/1\"],\"denominator\":28,\"falseIds\":[\"snapshot_collision-control/452e000a4fc9e06284bb509e7b96ce4a90abebaa2b489d700715528311b2fc4a/candidate/0\",\"snapshot_collision-control/452e000a4fc9e06284bb509e7b96ce4a90abebaa2b489d700715528311b2fc4a/candidate/1\"],\"numerator\":2,\"rate\":0.07142857142857142,\"unadjudicatedIds\":[]}; discovery imports, renamed envelopes, optional and non-spending observations confer no relation authority\n\n---- supported_reference_recall_and_all_site_accounting stdout ----\n{\"actionSetAccuracy\":null,\"allCaseRecall\":{\"denominator\":31,\"denominatorIds\":[\"literal_spend-positive/B\",\"literal_spend-control/B\",\"self_alias-positive/B\",\"action_alternatives-positive/B\",\"action_alternatives-positive/C\",\"action_alternatives-control/B\",\"action_alternatives-control/C\",\"data_only-positive/B\",\"data_only-control/B\",\"output_only-positive/B\",\"output_only-control/B\",\"dead_check-positive/B\",\"dead_check-control/B\",\"script_identity-positive/B\",\"script_identity-control/C\",\"token_identity-positive/B\",\"token_identity-positive/C\",\"token_identity-control/B\",\"token_identity-control/C\",\"tokenless-positive/B\",\"exists_literal-positive/B\",\"exists_literal-control/B\",\"computed_index-positive/B\",\"computed_index-control/B\",\"register_identity-positive/B\",\"register_identity-positive/C\",\"register_identity-control/C\",\"register_identity-control/U\",\"context_code-positive/B\",\"context_code-control/B\",\"snapshot_collision-positive/B\"],\"numerator\":26,\"numeratorIds\":[\"literal_spend-positive/B\",\"literal_spend-control/B\",\"self_alias-positive/B\",\"action_alternatives-positive/B\",\"action_alternatives-positive/C\",\"action_alternatives-control/B\",\"action_alternatives-control/C\",\"data_only-positive/B\",\"data_only-control/B\",\"output_only-positive/B\",\"output_only-control/B\",\"dead_check-positive/B\",\"dead_check-control/B\",\"script_identity-positive/B\",\"script_identity-control/C\",\"token_identity-positive/B\",\"token_identity-positive/C\",\"token_identity-control/B\",\"token_identity-control/C\",\"tokenless-positive/B\",\"exists_literal-positive/B\",\"exists_literal-control/B\",\"register_identity-positive/B\",\"context_code-positive/B\",\"context_code-control/B\",\"snapshot_collision-positive/B\"],\"rate\":0.8387096774193549},\"caseAccounting\":{\"denominator\":32,\"numerator\":32},\"dynamicByFamilyAndSupport\":[{\"family\":\"self_alias\",\"id\":\"self_alias-positive\",\"recovery\":{\"denominator\":1,\"denominatorIds\":[\"self_alias-positive/[\\\"A\\\",\\\"B\\\"]\"],\"numerator\":1,\"numeratorIds\":[\"self_alias-positive/[\\\"A\\\",\\\"B\\\"]\"],\"rate\":1.0},\"supported\":true},{\"family\":\"self_alias\",\"id\":\"self_alias-control\",\"recovery\":{\"denominator\":0,\"denominatorIds\":[],\"numerator\":0,\"numeratorIds\":[],\"rate\":null},\"supported\":true},{\"family\":\"token_identity\",\"id\":\"token_identity-positive\",\"recovery\":{\"denominator\":2,\"denominatorIds\":[\"token_identity-positive/[\\\"A\\\",\\\"B\\\"]\",\"token_identity-positive/[\\\"A\\\",\\\"C\\\"]\"],\"numerator\":2,\"numeratorIds\":[\"token_identity-positive/[\\\"A\\\",\\\"B\\\"]\",\"token_identity-positive/[\\\"A\\\",\\\"C\\\"]\"],\"rate\":1.0},\"supported\":true},{\"family\":\"token_identity\",\"id\":\"token_identity-control\",\"recovery\":{\"denominator\":2,\"denominatorIds\":[\"token_identity-control/[\\\"A\\\",\\\"B\\\"]\",\"token_identity-control/[\\\"A\\\",\\\"C\\\"]\"],\"numerator\":2,\"numeratorIds\":[\"token_identity-control/[\\\"A\\\",\\\"B\\\"]\",\"token_identity-control/[\\\"A\\\",\\\"C\\\"]\"],\"rate\":1.0},\"supported\":true},{\"family\":\"exists_literal\",\"id\":\"exists_literal-positive\",\"recovery\":{\"denominator\":1,\"denominatorIds\":[\"exists_literal-positive/[\\\"A\\\",\\\"B\\\"]\"],\"numerator\":1,\"numeratorIds\":[\"exists_literal-positive/[\\\"A\\\",\\\"B\\\"]\"],\"rate\":1.0},\"supported\":true},{\"family\":\"exists_literal\",\"id\":\"exists_literal-control\",\"recovery\":{\"denominator\":1,\"denominatorIds\":[\"exists_literal-control/[\\\"A\\\",\\\"B\\\"]\"],\"numerator\":1,\"numeratorIds\":[\"exists_literal-control/[\\\"A\\\",\\\"B\\\"]\"],\"rate\":1.0},\"supported\":true},{\"family\":\"computed_index\",\"id\":\"computed_index-positive\",\"recovery\":{\"denominator\":1,\"denominatorIds\":[\"computed_index-positive/[\\\"A\\\",\\\"B\\\"]\"],\"numerator\":0,\"numeratorIds\":[],\"rate\":0.0},\"supported\":false},{\"family\":\"computed_index\",\"id\":\"computed_index-control\",\"recovery\":{\"denominator\":1,\"denominatorIds\":[\"computed_index-control/[\\\"A\\\",\\\"B\\\"]\"],\"numerator\":0,\"numeratorIds\":[],\"rate\":0.0},\"supported\":false},{\"family\":\"register_identity\",\"id\":\"register_identity-positive\",\"recovery\":{\"denominator\":2,\"denominatorIds\":[\"register_identity-positive/[\\\"A\\\",\\\"B\\\"]\",\"register_identity-positive/[\\\"A\\\",\\\"C\\\"]\"],\"numerator\":1,\"numeratorIds\":[\"register_identity-positive/[\\\"A\\\",\\\"B\\\"]\"],\"rate\":0.5},\"supported\":false},{\"family\":\"register_identity\",\"id\":\"register_identity-control\",\"recovery\":{\"denominator\":2,\"denominatorIds\":[\"register_identity-control/[\\\"A\\\",\\\"C\\\"]\",\"register_identity-control/[\\\"A\\\",\\\"U\\\"]\"],\"numerator\":0,\"numeratorIds\":[],\"rate\":0.0},\"supported\":false},{\"family\":\"context_code\",\"id\":\"context_code-positive\",\"recovery\":{\"denominator\":1,\"denominatorIds\":[\"context_code-positive/[\\\"A\\\",\\\"B\\\"]\"],\"numerator\":1,\"numeratorIds\":[\"context_code-positive/[\\\"A\\\",\\\"B\\\"]\"],\"rate\":1.0},\"supported\":false},{\"family\":\"context_code\",\"id\":\"context_code-control\",\"recovery\":{\"denominator\":1,\"denominatorIds\":[\"context_code-control/[\\\"A\\\",\\\"B\\\"]\"],\"numerator\":1,\"numeratorIds\":[\"context_code-control/[\\\"A\\\",\\\"B\\\"]\"],\"rate\":1.0},\"supported\":false},{\"family\":\"context_scope\",\"id\":\"context_scope-positive\",\"recovery\":{\"denominator\":0,\"denominatorIds\":[],\"numerator\":0,\"numeratorIds\":[],\"rate\":null},\"supported\":false},{\"family\":\"context_scope\",\"id\":\"context_scope-control\",\"recovery\":{\"denominator\":0,\"denominatorIds\":[],\"numerator\":0,\"numeratorIds\":[],\"rate\":null},\"supported\":false},{\"family\":\"avl_identity\",\"id\":\"avl_identity-positive\",\"recovery\":{\"denominator\":0,\"denominatorIds\":[],\"numerator\":0,\"numeratorIds\":[],\"rate\":null},\"supported\":false},{\"family\":\"avl_identity\",\"id\":\"avl_identity-control\",\"recovery\":{\"denominator\":0,\"denominatorIds\":[],\"numerator\":0,\"numeratorIds\":[],\"rate\":null},\"supported\":false}],\"dynamicRecovery\":{\"denominator\":15,\"denominatorIds\":[\"self_alias-positive/[\\\"A\\\",\\\"B\\\"]\",\"token_identity-positive/[\\\"A\\\",\\\"B\\\"]\",\"token_identity-positive/[\\\"A\\\",\\\"C\\\"]\",\"token_identity-control/[\\\"A\\\",\\\"B\\\"]\",\"token_identity-control/[\\\"A\\\",\\\"C\\\"]\",\"exists_literal-positive/[\\\"A\\\",\\\"B\\\"]\",\"exists_literal-control/[\\\"A\\\",\\\"B\\\"]\",\"computed_index-positive/[\\\"A\\\",\\\"B\\\"]\",\"computed_index-control/[\\\"A\\\",\\\"B\\\"]\",\"register_identity-positive/[\\\"A\\\",\\\"B\\\"]\",\"register_identity-positive/[\\\"A\\\",\\\"C\\\"]\",\"register_identity-control/[\\\"A\\\",\\\"C\\\"]\",\"register_identity-control/[\\\"A\\\",\\\"U\\\"]\",\"context_code-positive/[\\\"A\\\",\\\"B\\\"]\",\"context_code-control/[\\\"A\\\",\\\"B\\\"]\"],\"numerator\":10,\"numeratorIds\":[\"self_alias-positive/[\\\"A\\\",\\\"B\\\"]\",\"token_identity-positive/[\\\"A\\\",\\\"B\\\"]\",\"token_identity-positive/[\\\"A\\\",\\\"C\\\"]\",\"token_identity-control/[\\\"A\\\",\\\"B\\\"]\",\"token_identity-control/[\\\"A\\\",\\\"C\\\"]\",\"exists_literal-positive/[\\\"A\\\",\\\"B\\\"]\",\"exists_literal-control/[\\\"A\\\",\\\"B\\\"]\",\"register_identity-positive/[\\\"A\\\",\\\"B\\\"]\",\"context_code-positive/[\\\"A\\\",\\\"B\\\"]\",\"context_code-control/[\\\"A\\\",\\\"B\\\"]\"],\"rate\":0.6666666666666666},\"falseProposal\":{\"adjudicatedIds\":[\"literal_spend-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0\",\"literal_spend-control/3c8d0008bfccb2ea0207bf34d79732252bf13be0bc25117ba9731c49d4194986/candidate/0\",\"self_alias-positive/beca2179b9c609bfc7affd1142bd600f7bbe501f58204b225f37872c000c7493/candidate/0\",\"action_alternatives-positive/47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4/candidate/0\",\"action_alternatives-positive/47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4/candidate/1\",\"action_alternatives-control/47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4/candidate/0\",\"action_alternatives-control/47d1d0b27a677eb2504da2a244216ba420b14655d0503923431e863814e198e4/candidate/1\",\"data_only-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0\",\"data_only-control/2ddff834dd3c35b850e7a936b39c58713c7501990a616787d0824861bf286c9e/candidate/0\",\"output_only-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0\",\"output_only-control/9dbe05e5b43786a449a5223a2b44b28a94191d75b1c4b9ee2b38cd6fcbb9d870/candidate/0\",\"dead_check-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0\",\"dead_check-control/a2d74007ec59679a0e3d62fff05dcbf4c34327de1af24114c1f1218dc177c589/candidate/0\",\"script_identity-positive/86929e1d9b506e70d75220b073ed3fafe4ba0bc6228fa5b013621651a6940570/candidate/0\",\"script_identity-control/ef971bec31181025b3c12a505a67c12f484f078ea2e4008a18882d8a6ef3b9e7/candidate/0\",\"token_identity-positive/c52a3277b56d747d8cdc5167cea2559ff888daecef4b8decaa2fa2b48d900ef8/candidate/0\",\"token_identity-positive/c52a3277b56d747d8cdc5167cea2559ff888daecef4b8decaa2fa2b48d900ef8/candidate/1\",\"token_identity-control/652ce0ee6908274f54715bff0ecc0b3bd2e6966f6e845cdd4a0946eafdff3773/candidate/0\",\"token_identity-control/652ce0ee6908274f54715bff0ecc0b3bd2e6966f6e845cdd4a0946eafdff3773/candidate/1\",\"tokenless-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0\",\"exists_literal-positive/beca2179b9c609bfc7affd1142bd600f7bbe501f58204b225f37872c000c7493/candidate/0\",\"exists_literal-control/94b248456afa410e9b53f87e4ae088fae39ba016429c127bb2eced4434e1e504/candidate/0\",\"register_identity-positive/23fada8730f7e9a997ca8c4eecd34c57ed3e3302a51ab4a8f4b4d5cb2fd3f11e/candidate/0\",\"context_code-positive/6157443719cfa5ad79bb4e6c82bca94752ec712286301b0079593fe9eee5a3fb/candidate/0\",\"context_code-control/05eeca589a4488dc0ca4d38aceafc7a9e7a15fee71a4b580dfb553a96a1138dc/candidate/0\",\"snapshot_collision-positive/227d545f5901cb502e19a003583dcf6cb8d919b821ce68628c4b9c2bc4929d28/candidate/0\",\"snapshot_collision-control/452e000a4fc9e06284bb509e7b96ce4a90abebaa2b489d700715528311b2fc4a/candidate/0\",\"snapshot_collision-control/452e000a4fc9e06284bb509e7b96ce4a90abebaa2b489d700715528311b2fc4a/candidate/1\"],\"denominator\":28,\"falseIds\":[\"snapshot_collision-control/452e000a4fc9e06284bb509e7b96ce4a90abebaa2b489d700715528311b2fc4a/candidate/0\",\"snapshot_collision-control/452e000a4fc9e06284bb509e7b96ce4a90abebaa2b489d700715528311b2fc4a/candidate/1\"],\"numerator\":2,\"rate\":0.07142857142857142,\"unadjudicatedIds\":[]},\"meaning\":\"finite supplied hypothetical material only; lexical site accounting is not exact-tree correspondence; neither observation nor hint confers necessity or simultaneous availability\",\"necessityRecall\":null,\"omissionRefutation\":null,\"promotedFalseRelation\":{\"denominator\":0,\"numerator\":0,\"rate\":null,\"reason\":\"discovery has no establishment API; M03 not implemented\"},\"siteAccounting\":{\"denominator\":52,\"denominatorIds\":[\"literal_spend-positive/site/0\",\"literal_spend-positive/site/1\",\"literal_spend-control/site/0\",\"literal_spend-control/site/1\",\"self_alias-positive/site/0\",\"self_alias-control/site/0\",\"action_alternatives-positive/site/0\",\"action_alternatives-positive/site/1\",\"action_alternatives-positive/site/2\",\"action_alternatives-control/site/0\",\"action_alternatives-control/site/1\",\"action_alternatives-control/site/2\",\"data_only-positive/site/0\",\"data_only-positive/site/1\",\"data_only-control/site/0\",\"output_only-positive/site/0\",\"output_only-positive/site/1\",\"output_only-control/site/0\",\"dead_check-positive/site/0\",\"dead_check-positive/site/1\",\"dead_check-control/site/0\",\"script_identity-positive/site/0\",\"script_identity-control/site/0\",\"token_identity-positive/site/0\",\"token_identity-control/site/0\",\"tokenless-positive/site/0\",\"tokenless-positive/site/1\",\"tokenless-control/site/0\",\"exists_literal-positive/site/0\",\"exists_literal-control/site/0\",\"computed_index-positive/site/0\",\"computed_index-control/site/0\",\"register_identity-positive/site/0\",\"register_identity-positive/site/1\",\"register_identity-positive/site/2\",\"register_identity-control/site/0\",\"register_identity-control/site/1\",\"context_code-positive/site/0\",\"context_code-positive/site/1\",\"context_code-positive/site/2\",\"context_code-control/site/0\",\"context_code-control/site/1\",\"context_code-control/site/2\",\"context_scope-positive/site/0\",\"context_scope-positive/site/1\",\"context_scope-control/site/0\",\"context_scope-control/site/1\",\"avl_identity-positive/site/0\",\"avl_identity-control/site/0\",\"snapshot_collision-positive/site/0\",\"snapshot_collision-positive/site/1\",\"snapshot_collision-control/site/0\"],\"numerator\":52,\"numeratorIds\":[\"literal_spend-positive/site/0\",\"literal_spend-positive/site/1\",\"literal_spend-control/site/0\",\"literal_spend-control/site/1\",\"self_alias-positive/site/0\",\"self_alias-control/site/0\",\"action_alternatives-positive/site/0\",\"action_alternatives-positive/site/1\",\"action_alternatives-positive/site/2\",\"action_alternatives-control/site/0\",\"action_alternatives-control/site/1\",\"action_alternatives-control/site/2\",\"data_only-positive/site/0\",\"data_only-positive/site/1\",\"data_only-control/site/0\",\"output_only-positive/site/0\",\"output_only-positive/site/1\",\"output_only-control/site/0\",\"dead_check-positive/site/0\",\"dead_check-positive/site/1\",\"dead_check-control/site/0\",\"script_identity-positive/site/0\",\"script_identity-control/site/0\",\"token_identity-positive/site/0\",\"token_identity-control/site/0\",\"tokenless-positive/site/0\",\"tokenless-positive/site/1\",\"tokenless-control/site/0\",\"exists_literal-positive/site/0\",\"exists_literal-control/site/0\",\"computed_index-positive/site/0\",\"computed_index-control/site/0\",\"register_identity-positive/site/0\",\"register_identity-positive/site/1\",\"register_identity-positive/site/2\",\"register_identity-control/site/0\",\"register_identity-control/site/1\",\"context_code-positive/site/0\",\"context_code-positive/site/1\",\"context_code-positive/site/2\",\"context_code-control/site/0\",\"context_code-control/site/1\",\"context_code-control/site/2\",\"context_scope-positive/site/0\",\"context_scope-positive/site/1\",\"context_scope-control/site/0\",\"context_scope-control/site/1\",\"avl_identity-positive/site/0\",\"avl_identity-control/site/0\",\"snapshot_collision-positive/site/0\",\"snapshot_collision-positive/site/1\",\"snapshot_collision-control/site/0\"],\"rate\":1.0},\"supportedRecall\":{\"denominator\":23,\"denominatorIds\":[\"literal_spend-positive/B\",\"literal_spend-control/B\",\"self_alias-positive/B\",\"action_alternatives-positive/B\",\"action_alternatives-positive/C\",\"action_alternatives-control/B\",\"action_alternatives-control/C\",\"data_only-positive/B\",\"data_only-control/B\",\"output_only-positive/B\",\"output_only-control/B\",\"dead_check-positive/B\",\"dead_check-control/B\",\"script_identity-positive/B\",\"script_identity-control/C\",\"token_identity-positive/B\",\"token_identity-positive/C\",\"token_identity-control/B\",\"token_identity-control/C\",\"tokenless-positive/B\",\"exists_literal-positive/B\",\"exists_literal-control/B\",\"snapshot_collision-positive/B\"],\"numerator\":23,\"numeratorIds\":[\"literal_spend-positive/B\",\"literal_spend-control/B\",\"self_alias-positive/B\",\"action_alternatives-positive/B\",\"action_alternatives-positive/C\",\"action_alternatives-control/B\",\"action_alternatives-control/C\",\"data_only-positive/B\",\"data_only-control/B\",\"output_only-positive/B\",\"output_only-control/B\",\"dead_check-positive/B\",\"dead_check-control/B\",\"script_identity-positive/B\",\"script_identity-control/C\",\"token_identity-positive/B\",\"token_identity-positive/C\",\"token_identity-control/B\",\"token_identity-control/C\",\"tokenless-positive/B\",\"exists_literal-positive/B\",\"exists_literal-control/B\",\"snapshot_collision-positive/B\"],\"rate\":1.0},\"wholeDeployedProtocolCompleteness\":null}\n<repo>/docs/mapping/m02-mapping-results.json sha256=788b40190b022009f4d2321331220fac6b25e467eac84d98049bada0a02fd4b3\n\n\nsuccesses:\n    caps_missing_pages_and_computed_identities_stay_unresolved\n    false_hints_never_become_required_relations\n    supported_reference_recall_and_all_site_accounting\n\ntest result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s\n\n",
+      "outputSha256": "43373c03e79cecb7aeae8cc82a05f9671d55c0741981d67bbac96f82c4c581fd"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "mapping_necessity",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 2.46s\n     Running tests/mapping_necessity.rs (<home>/coding/ergo-forge/target-p00/release/deps/mapping_necessity-eb4404bdfe49ad14)\nalternatives_dead_checks_and_self_do_not_prove_cospend: test\nexact_guarded_necessity_matches_pinned_answers: test\nsatisfying_omission_and_relaxed_controls_use_full_validator: test\nunsupported_anchors_and_cyclic_proofs_are_rejected: test\n\n4 tests, 0 benchmarks\n",
+      "outputSha256": "71ee68db69fca213ada21799e2dee8e152d6309f3cb5916d69ce70c42472e88a"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "mapping_necessity",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/mapping_necessity.rs (<home>/coding/ergo-forge/target-p00/release/deps/mapping_necessity-eb4404bdfe49ad14)\n\nrunning 4 tests\ntest unsupported_anchors_and_cyclic_proofs_are_rejected ... ok\ntest alternatives_dead_checks_and_self_do_not_prove_cospend ... ok\ntest exact_guarded_necessity_matches_pinned_answers ... ok\ntest satisfying_omission_and_relaxed_controls_use_full_validator ... ok\n\nsuccesses:\n\n---- unsupported_anchors_and_cyclic_proofs_are_rejected stdout ----\naltered/missing/reordered anchors, claim/guard changes, cycles, caps, wrong subject and storage-rent acceptance domain rejected\n\n---- alternatives_dead_checks_and_self_do_not_prove_cospend stdout ----\n18 pinned adversarial/unsupported members refused; unconditional alternative and wrong authentication scope refused\n\n---- exact_guarded_necessity_matches_pinned_answers stdout ----\nevidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m03-mapping-results.json sha256=7c64e6d0a26c05720128d2dc4891e408d76bdbd6a7d5ff226e0bf4d9b9087ba6; supported 12/12; established 12; incorrect 0/12; unresolved 20/32\n\n---- satisfying_omission_and_relaxed_controls_use_full_validator stdout ----\nevidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m03-omission-results.json sha256=2b4dd32bcdc5d41c0974e3718383744e0f6c903eae4ce5e4048695ad40c42ae1\nevidence <repo>/ergo-sandbox/tests/fixtures/mapping/m03/supplemental-v2.fixture sha256=25b20fb46cdd45ee199e3847321419fef765505a0db8d61b0bbc0499c40adfda\n27 accepted premise-matching omission assessments refute their own exact claims\nfull validator: 52 accepted, 21 script rejections; 73 canonical vectors; evidence <repo>/ergo-sandbox/tests/fixtures/mapping/m03/manifest.json sha256=cdf73504cc3d5f98141bac9e44b46621a76baf8ac5219826d03367d171383853\n\n\nsuccesses:\n    alternatives_dead_checks_and_self_do_not_prove_cospend\n    exact_guarded_necessity_matches_pinned_answers\n    satisfying_omission_and_relaxed_controls_use_full_validator\n    unsupported_anchors_and_cyclic_proofs_are_rejected\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s\n\n",
+      "outputSha256": "2db11f9c3a9da4b2b114fc4c9f4397bab8917d6ca7e8848af718df451a3d07e1"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "mapping_actions",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 3.22s\n     Running tests/mapping_actions.rs (<home>/coding/ergo-forge/target-p00/release/deps/mapping_actions-1df0a003987e3a7a)\naccepted_omission_refutes_only_matching_claim_and_premises: test\nalternative_action_sets_are_checked_separately: test\ndata_outputs_and_unrelated_inputs_cannot_satisfy_spend: test\n\n3 tests, 0 benchmarks\n",
+      "outputSha256": "88abc1791fa593a6d8754b5742a156b3a27746351973847be7c93cd557f064e7"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "mapping_actions",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/mapping_actions.rs (<home>/coding/ergo-forge/target-p00/release/deps/mapping_actions-1df0a003987e3a7a)\n\nrunning 3 tests\ntest data_outputs_and_unrelated_inputs_cannot_satisfy_spend ... ok\ntest alternative_action_sets_are_checked_separately ... ok\ntest accepted_omission_refutes_only_matching_claim_and_premises ... ok\n\nsuccesses:\n\n---- data_outputs_and_unrelated_inputs_cannot_satisfy_spend stdout ----\ndata/output/unrelated inputs cannot satisfy Spend; missing/duplicate subject, stale proof, unknown bindings and versions fail closed\n\n---- alternative_action_sets_are_checked_separately stdout ----\nevidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m04-action-results.json sha256=da66d2037ae2516bae05fdb1ffbf5eb270941b989badea5dacf24d06256e3b80\n63/63 M04-eligible action dispositions; all 67 retained; 4 Execute expectations deferred to M05; alternatives never unioned\n\n---- accepted_omission_refutes_only_matching_claim_and_premises stdout ----\nevidence <repo>/ergo-sandbox/tests/fixtures/mapping/../../../../docs/mapping/m04-omission-results.json sha256=2bb08be500b8c2b0209a5990ca65100695cb52f16fdf31ed3b153d49148f62fe\n27/27 digest-matched accepted omissions refuted; 52 accepted / 21 script rejections; altered bindings and accepted satisfying spends cannot refute\n\n\nsuccesses:\n    accepted_omission_refutes_only_matching_claim_and_premises\n    alternative_action_sets_are_checked_separately\n    data_outputs_and_unrelated_inputs_cannot_satisfy_spend\n\ntest result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s\n\n",
+      "outputSha256": "42e281fd332a0baeac67247ea586b23519bdf362f375dc3c2733847edab2c6ce"
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import sys, unittest\ndef names(suite):\n    for test in suite:\n        if isinstance(test, unittest.TestSuite):\n            yield from names(test)\n        else:\n            yield test.id().rsplit('.', 1)[-1].removeprefix('test_')\nloader = unittest.TestLoader()\nsuite = loader.discover('scripts', pattern=sys.argv[1] + '.py')\nif loader.errors:\n    sys.exit('\\n'.join(loader.errors))\nfor name in names(suite):\n    print(name + ': test')\n",
+        "test_roadmap_gate"
+      ],
+      "exitCode": 0,
+      "output": "ci_accepts_only_validated_recorded_stops_not_completion: test\nci_rejects_corrupt_stop_evidence: test\nci_rejects_failed_missing_and_blocked_units: test\nci_reports_future_units_as_not_started_without_running_them: test\ncommand_normalizes_before_printing_recording_and_hashing: test\ndependencies_are_in_policy_order: test\nextra_commands_cannot_be_omitted: test\nfuture_units_fail_as_unimplemented_not_missing_gate: test\nincomplete_stop_record_is_rejected: test\nmalformed_inputs_still_write_a_failing_report: test\nmissing_evidence_is_distinct_from_product_failure: test\nmissing_scoreboard_is_rejected: test\npolicy_requires_unique_block_and_known_completion: test\npolicy_v2_block_parses: test\npython_targets_require_discovered_executed_unskipped_names: test\nrequired_names_must_be_discovered_and_executed: test\nresolution_requires_exact_policy_record_and_decision: test\nrunner_captures_diagnostics_without_weakening_execution_checks: test\nscoreboard_cannot_self_attest_changed_measurements: test\nscoreboard_reads_every_baseline_artifact: test\nskipped_tests_are_rejected: test\nthresholds_are_read_from_policy: test\nunknown_unit_is_rejected: test\nzero_test_filter_is_rejected: test\n",
+      "outputSha256": "ea056620d1d419b250a6be833dc0124e8bacf39bca36e2b7a4842dc90b7f63b2"
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-b",
+        "-v",
+        "-s",
+        "scripts",
+        "-p",
+        "test_roadmap_gate.py"
+      ],
+      "exitCode": 0,
+      "output": "test_ci_accepts_only_validated_recorded_stops_not_completion (test_roadmap_gate.CiGovernanceTests.test_ci_accepts_only_validated_recorded_stops_not_completion) ... ok\ntest_ci_rejects_corrupt_stop_evidence (test_roadmap_gate.CiGovernanceTests.test_ci_rejects_corrupt_stop_evidence) ... ok\ntest_ci_rejects_failed_missing_and_blocked_units (test_roadmap_gate.CiGovernanceTests.test_ci_rejects_failed_missing_and_blocked_units) ... ok\ntest_ci_reports_future_units_as_not_started_without_running_them (test_roadmap_gate.CiGovernanceTests.test_ci_reports_future_units_as_not_started_without_running_them) ... ok\ntest_command_normalizes_before_printing_recording_and_hashing (test_roadmap_gate.CiGovernanceTests.test_command_normalizes_before_printing_recording_and_hashing) ... ok\ntest_dependencies_are_in_policy_order (test_roadmap_gate.RoadmapGateTests.test_dependencies_are_in_policy_order) ... ok\ntest_extra_commands_cannot_be_omitted (test_roadmap_gate.RoadmapGateTests.test_extra_commands_cannot_be_omitted) ... ok\ntest_future_units_fail_as_unimplemented_not_missing_gate (test_roadmap_gate.RoadmapGateTests.test_future_units_fail_as_unimplemented_not_missing_gate) ... ok\ntest_incomplete_stop_record_is_rejected (test_roadmap_gate.RoadmapGateTests.test_incomplete_stop_record_is_rejected) ... ok\ntest_malformed_inputs_still_write_a_failing_report (test_roadmap_gate.RoadmapGateTests.test_malformed_inputs_still_write_a_failing_report) ... ok\ntest_missing_evidence_is_distinct_from_product_failure (test_roadmap_gate.RoadmapGateTests.test_missing_evidence_is_distinct_from_product_failure) ... ok\ntest_missing_scoreboard_is_rejected (test_roadmap_gate.RoadmapGateTests.test_missing_scoreboard_is_rejected) ... ok\ntest_policy_requires_unique_block_and_known_completion (test_roadmap_gate.RoadmapGateTests.test_policy_requires_unique_block_and_known_completion) ... ok\ntest_policy_v2_block_parses (test_roadmap_gate.RoadmapGateTests.test_policy_v2_block_parses) ... ok\ntest_python_targets_require_discovered_executed_unskipped_names (test_roadmap_gate.RoadmapGateTests.test_python_targets_require_discovered_executed_unskipped_names) ... ok\ntest_required_names_must_be_discovered_and_executed (test_roadmap_gate.RoadmapGateTests.test_required_names_must_be_discovered_and_executed) ... ok\ntest_resolution_requires_exact_policy_record_and_decision (test_roadmap_gate.RoadmapGateTests.test_resolution_requires_exact_policy_record_and_decision) ... ok\ntest_runner_captures_diagnostics_without_weakening_execution_checks (test_roadmap_gate.RoadmapGateTests.test_runner_captures_diagnostics_without_weakening_execution_checks) ... ok\ntest_scoreboard_cannot_self_attest_changed_measurements (test_roadmap_gate.RoadmapGateTests.test_scoreboard_cannot_self_attest_changed_measurements) ... ok\ntest_scoreboard_reads_every_baseline_artifact (test_roadmap_gate.RoadmapGateTests.test_scoreboard_reads_every_baseline_artifact) ... ok\ntest_skipped_tests_are_rejected (test_roadmap_gate.RoadmapGateTests.test_skipped_tests_are_rejected) ... ok\ntest_thresholds_are_read_from_policy (test_roadmap_gate.RoadmapGateTests.test_thresholds_are_read_from_policy) ... ok\ntest_unknown_unit_is_rejected (test_roadmap_gate.RoadmapGateTests.test_unknown_unit_is_rejected) ... ok\ntest_zero_test_filter_is_rejected (test_roadmap_gate.RoadmapGateTests.test_zero_test_filter_is_rejected) ... ok\n\n----------------------------------------------------------------------\nRan 24 tests in 0.504s\n\nOK\n",
+      "outputSha256": "c98515b44f7c8c553e7a067c94b1ff2192508cd3046d7eaf1e645f7c41fd5409"
+    }
+  ],
+  "evidenceHashes": {
+    "docs/ingestion-lithos-results.json": "1c43bc46d910b11d4e970ce714657175515a0cf61e1ec420b4c58a3d4e7bc69e",
+    "ergo-sandbox/tests/fixtures/decompile_corpus_expectations.json": "5d2bfc24d758dac520e24968793fe95a87c1cc673d54fe577d4a93b89768aa69",
+    "examples/mutants/answer-key.custody-v1.json": "4d038f5ab7722e954c44c426719237c9df2098e689f54eb4c679f3348b485259",
+    "examples/mutants/answer-key.json": "e7f31518f021dca2d74ce4267126313f1624f091b6cedda0246e8115ead3c3d5",
+    "docs/roadmap-metrics.json": "4cc60a3f4b342aebe85b91a17ff64c7b79d6fcace73ad0518e7c49e3a57c134d"
+  },
+  "policySha256": "c3ba990a5baa491a3e99ecfe8fd4bb7d19241a82d7e04bf6cd6ba01f73d81ae6",
+  "ciAccepted": true,
+  "passed": false
+}

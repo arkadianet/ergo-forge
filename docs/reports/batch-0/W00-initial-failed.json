@@ -1,0 +1,53 @@
+{
+  "formatVersion": 1,
+  "results": [
+    {
+      "unit": "scoreboard",
+      "status": "passed"
+    },
+    {
+      "unit": "W00",
+      "status": "missing-gate",
+      "detail": "skipped Python test"
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import sys, unittest\ndef names(suite):\n    for test in suite:\n        if isinstance(test, unittest.TestSuite):\n            yield from names(test)\n        else:\n            yield test.id().rsplit('.', 1)[-1].removeprefix('test_')\nloader = unittest.TestLoader()\nsuite = loader.discover('scripts', pattern=sys.argv[1] + '.py')\nif loader.errors:\n    sys.exit('\\n'.join(loader.errors))\nfor name in names(suite):\n    print(name + ': test')\n",
+        "test_roadmap_gate"
+      ],
+      "exitCode": 0,
+      "output": "ci_accepts_only_validated_recorded_stops_not_completion: test\nci_rejects_corrupt_stop_evidence: test\nci_rejects_failed_missing_and_blocked_units: test\nci_reports_future_units_as_not_started_without_running_them: test\ncommand_normalizes_before_printing_recording_and_hashing: test\ndependencies_are_in_policy_order: test\nextra_commands_cannot_be_omitted: test\nfuture_units_fail_as_unimplemented_not_missing_gate: test\nincomplete_stop_record_is_rejected: test\nmalformed_inputs_still_write_a_failing_report: test\nmissing_evidence_is_distinct_from_product_failure: test\nmissing_scoreboard_is_rejected: test\npolicy_requires_unique_block_and_known_completion: test\npolicy_v2_block_parses: test\npython_targets_require_discovered_executed_unskipped_names: test\nrequired_names_must_be_discovered_and_executed: test\nresolution_requires_exact_policy_record_and_decision: test\nrunner_captures_diagnostics_without_weakening_execution_checks: test\nscoreboard_cannot_self_attest_changed_measurements: test\nscoreboard_reads_every_baseline_artifact: test\nskipped_tests_are_rejected: test\nthresholds_are_read_from_policy: test\nunknown_unit_is_rejected: test\nzero_test_filter_is_rejected: test\n",
+      "outputSha256": "ea056620d1d419b250a6be833dc0124e8bacf39bca36e2b7a4842dc90b7f63b2"
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-v",
+        "-s",
+        "scripts",
+        "-p",
+        "test_roadmap_gate.py"
+      ],
+      "exitCode": 0,
+      "output": "test_ci_accepts_only_validated_recorded_stops_not_completion (test_roadmap_gate.CiGovernanceTests.test_ci_accepts_only_validated_recorded_stops_not_completion) ... M05: stopped: recorded stop blocks this unit\nscoreboard: passed\nM05: stopped: recorded stop blocks this unit\nreport: <tmp>/tmpe90yjdo3/report.json\nM05: stopped: recorded stop blocks this unit\nscoreboard: passed\nM05: stopped: recorded stop blocks this unit\nreport: <tmp>/tmpjqs0s9ea/report.json\nM05: stopped: recorded stop blocks this unit\nscoreboard: passed\nM05: stopped: recorded stop blocks this unit\nreport: <tmp>/tmpc3eqp5ek/report.json\nM05: unimplemented: registered product unit is not implemented\nok\ntest_ci_rejects_corrupt_stop_evidence (test_roadmap_gate.CiGovernanceTests.test_ci_rejects_corrupt_stop_evidence) ... ok\ntest_ci_rejects_failed_missing_and_blocked_units (test_roadmap_gate.CiGovernanceTests.test_ci_rejects_failed_missing_and_blocked_units) ... scoreboard: passed\nM05: unimplemented: registered product unit is not implemented\nreport: <tmp>/tmpveqg6c5t/report.json\npolicy/evidence: missing-gate: stop evidence hash mismatch\nreport: <tmp>/tmpk80cm3h9/ci.json\nA: failed: test failure\nscoreboard: passed\nA: failed: test failure\nreport: <tmp>/tmpc7cgtt5x/report.json\nA: missing-gate: test failure\nscoreboard: passed\nA: missing-gate: test failure\nreport: <tmp>/tmpi8q8yeim/report.json\nA: stopped: recorded stop blocks this unit\nB: not-started: registered future unit has not started\nscoreboard: passed\nA: stopped: recorded stop blocks this unit\nB: not-started: registered future unit has not started\nreport: <tmp>/tmpr03l551k/report.json\nA: stopped: recorded stop blocks this unit\nB: blocked: dependency did not pass\nscoreboard: passed\nA: stopped: recorded stop blocks this unit\nB: blocked: dependency did not pass\nreport: <tmp>/tmp5bt8dhrj/report.json\nA: passed: required tests executed\nok\ntest_ci_reports_future_units_as_not_started_without_running_them (test_roadmap_gate.CiGovernanceTests.test_ci_reports_future_units_as_not_started_without_running_them) ... scoreboard: passed\nA: passed: required tests executed\nreport: <tmp>/tmp_x44aufq/report.json\nfuture: not-started: registered future unit has not started\nlater: not-started: registered future unit has not started\nscoreboard: passed\nfuture: not-started: registered future unit has not started\nlater: not-started: registered future unit has not started\nreport: <tmp>/tmp44y3fnqo/report.json\nfuture: unimplemented: registered product unit is not implemented\nlater: unimplemented: registered product unit is not implemented\nscoreboard: passed\nfuture: unimplemented: registered product unit is not implemented\nlater: unimplemented: registered product unit is not implemented\nreport: <tmp>/tmpyse2lh0n/report.json\nfuture: unimplemented: registered product unit is not implemented\nok\ntest_command_normalizes_before_printing_recording_and_hashing (test_roadmap_gate.CiGovernanceTests.test_command_normalizes_before_printing_recording_and_hashing) ... ok\ntest_dependencies_are_in_policy_order (test_roadmap_gate.RoadmapGateTests.test_dependencies_are_in_policy_order) ... ok\ntest_extra_commands_cannot_be_omitted (test_roadmap_gate.RoadmapGateTests.test_extra_commands_cannot_be_omitted) ... ok\ntest_future_units_fail_as_unimplemented_not_missing_gate (test_roadmap_gate.RoadmapGateTests.test_future_units_fail_as_unimplemented_not_missing_gate) ... ok\ntest_incomplete_stop_record_is_rejected (test_roadmap_gate.RoadmapGateTests.test_incomplete_stop_record_is_rejected) ... ok\ntest_malformed_inputs_still_write_a_failing_report (test_roadmap_gate.RoadmapGateTests.test_malformed_inputs_still_write_a_failing_report) ... ok\ntest_missing_evidence_is_distinct_from_product_failure (test_roadmap_gate.RoadmapGateTests.test_missing_evidence_is_distinct_from_product_failure) ... ok\ntest_missing_scoreboard_is_rejected (test_roadmap_gate.RoadmapGateTests.test_missing_scoreboard_is_rejected) ... ok\ntest_policy_requires_unique_block_and_known_completion (test_roadmap_gate.RoadmapGateTests.test_policy_requires_unique_block_and_known_completion) ... ok\ntest_policy_v2_block_parses (test_roadmap_gate.RoadmapGateTests.test_policy_v2_block_parses) ... ok\ntest_python_targets_require_discovered_executed_unskipped_names (test_roadmap_gate.RoadmapGateTests.test_python_targets_require_discovered_executed_unskipped_names) ... scoreboard: passed\nfuture: unimplemented: registered product unit is not implemented\nreport: <tmp>/tmpuw69fim3/report.json\npolicy/evidence: missing-gate: 'list' object has no attribute 'values'\nreport: <tmp>/tmp1ez_invg/nested/report.json\npolicy/evidence: missing-gate: 'NoneType' object has no attribute 'keys'\nreport: <tmp>/tmpsiuosmpe/nested/report.json\npolicy/evidence: missing-gate: division by zero\nreport: <tmp>/tmp9vs91b69/nested/report.json\nsample: test\ntest_sample (test_sample.Sample.test_sample) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\nunrelated: test\nsample: test\ntest_sample (test_sample.Sample.test_sample) ... skipped 'no'\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK (skipped=1)\nsample: test\ntest_sample (test_sample.Sample.test_sample) ... FAIL\n\n======================================================================\nFAIL: test_sample (test_sample.Sample.test_sample)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<repo>/scripts/test_sample.py\", line 3, in test_sample\n    def test_sample(self): self.fail(\"broken\")\n                           ~~~~~~~~~^^^^^^^^^^\nAssertionError: broken\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nFAILED (failures=1)\nok\ntest_required_names_must_be_discovered_and_executed (test_roadmap_gate.RoadmapGateTests.test_required_names_must_be_discovered_and_executed) ... ok\ntest_resolution_requires_exact_policy_record_and_decision (test_roadmap_gate.RoadmapGateTests.test_resolution_requires_exact_policy_record_and_decision) ... ok\ntest_runner_captures_diagnostics_without_weakening_execution_checks (test_roadmap_gate.RoadmapGateTests.test_runner_captures_diagnostics_without_weakening_execution_checks) ... ok\ntest_scoreboard_cannot_self_attest_changed_measurements (test_roadmap_gate.RoadmapGateTests.test_scoreboard_cannot_self_attest_changed_measurements) ... ok\ntest_scoreboard_reads_every_baseline_artifact (test_roadmap_gate.RoadmapGateTests.test_scoreboard_reads_every_baseline_artifact) ... ok\ntest_skipped_tests_are_rejected (test_roadmap_gate.RoadmapGateTests.test_skipped_tests_are_rejected) ... ok\ntest_thresholds_are_read_from_policy (test_roadmap_gate.RoadmapGateTests.test_thresholds_are_read_from_policy) ... ok\ntest_unknown_unit_is_rejected (test_roadmap_gate.RoadmapGateTests.test_unknown_unit_is_rejected) ... ok\ntest_zero_test_filter_is_rejected (test_roadmap_gate.RoadmapGateTests.test_zero_test_filter_is_rejected) ... ok\n\n----------------------------------------------------------------------\nRan 24 tests in 0.395s\n\nOK\n",
+      "outputSha256": "7d9dcc9fadb277b2e8eee9e7b09c835b176457a065fa1a3d67327597face5174"
+    }
+  ],
+  "evidenceHashes": {
+    "docs/ingestion-lithos-results.json": "1c43bc46d910b11d4e970ce714657175515a0cf61e1ec420b4c58a3d4e7bc69e",
+    "ergo-sandbox/tests/fixtures/decompile_corpus_expectations.json": "5d2bfc24d758dac520e24968793fe95a87c1cc673d54fe577d4a93b89768aa69",
+    "examples/mutants/answer-key.custody-v1.json": "4d038f5ab7722e954c44c426719237c9df2098e689f54eb4c679f3348b485259",
+    "examples/mutants/answer-key.json": "e7f31518f021dca2d74ce4267126313f1624f091b6cedda0246e8115ead3c3d5",
+    "docs/roadmap-metrics.json": "2a1ba9c250f5940dce441dc24f9b932f9b3aceed4c26f46a3bf8a4f5232500a6"
+  },
+  "policySha256": "832369de8c6bc8beb53af0fd2d91691fb26c9555b567d36bd381b6c9902a9f03",
+  "ciAccepted": false,
+  "passed": false
+}

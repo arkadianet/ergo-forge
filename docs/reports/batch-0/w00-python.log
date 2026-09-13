@@ -1,0 +1,100 @@
+M05: stopped: recorded stop blocks this unit
+scoreboard: passed
+M05: stopped: recorded stop blocks this unit
+report: <tmp>/tmpi21desh0/report.json
+M05: stopped: recorded stop blocks this unit
+scoreboard: passed
+M05: stopped: recorded stop blocks this unit
+report: <tmp>/tmpdw3ckuvc/report.json
+M05: stopped: recorded stop blocks this unit
+scoreboard: passed
+M05: stopped: recorded stop blocks this unit
+report: <tmp>/tmpziiezyee/report.json
+M05: unimplemented: registered product unit is not implemented
+..scoreboard: passed
+M05: unimplemented: registered product unit is not implemented
+report: <tmp>/tmpmttqumvm/report.json
+policy/evidence: missing-gate: stop evidence hash mismatch
+report: <tmp>/tmpjoszpeue/ci.json
+A: failed: test failure
+scoreboard: passed
+A: failed: test failure
+report: <tmp>/tmp5eyecmmz/report.json
+A: missing-gate: test failure
+scoreboard: passed
+A: missing-gate: test failure
+report: <tmp>/tmpk0popx9d/report.json
+A: stopped: recorded stop blocks this unit
+B: not-started: registered future unit has not started
+scoreboard: passed
+A: stopped: recorded stop blocks this unit
+B: not-started: registered future unit has not started
+report: <tmp>/tmpwmky_t3j/report.json
+A: stopped: recorded stop blocks this unit
+B: blocked: dependency did not pass
+scoreboard: passed
+A: stopped: recorded stop blocks this unit
+B: blocked: dependency did not pass
+report: <tmp>/tmpe9i9wi2v/report.json
+A: passed: required tests executed
+.scoreboard: passed
+A: passed: required tests executed
+report: <tmp>/tmpstehe8vz/report.json
+future: not-started: registered future unit has not started
+later: not-started: registered future unit has not started
+scoreboard: passed
+future: not-started: registered future unit has not started
+later: not-started: registered future unit has not started
+report: <tmp>/tmpns2n6fdx/report.json
+future: unimplemented: registered product unit is not implemented
+later: unimplemented: registered product unit is not implemented
+scoreboard: passed
+future: unimplemented: registered product unit is not implemented
+later: unimplemented: registered product unit is not implemented
+report: <tmp>/tmpa0qaltb0/report.json
+future: unimplemented: registered product unit is not implemented
+...........scoreboard: passed
+future: unimplemented: registered product unit is not implemented
+report: <tmp>/tmpw0kd9rpz/report.json
+policy/evidence: missing-gate: 'list' object has no attribute 'values'
+report: <tmp>/tmp92d1j1pq/nested/report.json
+policy/evidence: missing-gate: 'NoneType' object has no attribute 'keys'
+report: <tmp>/tmp_4u79sgg/nested/report.json
+policy/evidence: missing-gate: division by zero
+report: <tmp>/tmpylohkcws/nested/report.json
+sample: test
+test_sample (test_sample.Sample.test_sample) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+OK
+unrelated: test
+sample: test
+test_sample (test_sample.Sample.test_sample) ... skipped 'no'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+OK (skipped=1)
+sample: test
+test_sample (test_sample.Sample.test_sample) ... FAIL
+
+======================================================================
+FAIL: test_sample (test_sample.Sample.test_sample)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/scripts/test_sample.py", line 3, in test_sample
+    def test_sample(self): self.fail("broken")
+                           ~~~~~~~~~^^^^^^^^^^
+AssertionError: broken
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (failures=1)
+..........
+----------------------------------------------------------------------
+Ran 24 tests in 0.400s
+
+OK

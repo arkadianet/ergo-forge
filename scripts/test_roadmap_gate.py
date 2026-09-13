@@ -1,5 +1,8 @@
 import copy
+import contextlib
+import io
 import json
+import re
 from pathlib import Path
 import tempfile
 import unittest
@@ -17,6 +20,78 @@ class RoadmapGateTests(unittest.TestCase):
         with self.assertRaises(gate.GateError) as caught:
             call()
         self.assertEqual(caught.exception.status, status)
+
+    def test_policy_v2_block_parses(self):
+        v1, v2 = gate.load_policies()
+        original_doc = gate.baseline_bytes(gate.ROOT, v2['baselineRev'], 'docs/ROADMAP.md').decode()
+        current_doc = (gate.ROOT / 'docs/ROADMAP.md').read_text()
+        pattern = r'<!-- roadmap-policy:v1 -->.*?<!-- /roadmap-policy:v1 -->'
+        self.assertEqual(re.search(pattern, original_doc, re.S)[0], re.search(pattern, current_doc, re.S)[0])
+        spec = (gate.ROOT / 'docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md').read_text()
+        expected = json.loads(re.search(r'```json\n(.*?)\n```', spec, re.S)[1])['newUnits']
+        self.assertEqual(len(expected), 18)
+        self.assertEqual(v2['baselineRev'], 'a57df087df85813c7f90a6f6f9ad6aaf5b4597cd')
+        self.assertIsNone(v2['completedThrough'])
+        self.assertEqual(v1['completedThrough'], 'M04')
+        self.assertEqual([{k: v for k, v in u.items() if k != 'implemented'} for u in v2['units']], expected)
+        for key in ['schemaVersion', 'maxActiveImplementationBranches', 'maxOpenImplementationPrs',
+                    'thresholds', 'frozenPreflight', 'scoreboard', 'stopRecords']:
+            self.assertEqual(v2[key], v1[key])
+        union = gate.union_policy([v1, v2])
+        for unit in v2['units']:
+            self.assertEqual(gate.select_units(union, unit['id'])[-1], unit)
+        self.assertTrue(all(not u['implemented'] for u in v2['units'] if u['id'] not in {'W00', 'S00'}))
+        archived = (gate.ROOT / 'docs/reports/ROADMAP-v1-queue.md').read_text()
+        self.assertIn(original_doc[original_doc.index('## 2. '):original_doc.index('## 4. ')], archived)
+        self.assert_status('missing-gate', lambda: gate.policy_v2_from(current_doc + gate.V2_MARKER, v1))
+        cross = current_doc.replace('"depends": [],\n      "days": 1', '"depends": ["P08"],\n      "days": 1')
+        parsed = gate.policy_v2_from(cross, v1)
+        self.assertEqual(parsed['units'][0]['depends'], ['P08'])
+        broken = cross.replace('"depends": ["P08"],\n      "days": 1', '"depends": ["absent"],\n      "days": 1')
+        self.assert_status('missing-gate', lambda: gate.policy_v2_from(broken, v1))
+        self.assertEqual(gate.completed_units([v1, v2]), gate.select_units(v1, 'M04'))
+        completed = copy.deepcopy(v2)
+        completed['completedThrough'] = 'S00'
+        self.assertEqual([u['id'] for u in gate.completed_units([v1, completed])][-2:], ['W00', 'S00'])
+
+    def test_scoreboard_reads_every_baseline_artifact(self):
+        metrics = gate.load_json(gate.ROOT / self.policy['scoreboard']['path'])
+        for policy in gate.load_policies():
+            with patch.object(gate, 'baseline_bytes', wraps=gate.baseline_bytes) as baseline:
+                evidence = gate.scoreboard(policy)
+            for rev in [policy['baselineRev'], metrics['sourceCommit']]:
+                for path in metrics['baselineArtifactSha256']:
+                    baseline.assert_any_call(gate.ROOT, rev, path)
+                    self.assertIn(path, evidence)
+            for path in metrics['baselineArtifactSha256']:
+                with self.subTest(missing=path), patch.object(gate, 'baseline_bytes', side_effect=lambda root, rev, p: (
+                    gate.read(Path('/nonexistent-batch-0-artifact')) if p == path else baseline(root, rev, p)
+                )):
+                    self.assert_status('missing-gate', lambda: gate.scoreboard(policy))
+
+    def test_python_targets_require_discovered_executed_unskipped_names(self):
+        with tempfile.TemporaryDirectory() as tmp, contextlib.redirect_stdout(io.StringIO()):
+            root = Path(tmp)
+            (root / 'scripts').mkdir()
+            target = root / 'scripts/test_sample.py'
+            unit = dict(id='sample', implemented=True, package='scripts', target='test_sample', tests=['sample'])
+            for source, status in [
+                ('def test_sample(self): pass', None),
+                ('def test_unrelated(self): pass', 'missing-gate'),
+                ('@unittest.skip("no")\n    def test_sample(self): pass', 'missing-gate'),
+                ('def test_sample(self): self.fail("broken")', 'failed'),
+            ]:
+                target.write_text('import unittest\nclass Sample(unittest.TestCase):\n    ' + source + '\n')
+                # Different file contents must not reuse an import cache.
+                for cached in (root / 'scripts/__pycache__').glob('*'):
+                    cached.unlink()
+                with self.subTest(source=source):
+                    if status:
+                        self.assert_status(status, lambda: gate.run_unit(unit, [], root))
+                    else:
+                        gate.run_unit(unit, [], root)
+        self.assert_status('missing-gate', lambda: gate.check_test_output(
+            'test_unrelated (sample.Sample.test_unrelated) ... ok\nRan 1 test\nOK\n', ['sample'], 'python'))
 
     def test_unknown_unit_is_rejected(self):
         self.assert_status('missing-gate', lambda: gate.select_units(self.policy, 'NOT-A-UNIT'))
@@ -105,9 +180,9 @@ class RoadmapGateTests(unittest.TestCase):
         for failure in ['policy', 'stop-record', 'arithmetic']:
             with self.subTest(failure=failure), tempfile.TemporaryDirectory() as tmp:
                 output = Path(tmp) / 'nested/report.json'
-                with patch.object(gate, 'load_policy', side_effect=(
-                    lambda: gate.policy_from(malformed_doc)
-                ) if failure == 'policy' else lambda: self.policy), patch.object(
+                with patch.object(gate, 'load_policies', side_effect=(
+                    lambda: [gate.policy_from(malformed_doc)]
+                ) if failure == 'policy' else lambda: [self.policy]), patch.object(
                     gate, 'scoreboard', side_effect=ZeroDivisionError('division by zero')
                     if failure == 'arithmetic' else lambda policy: {}
                 ), patch.object(gate, 'load_json', side_effect=lambda path: (
@@ -179,13 +254,14 @@ class RoadmapGateTests(unittest.TestCase):
 
 
 class CiGovernanceTests(unittest.TestCase):
-    def run_report(self, mode, units, stops, failure=None):
+    def run_report(self, mode, units, stops, failure=None, v2=False):
         policy = copy.deepcopy(gate.load_policy())
         policy['units'] = units
         policy['completedThrough'] = units[0]['id']
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp) / 'report.json'
-            with patch.object(gate, 'load_policy', return_value=policy), patch.object(
+            with patch.object(gate, 'load_policies', return_value=(
+                [{**policy, 'units': [], 'completedThrough': None}, policy] if v2 else [policy])), patch.object(
                 gate, 'scoreboard', return_value={}
             ), patch.object(gate, 'stop_records', return_value=stops), patch.object(
                 gate, 'run_unit', side_effect=failure
@@ -194,8 +270,8 @@ class CiGovernanceTests(unittest.TestCase):
             return code, json.loads(output.read_text())
 
     def test_ci_accepts_only_validated_recorded_stops_not_completion(self):
-        unit = dict(id='A', depends=[], implemented=False)
-        stops = [dict(unitOrProposal='A')]
+        unit = dict(id='M05', depends=[], implemented=False)
+        stops = [dict(unitOrProposal='M05')]
         for mode, expected in [('--ci', 0), ('--all-goals', 1), ('--through-completed', 1)]:
             code, report = self.run_report(mode, [unit], stops)
             self.assertEqual(code, expected)
@@ -205,16 +281,29 @@ class CiGovernanceTests(unittest.TestCase):
         self.assertEqual(code, 1)  # Deleting the stop cannot make CI green.
         self.assertEqual(report['results'][-1]['status'], 'unimplemented')
 
-    def test_ci_rejects_failed_missing_unimplemented_and_blocked_units(self):
+    def test_ci_reports_future_units_as_not_started_without_running_them(self):
+        units = [dict(id='future', depends=[], implemented=False),
+                 dict(id='later', depends=['future'], implemented=False)]
+        code, report = self.run_report('--ci', units, [], AssertionError('must not run'), v2=True)
+        self.assertEqual(code, 0)
+        self.assertTrue(report['ciAccepted'])
+        self.assertFalse(report['passed'])
+        self.assertEqual([r['status'] for r in report['results'][1:]], ['not-started', 'not-started'])
+        for mode in ['--all-goals', '--through-completed']:
+            code, report = self.run_report(mode, units, [], AssertionError('must not run'))
+            self.assertEqual(code, 1)
+            self.assertEqual(report['results'][-1]['status'], 'unimplemented')
+
+    def test_ci_rejects_failed_missing_and_blocked_units(self):
         unit = dict(id='A', depends=[], implemented=True)
         for status in ['failed', 'missing-gate']:
             code, report = self.run_report('--ci', [unit], [], gate.GateError(status, 'test failure'))
             self.assertEqual(code, 1)
             self.assertEqual(report['results'][-1]['status'], status)
-        for implemented, status in [(False, 'unimplemented'), (True, 'blocked')]:
+        for implemented, status, expected in [(False, 'unimplemented', 1), (True, 'blocked', 1)]:
             dependent = dict(id='B', depends=['A'], implemented=implemented)
             code, report = self.run_report('--ci', [unit, dependent], [dict(unitOrProposal='A')])
-            self.assertEqual(code, 1)
+            self.assertEqual(code, expected)
             self.assertEqual(report['results'][-1]['status'], status)
         self.assertEqual(self.run_report('--ci', [unit], [])[0], 0)
 

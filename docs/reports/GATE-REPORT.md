@@ -3,7 +3,7 @@
 This report records the pre-P00 implementation at `ee4ac6a`. Its `confirmed`
 label meant scenario reproduction through txcheck, not full node validation or
 lint causation. Current v2 records use `reproduced-in-scenario`; see
-[ROADMAP.md](docs/ROADMAP.md#p00--amend-95-and-make-all-current-claims-truthful).
+[ROADMAP.md](ROADMAP-v1-queue.md#p00--amend-95-and-make-all-current-claims-truthful).
 
 # Finding confirmation gate
 

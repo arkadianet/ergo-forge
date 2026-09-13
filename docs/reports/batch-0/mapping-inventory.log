@@ -1,0 +1,11 @@
+   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.51s
+     Running tests/mapping_inventory.rs (<home>/coding/ergo-forge/target-p00/debug/deps/mapping_inventory-046deafa07748924)
+
+running 3 tests
+test inventory_has_32_pinned_cases_and_independent_answers ... ok
+test fixture_constructs_execute_and_unsupported_members_remain ... ok
+test legacy_metrics_are_measured_without_baseline_changes ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+

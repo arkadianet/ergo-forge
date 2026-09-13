@@ -1,0 +1,446 @@
+{
+  "formatVersion": 1,
+  "results": [
+    {
+      "unit": "scoreboard",
+      "status": "passed"
+    },
+    {
+      "unit": "P00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P01",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P02",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P03",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P04",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P05",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P06",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P07",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "P08",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "M00",
+      "status": "failed",
+      "detail": "product test command failed"
+    },
+    {
+      "unit": "M01",
+      "status": "blocked",
+      "detail": "dependency did not pass"
+    },
+    {
+      "unit": "M02",
+      "status": "blocked",
+      "detail": "dependency did not pass"
+    },
+    {
+      "unit": "M03",
+      "status": "blocked",
+      "detail": "dependency did not pass"
+    },
+    {
+      "unit": "M04",
+      "status": "blocked",
+      "detail": "dependency did not pass"
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "claim_contract",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 15.25s\n     Running tests/claim_contract.rs (<home>/coding/ergo-forge/target-p00/release/deps/claim_contract-67314c4a30c78ca0)\nlegacy_record_cannot_import_as_verified: test\nlegacy_results_are_explicitly_preflight_or_simulation: test\nscenario_reproduction_is_not_confirmation: test\n\n3 tests, 0 benchmarks\n",
+      "outputSha256": "85fe47138c2f7b13c9e0808fc0f877c73dc15f16267505b7e0e7b1502f1c27cf"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "claim_contract",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/claim_contract.rs (<home>/coding/ergo-forge/target-p00/release/deps/claim_contract-67314c4a30c78ca0)\n\nrunning 3 tests\ntest legacy_record_cannot_import_as_verified ... ok\ntest legacy_results_are_explicitly_preflight_or_simulation ... ok\ntest scenario_reproduction_is_not_confirmation ... ok\n\nsuccesses:\n\n---- legacy_record_cannot_import_as_verified stdout ----\nstored confirmed records and imported authority fields rejected; replay request required\n\n---- legacy_results_are_explicitly_preflight_or_simulation stdout ----\npositive and negative legacy envelopes: explicit method/provenance, nodeValidated=false\n\n---- scenario_reproduction_is_not_confirmation stdout ----\nformatVersion=2 state=reproduced-in-scenario preflightPassed=true nodeValidated=false\n\n\nsuccesses:\n    legacy_record_cannot_import_as_verified\n    legacy_results_are_explicitly_preflight_or_simulation\n    scenario_reproduction_is_not_confirmation\n\ntest result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s\n\n",
+      "outputSha256": "66b668cfddd4d8206bc3d7b5cff1693c6c533d84e75dfdc80397b8fe4e9bd421"
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_roadmap_gate.py"
+      ],
+      "exitCode": 0,
+      "output": "M05: stopped: recorded stop blocks this unit\nscoreboard: passed\nM05: stopped: recorded stop blocks this unit\nreport: <tmp>/tmpynpascgn/report.json\nM05: stopped: recorded stop blocks this unit\nscoreboard: passed\nM05: stopped: recorded stop blocks this unit\nreport: <tmp>/tmpj52qjucw/report.json\nM05: stopped: recorded stop blocks this unit\nscoreboard: passed\nM05: stopped: recorded stop blocks this unit\nreport: <tmp>/tmpry9690fa/report.json\nM05: unimplemented: registered product unit is not implemented\n..scoreboard: passed\nM05: unimplemented: registered product unit is not implemented\nreport: <tmp>/tmpwcoj8l_q/report.json\npolicy/evidence: missing-gate: stop evidence hash mismatch\nreport: <tmp>/tmpvj6y22nr/ci.json\nA: failed: test failure\nscoreboard: passed\nA: failed: test failure\nreport: <tmp>/tmpk9bk9gif/report.json\nA: missing-gate: test failure\nscoreboard: passed\nA: missing-gate: test failure\nreport: <tmp>/tmpx17kkpc5/report.json\nA: stopped: recorded stop blocks this unit\nB: not-started: registered future unit has not started\nscoreboard: passed\nA: stopped: recorded stop blocks this unit\nB: not-started: registered future unit has not started\nreport: <tmp>/tmp6xlhunyg/report.json\nA: stopped: recorded stop blocks this unit\nB: blocked: dependency did not pass\nscoreboard: passed\nA: stopped: recorded stop blocks this unit\nB: blocked: dependency did not pass\nreport: <tmp>/tmp8201oock/report.json\nA: passed: required tests executed\n.scoreboard: passed\nA: passed: required tests executed\nreport: <tmp>/tmpx9o1jqil/report.json\nfuture: not-started: registered future unit has not started\nlater: not-started: registered future unit has not started\nscoreboard: passed\nfuture: not-started: registered future unit has not started\nlater: not-started: registered future unit has not started\nreport: <tmp>/tmpvwm2snth/report.json\nfuture: unimplemented: registered product unit is not implemented\nlater: unimplemented: registered product unit is not implemented\nscoreboard: passed\nfuture: unimplemented: registered product unit is not implemented\nlater: unimplemented: registered product unit is not implemented\nreport: <tmp>/tmplw7f7tcx/report.json\nfuture: unimplemented: registered product unit is not implemented\n.....................\n----------------------------------------------------------------------\nRan 24 tests in 0.479s\n\nOK\nscoreboard: passed\nfuture: unimplemented: registered product unit is not implemented\nreport: <tmp>/tmpwlp25d8q/report.json\npolicy/evidence: missing-gate: 'list' object has no attribute 'values'\nreport: <tmp>/tmptily898a/nested/report.json\npolicy/evidence: missing-gate: 'NoneType' object has no attribute 'keys'\nreport: <tmp>/tmp2fblckoz/nested/report.json\npolicy/evidence: missing-gate: division by zero\nreport: <tmp>/tmp0ta_bd3t/nested/report.json\n",
+      "outputSha256": "b7ae386acff1f6d6fc0441f3e2d0e0b1af50553ac1f86f3222fab9b2f1347d97"
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "ui/tests/claim-labels.test.js"
+      ],
+      "exitCode": 0,
+      "output": "TAP version 13\n# Subtest: Read and Write render synthetic warning for spendableByAnyone\nok 1 - Read and Write render synthetic warning for spendableByAnyone\n  ---\n  duration_ms: 13.126366\n  type: 'test'\n  ...\n# Subtest: Read and Write render synthetic warning for movableByAnyone\nok 2 - Read and Write render synthetic warning for movableByAnyone\n  ---\n  duration_ms: 5.877542\n  type: 'test'\n  ...\n# Subtest: Read and Write render synthetic warning for notUnderProbes\nok 3 - Read and Write render synthetic warning for notUnderProbes\n  ---\n  duration_ms: 5.353074\n  type: 'test'\n  ...\n# Subtest: Read and Write render synthetic warning for requiresProof\nok 4 - Read and Write render synthetic warning for requiresProof\n  ---\n  duration_ms: 2.848644\n  type: 'test'\n  ...\n# Subtest: Preflight renders success and failure with signature counts, including the legacy alias\nok 5 - Preflight renders success and failure with signature counts, including the legacy alias\n  ---\n  duration_ms: 6.060511\n  type: 'test'\n  ...\n# Subtest: stored v1 confirmation never renders as verified\nok 6 - stored v1 confirmation never renders as verified\n  ---\n  duration_ms: 4.423143\n  type: 'test'\n  ...\n# Subtest: production Read and Write handlers render both signs of synthetic hunt\nok 7 - production Read and Write handlers render both signs of synthetic hunt\n  ---\n  duration_ms: 9.055574\n  type: 'test'\n  ...\n1..7\n# tests 7\n# suites 0\n# pass 7\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 230.195956\n",
+      "outputSha256": "54473ab0f843bb61a9ea7a02e12331198102594b8283a689e494c781ba8a8e9d"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "evidence_provenance",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 1.37s\n     Running tests/evidence_provenance.rs (<home>/coding/ergo-forge/target-p00/release/deps/evidence_provenance-83344e4e24342818)\nchanging_any_premise_invalidates_cached_evidence: test\nmissing_registers_are_not_empty_registers: test\nstructural_match_does_not_establish_deployment: test\nsynthetic_binding_survives_export_and_import: test\n\n4 tests, 0 benchmarks\n",
+      "outputSha256": "481eec08ceaa5256b682dc3d55cdea61bd15d752e31857111f49777b1f89dc71"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "evidence_provenance",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/evidence_provenance.rs (<home>/coding/ergo-forge/target-p00/release/deps/evidence_provenance-83344e4e24342818)\n\nrunning 4 tests\ntest missing_registers_are_not_empty_registers ... ok\ntest structural_match_does_not_establish_deployment ... ok\ntest changing_any_premise_invalidates_cached_evidence ... ok\ntest synthetic_binding_survives_export_and_import ... ok\n\nsuccesses:\n\n---- changing_any_premise_invalidates_cached_evidence stdout ----\nall case premises and comparison dependencies are bound; stale cache entries return no result\n\n---- synthetic_binding_survives_export_and_import stdout ----\nrecorded inventory: 28 rows retained; recorded binding values/origins retained; missing source text/target bytes not invented\n\n\nsuccesses:\n    changing_any_premise_invalidates_cached_evidence\n    missing_registers_are_not_empty_registers\n    structural_match_does_not_establish_deployment\n    synthetic_binding_survives_export_and_import\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s\n\n",
+      "outputSha256": "de7753afc9ee727caf545a1bca64fee0c3a2b235f3c68dfb286e347d8add40c9"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "evidence_wire",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 1.35s\n     Running tests/evidence_wire.rs (<home>/coding/ergo-forge/target-p00/release/deps/evidence_wire-f372c6c7d4dbbdaa)\ninvalid_tree_never_becomes_empty_bytes: test\nlegacy_box_missing_reference_cannot_be_promoted: test\ntransaction_id_and_message_use_node_bytes_to_sign: test\nwire_box_id_matches_full_serialization: test\n\n4 tests, 0 benchmarks\n",
+      "outputSha256": "6981b2aa95c7b5b9c1c52ff32b367aa1d11e228af4ec795d1d4b4e40ee3ccb6b"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "evidence_wire",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.09s\n     Running tests/evidence_wire.rs (<home>/coding/ergo-forge/target-p00/release/deps/evidence_wire-f372c6c7d4dbbdaa)\n\nrunning 4 tests\ntest legacy_box_missing_reference_cannot_be_promoted ... ok\ntest invalid_tree_never_becomes_empty_bytes ... ok\ntest wire_box_id_matches_full_serialization ... ok\ntest transaction_id_and_message_use_node_bytes_to_sign ... ok\n\nsuccesses:\n\n---- wire_box_id_matches_full_serialization stdout ----\n2 pinned full boxes retain bytes/IDs/references; claimed ID mismatches are rejected\n\n---- transaction_id_and_message_use_node_bytes_to_sign stdout ----\n1 pinned transactions use node bytes_to_sign; proof/extension changes and canonical output references checked\n\n\nsuccesses:\n    invalid_tree_never_becomes_empty_bytes\n    legacy_box_missing_reference_cannot_be_promoted\n    transaction_id_and_message_use_node_bytes_to_sign\n    wire_box_id_matches_full_serialization\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+      "outputSha256": "852c39ddf7bf21e64c05be725d533310e80a6070538e96f4ab2b80a324011c18"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "node_validation",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 1.82s\n     Running tests/node_validation.rs (<home>/coding/ergo-forge/target-p00/release/deps/node_validation-71785e616645c29a)\naccepted_execution_cannot_be_deserialized_or_fabricated: test\nfull_pipeline_matches_pinned_node_vectors: test\nincomplete_context_is_not_node_acceptance: test\n\n3 tests, 0 benchmarks\n",
+      "outputSha256": "455f8631fdc8d8c0517b69a5130acaa39b896d348c4898acf3e0b992cf6e6807"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "node_validation",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/node_validation.rs (<home>/coding/ergo-forge/target-p00/release/deps/node_validation-71785e616645c29a)\n\nrunning 3 tests\ntest accepted_execution_cannot_be_deserialized_or_fabricated ... ok\ntest incomplete_context_is_not_node_acceptance ... ok\ntest full_pipeline_matches_pinned_node_vectors ... ok\n\nsuccesses:\n\nsuccesses:\n    accepted_execution_cannot_be_deserialized_or_fabricated\n    full_pipeline_matches_pinned_node_vectors\n    incomplete_context_is_not_node_acceptance\n\ntest result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+      "outputSha256": "6a6d278f85784b41a41dbdd607b580ca5a99eaf28e3fbea26f9d46df80b68386"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "transaction_proofs",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 1.77s\n     Running tests/transaction_proofs.rs (<home>/coding/ergo-forge/target-p00/release/deps/transaction_proofs-fe647ec940042bb0)\nchanged_transaction_invalidates_proof: test\ndeclared_public_key_without_proof_is_not_acceptance: test\nowned_p2pk_funding_signs_actual_transaction: test\nreplay_bundle_contains_no_secret: test\n\n4 tests, 0 benchmarks\n",
+      "outputSha256": "00c7338f66391e56cfbea51239cacbf1fc7a013278dc1c13d81463a433f49aef"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "transaction_proofs",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/transaction_proofs.rs (<home>/coding/ergo-forge/target-p00/release/deps/transaction_proofs-fe647ec940042bb0)\n\nrunning 4 tests\ntest declared_public_key_without_proof_is_not_acceptance ... ok\ntest replay_bundle_contains_no_secret ... ok\ntest owned_p2pk_funding_signs_actual_transaction ... ok\ntest changed_transaction_invalidates_proof ... ok\n\nsuccesses:\n\nsuccesses:\n    changed_transaction_invalidates_proof\n    declared_public_key_without_proof_is_not_acceptance\n    owned_p2pk_funding_signs_actual_transaction\n    replay_bundle_contains_no_secret\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+      "outputSha256": "dbd8ec23073ba91678b1acd55f9a3f64348dae6d3c4f7d640414fd3c22ed1bb6"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "claim_replay",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 2.05s\n     Running tests/claim_replay.rs (<home>/coding/ergo-forge/target-p00/release/deps/claim_replay-d79525742826db59)\nclaim_requires_accepted_execution_and_violated_property: test\noffline_replay_reproduces_claim: test\nunknown_policy_cannot_confirm: test\nwrong_companion_or_policy_invalidates_claim: test\n\n4 tests, 0 benchmarks\n",
+      "outputSha256": "b7612777686ae9a8c47b6e47b31ceeb512a4fc90f8850ae202a4d1d5e55b5699"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "claim_replay",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/claim_replay.rs (<home>/coding/ergo-forge/target-p00/release/deps/claim_replay-d79525742826db59)\n\nrunning 4 tests\ntest unknown_policy_cannot_confirm ... ok\ntest wrong_companion_or_policy_invalidates_claim ... ok\ntest claim_requires_accepted_execution_and_violated_property ... ok\ntest offline_replay_reproduces_claim ... ok\n\nsuccesses:\n\n---- wrong_companion_or_policy_invalidates_claim stdout ----\nepoch parameters: {\"dataInputCost\":100,\"inputCost\":2407,\"maxBlockCost\":8001091,\"maxBlockSize\":1271009,\"maxBoxSize\":4096,\"maxTokensPerBox\":122,\"minValuePerByte\":360,\"outputCost\":298,\"storageFeeFactor\":1250000,\"storagePeriod\":1051200,\"tokenAccessCost\":100}\nindex 0: accepted 10ff5c82991eb44853b7aaf6da95372d9c006e8a18c18809ca9a9a5405356b68, total cost 14059\nindex 1: accepted ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1, total cost 100833\nindex 2: accepted 2b5a56dc2714ebcd1eceaef086edfcc12d4d63eb30ca8a42257ad7df04b57b60, total cost 123759\nindex 3: accepted 6a4d184c397f1b4159d1ca0065d987e41efc23a563c5f0800003dcc50eedb641, total cost 136478\nindex 4: accepted 30c1cacc7f4e30f1b52f1f1da35ae93750bf9187461eb374ecf9d9f9ade3d719, total cost 194317\nindex 5: accepted 5371373d346aade57f684ead23f386e3441ffb2cb7a860babe96e3c5048b2725, total cost 216345\n\n---- claim_requires_accepted_execution_and_violated_property stdout ----\naccepted bundles: 3; positive claims: 2; families: 2; accepted nonviolating controls: 1; negative-control claims: 0; recorded-input cases: 1; hypothetical-input cases: 3\n\n\nsuccesses:\n    claim_requires_accepted_execution_and_violated_property\n    offline_replay_reproduces_claim\n    unknown_policy_cannot_confirm\n    wrong_companion_or_policy_invalidates_claim\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s\n\n",
+      "outputSha256": "1fd5fba74aa5e2dd6a04d7bd5929050b9222d8c2a2c41f1c9f265824b35b5fa0"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "drain_promotion",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 2.08s\n     Running tests/drain_promotion.rs (<home>/coding/ergo-forge/target-p00/release/deps/drain_promotion-86b4cb15231631ee)\nassociated_lint_is_not_the_confirmed_claim: test\ngenerated_public_incident_candidate_promotes: test\nmissing_funding_proof_blocks_promotion: test\nunbacked_synthetic_material_stays_preflight: test\n\n4 tests, 0 benchmarks\n",
+      "outputSha256": "ce83f57ef0bcb6074442c2ffe07f84d3b762afe51a86b54e0d8b9d6800cb2714"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "drain_promotion",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.08s\n     Running tests/drain_promotion.rs (<home>/coding/ergo-forge/target-p00/release/deps/drain_promotion-86b4cb15231631ee)\n\nrunning 4 tests\ntest unbacked_synthetic_material_stays_preflight ... ok\ntest generated_public_incident_candidate_promotes ... ok\ntest associated_lint_is_not_the_confirmed_claim ... ok\ntest missing_funding_proof_blocks_promotion ... ok\n\nsuccesses:\n\n---- unbacked_synthetic_material_stays_preflight stdout ----\nepoch parameters: {\"dataInputCost\":100,\"inputCost\":2407,\"maxBlockCost\":8001091,\"maxBlockSize\":1271009,\"maxBoxSize\":4096,\"maxTokensPerBox\":122,\"minValuePerByte\":360,\"outputCost\":298,\"storageFeeFactor\":1250000,\"storagePeriod\":1051200,\"tokenAccessCost\":100}\nindex 0: accepted 10ff5c82991eb44853b7aaf6da95372d9c006e8a18c18809ca9a9a5405356b68, total cost 14059\nindex 1: accepted ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1, total cost 100833\nindex 2: accepted 2b5a56dc2714ebcd1eceaef086edfcc12d4d63eb30ca8a42257ad7df04b57b60, total cost 123759\nindex 3: accepted 6a4d184c397f1b4159d1ca0065d987e41efc23a563c5f0800003dcc50eedb641, total cost 136478\nindex 4: accepted 30c1cacc7f4e30f1b52f1f1da35ae93750bf9187461eb374ecf9d9f9ade3d719, total cost 194317\nindex 5: accepted 5371373d346aade57f684ead23f386e3441ffb2cb7a860babe96e3c5048b2725, total cost 216345\n\n---- generated_public_incident_candidate_promotes stdout ----\nepoch parameters: {\"dataInputCost\":100,\"inputCost\":2407,\"maxBlockCost\":8001091,\"maxBlockSize\":1271009,\"maxBoxSize\":4096,\"maxTokensPerBox\":122,\"minValuePerByte\":360,\"outputCost\":298,\"storageFeeFactor\":1250000,\"storagePeriod\":1051200,\"tokenAccessCost\":100}\nindex 0: accepted 10ff5c82991eb44853b7aaf6da95372d9c006e8a18c18809ca9a9a5405356b68, total cost 14059\nindex 1: accepted ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1, total cost 100833\nindex 2: accepted 2b5a56dc2714ebcd1eceaef086edfcc12d4d63eb30ca8a42257ad7df04b57b60, total cost 123759\nindex 3: accepted 6a4d184c397f1b4159d1ca0065d987e41efc23a563c5f0800003dcc50eedb641, total cost 136478\nindex 4: accepted 30c1cacc7f4e30f1b52f1f1da35ae93750bf9187461eb374ecf9d9f9ade3d719, total cost 194317\nindex 5: accepted 5371373d346aade57f684ead23f386e3441ffb2cb7a860babe96e3c5048b2725, total cost 216345\n\n---- associated_lint_is_not_the_confirmed_claim stdout ----\nepoch parameters: {\"dataInputCost\":100,\"inputCost\":2407,\"maxBlockCost\":8001091,\"maxBlockSize\":1271009,\"maxBoxSize\":4096,\"maxTokensPerBox\":122,\"minValuePerByte\":360,\"outputCost\":298,\"storageFeeFactor\":1250000,\"storagePeriod\":1051200,\"tokenAccessCost\":100}\nindex 0: accepted 10ff5c82991eb44853b7aaf6da95372d9c006e8a18c18809ca9a9a5405356b68, total cost 14059\nindex 1: accepted ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1, total cost 100833\nindex 2: accepted 2b5a56dc2714ebcd1eceaef086edfcc12d4d63eb30ca8a42257ad7df04b57b60, total cost 123759\nindex 3: accepted 6a4d184c397f1b4159d1ca0065d987e41efc23a563c5f0800003dcc50eedb641, total cost 136478\nindex 4: accepted 30c1cacc7f4e30f1b52f1f1da35ae93750bf9187461eb374ecf9d9f9ade3d719, total cost 194317\nindex 5: accepted 5371373d346aade57f684ead23f386e3441ffb2cb7a860babe96e3c5048b2725, total cost 216345\n\n---- missing_funding_proof_blocks_promotion stdout ----\nepoch parameters: {\"dataInputCost\":100,\"inputCost\":2407,\"maxBlockCost\":8001091,\"maxBlockSize\":1271009,\"maxBoxSize\":4096,\"maxTokensPerBox\":122,\"minValuePerByte\":360,\"outputCost\":298,\"storageFeeFactor\":1250000,\"storagePeriod\":1051200,\"tokenAccessCost\":100}\nindex 0: accepted 10ff5c82991eb44853b7aaf6da95372d9c006e8a18c18809ca9a9a5405356b68, total cost 14059\nindex 1: accepted ce0f75d6d59d5e350bd5841a038ff9f22136127af9f69ecf05d777533dcf7ec1, total cost 100833\nindex 2: accepted 2b5a56dc2714ebcd1eceaef086edfcc12d4d63eb30ca8a42257ad7df04b57b60, total cost 123759\nindex 3: accepted 6a4d184c397f1b4159d1ca0065d987e41efc23a563c5f0800003dcc50eedb641, total cost 136478\nindex 4: accepted 30c1cacc7f4e30f1b52f1f1da35ae93750bf9187461eb374ecf9d9f9ade3d719, total cost 194317\nindex 5: accepted 5371373d346aade57f684ead23f386e3441ffb2cb7a860babe96e3c5048b2725, total cost 216345\n\n\nsuccesses:\n    associated_lint_is_not_the_confirmed_claim\n    generated_public_incident_candidate_promotes\n    missing_funding_proof_blocks_promotion\n    unbacked_synthetic_material_stays_preflight\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s\n\n",
+      "outputSha256": "44ba46133d745176b42009acce8913bd5ecc276f365a5f4748e1e81a5073b8ae"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "obligation_reports",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 2.49s\n     Running tests/obligation_reports.rs (<home>/coding/ergo-forge/target-p00/release/deps/obligation_reports-c0f2e7b0ec212eb3)\nconditional_discharge_exports_the_full_premise_set: test\ncurated_precision_has_positive_and_negative_controls: test\nduplicate_observations_keep_all_anchors_in_one_obligation: test\nsuppression_invalidates_on_premise_change: test\n\n4 tests, 0 benchmarks\n",
+      "outputSha256": "3cbf4149990dbd8e8ca151d7ab25695232b5c970ea5d79d06de95ad38d9b7f33"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "obligation_reports",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.08s\n     Running tests/obligation_reports.rs (<home>/coding/ergo-forge/target-p00/release/deps/obligation_reports-c0f2e7b0ec212eb3)\n\nrunning 4 tests\ntest duplicate_observations_keep_all_anchors_in_one_obligation ... ok\ntest conditional_discharge_exports_the_full_premise_set ... ok\ntest suppression_invalidates_on_premise_change ... ok\ntest curated_precision_has_positive_and_negative_controls ... ok\n\nsuccesses:\n\n---- duplicate_observations_keep_all_anchors_in_one_obligation stdout ----\nduplicate: 12 anchors -> 1 obligation; all lift-local anchors retained; unknowns separate\n\n---- conditional_discharge_exports_the_full_premise_set stdout ----\nconditional discharge: full case, both executing scripts, membership, singleton evidence, recovery gaps and reason survive export; omission controls remain unresolved\n\n---- suppression_invalidates_on_premise_change stdout ----\nsuppression: constants, companion code, deployment state, policy and source changes invalidate; stale reasons and anchors retained\n\n---- curated_precision_has_positive_and_negative_controls stdout ----\nmalformed-optional-witness-rejection: 0 confirmed violations; 1 obligations\nmissing-candidate-output-register-rejection: 0 confirmed violations; 1 obligations\nwell-formed-self-register: 0 confirmed violations; 1 obligations\nfixed-recipient-paid-output: 0 confirmed violations; 1 obligations\nrequired-companion-identity-binding: 0 confirmed violations; 1 obligations\nintended-permissionless-height-release: 0 confirmed violations; 1 obligations\nuse-incident: 1 confirmed violations; 1 obligations\nsale-mutant-unpaid: 1 confirmed violations; 1 obligations\ncurated precision: 2/2 positives retained, 0/6 benign falsely confirmed; 6 benign static anchors retained; manifest 034a652bbdadb5b569fa9b74504316a6e7cbb54d9b8a02018a480561304ce76e\n\n\nsuccesses:\n    conditional_discharge_exports_the_full_premise_set\n    curated_precision_has_positive_and_negative_controls\n    duplicate_observations_keep_all_anchors_in_one_obligation\n    suppression_invalidates_on_premise_change\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s\n\n",
+      "outputSha256": "714d406cc3614cb52d82e51c12adb03dd0476d6ecec0aa68d45dbee14a907695"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-web",
+        "--test",
+        "evidence_replay",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling rustls-webpki v0.103.15\n   Compiling rustls v0.23.43\n   Compiling tokio-rustls v0.26.4\n   Compiling ureq v3.4.1\n   Compiling hyper-rustls v0.27.9\n   Compiling reqwest v0.12.28\n   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n   Compiling ergo-web v0.3.0 (<repo>/ergo-web)\n    Finished `release` profile [optimized] target(s) in 17.03s\n     Running tests/evidence_replay.rs (<home>/coding/ergo-forge/target-p00/release/deps/evidence_replay-224d16615cf94622)\nhistorical_and_hypothetical_state_labels_are_visible: test\nhttp_and_cli_replay_have_identical_semantic_results: test\nlegacy_preflight_does_not_use_node_claim_badge: test\nreplay_request_never_fetches_or_broadcasts: test\n\n4 tests, 0 benchmarks\n",
+      "outputSha256": "c4d0a870cf162c4814b2470286d8accda0c863596b85e7c947b971d474f708c1"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-web",
+        "--test",
+        "evidence_replay",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.09s\n     Running tests/evidence_replay.rs (<home>/coding/ergo-forge/target-p00/release/deps/evidence_replay-224d16615cf94622)\n\nrunning 4 tests\n   Compiling ring v0.17.14\ntest replay_request_never_fetches_or_broadcasts ... ok\n   Compiling rustls v0.23.43\n   Compiling rustls-webpki v0.103.15\n   Compiling ureq v3.4.1\n   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 23.35s\ntest http_and_cli_replay_have_identical_semantic_results ... ok\ntest legacy_preflight_does_not_use_node_claim_badge ... ok\ntest historical_and_hypothetical_state_labels_are_visible ... ok\n\nsuccesses:\n\nsuccesses:\n    historical_and_hypothetical_state_labels_are_visible\n    http_and_cli_replay_have_identical_semantic_results\n    legacy_preflight_does_not_use_node_claim_badge\n    replay_request_never_fetches_or_broadcasts\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 23.67s\n\n",
+      "outputSha256": "86738db1e3291f4c80c53fd0d7bdcdb94c3419937425b7e58e7a8f85889edddd"
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "ui/tests/evidence-replay.test.js"
+      ],
+      "exitCode": 0,
+      "output": "TAP version 13\n# Subtest: historical_and_hypothetical_state_labels_are_visible\nok 1 - historical_and_hypothetical_state_labels_are_visible\n  ---\n  duration_ms: 21205.234882\n  type: 'test'\n  ...\n# Subtest: legacy_preflight_does_not_use_node_claim_badge\nok 2 - legacy_preflight_does_not_use_node_claim_badge\n  ---\n  duration_ms: 3.695126\n  type: 'test'\n  ...\n# Subtest: saved verdicts are discarded and errors clear earlier claims\nok 3 - saved verdicts are discarded and errors clear earlier claims\n  ---\n  duration_ms: 7.690755\n  type: 'test'\n  ...\n1..3\n# tests 3\n# suites 0\n# pass 3\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 21374.618405\n",
+      "outputSha256": "8bdfbcd50a44df06948910d7986db26c775fdbbf6fbff49078384c0ce1fa54b5"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "mapping_inventory",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 1.29s\n     Running tests/mapping_inventory.rs (<home>/coding/ergo-forge/target-p00/release/deps/mapping_inventory-5046a3df6ee52135)\nfixture_constructs_execute_and_unsupported_members_remain: test\ninventory_has_32_pinned_cases_and_independent_answers: test\nlegacy_metrics_are_measured_without_baseline_changes: test\n\n3 tests, 0 benchmarks\n",
+      "outputSha256": "84e47f4bdff3d7029762fddbfcf5d34fd8393b7a0129a636d01b0e00f9dce3fb"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "mapping_inventory",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 101,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/mapping_inventory.rs (<home>/coding/ergo-forge/target-p00/release/deps/mapping_inventory-5046a3df6ee52135)\n\nrunning 3 tests\ntest legacy_metrics_are_measured_without_baseline_changes ... FAILED\ntest inventory_has_32_pinned_cases_and_independent_answers ... ok\ntest fixture_constructs_execute_and_unsupported_members_remain ... ok\n\nsuccesses:\n\n---- inventory_has_32_pinned_cases_and_independent_answers stdout ----\nevidence <repo>/ergo-sandbox/tests/fixtures/mapping/manifest.json sha256=7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f\nevidence <repo>/ergo-sandbox/tests/fixtures/mapping/expected.json sha256=291923d76f2de8a69deec82cc049d233d87d91f816295312ed89f9291e13405e\n32 cases / 16 paired families; missing, duplicate, altered fixture and altered answer rejected\n\n---- fixture_constructs_execute_and_unsupported_members_remain stdout ----\n67 real engine vectors across 32 cases; 18 unsupported members retained: [String(\"literal_spend-control\"), String(\"self_alias-control\"), String(\"action_alternatives-control\"), String(\"data_only-control\"), String(\"output_only-control\"), String(\"dead_check-control\"), String(\"script_identity-control\"), String(\"token_identity-control\"), String(\"tokenless-control\"), String(\"exists_literal-control\"), String(\"computed_index-positive\"), String(\"computed_index-control\"), String(\"register_identity-control\"), String(\"context_code-control\"), String(\"context_scope-control\"), String(\"avl_identity-positive\"), String(\"avl_identity-control\"), String(\"snapshot_collision-control\")]; scenario reduction only, no node acceptance or necessity certification\nevidence <repo>/ergo-sandbox/tests/fixtures/mapping/manifest.json sha256=7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f\nevidence <repo>/ergo-sandbox/tests/fixtures/mapping/expected.json sha256=291923d76f2de8a69deec82cc049d233d87d91f816295312ed89f9291e13405e\n\n\nsuccesses:\n    fixture_constructs_execute_and_unsupported_members_remain\n    inventory_has_32_pinned_cases_and_independent_answers\n\nfailures:\n\n---- legacy_metrics_are_measured_without_baseline_changes stdout ----\n\nthread 'legacy_metrics_are_measured_without_baseline_changes' (2172) panicked at ergo-sandbox/tests/mapping_inventory.rs:227:9:\nassertion `left == right` failed: baseline changed: docs/roadmap-metrics.json\n  left: \"2a1ba9c250f5940dce441dc24f9b932f9b3aceed4c26f46a3bf8a4f5232500a6\"\n right: \"4cc60a3f4b342aebe85b91a17ff64c7b79d6fcace73ad0518e7c49e3a57c134d\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    legacy_metrics_are_measured_without_baseline_changes\n\ntest result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s\n\nerror: test failed, to rerun pass `-p ergo-sandbox --test mapping_inventory`\n",
+      "outputSha256": "ab3e167761a12121f1f66cabcd8e7e3d03004e0603566fb1c8a285c39b688aeb"
+    }
+  ],
+  "evidenceHashes": {
+    "docs/ingestion-lithos-results.json": "1c43bc46d910b11d4e970ce714657175515a0cf61e1ec420b4c58a3d4e7bc69e",
+    "ergo-sandbox/tests/fixtures/decompile_corpus_expectations.json": "5d2bfc24d758dac520e24968793fe95a87c1cc673d54fe577d4a93b89768aa69",
+    "examples/mutants/answer-key.custody-v1.json": "4d038f5ab7722e954c44c426719237c9df2098e689f54eb4c679f3348b485259",
+    "examples/mutants/answer-key.json": "e7f31518f021dca2d74ce4267126313f1624f091b6cedda0246e8115ead3c3d5",
+    "docs/roadmap-metrics.json": "2a1ba9c250f5940dce441dc24f9b932f9b3aceed4c26f46a3bf8a4f5232500a6"
+  },
+  "policySha256": "832369de8c6bc8beb53af0fd2d91691fb26c9555b567d36bd381b6c9902a9f03",
+  "ciAccepted": false,
+  "passed": false
+}
