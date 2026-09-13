@@ -232,6 +232,16 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
           <ul id="tx-problems" class="residuals"></ul>
         </div>
       </div>
+      <details id="attack-panel"><summary>Attacker experiments (synthetic)</summary>
+        <p class="hint">Mutate the drafted transaction the way a spender could — reorder inputs, insert a decoy box, swap a data input — and see which input scripts still accept. Synthetic; never node-validated.</p>
+        <div class="field"><label>Draft (JSON: height, network, boxes, tx)</label><textarea id="attack-draft" rows="3" spellcheck="false"></textarea></div>
+        <div class="play-bar">
+          <button type="button" class="secondary tiny" data-attack-op='[{"op":"reorderInputs","order":[1,0]}]'>reorder inputs</button>
+          <button type="button" class="secondary tiny" data-attack-op='[{"op":"insertDecoy","atIndex":0,"targetInput":0}]'>insert decoy at 0</button>
+        </div>
+        <p id="attack-message" class="status"></p>
+        <div id="attack-result" hidden></div>
+      </details>
       <details><summary>History</summary><ul id="play-history" class="residuals"></ul></details>
     </section>
 
@@ -502,6 +512,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
   <script src="vendor/sha256.js"></script>
   <script src="claim-labels.js"></script>
   <script src="evidence-replay.js"></script>
+  <script src="attack.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -826,14 +826,14 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
         "W00"
       ],
       "days": 5,
-      "package": "ergo-web",
-      "target": "play_attacker",
+      "package": "ergo-sandbox",
+      "target": "attack",
       "tests": [
         "play_attacker_reorder_reproduces_use_drain",
         "decoy_box_satisfies_every_positional_access",
         "attacker_results_are_synthetic_and_unvalidated"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "S02",
