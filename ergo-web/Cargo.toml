@@ -15,10 +15,14 @@ path = "src/lib.rs"
 name = "ergo-web"
 path = "src/main.rs"
 
+[features]
+default = ["cost-trace"]
+cost-trace = ["ergo-sandbox/cost-trace"]
+
 [dependencies]
 # Reuse the public read-only chain source for protocol mapping. Outbound
 # requests still require the instance's EXPLORER_URL configuration.
-ergo-sandbox = { path = "../ergo-sandbox", default-features = false, features = ["explorer", "cost-trace"] }
+ergo-sandbox = { path = "../ergo-sandbox", default-features = false, features = ["explorer"] }
 ergo-ser     = { workspace = true }
 ergo-primitives = { workspace = true }
 ergo-compiler = { workspace = true }

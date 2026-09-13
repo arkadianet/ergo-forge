@@ -33,8 +33,10 @@ pub struct AppState {
 /// Runtime configuration. `explorer_url` is the ONE outbound dependency the
 /// service can have; `None` (the default) keeps the "nothing leaves this
 /// host" promise and turns `/api/v1/lookup` into a 501.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct AppConfig {
+    /// Enable cost routes when compiled with `cost-trace`.
+    pub cost_trace: bool,
     /// Base URL of an Ergo explorer API (e.g. `https://api.ergoplatform.com`).
     pub explorer_url: Option<String>,
     /// Which network that explorer serves (`mainnet` default, or `testnet`),
@@ -50,10 +52,24 @@ pub struct AppConfig {
     pub trust_proxy: bool,
 }
 
+impl Default for AppConfig {
+    fn default() -> Self {
+        Self {
+            cost_trace: cfg!(feature = "cost-trace"),
+            explorer_url: None,
+            explorer_network: String::new(),
+            ui_dir: None,
+            rate_limit_per_minute: None,
+            trust_proxy: false,
+        }
+    }
+}
+
 impl AppConfig {
     /// From the environment: `EXPLORER_URL`, `UI_DIR`.
     pub fn from_env() -> Self {
         AppConfig {
+            cost_trace: cfg!(feature = "cost-trace"),
             explorer_url: std::env::var("EXPLORER_URL")
                 .ok()
                 .map(|u| u.trim_end_matches('/').to_string())
@@ -80,7 +96,8 @@ pub fn router() -> Router {
 }
 
 /// The complete application router with an explicit configuration.
-pub fn router_with(cfg: AppConfig) -> Router {
+pub fn router_with(mut cfg: AppConfig) -> Router {
+    cfg.cost_trace &= cfg!(feature = "cost-trace");
     let state = Arc::new(AppState {
         engine: EngineBudget::new(MAX_ENGINE_IN_FLIGHT),
         limiter: cfg
@@ -102,6 +119,10 @@ pub fn router_with(cfg: AppConfig) -> Router {
         )
         .route("/api/v1/hunt", post(crate::routes::hunt::hunt_route))
         .route("/api/v1/eval", post(crate::routes::eval::eval_route))
+        .route(
+            "/api/v1/explain",
+            post(crate::routes::explain::explain_route),
+        )
         .route("/api/v1/point", post(crate::routes::point::point))
         .route("/api/v1/play", post(crate::routes::play::play))
         .route(
@@ -127,13 +148,26 @@ pub fn router_with(cfg: AppConfig) -> Router {
         .route(
             "/api/v1/validate-tx",
             post(crate::routes::validate::validate_tx),
+        );
+    #[cfg(feature = "cost-trace")]
+    let engine = if state.cfg.cost_trace {
+        engine.route(
+            "/api/v1/cost-spans",
+            post(crate::routes::eval::cost_spans_route),
         )
-        .route_layer(axum::middleware::from_fn_with_state(
-            state.clone(),
-            crate::ratelimit::limit,
-        ));
+    } else {
+        engine
+    };
+    let engine = engine.route_layer(axum::middleware::from_fn_with_state(
+        state.clone(),
+        crate::ratelimit::limit,
+    ));
     Router::new()
         .merge(engine)
+        .route(
+            "/api/{*path}",
+            axum::routing::any(|| async { axum::http::StatusCode::NOT_FOUND }),
+        )
         .route("/api/v1/health", get(crate::routes::health::health))
         .route("/api/v1/config", get(crate::routes::lookup::config))
         .fallback_service(ServeDir::new(

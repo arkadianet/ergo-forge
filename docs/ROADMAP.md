@@ -948,7 +948,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
         "explain_subexpression_matches_full_reduction",
         "cost_trace_route_is_behind_feature_flag"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "S04",

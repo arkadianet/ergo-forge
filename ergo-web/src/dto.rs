@@ -217,6 +217,9 @@ pub struct EvalResponse {
     /// Ranked costs of the diagnostic reduction, in JIT units. This trace
     /// excludes the later proof-verification pass and has no source spans.
     pub hot_spots: Vec<HotSpotDto>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cost_spans: Option<ergo_sandbox::cost_spans::CostSpans>,
+    pub map_status: &'static str,
     pub tree_hex: String,
     pub address: String,
 }
@@ -261,6 +264,7 @@ pub fn verdict_str(v: ergo_sandbox::Verdict) -> &'static str {
 
 impl EvalResponse {
     pub fn from_engine(o: ergo_sandbox::EvalOutcome) -> Self {
+        #[cfg(feature = "cost-trace")]
         let hot_spots = ergo_sandbox::hot_spots::hot_spots(&o.cost_breakdown)
             .into_iter()
             .map(|row| HotSpotDto {
@@ -272,7 +276,12 @@ impl EvalResponse {
             .collect();
         Self {
             claim: o.claim,
+            #[cfg(feature = "cost-trace")]
             hot_spots,
+            #[cfg(not(feature = "cost-trace"))]
+            hot_spots: Vec::new(),
+            cost_spans: None,
+            map_status: "no-map",
             verdict: verdict_str(o.verdict),
             values: o
                 .values

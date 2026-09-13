@@ -1,0 +1,9 @@
+docs(roadmap): register W04 and retain batch 6 verification evidence
+
+Enable W04 in both complete v2 policy records, require both standalone DOM
+suites in the roadmap runner, and test missing/failed/skipped extras.
+Document interfaces and conservative evidence limits, with observed command
+exits, gate output, protected-scope verification and commit preparation.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg
