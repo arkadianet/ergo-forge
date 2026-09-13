@@ -33,13 +33,8 @@ class RoadmapGateTests(unittest.TestCase):
         self.assertEqual(v2['baselineRev'], '11d9a1c0986c5943d5b421e42271e1277d23528c')
         self.assertIsNone(v2['completedThrough'])
         self.assertEqual(v1['completedThrough'], 'D02')
-        self.assertEqual([{k: v for k, v in u.items() if k != 'implemented'} for u in v2['units']],
-                         [{k: v for k, v in u.items() if k != 'implemented'} for u in expected])
-        for example in expected:
-            if 'implemented' in example:
-                actual = next(u for u in v2['units'] if u['id'] == example['id'])
-                self.assertEqual(actual['implemented'], example['implemented'])
-        self.assertTrue(next(u for u in expected if u['id'] == 'S02')['implemented'])
+        self.assertTrue(all(isinstance(u.get('implemented'), bool) for u in expected))
+        self.assertEqual(v2['units'], expected)
         for key in ['schemaVersion', 'maxActiveImplementationBranches', 'maxOpenImplementationPrs',
                     'thresholds', 'frozenPreflight', 'scoreboard', 'stopRecords']:
             self.assertEqual(v2[key], v1[key])

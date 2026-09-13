@@ -168,8 +168,7 @@ fn scan(n: &Node, vals: &Vals, sites: &mut BTreeMap<String, u64>, bounded: &mut 
                 || (!reversed && matches!(*op, "<" | "<="))
                 || (reversed && matches!(*op, ">" | ">="));
             if !mentions_outputs(rhs, vals, 64)
-                && ((size(lhs, vals) && upper)
-                    || (total_value(lhs, vals) && *op != "!=")
+                && ((upper && (size(lhs, vals) || total_value(lhs, vals)))
                     || (outputs(lhs, vals) && *op == "=="))
             {
                 *bounded = true;

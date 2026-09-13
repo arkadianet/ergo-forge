@@ -85,7 +85,7 @@ things above — carry no such constraint and are what this document records.
 
 ## S02 sweep — 2026-09-13
 
-Command (exit **0**), with `CARGO_TARGET_DIR=/home/rkadias/coding/ergo-forge/target-p00`:
+Command (exit **0**), with `CARGO_TARGET_DIR=$CARGO_TARGET_DIR` (the shared local build directory):
 
 ```sh
 cargo run --release -p ergo-sandbox --example audit_sweep

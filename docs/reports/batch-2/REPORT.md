@@ -1,12 +1,13 @@
 # Batch 2 / S02 implementation report
 
-S02 is implemented in the `v2/batch-2` worktree. **No commits were created:**
-the environment mounts `/home/rkadias/coding/ergo-forge/.git/worktrees/ergo-forge-b2`
-read-only. Normal `git add` and `git commit` both exited **128** when Git could
-not create `index.lock`. Nothing was pushed and `main` was not modified.
-Three prepared commit messages, with the requested trailers, are retained as
-`commit-1-message.txt`, `commit-2-message.txt`, and `commit-3-message.txt`.
-The authorized commits are the remaining task once metadata becomes writable.
+S02 was implemented in the `v2/batch-2` worktree. **The implementation session
+could not create commits:** its sandbox mounted the worktree's Git metadata
+directory (`$WORKTREE_GIT_DIR`) read-only, so `git add` and `git commit` both
+exited **128** when Git could not create `index.lock`. Nothing was pushed and
+`main` was not modified during that session. The three commit messages it
+prepared, with the requested trailers, are retained as `commit-1-message.txt`,
+`commit-2-message.txt`, and `commit-3-message.txt`; the commits were created
+afterwards from those messages once the tree had been verified.
 
 ## Implementation and evidence
 
@@ -85,7 +86,7 @@ historical **4/5** attributable result; no static pair enters that denominator.
 ## Verification
 
 Every build used
-`CARGO_TARGET_DIR=/home/rkadias/coding/ergo-forge/target-p00`.
+`CARGO_TARGET_DIR=$CARGO_TARGET_DIR`, the shared local build directory.
 Commands below are recorded verbatim with observed exit codes and logs.
 An interrupted initial sweep has **no observed exit**, not an invented pass.
 The named-filter `lint-step` run executed only the mutant gate; its other
@@ -147,9 +148,9 @@ inspection and edits are not test results. Final `git diff --check` passed.
 
 ## Remaining limitation
 
-Commit creation is blocked by the environment's read-only Git worktree metadata,
-not by missing authorization. The worktree files and prepared commit messages
-are complete and reviewable. No alternate Git metadata/index path was used to
-bypass the restriction. Source-only analysis cannot decide reachability,
+During the implementation session, commit creation was blocked by that
+session's read-only Git worktree metadata, not by missing authorization. No
+alternate Git metadata/index path was used to bypass the restriction; the
+commits were made afterwards from the prepared messages. Source-only analysis cannot decide reachability,
 singleton supply, intentional state transitions or deployment exploitability;
 all recogniser limits and the ten unanalysed corpus files are recorded.

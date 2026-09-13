@@ -1,7 +1,10 @@
 Record batch 2 verification commands and environment limitations
 
-Retain the sweep, S02 gate report and complete command exit statuses,
-including the known local seed-corpus mismatch and interrupted initial sweep.
+Retain the sweep, the S02 gate report and every observed command exit
+status. The initial sweep was interrupted and has no observed exit; the
+final workspace run exited 101 on the known local seed-corpus mismatch and
+on property_inventory_pins_24_cases_and_independent_answers, whose
+answer-key hash pin was then fixed and re-verified by the inventory run.
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg
