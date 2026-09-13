@@ -1,0 +1,101 @@
+{
+  "formatVersion": 1,
+  "results": [
+    {
+      "unit": "scoreboard",
+      "status": "passed"
+    },
+    {
+      "unit": "W00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "I01",
+      "status": "passed",
+      "detail": "required tests executed"
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import sys, unittest\ndef names(suite):\n    for test in suite:\n        if isinstance(test, unittest.TestSuite):\n            yield from names(test)\n        else:\n            yield test.id().rsplit('.', 1)[-1].removeprefix('test_')\nloader = unittest.TestLoader()\nsuite = loader.discover('scripts', pattern=sys.argv[1] + '.py')\nif loader.errors:\n    sys.exit('\\n'.join(loader.errors))\nfor name in names(suite):\n    print(name + ': test')\n",
+        "test_roadmap_gate"
+      ],
+      "exitCode": 0,
+      "output": "ci_accepts_only_validated_recorded_stops_not_completion: test\nci_rejects_corrupt_stop_evidence: test\nci_rejects_failed_missing_and_blocked_units: test\nci_reports_future_units_as_not_started_without_running_them: test\ncommand_normalizes_before_printing_recording_and_hashing: test\nabsolute_cargo_target_is_normalized_before_report_hashing: test\ndependencies_are_in_policy_order: test\nextra_commands_cannot_be_omitted: test\nfuture_units_fail_as_unimplemented_not_missing_gate: test\ni01_extras_require_the_verify_dom_test: test\nincomplete_stop_record_is_rejected: test\nmalformed_inputs_still_write_a_failing_report: test\nmissing_evidence_is_distinct_from_product_failure: test\nmissing_scoreboard_is_rejected: test\npolicy_requires_unique_block_and_known_completion: test\npolicy_v2_block_parses: test\npython_targets_require_discovered_executed_unskipped_names: test\nrequired_names_must_be_discovered_and_executed: test\nresolution_requires_exact_policy_record_and_decision: test\nrunner_captures_diagnostics_without_weakening_execution_checks: test\ns01_extras_require_the_checklist_dom_test: test\nscoreboard_cannot_self_attest_changed_measurements: test\nscoreboard_reads_every_baseline_artifact: test\nskipped_tests_are_rejected: test\nstatic_lint_namespace_does_not_relax_frozen_hunt_measurements: test\nthresholds_are_read_from_policy: test\nunknown_unit_is_rejected: test\nzero_test_filter_is_rejected: test\n",
+      "outputSha256": "3253ed38e8411ddf4f41cc29d0725b6794145f84a58aaefb4908b905cf83e6aa"
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-b",
+        "-v",
+        "-s",
+        "scripts",
+        "-p",
+        "test_roadmap_gate.py"
+      ],
+      "exitCode": 0,
+      "output": "test_ci_accepts_only_validated_recorded_stops_not_completion (test_roadmap_gate.CiGovernanceTests.test_ci_accepts_only_validated_recorded_stops_not_completion) ... ok\ntest_ci_rejects_corrupt_stop_evidence (test_roadmap_gate.CiGovernanceTests.test_ci_rejects_corrupt_stop_evidence) ... ok\ntest_ci_rejects_failed_missing_and_blocked_units (test_roadmap_gate.CiGovernanceTests.test_ci_rejects_failed_missing_and_blocked_units) ... ok\ntest_ci_reports_future_units_as_not_started_without_running_them (test_roadmap_gate.CiGovernanceTests.test_ci_reports_future_units_as_not_started_without_running_them) ... ok\ntest_command_normalizes_before_printing_recording_and_hashing (test_roadmap_gate.CiGovernanceTests.test_command_normalizes_before_printing_recording_and_hashing) ... ok\ntest_absolute_cargo_target_is_normalized_before_report_hashing (test_roadmap_gate.RoadmapGateTests.test_absolute_cargo_target_is_normalized_before_report_hashing) ... ok\ntest_dependencies_are_in_policy_order (test_roadmap_gate.RoadmapGateTests.test_dependencies_are_in_policy_order) ... ok\ntest_extra_commands_cannot_be_omitted (test_roadmap_gate.RoadmapGateTests.test_extra_commands_cannot_be_omitted) ... ok\ntest_future_units_fail_as_unimplemented_not_missing_gate (test_roadmap_gate.RoadmapGateTests.test_future_units_fail_as_unimplemented_not_missing_gate) ... ok\ntest_i01_extras_require_the_verify_dom_test (test_roadmap_gate.RoadmapGateTests.test_i01_extras_require_the_verify_dom_test) ... ok\ntest_incomplete_stop_record_is_rejected (test_roadmap_gate.RoadmapGateTests.test_incomplete_stop_record_is_rejected) ... ok\ntest_malformed_inputs_still_write_a_failing_report (test_roadmap_gate.RoadmapGateTests.test_malformed_inputs_still_write_a_failing_report) ... ok\ntest_missing_evidence_is_distinct_from_product_failure (test_roadmap_gate.RoadmapGateTests.test_missing_evidence_is_distinct_from_product_failure) ... ok\ntest_missing_scoreboard_is_rejected (test_roadmap_gate.RoadmapGateTests.test_missing_scoreboard_is_rejected) ... ok\ntest_policy_requires_unique_block_and_known_completion (test_roadmap_gate.RoadmapGateTests.test_policy_requires_unique_block_and_known_completion) ... ok\ntest_policy_v2_block_parses (test_roadmap_gate.RoadmapGateTests.test_policy_v2_block_parses) ... ok\ntest_python_targets_require_discovered_executed_unskipped_names (test_roadmap_gate.RoadmapGateTests.test_python_targets_require_discovered_executed_unskipped_names) ... ok\ntest_required_names_must_be_discovered_and_executed (test_roadmap_gate.RoadmapGateTests.test_required_names_must_be_discovered_and_executed) ... ok\ntest_resolution_requires_exact_policy_record_and_decision (test_roadmap_gate.RoadmapGateTests.test_resolution_requires_exact_policy_record_and_decision) ... ok\ntest_runner_captures_diagnostics_without_weakening_execution_checks (test_roadmap_gate.RoadmapGateTests.test_runner_captures_diagnostics_without_weakening_execution_checks) ... ok\ntest_s01_extras_require_the_checklist_dom_test (test_roadmap_gate.RoadmapGateTests.test_s01_extras_require_the_checklist_dom_test) ... ok\ntest_scoreboard_cannot_self_attest_changed_measurements (test_roadmap_gate.RoadmapGateTests.test_scoreboard_cannot_self_attest_changed_measurements) ... ok\ntest_scoreboard_reads_every_baseline_artifact (test_roadmap_gate.RoadmapGateTests.test_scoreboard_reads_every_baseline_artifact) ... ok\ntest_skipped_tests_are_rejected (test_roadmap_gate.RoadmapGateTests.test_skipped_tests_are_rejected) ... ok\ntest_static_lint_namespace_does_not_relax_frozen_hunt_measurements (test_roadmap_gate.RoadmapGateTests.test_static_lint_namespace_does_not_relax_frozen_hunt_measurements) ... ok\ntest_thresholds_are_read_from_policy (test_roadmap_gate.RoadmapGateTests.test_thresholds_are_read_from_policy) ... ok\ntest_unknown_unit_is_rejected (test_roadmap_gate.RoadmapGateTests.test_unknown_unit_is_rejected) ... ok\ntest_zero_test_filter_is_rejected (test_roadmap_gate.RoadmapGateTests.test_zero_test_filter_is_rejected) ... ok\n\n----------------------------------------------------------------------\nRan 28 tests in 0.634s\n\nOK\n",
+      "outputSha256": "6dfd24d5cfae9633463e1881875e03cb291c8229f8f2ea825a82256ab7b95519"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "verify_deployment",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.08s\n     Running tests/verify_deployment.rs ($CARGO_TARGET_DIR/release/deps/verify_deployment-c67f5625fee7168c)\nignored_serialization_differences_are_not_exact_or_template: test\nverify_cli_codes_json_text_and_errors: test\nverify_exact_template_and_mismatch_are_distinct: test\nverify_lists_differing_constants: test\n\n4 tests, 0 benchmarks\n",
+      "outputSha256": "8997740b481e7af24f1295383cc99a428af334d43859748a553296f5c5ed5bc1"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "verify_deployment",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.06s\n     Running tests/verify_deployment.rs ($CARGO_TARGET_DIR/release/deps/verify_deployment-c67f5625fee7168c)\n\nrunning 4 tests\ntest ignored_serialization_differences_are_not_exact_or_template ... ok\ntest verify_lists_differing_constants ... ok\ntest verify_exact_template_and_mismatch_are_distinct ... ok\ntest verify_cli_codes_json_text_and_errors ... ok\n\nsuccesses:\n\nsuccesses:\n    ignored_serialization_differences_are_not_exact_or_template\n    verify_cli_codes_json_text_and_errors\n    verify_exact_template_and_mismatch_are_distinct\n    verify_lists_differing_constants\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s\n\n",
+      "outputSha256": "f746fbf1e890d68ad439b8db1fe0cdfe259d4d9c52005752dc06086c3c50b954"
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "ui/tests/verify.test.js"
+      ],
+      "exitCode": 0,
+      "output": "TAP version 13\n# Subtest: verify renders three distinct outcomes, every typed constant and the full limitation as text\nok 1 - verify renders three distinct outcomes, every typed constant and the full limitation as text\n  ---\n  duration_ms: 12.921056\n  type: 'test'\n  ...\n# Subtest: verify rejects stale results and displays failures without inferring a match\nok 2 - verify rejects stale results and displays failures without inferring a match\n  ---\n  duration_ms: 6.248268\n  type: 'test'\n  ...\n# Subtest: production Write control sends current source, params, network and target and invalidates on changes\nok 3 - production Write control sends current source, params, network and target and invalidates on changes\n  ---\n  duration_ms: 8.363046\n  type: 'test'\n  ...\n# Subtest: project export includes the server lock and preserves the STORE zip with the requested snapshot\nok 4 - project export includes the server lock and preserves the STORE zip with the requested snapshot\n  ---\n  duration_ms: 5.171598\n  type: 'test'\n  ...\n1..4\n# tests 4\n# suites 0\n# pass 4\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 187.035689\n",
+      "outputSha256": "1e0ff2e8164464a58e11df03344ed3bf1ac1fea3a1d70e808eda80314bf8119b"
+    }
+  ],
+  "evidenceHashes": {
+    "docs/ingestion-lithos-results.json": "1c43bc46d910b11d4e970ce714657175515a0cf61e1ec420b4c58a3d4e7bc69e",
+    "ergo-sandbox/tests/fixtures/decompile_corpus_expectations.json": "5d2bfc24d758dac520e24968793fe95a87c1cc673d54fe577d4a93b89768aa69",
+    "examples/mutants/answer-key.custody-v1.json": "4d038f5ab7722e954c44c426719237c9df2098e689f54eb4c679f3348b485259",
+    "examples/mutants/answer-key.json": "c3f4208a2f87de533739734dbea079c1a6129ca1e380d051204d081e5cf20bcd",
+    "docs/roadmap-metrics.json": "4cc60a3f4b342aebe85b91a17ff64c7b79d6fcace73ad0518e7c49e3a57c134d"
+  },
+  "policySha256": "586dc98aab00713bb85f822a2099c62496c829e9c99af627d0383d7e504c94cb",
+  "ciAccepted": true,
+  "passed": true
+}
