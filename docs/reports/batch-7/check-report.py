@@ -23,6 +23,6 @@ for p in root.rglob('*'):
     if p.is_file() and '__pycache__' not in p.parts:
         # The gate runner records the interpreter it ran (/usr/bin/python3);
         # that is not a workstation location.
-        text = p.read_text().replace('/usr/bin/python3', 'python3')
-        assert not re.search('/' + '(?:home|tmp|usr|opt)/', text), str(p)
+        text = re.sub(r'(?<![A-Za-z0-9._/-])/usr/bin/python3(?![A-Za-z0-9._/-])', 'python3', p.read_text())
+        assert not re.search(r'/(?:home|tmp|usr|opt)/', text), str(p)
 print('Gate outputs and hashes match; all ledger logs exist; report paths are portable.')
