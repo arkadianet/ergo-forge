@@ -2,7 +2,7 @@
 
 ## 0.5.0 — prepared, unreleased
 
-This release collects roadmap v2 batches 0–10. Cutting `v0.5.0` after merge is
+This release collects roadmap v2 batches 0–11. Cutting `v0.5.0` after merge is
 the maintainer's action; this preparation does not publish binaries or a container.
 
 | Batch | Units | What a user gets |
@@ -18,6 +18,7 @@ the maintainer's action; this preparation does not publish binaries or a contain
 | 8 | I03 | Watch protocol NFTs for script and upgrade-hook changes, with fixture-backed checks. |
 | 9 | W05, S05 | Pool-bound swap and successor-locked vault recipes with caught mutants; incident scaffolds with expectations left to the author. |
 | 10 | X01, X02, X03 | Engine remeasurement, release 0.5.0 preparation, a cached node corpus checkout and parallel cost-trace CI. |
+| 11 | S03 | The drain hunt's two-instance family: one derived second instance per protected box, inside the same probe cap, gated by the class-11 counterexample/control pair. |
 
 Engine pin: `9468043396e5daa2828211bcff4234bc70fae4f0` →
 `016533194f94ad95b1a87df70bb9bfce493922e2`. Seed exact round-trips rose
