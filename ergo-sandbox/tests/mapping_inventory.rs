@@ -1,6 +1,8 @@
 //! M00 locks an independently authored denominator before any extractor exists.
 //! These are fixture gates, not a required-relations proof API.
 mod baseline_support;
+#[path = "engine_support/request.rs"]
+mod engine_support;
 mod mapping_support;
 use mapping_support::*;
 use serde_json::{json, Value};
@@ -261,7 +263,8 @@ fn fixture_constructs_execute_and_unsupported_members_remain() {
     let mut count = 0;
     let mut unsupported = vec![];
     let cargo = std::fs::read_to_string(root().join("../../../../Cargo.toml")).unwrap();
-    assert!(cargo.contains(m["nodeRevision"].as_str().unwrap()));
+    assert_eq!(m["nodeRevision"], engine_support::fixture_revision());
+    assert!(cargo.contains(ergo_sandbox::evidence::case::engine_revision()));
     for (entry, answer) in m["cases"]
         .as_array()
         .unwrap()

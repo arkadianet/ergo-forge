@@ -1,0 +1,7 @@
+chore(roadmap): register X01–X03 with batch 10 measurements
+
+Keep v1 policy and protected digests frozen. Record every observed exit,
+the engine comparison, prepared commits and session limitations.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

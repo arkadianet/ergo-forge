@@ -1,0 +1,8 @@
+chore(engine): advance the node pin with corpus and vector evidence
+
+Measure 74/87 to 79/92 exact seed rows, retain all 270/279 mainnet
+round-trips and all nine P03 outcomes. Preserve historical evidence and
+explicitly remeasure it under the new revision; retain drift rejection.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

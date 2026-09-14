@@ -1,3 +1,4 @@
+mod engine_support;
 use ergo_primitives::reader::VlqReader;
 use ergo_sandbox::evidence::{
     claim::PROPERTY_VERSION,
@@ -78,10 +79,7 @@ fn fixtures() -> Vec<(Value, ReplayBundle)> {
     let mut loaded = vec![];
     // All files/revisions authenticated before any case is executed.
     for row in rows {
-        assert_eq!(
-            row["nodeRevision"],
-            ergo_sandbox::evidence::validate::node_revision()
-        );
+        assert_eq!(row["nodeRevision"], engine_support::fixture_revision());
         assert_eq!(row["propertyVersion"], PROPERTY_VERSION);
         assert_eq!(
             row["publicationEligibility"],
@@ -109,7 +107,8 @@ fn fixtures() -> Vec<(Value, ReplayBundle)> {
                 bundle = Some(b);
             }
         }
-        let bundle = bundle.unwrap();
+        let mut bundle = bundle.unwrap();
+        bundle.execution = engine_support::on_current_engine(bundle.execution);
         let records = bundle.execution.case.premises().boxes.value().unwrap();
         let expected_origin = if row["id"] == "use-incident" {
             "source-recorded"

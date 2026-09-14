@@ -1,5 +1,6 @@
 //! M05 stop evidence: mandatory local execution does not authenticate a code digest.
 //! This diagnostic is not the registered M05 capability target.
+mod engine_support;
 #[allow(dead_code)]
 mod mapping_support;
 use ergo_sandbox::{
@@ -55,6 +56,7 @@ fn mandatory_local_execution_does_not_authenticate_exact_code() {
         "7c64e6d0a26c05720128d2dc4891e408d76bdbd6a7d5ff226e0bf4d9b9087ba6"
     );
     let claims: Value = serde_json::from_slice(&claims_raw).unwrap();
+    let claims = engine_support::RevisionMap::default().expected(&claims);
     let old = claims["cases"]
         .as_array()
         .unwrap()
@@ -108,6 +110,7 @@ fn mandatory_local_execution_does_not_authenticate_exact_code() {
         let raw = std::fs::read(root().join("m05-stop").join(format!("{id}.fixture"))).unwrap();
         assert_eq!(sha(&raw), hash);
         let request: ValidationRequest = serde_json::from_slice(&raw).unwrap();
+        let request = engine_support::on_current_engine(request);
         // All state-domain components agree with the original normalized P.
         let actual = StateDomain {
             block_context: request.block_context.value().unwrap().clone(),
@@ -207,7 +210,11 @@ fn mandatory_local_execution_does_not_authenticate_exact_code() {
     let result = json!({"version":"m05-stop-evidence:v1","caseId":fixture["id"],"claim":claim,"claimDigest":claim.claim_digest(),"premiseDigest":claim.premises.digest(),"proposedExactDigestClaim":proposed,"executions":rows,"conclusion":"Same root, SELF, state and guard accept distinct code digests. Mandatory local execution alone cannot establish exact authenticated Execute(input,var,codeDigest)."});
     let path = root().join("../../../../docs/mapping/m05-stop-results.json");
     let raw = std::fs::read(&path).unwrap();
-    assert_eq!(serde_json::from_slice::<Value>(&raw).unwrap(), result);
+    assert_eq!(
+        engine_support::RevisionMap::default()
+            .expected(&serde_json::from_slice::<Value>(&raw).unwrap()),
+        result
+    );
     println!("evidence {} sha256={}", path.display(), sha(&raw));
     println!("M05 coverage stop: pinned supported context_scope-positive lacks exact-code authentication; M00-M04 claims and all 67 expected action dispositions preserved");
 }

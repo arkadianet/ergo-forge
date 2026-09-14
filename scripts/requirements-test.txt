@@ -1,0 +1,2 @@
+# Workflow gate tests parse GitHub Actions YAML without contacting GitHub.
+PyYAML==6.0.3

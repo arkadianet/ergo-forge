@@ -1,3 +1,4 @@
+mod engine_support;
 use ergo_sandbox::{
     audit::{audit, audit_with_contracts, ContractSet, Execution, InputContract},
     compile_source,
@@ -319,10 +320,7 @@ fn curated_precision_has_positive_and_negative_controls() {
     let mut anchors = 0;
     for row in rows {
         let id = row["id"].as_str().unwrap();
-        assert_eq!(
-            row["nodeRevision"],
-            ergo_sandbox::evidence::validate::node_revision()
-        );
+        assert_eq!(row["nodeRevision"], engine_support::fixture_revision());
         assert_eq!(
             row["publicationEligibility"],
             "public-authored-or-public-incident"
@@ -340,7 +338,8 @@ fn curated_precision_has_positive_and_negative_controls() {
             if is_positive { "positive" } else { "benign" }
         );
         let r = if is_positive || id == "fixed-recipient-paid-output" {
-            let bundle: ReplayBundle = serde_json::from_slice(&bytes).unwrap();
+            let mut bundle: ReplayBundle = serde_json::from_slice(&bytes).unwrap();
+            bundle.execution = engine_support::on_current_engine(bundle.execution);
             // Audit the exact protected script from the replay bundle, retaining
             // all supplied state premises without changing the pinned bundle.
             let protected = bundle

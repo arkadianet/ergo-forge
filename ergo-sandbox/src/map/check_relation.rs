@@ -545,7 +545,9 @@ pub fn check(claim: &RelationProposal, derivation: &Derivation) -> Result<Establ
             .clone(),
     )
     .map_err(|e| format!("unsupported state constraints: {e}"))?;
-    domain.network_rules.node()?;
+    domain
+        .network_rules
+        .node(domain.block_context.activated_script_version)?;
     domain.block_context.node()?;
     let subject = WireBox::from_record(
         p.self_box

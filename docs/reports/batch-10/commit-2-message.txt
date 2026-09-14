@@ -1,0 +1,8 @@
+chore(release): prepare 0.5.0 and document roadmap batches
+
+Update the inherited crate version and release examples. Add the batch
+changelog and offline asset/tag compatibility gates. Publishing remains
+a maintainer action after merge.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

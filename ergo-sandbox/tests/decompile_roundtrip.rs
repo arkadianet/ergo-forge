@@ -309,6 +309,7 @@ fn seed_corpus_holds_the_exact_floor_when_checkout_present() {
         serde_json::from_str(&std::fs::read_to_string(&path).expect("read")).expect("json");
     let mut exact = 0usize;
     let mut total = 0usize;
+    let mut measured = Vec::new();
     for v in doc["vectors"].as_array().expect("vectors") {
         if v["oracle"].as_str() != Some("ACCEPT") || v["tree_version"].as_u64() != Some(3) {
             continue;
@@ -323,20 +324,20 @@ fn seed_corpus_holds_the_exact_floor_when_checkout_present() {
         total += 1;
         let bytes = hex::decode(hex_str).expect("hex");
         let src = decompile_net(&bytes, true);
-        if let Ok(out) = recompile(&src, 3, NetworkPrefix::Testnet) {
-            if out == bytes {
-                exact += 1;
-            }
-        }
+        let is_exact = recompile(&src, 3, NetworkPrefix::Testnet).is_ok_and(|out| out == bytes);
+        exact += usize::from(is_exact);
+        measured.push((bytes, is_exact));
     }
     assert_eq!(
-        total, 87,
+        total, 92,
         "compile corpus size changed — re-check the floor"
     );
     assert!(
-        exact >= 73,
-        "seed corpus dropped to {exact}/87 byte-exact (floor is 73)"
+        exact >= 79,
+        "seed corpus dropped to {exact}/92 byte-exact (floor is 79)"
     );
+    check_node_measurement("seed", measured);
+    println!("seed corpus: {exact}/{total} byte-exact");
 }
 
 #[test]
@@ -359,18 +360,54 @@ fn mainnet_corpus_holds_the_exact_floor_when_checkout_present() {
         }
     }
     let mut exact = 0usize;
+    let mut measured = Vec::new();
     for t in &trees {
         let bytes = hex::decode(t).expect("hex");
         let src = decompile_net(&bytes, false);
-        if let Ok(out) = recompile(&src, 0, NetworkPrefix::Mainnet) {
-            if out == bytes {
-                exact += 1;
-            }
-        }
+        let is_exact = recompile(&src, 0, NetworkPrefix::Mainnet).is_ok_and(|out| out == bytes);
+        exact += usize::from(is_exact);
+        measured.push((bytes, is_exact));
     }
     assert!(
-        exact >= 250,
-        "mainnet corpus dropped to {exact}/{} byte-exact (floor is 250)",
+        exact >= 270,
+        "mainnet corpus dropped to {exact}/{} byte-exact (floor is 270)",
         trees.len()
     );
+    check_node_measurement("mainnet", measured);
+    println!("mainnet corpus: {exact}/{} byte-exact", trees.len());
+}
+
+// Per-entry hashes prevent one gained exact row from concealing another's loss.
+fn check_node_measurement(corpus: &str, measured: Vec<(Vec<u8>, bool)>) {
+    use sha2::{Digest, Sha256};
+    let fixture: serde_json::Value =
+        serde_json::from_str(include_str!("fixtures/node_corpus_expectations.json")).unwrap();
+    assert_eq!(
+        fixture["engineRevision"],
+        ergo_sandbox::evidence::case::engine_revision()
+    );
+    let expected: Vec<_> = fixture["rows"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|r| r["corpus"] == corpus)
+        .collect();
+    assert_eq!(
+        measured.len(),
+        expected.len(),
+        "{corpus} corpus membership changed"
+    );
+    for ((tree, exact), row) in measured.iter().zip(expected) {
+        assert_eq!(
+            hex::encode(Sha256::digest(tree)),
+            row["treeSha256"],
+            "{corpus}: original tree changed"
+        );
+        assert_eq!(
+            *exact,
+            row["exact"].as_bool().unwrap(),
+            "{corpus}: {} changed",
+            row["index"]
+        );
+    }
 }

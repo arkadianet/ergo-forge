@@ -1,4 +1,5 @@
 //! Mechanical adaptation of frozen draft syntax; never reads the answer key.
+use crate::engine_support;
 use ergo_sandbox::{
     evidence::validate::{node_revision, ValidationRequest},
     properties::{
@@ -13,7 +14,9 @@ pub fn envelope(c: &Value) -> ReplayEnvelope {
         .as_array()
         .unwrap()
         .iter()
-        .map(|r| serde_json::from_value(r["request"].clone()).unwrap())
+        .map(|r| {
+            engine_support::on_current_engine(serde_json::from_value(r["request"].clone()).unwrap())
+        })
         .collect();
     let root = steps[0].case.premises().boxes.value().unwrap().clone();
     let schedule: Vec<Value> = steps.iter().map(schedule_step).collect();

@@ -1,3 +1,5 @@
+#[path = "engine_support/request.rs"]
+mod engine_support;
 use ergo_sandbox::{
     lockfile::{self, DriftKind, LiveStatus, Lockfile},
     map::{
@@ -27,7 +29,7 @@ fn lockfile_detects_source_param_and_engine_drift() {
     );
     assert_eq!(
         lock.compiler_revision,
-        "9468043396e5daa2828211bcff4234bc70fae4f0"
+        ergo_sandbox::evidence::case::engine_revision()
     );
     assert_eq!(lock.node_revision, lock.compiler_revision);
     assert!(
@@ -48,12 +50,12 @@ fn lockfile_detects_source_param_and_engine_drift() {
         ),
         (
             "compilerRevision",
-            json!("11".repeat(20)),
+            json!(engine_support::fixture_revision()),
             DriftKind::CompilerRevision,
         ),
         (
             "nodeRevision",
-            json!("11".repeat(20)),
+            json!(engine_support::fixture_revision()),
             DriftKind::NodeRevision,
         ),
         (

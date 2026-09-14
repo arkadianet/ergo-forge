@@ -1,3 +1,4 @@
+mod engine_support;
 use ergo_primitives::reader::VlqReader;
 use ergo_sandbox::evidence::{
     sign::{sign_owned_p2pk, OwnedDlogSecret, SigningFailure},
@@ -47,10 +48,7 @@ fn fixtures() -> (ValidationRequest, ValidationRequest, Value) {
     let root = path.parent().unwrap();
     let manifest: Value = serde_json::from_slice(&std::fs::read(&path).unwrap()).unwrap();
     assert_eq!(manifest["formatVersion"], 1);
-    assert_eq!(
-        manifest["nodeRevision"],
-        ergo_sandbox::evidence::validate::node_revision()
-    );
+    assert_eq!(manifest["nodeRevision"], engine_support::fixture_revision());
     let rows = manifest["cases"].as_array().unwrap();
     let ids = rows
         .iter()
@@ -90,6 +88,7 @@ fn fixtures() -> (ValidationRequest, ValidationRequest, Value) {
                 request.case.premises().engine_revision,
                 manifest["nodeRevision"]
             );
+            let request = engine_support::on_current_engine(request);
             assert!(by_role
                 .insert(file["role"].as_str().unwrap(), request)
                 .is_none());

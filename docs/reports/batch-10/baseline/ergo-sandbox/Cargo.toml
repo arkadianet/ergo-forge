@@ -1,0 +1,48 @@
+[package]
+name        = "ergo-sandbox"
+description = "ErgoScript workbench engine: scenario-driven evaluation, cost reporting, compile, and structural decompile on the consensus interpreter. Sandbox only — never a consensus surface."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish    = false
+
+[dependencies]
+thiserror       = { workspace = true }
+ergo-primitives = { workspace = true }
+ergo-ser        = { workspace = true }
+ergo-sigma      = { workspace = true, features = ["value-trace"] }
+ergo-compiler   = { workspace = true }
+ergo-wallet     = { workspace = true }
+ergo-validation = { workspace = true }
+ergo_avltree_rust = { workspace = true }
+k256            = { workspace = true }
+zeroize         = { workspace = true }
+bytes           = { workspace = true }
+serde           = { workspace = true }
+serde_json      = { workspace = true }
+hex             = { workspace = true }
+sha2            = "0.10"
+indexmap        = { workspace = true }
+num-bigint      = { workspace = true }
+bs58            = { workspace = true }
+ureq            = { workspace = true, optional = true }
+
+[[bin]]
+name = "ergo-es"
+path = "src/bin/ergo-es.rs"
+
+[features]
+# The live public-explorer chain source for `ergo-es map`. Off makes the
+# crate network-free: fixtures and any caller-supplied `ChainSource` still
+# work, which is how the map's tests run.
+default = ["explorer"]
+explorer = ["dep:ureq"]
+
+# Passthrough to ergo-sigma's debug cost tracer (global Vec push per cost
+# record — dev/diagnostic builds only, never ship in a consensus path).
+cost-trace = ["ergo-sigma/cost-trace"]
+
+[dev-dependencies]
+ergo-chain-spec = { git = "https://github.com/arkadianet/ergo", rev = "9468043396e5daa2828211bcff4234bc70fae4f0" }
+ergo-crypto = { git = "https://github.com/arkadianet/ergo", rev = "9468043396e5daa2828211bcff4234bc70fae4f0" }

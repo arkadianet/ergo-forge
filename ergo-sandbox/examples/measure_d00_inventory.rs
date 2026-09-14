@@ -1,4 +1,6 @@
 //! One-time raw D00 observation capture after manifest and answers were locked.
+#[path = "../tests/engine_support/mod.rs"]
+mod engine_support;
 #[path = "../tests/property_support/mod.rs"]
 mod property_support;
 fn main() {

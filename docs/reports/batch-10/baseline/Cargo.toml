@@ -1,0 +1,42 @@
+[workspace]
+resolver = "2"
+members = ["ergo-sandbox", "ergo-web"]
+
+[workspace.package]
+version    = "0.3.0"
+edition    = "2021"
+license    = "MIT OR Apache-2.0"
+repository = "https://github.com/arkadianet/ergo-forge"
+
+[workspace.dependencies]
+# Engine crates — consumed from the Rust Ergo node (arkadianet/ergo).
+# Pinned to a main rev for reproducible builds; bump deliberately.
+ergo-primitives = { git = "https://github.com/arkadianet/ergo", rev = "9468043396e5daa2828211bcff4234bc70fae4f0" }
+ergo-ser        = { git = "https://github.com/arkadianet/ergo", rev = "9468043396e5daa2828211bcff4234bc70fae4f0" }
+ergo-sigma      = { git = "https://github.com/arkadianet/ergo", rev = "9468043396e5daa2828211bcff4234bc70fae4f0" }
+ergo-compiler   = { git = "https://github.com/arkadianet/ergo", rev = "9468043396e5daa2828211bcff4234bc70fae4f0" }
+# The node's wallet prover (Schnorr / DH-tuple / AND / OR / threshold) and
+# the AVL+ crate whose verifier the node's evaluator uses — so the sandbox
+# can PRODUCE the proofs a spender attaches, not only check them.
+ergo-validation = { git = "https://github.com/arkadianet/ergo", rev = "9468043396e5daa2828211bcff4234bc70fae4f0" }
+ergo-wallet     = { git = "https://github.com/arkadianet/ergo", rev = "9468043396e5daa2828211bcff4234bc70fae4f0" }
+ergo_avltree_rust = "0.1.1"
+k256       = { version = "0.13", features = ["arithmetic"] }
+zeroize    = "1"
+bytes      = "1"
+
+thiserror  = "2"
+serde      = { version = "1", features = ["derive"] }
+serde_json = "1"
+hex        = "0.4"
+indexmap   = { version = "2", features = ["serde"] }
+num-bigint = "0.4"
+bs58       = "0.5"
+ureq       = "3"
+axum       = "0.8"
+tokio      = { version = "1", features = ["rt-multi-thread", "macros", "signal", "sync"] }
+tower      = { version = "0.5", features = ["limit"] }
+tower-http = { version = "0.7", features = ["fs", "trace"] }
+tracing    = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+

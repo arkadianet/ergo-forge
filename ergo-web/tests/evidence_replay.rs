@@ -1,4 +1,6 @@
 //! Real HTTP, CLI, and production DOM replay contract checks.
+#[path = "../../ergo-sandbox/tests/engine_support/request.rs"]
+mod engine_support;
 use serde_json::{json, Value};
 use std::{path::PathBuf, process::Command, sync::OnceLock};
 
@@ -9,14 +11,16 @@ fn root() -> PathBuf {
         .to_owned()
 }
 fn fixture(name: &str) -> Value {
-    serde_json::from_slice(
-        &std::fs::read(root().join(format!(
-            "ergo-sandbox/tests/fixtures/evidence/claim-vectors/{name}.fixture"
-        )))
-        .unwrap(),
-    )
-    .unwrap()
+    let bytes = std::fs::read(root().join(format!(
+        "ergo-sandbox/tests/fixtures/evidence/claim-vectors/{name}.fixture"
+    )))
+    .unwrap();
+    let mut bundle: ergo_sandbox::evidence::replay::ReplayBundle =
+        serde_json::from_slice(&bytes).unwrap();
+    bundle.execution = engine_support::on_current_engine(bundle.execution);
+    serde_json::to_value(bundle).unwrap()
 }
+
 fn bundles() -> Vec<Value> {
     let mut incomplete = fixture("sale-fixed-paid");
     incomplete["execution"]["headers"] =

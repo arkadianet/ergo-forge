@@ -1,4 +1,5 @@
 // Retained correctness prefix only. D03 utility remains failed in the archived target.
+mod engine_support;
 mod property_replay_support;
 #[allow(dead_code)]
 mod property_support;
@@ -95,7 +96,10 @@ fn legacy_replay_bytes_and_semantics_remain_unchanged() {
     let (m, _) = inventory();
     let current = measure(&m);
     let frozen = read("legacy-results-raw.fixture");
-    assert_eq!(current, frozen);
+    assert_eq!(
+        current,
+        engine_support::RevisionMap::default().expected(&frozen)
+    );
 }
 
 #[test]

@@ -1,4 +1,5 @@
 //! M03: independent pinned answers, exact-code checking and full node replay.
+mod engine_support;
 #[allow(dead_code)]
 mod mapping_support;
 use ergo_sandbox::{
@@ -298,7 +299,11 @@ fn exact_guarded_necessity_matches_pinned_answers() {
 
     let result = json!({"version":"m03-mapping-results:v2","implementationBase":"0545b16347a29dbe9b60bc1a3df46a5eb602bd8d","canonicalManifestSha256":"cdf73504cc3d5f98141bac9e44b46621a76baf8ac5219826d03367d171383853","supplementalSha256":"25b20fb46cdd45ee199e3847321419fef765505a0db8d61b0bbc0499c40adfda","nodeRevision":ergo_sandbox::evidence::case::engine_revision(),"manifestSha256":"7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f","expectedSha256":"291923d76f2de8a69deec82cc049d233d87d91f816295312ed89f9291e13405e","cases":rows,"supplementalCases":extra_rows,"supplementalMetrics":{"registered":10,"established":5,"unresolved":5},"metrics":{"registered":32,"established":12,"supportedM03":12,"unresolved":20,"incorrectEstablished":0,"allSupportedIncludingM05":14}});
     let bytes = std::fs::read(result_path()).unwrap();
-    assert_eq!(result, serde_json::from_slice::<Value>(&bytes).unwrap());
+    assert_eq!(
+        result,
+        engine_support::mapping_revisions()
+            .expected(&serde_json::from_slice::<Value>(&bytes).unwrap())
+    );
     println!(
         "evidence {} sha256={}; supported 12/12; established 12; incorrect 0/12; unresolved 20/32",
         result_path().display(),
@@ -404,6 +409,7 @@ fn satisfying_omission_and_relaxed_controls_use_full_validator() {
                 std::fs::read(root().join("m03").join(entry["path"].as_str().unwrap())).unwrap();
             assert_eq!(sha(&raw), entry["sha256"]);
             let req: ValidationRequest = serde_json::from_slice(&raw).unwrap();
+            let req = engine_support::on_current_engine(req);
             assert_eq!(
                 serde_json::to_value(&req).unwrap(),
                 serde_json::to_value(authored_request(&c, v)).unwrap()
@@ -471,11 +477,13 @@ fn satisfying_omission_and_relaxed_controls_use_full_validator() {
         .iter()
         .any(|r| r["vector"] == "exists_literal-control/omission"));
     assert_eq!(
-        serde_json::from_slice::<Value>(
-            &std::fs::read(root().join("../../../../docs/mapping/m03-omission-results.json"))
-                .unwrap()
-        )
-        .unwrap(),
+        engine_support::mapping_revisions().expected(
+            &serde_json::from_slice::<Value>(
+                &std::fs::read(root().join("../../../../docs/mapping/m03-omission-results.json"))
+                    .unwrap()
+            )
+            .unwrap()
+        ),
         json!(refutations)
     );
     for path in [

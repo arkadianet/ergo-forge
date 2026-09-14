@@ -1,4 +1,5 @@
 //! D00 fixture authentication and existing APIs only; no author-property evaluator.
+use crate::engine_support;
 use ergo_sandbox::evidence::{
     replay::{replay, ReplayBundle},
     validate::{validate, ValidationRequest},
@@ -107,6 +108,7 @@ pub fn measure(m: &Value) -> Value {
         let mut references = vec![];
         for r in c["references"].as_array().unwrap() {
             let request: ValidationRequest = serde_json::from_value(r["request"].clone()).unwrap();
+            let request = engine_support::on_current_engine(request);
             // Call the full node adapter independently for EVERY supplied reference.
             let accepted = validate(&request)
                 .unwrap_or_else(|e| panic!("{} step {}: {:?}", c["id"], r["index"], e));

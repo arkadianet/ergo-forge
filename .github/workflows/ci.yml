@@ -41,9 +41,17 @@ jobs:
           test -n "$rev"
           echo "rev=$rev" >> "$GITHUB_OUTPUT"
 
+      - name: Cache the pinned node checkout
+        id: node-cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ergo/
+          key: node-corpus-${{ runner.os }}-${{ steps.pin.outputs.rev }}
+
       # The corpus tests look for `../../ergo` relative to ergo-sandbox, i.e. a
       # sibling of this repo. Same rev as the crates, so the corpora match.
       - name: Checkout the node as a sibling (test corpora)
+        if: steps.node-cache.outputs.cache-hit != 'true'
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           repository: arkadianet/ergo
@@ -71,6 +79,16 @@ jobs:
         working-directory: ergo-forge
         run: npm ci --prefix ui
 
+      - name: Install workflow test dependency
+        working-directory: ergo-forge
+        run: python3 -m pip install -r scripts/requirements-test.txt
+
+      - name: Release and CI workflow gates
+        working-directory: ergo-forge
+        run: |
+          python3 scripts/test_release.py
+          python3 scripts/test_ci_workflow.py
+
       - name: fmt
         working-directory: ergo-forge
         run: cargo fmt --all -- --check
@@ -78,10 +96,6 @@ jobs:
       - name: clippy
         working-directory: ergo-forge
         run: cargo clippy --workspace --all-targets -- -D warnings
-
-      - name: clippy (cost-trace)
-        working-directory: ergo-forge
-        run: cargo clippy -p ergo-sandbox -p ergo-web --all-targets --features cost-trace -- -D warnings
 
       - name: test web without cost-trace
         working-directory: ergo-forge
@@ -95,10 +109,6 @@ jobs:
         working-directory: ergo-forge
         run: cargo test --workspace
 
-      - name: test (cost-trace)
-        working-directory: ergo-forge
-        run: cargo test -p ergo-sandbox -p ergo-web --features cost-trace
-
       - name: Governing roadmap completed prefix
         working-directory: ergo-forge
         run: |
@@ -110,3 +120,69 @@ jobs:
         if: always()
         working-directory: ergo-forge
         run: python3 scripts/roadmap_gate.py --ci
+
+  cost-trace:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ergo-forge
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # The scoreboard verifies baseline artifacts at the plan's baseline
+          # revision, so that commit must be in the runner's history.
+          fetch-depth: 0
+          path: ergo-forge
+
+      - name: Read the pinned engine rev
+        id: pin
+        working-directory: ergo-forge
+        run: |
+          rev=$(grep -m1 -oE 'ergo-sigma *= *\{[^}]*rev *= *"[0-9a-f]+"' Cargo.toml | grep -oE '[0-9a-f]{40}')
+          test -n "$rev"
+          echo "rev=$rev" >> "$GITHUB_OUTPUT"
+
+      - name: Cache the pinned node checkout
+        id: node-cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ergo/
+          key: node-corpus-${{ runner.os }}-${{ steps.pin.outputs.rev }}
+
+      # The corpus tests look for `../../ergo` relative to ergo-sandbox, i.e. a
+      # sibling of this repo. Same rev as the crates, so the corpora match.
+      - name: Checkout the node as a sibling (test corpora)
+        if: steps.node-cache.outputs.cache-hit != 'true'
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          repository: arkadianet/ergo
+          ref: ${{ steps.pin.outputs.rev }}
+          path: ergo
+
+      # Resolved from upstream refs/heads/stable; this action has no stable tag.
+      - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable (2026-09-03)
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          # Cache both debug and release dependencies in the actual target dir.
+          workspaces: ergo-forge -> target-p00
+          shared-key: cost-trace
+
+      # Workspace Rust tests invoke Node DOM tests; install before verification.
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: ergo-forge/ui/package-lock.json
+
+      - name: Install DOM test dependency
+        working-directory: ergo-forge
+        run: npm ci --prefix ui
+
+      - name: clippy (cost-trace)
+        working-directory: ergo-forge
+        run: cargo clippy -p ergo-sandbox -p ergo-web --all-targets --features cost-trace -- -D warnings
+
+      - name: test (cost-trace)
+        working-directory: ergo-forge
+        run: cargo test -p ergo-sandbox -p ergo-web --features cost-trace

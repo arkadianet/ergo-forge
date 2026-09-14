@@ -1,5 +1,6 @@
 //! Frozen D00 inputs/answers and measured existing APIs. No property evaluator.
 mod baseline_support;
+mod engine_support;
 mod property_support;
 use ergo_primitives::writer::VlqWriter;
 use ergo_sandbox::evidence::{
@@ -96,10 +97,7 @@ fn property_inventory_pins_24_cases_and_independent_answers() {
             "baseline {path}"
         );
     }
-    assert_eq!(
-        m["nodeRevision"],
-        ergo_sandbox::evidence::validate::node_revision()
-    );
+    assert_eq!(m["nodeRevision"], engine_support::fixture_revision());
     println!("manifest sha256={MANIFEST_SHA}; answers sha256={ANSWER_SHA}; 24 pinned rows: 8 authored violations, 8 controls, 8 boundaries; independent semantic review incomplete");
 }
 
@@ -108,6 +106,7 @@ fn property_inventory_pins_24_cases_and_independent_answers() {
 fn check_material(c: &Value, r: &Value, step: usize) {
     let request: ValidationRequest = serde_json::from_value(r["request"].clone()).unwrap();
     assert_eq!(serde_json::to_value(&request).unwrap(), r["request"]);
+    let request = engine_support::on_current_engine(request);
     let accepted = validate(&request).unwrap();
     let inputs = accepted.checked().resolved_inputs();
     let outputs = &accepted.checked().transaction().output_candidates;
@@ -229,12 +228,16 @@ fn reference_executions_and_legacy_results_are_reproduced() {
     }
     assert_eq!(sha(&bytes("legacy-results-raw.fixture")), LEGACY_SHA);
     let measured = measure(&m);
+    let mut revisions = engine_support::RevisionMap::default();
+    let expected = revisions.expected(&read("legacy-results-raw.fixture"));
     assert_eq!(
-        measured,
-        read("legacy-results-raw.fixture"),
-        "actual existing API output drifted"
+        measured, expected,
+        "actual existing API output drifted beyond the engine revision"
     );
-    assert_eq!(legacy_summary(&measured), read("legacy-results.json"));
+    assert_eq!(
+        legacy_summary(&measured),
+        revisions.expected(&read("legacy-results.json"))
+    );
     assert_eq!(measured["referenceTransactions"], 35);
     let mut statuses = BTreeMap::<String, usize>::new();
     for c in measured["cases"].as_array().unwrap() {

@@ -1,0 +1,7 @@
+ci: cache the pinned node and parallelize cost-trace checks
+
+Restore the sibling corpus checkout by engine revision and retain the
+complete verification bar in independent jobs. Add parsed YAML gates.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg
