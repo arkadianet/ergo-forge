@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "method": "synthetic",
+  "nodeValidated": false,
+  "note": "W05 recipe mutations, separate from frozen hunt and staticLintPairs history. The output-bound row is a separate single-edit mutation applied in memory; it does not confound the identity mutant.",
+  "recipeMutants": [
+    {
+      "id": "pool-bound-swap",
+      "version": 1,
+      "control": "examples/contracts/recipes/pool-bound-swap.es",
+      "mutant": "examples/mutants/w05/v1/pool-bound-swap-mutant.es",
+      "suite": "examples/contracts/recipes/pool-bound-swap.test.json",
+      "diff": {
+        "find": "val identified = pool.tokens(0)._1 == poolNFT",
+        "replace": "val identified = true"
+      },
+      "lint": "unbound-box-reserves",
+      "bindingCase": "decoy at pool position",
+      "expectedControl": "fail",
+      "expectedMutant": "pass"
+    },
+    {
+      "id": "successor-locked-vault",
+      "version": 1,
+      "control": "examples/contracts/recipes/successor-locked-vault.es",
+      "mutant": "examples/mutants/w05/v1/successor-locked-vault-mutant.es",
+      "suite": "examples/contracts/recipes/successor-locked-vault.test.json",
+      "diff": {
+        "find": "next.R4[Long].isDefined && next.R4[Long].getOrElse(-1L) == units &&",
+        "replace": "next.R4[Long].isDefined &&"
+      },
+      "lint": "successor-field-drift",
+      "bindingCase": "successor changes R4",
+      "expectedControl": "fail",
+      "expectedMutant": "pass"
+    },
+    {
+      "id": "pool-output-bound",
+      "version": 1,
+      "control": "examples/contracts/recipes/pool-bound-swap.es",
+      "suite": "examples/contracts/recipes/pool-bound-swap.test.json",
+      "diff": {
+        "find": "OUTPUTS.size == 2",
+        "replace": "OUTPUTS.size >= 2"
+      },
+      "lint": "unconstrained-outputs",
+      "bindingCase": "extra output",
+      "expectedControl": "fail",
+      "expectedMutant": "pass"
+    }
+  ]
+}

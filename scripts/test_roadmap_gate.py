@@ -41,7 +41,7 @@ class RoadmapGateTests(unittest.TestCase):
         union = gate.union_policy([v1, v2])
         for unit in v2['units']:
             self.assertEqual(gate.select_units(union, unit['id'])[-1], unit)
-        self.assertEqual({u['id'] for u in v2['units'] if u['implemented']}, {'W00', 'S00', 'W01', 'S02', 'S01', 'W06', 'I01', 'I02', 'W02', 'W03', 'W04', 'S04', 'I04', 'I03'})
+        self.assertEqual({u['id'] for u in v2['units'] if u['implemented']}, {'W00', 'S00', 'W01', 'S02', 'S01', 'W06', 'I01', 'I02', 'W02', 'W03', 'W04', 'S04', 'I04', 'I03', 'W05', 'S05'})
         archived = (gate.ROOT / 'docs/reports/ROADMAP-v1-queue.md').read_text()
         self.assertIn(original_doc[original_doc.index('## 2. '):original_doc.index('## 4. ')], archived)
         self.assert_status('missing-gate', lambda: gate.policy_v2_from(current_doc + gate.V2_MARKER, v1))
@@ -69,6 +69,31 @@ class RoadmapGateTests(unittest.TestCase):
                     gate.read(Path('/nonexistent-batch-0-artifact')) if p == path else baseline(root, rev, p)
                 )):
                     self.assert_status('missing-gate', lambda: gate.scoreboard(policy))
+
+    def test_w05_extras_require_the_binding_recipe_dom_test(self):
+        expected = [('node', ['node', '--test', 'ui/tests/binding-recipes.test.js'])]
+        self.assertEqual(gate.extras('W05'), expected)
+        from types import SimpleNamespace
+        unit = next(u for u in gate.load_policies()[1]['units'] if u['id'] == 'W05')
+        names = unit['tests']
+        listing = '\n'.join(f'{n}: test' for n in names)
+        output = '\n'.join(f'test {n} ... ok' for n in names) + '\ntest result: ok. 2 passed; 0 failed; 0 ignored;'
+        for code, node, status in [
+            (0, '# tests 1\n# pass 1\n# fail 0\n# skipped 0\n# cancelled 0\n# todo 0', None),
+            (1, '# tests 1\n# fail 1', 'failed'),
+            (0, '# tests 0\n# pass 0\n# fail 0', 'missing-gate'),
+            (0, '# tests 1\n# pass 0\n# fail 0\n# skipped 1\n# cancelled 0\n# todo 0', 'missing-gate'),
+        ]:
+            with patch.object(gate, 'read'), patch.object(Path, 'exists', return_value=True), patch.object(gate, 'command', side_effect=[
+                SimpleNamespace(returncode=0, stdout=listing),
+                SimpleNamespace(returncode=0, stdout=output),
+                SimpleNamespace(returncode=code, stdout=node),
+            ]) as command:
+                if status:
+                    self.assert_status(status, lambda: gate.run_unit(unit, []))
+                else:
+                    gate.run_unit(unit, [])
+                self.assertEqual(command.call_args_list[-1].args[0], expected[0][1])
 
     def test_s01_extras_require_the_checklist_dom_test(self):
         self.assertEqual(gate.extras('S01'), [('node', ['node', '--test', 'ui/tests/checklist.test.js'])])

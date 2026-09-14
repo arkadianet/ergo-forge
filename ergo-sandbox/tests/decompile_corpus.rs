@@ -273,6 +273,21 @@ fn bundled_contracts_and_compiled_fixtures_round_trip() {
                 "baseline override: {id}"
             );
         }
+        // W05 additions have their own reviewed inventory. No frozen corpus
+        // row or digest can be overwritten by the extension.
+        let recipes: BTreeMap<String, Value> =
+            serde_json::from_str(include_str!("fixtures/w05_decompile_expectations.json")).unwrap();
+        for (id, outcome) in recipes {
+            assert!(
+                id.starts_with("examples/contracts/recipes/pool-bound-swap.")
+                    || id.starts_with("examples/contracts/recipes/successor-locked-vault."),
+                "{id}"
+            );
+            assert!(
+                expected.insert(id.clone(), outcome).is_none(),
+                "baseline override: {id}"
+            );
+        }
         assert_eq!(actual.len(), rows.len(), "duplicate measurement IDs");
         assert_eq!(
             actual.keys().collect::<Vec<_>>(),

@@ -12,6 +12,7 @@ use ergo_sandbox::{compile_source, eval_scenario, inspect, Scenario};
 use ergo_ser::address::NetworkPrefix;
 
 mod deployment;
+mod incident;
 mod watching;
 
 fn main() -> ExitCode {
@@ -37,6 +38,7 @@ fn main() -> ExitCode {
         };
     }
     let result = match cmd.as_str() {
+        "incident" => incident::run(rest),
         "compile" => cmd_compile(rest),
         "checklist" => cmd_checklist(rest),
         "replay" => cmd_replay(rest),
@@ -80,6 +82,9 @@ fn usage() {
         "ergo-es — ErgoScript workbench CLI
 
 USAGE:
+  ergo-es incident <txid> --explorer URL [--out DIR] [--network mainnet|testnet]
+      Write one draft suite per spent script, README and empty triage skeleton.
+      Expectations (and missing inclusion height) require an author. Never broadcasts.
   ergo-es verify <address|treeHex> --source f.es [--params p.json]
                  [--network mainnet|testnet] [--json]
       Offline comparison: exit 0 exact bytes, 3 template with differing constants,

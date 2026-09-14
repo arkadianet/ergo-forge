@@ -160,6 +160,12 @@ pub struct TxBoxes {
     pub inputs: Vec<ChainBox>,
     /// Boxes it created.
     pub outputs: Vec<ChainBox>,
+    /// Read-only inputs, in transaction order. Older map archives omit them.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub data_inputs: Vec<ChainBox>,
+    /// Spending transaction inclusion height, never the current chain height.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub inclusion_height: Option<u32>,
 }
 
 /// What the map may ask a chain.

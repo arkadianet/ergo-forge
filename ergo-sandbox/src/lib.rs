@@ -57,6 +57,7 @@ pub mod evidence;
 pub mod hot_spots;
 pub mod hunt;
 pub mod identity;
+pub mod incident;
 pub mod ingest;
 pub mod inspect;
 pub mod lockfile;

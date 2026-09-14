@@ -303,6 +303,8 @@ def command(args, records, root=ROOT):
 
 
 def extras(unit):
+    if unit == 'W05':
+        return [('node', ['node', '--test', 'ui/tests/binding-recipes.test.js'])]
     if unit == 'W04':
         return [('node', ['node', '--test', f'ui/tests/{name}.test.js']) for name in ['cost-spans', 'explain']]
     if unit == 'W02':

@@ -1069,6 +1069,15 @@ fn check_sweep(batch: &str, lints: BTreeSet<&str>) {
         .collect();
     assert!(!paths.is_empty());
     assert_eq!(paths.len(), records.len(), "no duplicate records");
+    // W05 adds two independently swept recipes after this immutable S02
+    // snapshot. Their full lint cleanliness is gated by compose_recipes;
+    // every other corpus path must still match the historical sweep exactly.
+    for recipe in ["pool-bound-swap", "successor-locked-vault"] {
+        assert!(actual_paths.remove(&format!("recipes/{recipe}.es")));
+        assert!(corpus_root
+            .join(format!("recipes/{recipe}.test.json"))
+            .is_file());
+    }
     assert_eq!(paths, actual_paths, "no missing/new corpus files");
     assert_eq!(sweep["contracts"], records.len());
     let mut reported = BTreeMap::new();

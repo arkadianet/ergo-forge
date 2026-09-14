@@ -1,0 +1,377 @@
+{
+  "formatVersion": 1,
+  "baseRevision": "a69af13",
+  "branch": "v2/batch-9",
+  "cargoTargetDir": "$CARGO_TARGET_DIR",
+  "commands": [
+    {
+      "command": "cargo test -p ergo-sandbox --test compose_recipes",
+      "exitStatus": "101",
+      "exitCode": 101,
+      "elapsedSeconds": 16.84,
+      "log": "logs/recipes-first.log",
+      "logSha256": "4b8c50ff20982c75925af82b5f1229d24c4295bc45ab70897e561a35026dc966"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test compose_recipes",
+      "exitStatus": "101",
+      "exitCode": 101,
+      "elapsedSeconds": 0.82,
+      "log": "logs/recipes-corrected.log",
+      "logSha256": "b2a0d371e3a9800005e2e24f4fdeb9efc562503bb1492d377033ca6f8e6c2c1b"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test compose_recipes --test incident_scaffold",
+      "exitStatus": "101",
+      "exitCode": 101,
+      "elapsedSeconds": 4.99,
+      "log": "logs/focused.log",
+      "logSha256": "d0b8480d50788fd4597b9670fda14e2c2b15e082ae531341014a13249d2c20d6"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test compose_recipes --test incident_scaffold --lib incident_transaction_adapter",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 4.96,
+      "log": "logs/focused-corrected.log",
+      "logSha256": "88742231fadd98b0e53c963d2b58c6af1af3a2275d11115ca2c271b89873918c"
+    },
+    {
+      "command": "cargo fmt --all",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.43,
+      "log": "logs/fmt-implementation.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test compose_recipes --test incident_scaffold",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 2.88,
+      "log": "logs/recipe-incident-tests.log",
+      "logSha256": "77a0b85af604234e65e3ecc99a4368ba0d652dfe289b4a90f7e548363dfbd764"
+    },
+    {
+      "command": "node --test ui/tests/binding-recipes.test.js",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.26,
+      "log": "logs/binding-dom.log",
+      "logSha256": "33858d113ab2bdcb581560bb077b883389032b351a085287df39b0e69d8163a0"
+    },
+    {
+      "command": "cargo fmt --all",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.41,
+      "log": "logs/fmt-finalize.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 12.98,
+      "log": "logs/clippy.log",
+      "logSha256": "f52ff47a235af3e1622a48d116161964c33c9a3c8563099c72c32141c5ec4dea"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test compose_recipes",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 2.41,
+      "log": "logs/recipe-final.log",
+      "logSha256": "04807396ff71d05222819c6a9ec28f8e8bd1d7c8e91d45eca54d10622e67c414"
+    },
+    {
+      "command": "git add examples/contracts/recipes/pool-bound-swap.es examples/contracts/recipes/pool-bound-swap.test.json examples/contracts/recipes/successor-locked-vault.es examples/contracts/recipes/successor-locked-vault.test.json examples/mutants/recipes.json examples/mutants/w05/v1 ergo-sandbox/tests/compose_recipes.rs ergo-sandbox/tests/mutation_corpus.rs",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-add-step1.log",
+      "logSha256": "2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab"
+    },
+    {
+      "command": "git commit -F docs/reports/batch-9/commit-1-message.txt",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-commit-step1.log",
+      "logSha256": "2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab"
+    },
+    {
+      "command": "python3 scripts/test_roadmap_gate.py",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.71,
+      "log": "logs/roadmap-tests.log",
+      "logSha256": "e4caed7dbf6265b8e0075962d66a20c457da807ada36819c346736092a3a0e89"
+    },
+    {
+      "command": "python3 scripts/test_lockfile_action.py",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.05,
+      "log": "logs/lockfile-action.log",
+      "logSha256": "d094b1bd2c8318c96097f80c50da282add5b2972970a77046de8db6c8935f6ca"
+    },
+    {
+      "command": "node --test ui/tests/attack.test.js ui/tests/binding-recipes.test.js ui/tests/checklist.test.js ui/tests/claim-labels.test.js ui/tests/cost-spans.test.js ui/tests/evidence-replay.test.js ui/tests/explain.test.js ui/tests/play-export.test.js ui/tests/share.test.js ui/tests/verify.test.js",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 30.27,
+      "log": "logs/dom-all.log",
+      "logSha256": "50fab24e588db71070f42642d6391d0cc69959970d466bbb314d65df2942b7ba"
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 1.07,
+      "log": "logs/fmt-check.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test incident_scaffold",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 15.55,
+      "log": "logs/incident-final.log",
+      "logSha256": "4f0d2e54c0321a2d795bbf1731cd8dd5cc2294327fa0cf069898318391b8bc4f"
+    },
+    {
+      "command": "git add ergo-sandbox/src/incident.rs ergo-sandbox/src/bin/incident/mod.rs ergo-sandbox/src/bin/ergo-es.rs ergo-sandbox/src/lib.rs ergo-sandbox/src/map/source.rs ergo-sandbox/src/map/explorer.rs ergo-sandbox/tests/incident_scaffold.rs docs/incident-scaffold.md",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-add-step2.log",
+      "logSha256": "2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab"
+    },
+    {
+      "command": "git commit -F docs/reports/batch-9/commit-2-message.txt",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-commit-step2.log",
+      "logSha256": "2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab"
+    },
+    {
+      "command": "git add ui/app.js ui/tests/binding-recipes.test.js",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-add-step3.log",
+      "logSha256": "2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab"
+    },
+    {
+      "command": "git commit -F docs/reports/batch-9/commit-3-message.txt",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-commit-step3.log",
+      "logSha256": "2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab"
+    },
+    {
+      "command": "cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present",
+      "exitStatus": "101",
+      "exitCode": 101,
+      "elapsedSeconds": 35.6,
+      "log": "logs/workspace.log",
+      "logSha256": "5e637d48426d85f557a7d500f9170ddadb24be71a8563497bee2974c504f5ea5"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test recognize every_recipe_is_put_into_words_completely",
+      "exitStatus": "101",
+      "exitCode": 101,
+      "elapsedSeconds": 0.45,
+      "log": "logs/recipe-recognition.log",
+      "logSha256": "8e7c08ef4ba4f486632cd934bb06a24b8ce143e7d3683bebb724dce247078c78"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test recognize --test compose_recipes",
+      "exitStatus": "101",
+      "exitCode": 101,
+      "elapsedSeconds": 2.18,
+      "log": "logs/recognition-and-recipes.log",
+      "logSha256": "55c42ac3c3f84446eaee7a253f97abcf428eee87bb1bbf5da2d0061d9350faa4"
+    },
+    {
+      "command": "DC_REPORT=\"$PWD/docs/reports/batch-9/decompile-measurement.json\" cargo test -p ergo-sandbox --test decompile_corpus bundled_contracts_and_compiled_fixtures_round_trip",
+      "exitStatus": "101",
+      "exitCode": 101,
+      "elapsedSeconds": 1.6,
+      "log": "logs/decompile-measurement.log",
+      "logSha256": "936e24bf08f69de0e1332ed88418861d50d10a13ecaecbd4f2716c3efce829ea"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test recognize",
+      "exitStatus": "101",
+      "exitCode": 101,
+      "elapsedSeconds": 0.11,
+      "log": "logs/recognition-final.log",
+      "logSha256": "77144e34673ef26e55ce27efd20309c69727611e410dbb56bcd7f5439d624b25"
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require W05 --report docs/reports/batch-9/W05.json",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 179.87,
+      "log": "logs/gate-w05.log",
+      "logSha256": "66a3dd61cd9c0bca4fca7c6e27f4a21056c7247fde72ef28a9e714848f17ea9e"
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require S05 --report docs/reports/batch-9/S05.json",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 2.36,
+      "log": "logs/gate-s05.log",
+      "logSha256": "2bee30247915006690c245d5d89af8db344e4f913fe5bc0f44302514076cba93"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test mapping_inventory --test property_inventory",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 1.23,
+      "log": "logs/inventories.log",
+      "logSha256": "ff256642dd6dc8d6328710d9c7086dc4e74eec4e2fc2652d273ac7afd356bd09"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test recognize --test compose_recipes",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 2.08,
+      "log": "logs/recognition-recipes-complete.log",
+      "logSha256": "75f95fc90c2805f3f3761c8d43405dc4121a1931f783f7e75cee2a93c2e9ad59"
+    },
+    {
+      "command": "cargo fmt --all",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.4,
+      "log": "logs/fmt-integration.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "DC_REPORT=\"$PWD/docs/reports/batch-9/decompile-measurement.json\" cargo test -p ergo-sandbox --test decompile_corpus bundled_contracts_and_compiled_fixtures_round_trip",
+      "exitStatus": "101",
+      "exitCode": 101,
+      "elapsedSeconds": 1.52,
+      "log": "logs/decompile-final-measurement.log",
+      "logSha256": "7658e8fca8bb28c6b9026f61a2d4758775940c9ffe8f7dba533d06c0e5df727c"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test decompile_corpus bundled_contracts_and_compiled_fixtures_round_trip",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 1.49,
+      "log": "logs/decompile-inventory-final.log",
+      "logSha256": "5f757def9bbbae6b863c380da064a93c971d0d0c1faeb21cc5bb2d6ab9a7c965"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 11.19,
+      "log": "logs/clippy-final.log",
+      "logSha256": "0c5bee21dd709deb0ee5e5187e27ea3c941dd39fc78f6136f8ffdcb46fec3210"
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.42,
+      "log": "logs/fmt-check-final.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "python3 docs/reports/batch-9/check-integrity.py",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.67,
+      "log": "logs/integrity.log",
+      "logSha256": "8625a5242b5ffe29509ff2a392cb18a654103f5e08eabad3e228617eed72f191"
+    },
+    {
+      "command": "git diff --check",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.05,
+      "log": "logs/whitespace.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "git add docs/ROADMAP.md docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md scripts/roadmap_gate.py scripts/test_roadmap_gate.py docs/reports/batch-9",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-add-step4.log",
+      "logSha256": "2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab"
+    },
+    {
+      "command": "git add -f docs/reports/batch-9/logs",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-add-logs.log",
+      "logSha256": "2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab"
+    },
+    {
+      "command": "git commit -F docs/reports/batch-9/commit-4-message.txt",
+      "exitStatus": "128",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0,
+      "log": "logs/git-commit-step4.log",
+      "logSha256": "2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab"
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require W05 --report docs/reports/batch-9/W05.json",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 180.4,
+      "log": "logs/gate-w05-final.log",
+      "logSha256": "1497eb22b6ef0468faabee7b1fddae8b29038918e2e1b409a8e956c2a7168d14"
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require S05 --report docs/reports/batch-9/S05.json",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 2.4,
+      "log": "logs/gate-s05-final.log",
+      "logSha256": "03492121febfe7ba836502eba3397ac5cdc3fe641f5c8916c4272b611ac390d1"
+    },
+    {
+      "command": "python3 docs/reports/batch-9/check-integrity.py",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.71,
+      "log": "logs/integrity-final.log",
+      "logSha256": "8625a5242b5ffe29509ff2a392cb18a654103f5e08eabad3e228617eed72f191"
+    },
+    {
+      "command": "cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 873.65,
+      "log": "logs/workspace-final.log",
+      "logSha256": "1b77e5efeb97d109f1076ef7a74b6ab3e2c288ff19b3c7d35022fa7b5f66d31e"
+    },
+    {
+      "command": "python3 docs/reports/batch-9/check-integrity.py",
+      "exitStatus": "0",
+      "exitCode": 0,
+      "elapsedSeconds": 0.68,
+      "log": "logs/integrity-completed.log",
+      "logSha256": "8625a5242b5ffe29509ff2a392cb18a654103f5e08eabad3e228617eed72f191"
+    }
+  ],
+  "postSession": [
+    {
+      "command": "cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present",
+      "exitCode": 0,
+      "log": "docs/reports/batch-9/logs/workspace-post-session.log",
+      "note": "Post-session re-verification outside the implementation sandbox; the same log records the W05 and S05 gate runs (exit 0) that wrote the committed W05.json and S05.json."
+    }
+  ],
+  "requiredValidationComplete": true
+}

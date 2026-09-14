@@ -82,6 +82,15 @@ impl<'a> Cx<'a> {
 
     /// One way to spend: who, then the conditions.
     fn path(&mut self, n: &'a Node) -> String {
+        let n = self.enter(self.resolve(n));
+        // A guarded recipe can return sigma propositions from either branch.
+        // Describe both branches literally; never infer reachability.
+        if let NodeKind::If(condition, yes, no) = &n.kind {
+            let condition = self.cond(condition);
+            let yes = self.path(yes);
+            let no = self.path(no);
+            return format!("({yes}) when {condition}; otherwise ({no})");
+        }
         let mut keys: Vec<String> = Vec::new();
         let mut conds: Vec<String> = Vec::new();
         for part in flatten(self.resolve(n), "&&") {
@@ -322,6 +331,11 @@ impl<'a> Cx<'a> {
                 }
             }
         }
+        // Reserve-product comparisons are literal arithmetic descriptions.
+        // text() still marks any unsupported operand incomplete.
+        if matches!(&a.kind, Infix("+" | "-" | "*" | "/", ..)) {
+            return Some(format!("{} {rel} {}", self.text(a), self.text(b)));
+        }
         // script equality
         if let Prop(bx, f) = &a.kind {
             if f == "propositionBytes" {
@@ -333,6 +347,9 @@ impl<'a> Cx<'a> {
                             && matches!(self.resolve(other).kind, Leaf("SELF")) =>
                     {
                         format!("{place} stays under this contract")
+                    }
+                    Prop(other, g) if g == "propositionBytes" => {
+                        format!("{place}'s script {rel} {}'s script", self.place(other))
                     }
                     Method(key, m, _) if m == "propBytes" => {
                         format!("{place} goes to {}", self.who(key))
@@ -526,6 +543,7 @@ impl<'a> Cx<'a> {
         let n = self.resolve(n);
         use NodeKind::*;
         match &n.kind {
+            Coll(element, items) if items.is_empty() => format!("an empty {element} collection"),
             Int(i) => i.to_string(),
             Num(s) => s.trim_end_matches(['L', 'y', 's']).to_string(),
             Bool(b) => b.to_string(),

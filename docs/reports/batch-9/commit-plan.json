@@ -1,0 +1,56 @@
+{
+  "status": "uncommitted: worktree index is mounted read-only",
+  "steps": [
+    {
+      "step": 1,
+      "paths": [
+        "examples/contracts/recipes/pool-bound-swap.es",
+        "examples/contracts/recipes/pool-bound-swap.test.json",
+        "examples/contracts/recipes/successor-locked-vault.es",
+        "examples/contracts/recipes/successor-locked-vault.test.json",
+        "examples/mutants/recipes.json",
+        "examples/mutants/w05/v1",
+        "ergo-sandbox/tests/compose_recipes.rs",
+        "ergo-sandbox/tests/mutation_corpus.rs",
+        "ergo-sandbox/src/recognize.rs",
+        "ergo-sandbox/tests/decompile_corpus.rs",
+        "ergo-sandbox/tests/fixtures/w05_decompile_expectations.json"
+      ],
+      "messageFile": "docs/reports/batch-9/commit-1-message.txt"
+    },
+    {
+      "step": 2,
+      "paths": [
+        "ergo-sandbox/src/incident.rs",
+        "ergo-sandbox/src/bin/incident/mod.rs",
+        "ergo-sandbox/src/bin/ergo-es.rs",
+        "ergo-sandbox/src/lib.rs",
+        "ergo-sandbox/src/map/source.rs",
+        "ergo-sandbox/src/map/explorer.rs",
+        "ergo-sandbox/tests/incident_scaffold.rs",
+        "docs/incident-scaffold.md"
+      ],
+      "messageFile": "docs/reports/batch-9/commit-2-message.txt"
+    },
+    {
+      "step": 3,
+      "paths": [
+        "ui/app.js",
+        "ui/tests/binding-recipes.test.js"
+      ],
+      "messageFile": "docs/reports/batch-9/commit-3-message.txt"
+    },
+    {
+      "step": 4,
+      "paths": [
+        "docs/ROADMAP.md",
+        "docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md",
+        "scripts/roadmap_gate.py",
+        "scripts/test_roadmap_gate.py",
+        "docs/reports/batch-9"
+      ],
+      "messageFile": "docs/reports/batch-9/commit-4-message.txt"
+    }
+  ],
+  "note": "Stage each group and commit with git commit -F messageFile. Force-add only docs/reports/batch-9/logs if global ignore rules hide log files. Do not push."
+}

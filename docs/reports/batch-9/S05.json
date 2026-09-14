@@ -1,0 +1,91 @@
+{
+  "formatVersion": 1,
+  "results": [
+    {
+      "unit": "scoreboard",
+      "status": "passed"
+    },
+    {
+      "unit": "W00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "S05",
+      "status": "passed",
+      "detail": "required tests executed"
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import sys, unittest\ndef names(suite):\n    for test in suite:\n        if isinstance(test, unittest.TestSuite):\n            yield from names(test)\n        else:\n            yield test.id().rsplit('.', 1)[-1].removeprefix('test_')\nloader = unittest.TestLoader()\nsuite = loader.discover('scripts', pattern=sys.argv[1] + '.py')\nif loader.errors:\n    sys.exit('\\n'.join(loader.errors))\nfor name in names(suite):\n    print(name + ': test')\n",
+        "test_roadmap_gate"
+      ],
+      "exitCode": 0,
+      "output": "ci_accepts_only_validated_recorded_stops_not_completion: test\nci_rejects_corrupt_stop_evidence: test\nci_rejects_failed_missing_and_blocked_units: test\nci_reports_future_units_as_not_started_without_running_them: test\ncommand_normalizes_before_printing_recording_and_hashing: test\nabsolute_cargo_target_is_normalized_before_report_hashing: test\ndependencies_are_in_policy_order: test\nextra_commands_cannot_be_omitted: test\nfuture_units_fail_as_unimplemented_not_missing_gate: test\ni01_extras_require_the_verify_dom_test: test\ni03_extras_require_the_watch_dom_test: test\nincomplete_stop_record_is_rejected: test\nmalformed_inputs_still_write_a_failing_report: test\nmissing_evidence_is_distinct_from_product_failure: test\nmissing_scoreboard_is_rejected: test\npolicy_requires_unique_block_and_known_completion: test\npolicy_v2_block_parses: test\npython_targets_require_discovered_executed_unskipped_names: test\nrequired_names_must_be_discovered_and_executed: test\nresolution_requires_exact_policy_record_and_decision: test\nrunner_captures_diagnostics_without_weakening_execution_checks: test\ns01_extras_require_the_checklist_dom_test: test\nscoreboard_cannot_self_attest_changed_measurements: test\nscoreboard_reads_every_baseline_artifact: test\nskipped_tests_are_rejected: test\nstatic_lint_namespace_does_not_relax_frozen_hunt_measurements: test\nthresholds_are_read_from_policy: test\nunknown_unit_is_rejected: test\nw02_and_w03_extras_require_their_dom_tests: test\nw04_extras_require_both_dom_tests: test\nw05_extras_require_the_binding_recipe_dom_test: test\nzero_test_filter_is_rejected: test\n",
+      "outputSha256": "0cb4d4f3962da038fc255490409c380fb3c16c4c78578c9e4397d44eb5ef94a8"
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-b",
+        "-v",
+        "-s",
+        "scripts",
+        "-p",
+        "test_roadmap_gate.py"
+      ],
+      "exitCode": 0,
+      "output": "test_ci_accepts_only_validated_recorded_stops_not_completion (test_roadmap_gate.CiGovernanceTests.test_ci_accepts_only_validated_recorded_stops_not_completion) ... ok\ntest_ci_rejects_corrupt_stop_evidence (test_roadmap_gate.CiGovernanceTests.test_ci_rejects_corrupt_stop_evidence) ... ok\ntest_ci_rejects_failed_missing_and_blocked_units (test_roadmap_gate.CiGovernanceTests.test_ci_rejects_failed_missing_and_blocked_units) ... ok\ntest_ci_reports_future_units_as_not_started_without_running_them (test_roadmap_gate.CiGovernanceTests.test_ci_reports_future_units_as_not_started_without_running_them) ... ok\ntest_command_normalizes_before_printing_recording_and_hashing (test_roadmap_gate.CiGovernanceTests.test_command_normalizes_before_printing_recording_and_hashing) ... ok\ntest_absolute_cargo_target_is_normalized_before_report_hashing (test_roadmap_gate.RoadmapGateTests.test_absolute_cargo_target_is_normalized_before_report_hashing) ... ok\ntest_dependencies_are_in_policy_order (test_roadmap_gate.RoadmapGateTests.test_dependencies_are_in_policy_order) ... ok\ntest_extra_commands_cannot_be_omitted (test_roadmap_gate.RoadmapGateTests.test_extra_commands_cannot_be_omitted) ... ok\ntest_future_units_fail_as_unimplemented_not_missing_gate (test_roadmap_gate.RoadmapGateTests.test_future_units_fail_as_unimplemented_not_missing_gate) ... ok\ntest_i01_extras_require_the_verify_dom_test (test_roadmap_gate.RoadmapGateTests.test_i01_extras_require_the_verify_dom_test) ... ok\ntest_i03_extras_require_the_watch_dom_test (test_roadmap_gate.RoadmapGateTests.test_i03_extras_require_the_watch_dom_test) ... ok\ntest_incomplete_stop_record_is_rejected (test_roadmap_gate.RoadmapGateTests.test_incomplete_stop_record_is_rejected) ... ok\ntest_malformed_inputs_still_write_a_failing_report (test_roadmap_gate.RoadmapGateTests.test_malformed_inputs_still_write_a_failing_report) ... ok\ntest_missing_evidence_is_distinct_from_product_failure (test_roadmap_gate.RoadmapGateTests.test_missing_evidence_is_distinct_from_product_failure) ... ok\ntest_missing_scoreboard_is_rejected (test_roadmap_gate.RoadmapGateTests.test_missing_scoreboard_is_rejected) ... ok\ntest_policy_requires_unique_block_and_known_completion (test_roadmap_gate.RoadmapGateTests.test_policy_requires_unique_block_and_known_completion) ... ok\ntest_policy_v2_block_parses (test_roadmap_gate.RoadmapGateTests.test_policy_v2_block_parses) ... ok\ntest_python_targets_require_discovered_executed_unskipped_names (test_roadmap_gate.RoadmapGateTests.test_python_targets_require_discovered_executed_unskipped_names) ... ok\ntest_required_names_must_be_discovered_and_executed (test_roadmap_gate.RoadmapGateTests.test_required_names_must_be_discovered_and_executed) ... ok\ntest_resolution_requires_exact_policy_record_and_decision (test_roadmap_gate.RoadmapGateTests.test_resolution_requires_exact_policy_record_and_decision) ... ok\ntest_runner_captures_diagnostics_without_weakening_execution_checks (test_roadmap_gate.RoadmapGateTests.test_runner_captures_diagnostics_without_weakening_execution_checks) ... ok\ntest_s01_extras_require_the_checklist_dom_test (test_roadmap_gate.RoadmapGateTests.test_s01_extras_require_the_checklist_dom_test) ... ok\ntest_scoreboard_cannot_self_attest_changed_measurements (test_roadmap_gate.RoadmapGateTests.test_scoreboard_cannot_self_attest_changed_measurements) ... ok\ntest_scoreboard_reads_every_baseline_artifact (test_roadmap_gate.RoadmapGateTests.test_scoreboard_reads_every_baseline_artifact) ... ok\ntest_skipped_tests_are_rejected (test_roadmap_gate.RoadmapGateTests.test_skipped_tests_are_rejected) ... ok\ntest_static_lint_namespace_does_not_relax_frozen_hunt_measurements (test_roadmap_gate.RoadmapGateTests.test_static_lint_namespace_does_not_relax_frozen_hunt_measurements) ... ok\ntest_thresholds_are_read_from_policy (test_roadmap_gate.RoadmapGateTests.test_thresholds_are_read_from_policy) ... ok\ntest_unknown_unit_is_rejected (test_roadmap_gate.RoadmapGateTests.test_unknown_unit_is_rejected) ... ok\ntest_w02_and_w03_extras_require_their_dom_tests (test_roadmap_gate.RoadmapGateTests.test_w02_and_w03_extras_require_their_dom_tests) ... ok\ntest_w04_extras_require_both_dom_tests (test_roadmap_gate.RoadmapGateTests.test_w04_extras_require_both_dom_tests) ... ok\ntest_w05_extras_require_the_binding_recipe_dom_test (test_roadmap_gate.RoadmapGateTests.test_w05_extras_require_the_binding_recipe_dom_test) ... ok\ntest_zero_test_filter_is_rejected (test_roadmap_gate.RoadmapGateTests.test_zero_test_filter_is_rejected) ... ok\n\n----------------------------------------------------------------------\nRan 32 tests in 0.657s\n\nOK\n",
+      "outputSha256": "47365c078582214220dda210ad4c03795ab3d659a9d4970d6bdf82ef53990f6d"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "incident_scaffold",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 1.35s\n     Running tests/incident_scaffold.rs ($CARGO_TARGET_DIR/release/deps/incident_scaffold-3a473cef93b5abd5)\nincident_cli_rejects_incomplete_options_before_network_access: test\nincident_scaffold_never_fills_expectations: test\nincident_scaffold_reproduces_use_boxes: test\nrepeated_scripts_and_data_inputs_keep_original_positions_and_hex: test\n\n4 tests, 0 benchmarks\n",
+      "outputSha256": "4713fc40c9e2737035172488064b600996ca3c0920092467ce2a5a728b3bec8e"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "incident_scaffold",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/incident_scaffold.rs ($CARGO_TARGET_DIR/release/deps/incident_scaffold-3a473cef93b5abd5)\n\nrunning 4 tests\ntest repeated_scripts_and_data_inputs_keep_original_positions_and_hex ... ok\ntest incident_scaffold_reproduces_use_boxes ... ok\ntest incident_cli_rejects_incomplete_options_before_network_access ... ok\ntest incident_scaffold_never_fills_expectations ... ok\n\nsuccesses:\n\nsuccesses:\n    incident_cli_rejects_incomplete_options_before_network_access\n    incident_scaffold_never_fills_expectations\n    incident_scaffold_reproduces_use_boxes\n    repeated_scripts_and_data_inputs_keep_original_positions_and_hex\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s\n\n",
+      "outputSha256": "ed579f870e6195c8d4f5bcec83895da321b1925e9a32ab449651d2d3fff55702"
+    }
+  ],
+  "evidenceHashes": {
+    "docs/ingestion-lithos-results.json": "1c43bc46d910b11d4e970ce714657175515a0cf61e1ec420b4c58a3d4e7bc69e",
+    "ergo-sandbox/tests/fixtures/decompile_corpus_expectations.json": "5d2bfc24d758dac520e24968793fe95a87c1cc673d54fe577d4a93b89768aa69",
+    "examples/mutants/answer-key.custody-v1.json": "4d038f5ab7722e954c44c426719237c9df2098e689f54eb4c679f3348b485259",
+    "examples/mutants/answer-key.json": "560a1247352e12c06e4f9570b68d4c3ce4b3629026287a2cd3a6494f58150ed0",
+    "docs/roadmap-metrics.json": "4cc60a3f4b342aebe85b91a17ff64c7b79d6fcace73ad0518e7c49e3a57c134d"
+  },
+  "policySha256": "07c11703f9821d7ab72b04aa1785a0038b83ce4b674568fc520c6a0659f5066a",
+  "ciAccepted": true,
+  "passed": true
+}

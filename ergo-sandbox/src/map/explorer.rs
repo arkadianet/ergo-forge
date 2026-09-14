@@ -198,24 +198,108 @@ impl ChainSource for ExplorerSource {
 
     fn transaction(&self, tx_id: &str) -> Result<TxBoxes, SourceError> {
         let v = self.get(&format!("/api/v1/transactions/{tx_id}"))?;
-        let side = |k: &str| -> Result<Vec<ChainBox>, SourceError> {
-            match v.get(k) {
-                None | Some(Value::Null) => Ok(Vec::new()),
-                Some(a) => a
-                    .as_array()
-                    .ok_or_else(|| {
-                        SourceError::Backend(format!("transaction {tx_id}: `{k}` is not an array"))
-                    })?
-                    .iter()
-                    .map(to_box)
-                    .collect(),
+        transaction_boxes(&v, |id| self.get(&format!("/api/v1/boxes/{id}")))
+    }
+}
+
+/// Transaction parsing preserves original hex spelling and requires creation
+/// height. The map's legacy box normalisation/defaults remain unchanged.
+/// Explorer input/data-input references are hydrated through the same read-only
+/// box endpoint; the closure also makes this entire adapter testable offline.
+fn transaction_boxes(
+    v: &Value,
+    mut fetch_box: impl FnMut(&str) -> Result<Value, SourceError>,
+) -> Result<TxBoxes, SourceError> {
+    let mut side = |key: &str| -> Result<Vec<ChainBox>, SourceError> {
+        let entries = match v.get(key) {
+            None | Some(Value::Null) if key == "dataInputs" => return Ok(Vec::new()),
+            Some(Value::Array(a)) => a,
+            _ => {
+                return Err(SourceError::Backend(format!(
+                    "transaction `{key}` is not an array"
+                )))
             }
         };
-        Ok(TxBoxes {
-            inputs: side("inputs")?,
-            outputs: side("outputs")?,
-        })
-    }
+        entries
+            .iter()
+            .map(|entry| {
+                let id = entry
+                    .get("boxId")
+                    .and_then(Value::as_str)
+                    .ok_or_else(|| SourceError::Backend("transaction box has no boxId".into()))?;
+                let recorded;
+                let b = if [
+                    "ergoTree",
+                    "value",
+                    "creationHeight",
+                    "assets",
+                    "additionalRegisters",
+                ]
+                .iter()
+                .all(|key| entry.get(key).is_some_and(|v| !v.is_null()))
+                {
+                    entry
+                } else {
+                    recorded = fetch_box(id)?;
+                    if recorded
+                        .get("boxId")
+                        .and_then(Value::as_str)
+                        .map(str::to_ascii_lowercase)
+                        != Some(id.to_ascii_lowercase())
+                    {
+                        return Err(SourceError::Backend(
+                            "hydrated boxId differs from transaction reference".into(),
+                        ));
+                    }
+                    &recorded
+                };
+                if ["assets", "additionalRegisters"]
+                    .iter()
+                    .any(|key| b.get(key).is_none_or(Value::is_null))
+                {
+                    return Err(SourceError::Backend(format!(
+                        "box {id}: missing tokens/registers after hydration"
+                    )));
+                }
+                let mut parsed = to_box(b)?;
+                parsed.creation_height = b
+                    .get("creationHeight")
+                    .and_then(Value::as_u64)
+                    .and_then(|h| u32::try_from(h).ok())
+                    .ok_or_else(|| {
+                        SourceError::Backend(format!("box {id}: missing/invalid creationHeight"))
+                    })?;
+                // Keep the transaction reference's own spelling: an explorer that
+                // lower-cases hydrated ids must not change the incident artifacts.
+                parsed.box_id = id.to_string();
+                parsed.ergo_tree = b["ergoTree"].as_str().unwrap().to_string();
+                for (token, raw) in parsed
+                    .tokens
+                    .iter_mut()
+                    .zip(b["assets"].as_array().into_iter().flatten())
+                {
+                    token.id = raw["tokenId"].as_str().unwrap().to_string();
+                }
+                Ok(parsed)
+            })
+            .collect()
+    };
+    let inclusion_height = match v.get("inclusionHeight") {
+        None | Some(Value::Null) => None,
+        Some(h) => Some(
+            h.as_u64()
+                .and_then(|h| u32::try_from(h).ok())
+                .ok_or_else(|| {
+                    SourceError::Backend("invalid transaction inclusionHeight".into())
+                })?,
+        ),
+    };
+    Ok(TxBoxes {
+        inputs: side("inputs")?,
+        outputs: side("outputs")?,
+        data_inputs: side("dataInputs")?,
+        inclusion_height,
+    })
 }
 
 /// Merge one page into a recorded result set, keeping the source's total.
@@ -364,6 +448,53 @@ impl<S: ChainSource> ChainSource for RecordingSource<S> {
 mod tests {
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn incident_transaction_adapter_preserves_hex_and_hydrates_references() {
+        let b = json!({"boxId": "AB".repeat(32), "ergoTree": "10010101D17300",
+            "value": 9007199254740993u64, "creationHeight": 123,
+            "assets": [{"tokenId": "Cd".repeat(32), "amount": 7}],
+            "additionalRegisters": {"R4": {"serializedValue": "0e02ABcd"}}});
+        let mut fetched = Vec::new();
+        let tx = json!({"inputs": [{"boxId": b["boxId"]}], "outputs": [b],
+            "dataInputs": [{"boxId": b["boxId"]}], "inclusionHeight": 456});
+        let parsed = transaction_boxes(&tx, |id| {
+            fetched.push(id.to_string());
+            Ok(b.clone())
+        })
+        .unwrap();
+        assert_eq!(fetched, vec![b["boxId"].as_str().unwrap(); 2]);
+        assert_eq!(parsed.inputs, parsed.outputs);
+        assert_eq!(parsed.data_inputs, parsed.outputs);
+        assert_eq!(parsed.inclusion_height, Some(456));
+        assert_eq!(parsed.inputs[0].value, 9007199254740993);
+        assert_eq!(parsed.inputs[0].ergo_tree, "10010101D17300");
+        assert_eq!(parsed.inputs[0].tokens[0].id, "Cd".repeat(32));
+        assert_eq!(parsed.inputs[0].registers["R4"], "0e02ABcd");
+        let mut missing = tx.clone();
+        missing.as_object_mut().unwrap().remove("inclusionHeight");
+        assert_eq!(
+            transaction_boxes(&missing, |_| Ok(b.clone()))
+                .unwrap()
+                .inclusion_height,
+            None
+        );
+        let mut bad = b.clone();
+        bad.as_object_mut().unwrap().remove("creationHeight");
+        assert!(transaction_boxes(&tx, |_| Ok(bad.clone()))
+            .unwrap_err()
+            .to_string()
+            .contains("creationHeight"));
+        bad = b.clone();
+        bad["boxId"] = json!("00".repeat(32));
+        assert!(transaction_boxes(&tx, |_| Ok(bad.clone())).is_err());
+        // Case-only differences are accepted, but the reference spelling wins.
+        let mut lower = b.clone();
+        lower["boxId"] = json!("ab".repeat(32));
+        let kept = transaction_boxes(&tx, |_| Ok(lower.clone())).unwrap();
+        assert_eq!(kept.inputs[0].box_id, "AB".repeat(32));
+        assert_eq!(kept.data_inputs[0].box_id, "AB".repeat(32));
+    }
 
     #[test]
     fn explorer_registers_survive_box_and_page_parsing() {
