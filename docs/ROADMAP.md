@@ -1045,7 +1045,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
         "two_instance_mutant_is_found_and_control_is_not",
         "caps_and_truncation_are_recorded"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "X02",

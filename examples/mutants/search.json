@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "method": "unsigned-preflight",
+  "nodeValidated": false,
+  "note": "S03 search-family pairs, separate from the frozen hunt corpus (M1\u2013M8), staticLintPairs and recipeMutants. Each pair names a counterexample the family must find and a control it must not, under the caps recorded here; the caps are part of the measurement. The counterexample and control are the S00 class-11 vector pair.",
+  "searchFamilyPairs": [
+    {
+      "id": "S03-01-v1",
+      "version": 1,
+      "family": "two-instance",
+      "counterexample": "examples/contracts/vectors/shared-payment-across-instances/vulnerable.es",
+      "control": "examples/contracts/vectors/shared-payment-across-instances/fixed.es",
+      "vector": "shared-payment-across-instances",
+      "request": {
+        "protectedValue": 10000000,
+        "protocolNft": "1111111111111111111111111111111111111111111111111111111111111111",
+        "paymentTree": "0008cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+        "height": 1868204,
+        "network": "mainnet",
+        "paymentCarriesNft": true
+      },
+      "caps": {
+        "maxProbes": 50000,
+        "maxPermutations": 120,
+        "synthesis": {
+          "multiInstance": true
+        }
+      },
+      "expectedCounterexample": "drainable",
+      "expectedControl": "notUnderProbes",
+      "expectedWithoutFamily": "notUnderProbes",
+      "note": "The fixed payment output carries the instance's singleton: the vector contract never binds its token, so a bare payment lets the existing families report the NFT leaving and the pair would not isolate the two-instance mechanism."
+    }
+  ]
+}

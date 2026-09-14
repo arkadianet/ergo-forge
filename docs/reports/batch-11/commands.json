@@ -1,0 +1,92 @@
+{
+  "formatVersion": 1,
+  "baseRevision": "fc26a95",
+  "branch": "v2/batch-11",
+  "cargoTargetDir": "$CARGO_TARGET_DIR",
+  "implementedBy": "Claude session (Codex refused the brief twice: cybersecurity classifier)",
+  "commands": [
+    {
+      "command": "cargo fmt --all -- --check",
+      "exitCode": 0,
+      "log": "docs/reports/batch-11/logs/verification.log"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "exitCode": 0,
+      "log": "docs/reports/batch-11/logs/verification.log"
+    },
+    {
+      "command": "cargo clippy -p ergo-sandbox -p ergo-web --all-targets --features cost-trace -- -D warnings",
+      "exitCode": 0,
+      "log": "docs/reports/batch-11/logs/verification.log"
+    },
+    {
+      "command": "python3 scripts/test_roadmap_gate.py",
+      "exitCode": 0,
+      "log": "docs/reports/batch-11/logs/verification.log"
+    },
+    {
+      "command": "python3 scripts/test_release.py",
+      "exitCode": 0,
+      "log": "docs/reports/batch-11/logs/verification.log"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test drain_promotion",
+      "exitCode": 0,
+      "log": "docs/reports/batch-11/logs/verification.log"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test drain",
+      "exitCode": 0,
+      "log": "docs/reports/batch-11/logs/verification.log"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test vector_catalogue",
+      "exitCode": 0,
+      "log": "docs/reports/batch-11/logs/verification.log"
+    },
+    {
+      "command": "cargo test --workspace",
+      "exitCode": 0,
+      "log": "docs/reports/batch-11/logs/verification.log",
+      "note": "no test filter and no --skip: the whole workspace suite, including the seed-corpus floor and the mutation-corpus measurement"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox -p ergo-web --features cost-trace -- --skip the_corpus_is_measured_and_does_not_regress",
+      "exitCode": 0,
+      "log": "docs/reports/batch-11/logs/verification.log"
+    },
+    {
+      "command": "cargo test -p ergo-web --no-default-features",
+      "exitCode": 0,
+      "log": "docs/reports/batch-11/logs/verification.log"
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test mapping_inventory --test property_inventory --test mutation_corpus",
+      "exitCode": 0,
+      "log": "docs/reports/batch-11/logs/verification.log"
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require S03 --report docs/reports/batch-11/S03.json",
+      "exitCode": 0,
+      "log": "docs/reports/batch-11/logs/verification.log"
+    }
+  ],
+  "earlierAttempts": [
+    {
+      "command": "cargo test -p ergo-sandbox --test drain_promotion",
+      "exitCode": 101,
+      "note": "first run of two_instance_mutant_is_found_and_control_is_not: the single-instance request was already drainable because the unbound protocol NFT left through the free output; the pair's fixed payment output now carries the singleton so the two-instance mechanism is isolated"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "exitCode": 101,
+      "note": "very complex tuple type in the family driver; factored into a struct"
+    },
+    {
+      "command": "cargo test --workspace",
+      "exitCode": 101,
+      "note": "legacy_metrics_are_measured_without_baseline_changes: the baseline guard admitted only the X01 scoreboard key; S03 is now admitted alongside it, historical fields still authenticated byte-for-byte"
+    }
+  ]
+}

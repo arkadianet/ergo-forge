@@ -247,6 +247,24 @@
         "engine-before.json": "603aaa89ea3d5cc3857a7ea6308d4e2d14485006e1dfa96d4a2e16a90fbd0922",
         "engine-after.json": "e9f2f18eb000a35796ae4b90a5434b6dd8f6e100d4906cd17705cedeffd9944d"
       }
+    },
+    "S03": {
+      "family": "two-instance",
+      "optIn": "synthesis.multiInstance",
+      "pair": "examples/mutants/search.json#S03-01-v1",
+      "counterexample": "examples/contracts/vectors/shared-payment-across-instances/vulnerable.es",
+      "control": "examples/contracts/vectors/shared-payment-across-instances/fixed.es",
+      "caps": {
+        "maxProbes": 50000,
+        "maxPermutations": 120
+      },
+      "capAllocation": "the request cap split evenly across the base run and one derived run per protected input",
+      "found": "drainable (derived run two-instance(protected=0))",
+      "controlFound": "notUnderProbes",
+      "promotion": "confirmed-violation, nodeValidated true, on the explicit request that declares the derived box as hypothetical material (tests/drain_promotion.rs::two_instance_candidate_promotes_when_declared)",
+      "stop": null,
+      "report": "docs/reports/batch-11/REPORT.md",
+      "withoutFamily": "notUnderProbes"
     }
   }
 }
