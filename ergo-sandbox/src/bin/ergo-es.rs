@@ -12,6 +12,7 @@ use ergo_sandbox::{compile_source, eval_scenario, inspect, Scenario};
 use ergo_ser::address::NetworkPrefix;
 
 mod deployment;
+mod watching;
 
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -20,10 +21,11 @@ fn main() -> ExitCode {
         return ExitCode::from(2);
     };
     let rest = &args[1..];
-    if matches!(cmd.as_str(), "verify" | "lock" | "verify-lock") {
+    if matches!(cmd.as_str(), "verify" | "lock" | "verify-lock" | "watch") {
         let result = match cmd.as_str() {
             "verify" => deployment::verify(rest),
             "lock" => deployment::lock(rest),
+            "watch" => watching::run(rest),
             _ => deployment::verify_lock(rest),
         };
         return match result {
@@ -94,6 +96,15 @@ USAGE:
       Optional live lookup uses --explorer or EXPLORER_URL. Otherwise unverified.
       Lint digest: SHA-256 of compact JSON sorted [lint id, node id, message] triples.
       See docs/immutability.md for digest and CI project conventions.
+  ergo-es watch <contract.lock.json>... --nft tokenId [--nft tokenId ...]
+                [--register R4 R5 ...] [--baseline box.json] [--explorer URL] [--json]
+      Each NFT is checked against each lockfile. One holder page, limit 2.
+      Exit 0 all bytes_match and registers unchanged; 3 bytes_differ or changed;
+      4 any unverified (takes precedence over 3); 1 input error.
+      Uses --explorer or EXPLORER_URL; absent explorer is unverified.
+      First observation establishes register baselines; JSON returns baselineBox
+      for caller reuse. Observes source responses, not verified chain membership.
+      Nothing is signed or broadcast. See docs/immutability.md.
   ergo-es checklist <source-file|source|treeHex|address> [--scenario f.json]
                     [--evidence bundle.json] [--json] [--network mainnet|testnet]
       S00 review questions, with visible unchecked rows and anchored static observations.
