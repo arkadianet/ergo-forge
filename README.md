@@ -63,7 +63,7 @@ cargo run -p ergo-sandbox --features cost-trace --bin ergo-es -- eval scenario.j
 cargo run -p ergo-web --bin ergo-web        # http://127.0.0.1:8080 — the playground
 EXPLORER_URL=https://api.ergoplatform.com RATE_LIMIT_PER_MINUTE=60 \
   cargo run -p ergo-web --bin ergo-web      # with chain lookups, for a public instance
-docker run --rm -p 127.0.0.1:8080:8080 ghcr.io/arkadianet/ergo-web:0.3.0
+docker run --rm -p 127.0.0.1:8080:8080 ghcr.io/arkadianet/ergo-web:0.5.0
 ```
 
 Without `EXPLORER_URL` the service makes no outbound calls at all. With it,
@@ -138,7 +138,7 @@ table to the job summary:
 - uses: arkadianet/ergo-forge/.github/actions/test@main
   with:
     suites: "contracts/**/contract.test.json"   # default: **/contract.test.json
-    version: latest                             # or a tag, e.g. v0.3.0; 'source' builds from an ergo-forge checkout
+    version: latest                             # or a tag, e.g. v0.5.0; 'source' builds from an ergo-forge checkout
 ```
 
 Prebuilt `ergo-es` binaries (Linux x86_64/aarch64, macOS arm64) are attached
@@ -149,8 +149,11 @@ to every release alongside the container image.
 - **Compiler and reducer are the node's own.** The decompiler is graded by
   byte-exact recompilation. Historical node-corpus measurements were 270 of
   279 mainnet trees and 332 of 344 trees from a sampled set of blocks. The
-  current committed fixture inventory records 238/329 exact obtained trees
-  (339 rows including 10 initial compile failures); see the
+  historical committed baseline records 238/329 exact obtained trees.
+  Including the v2 additions, the bundled inventory records 264/357 exact
+  trees (367 rows including 10 initial compile failures). On the current
+  engine pin, the node corpus measures 79/92 exact seed entries and 270/279
+  exact mainnet trees; see the
   [versioned scoreboard](docs/roadmap-metrics.json). Misses degrade to
   honest `<…>` placeholders and an audit over a partial tree says so.
 - **Separate structural coverage measurement.** A supplied local-index export

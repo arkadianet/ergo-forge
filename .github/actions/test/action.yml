@@ -13,7 +13,7 @@ inputs:
     required: false
     default: ""
   version:
-    description: "ergo-forge release to use (a tag such as v0.3.0, or 'latest'), or 'source' to build ergo-es from the checked-out ergo-forge workspace (for this repo's own suites)."
+    description: "ergo-forge release to use (a tag such as v0.5.0, or 'latest'), or 'source' to build ergo-es from the checked-out ergo-forge workspace (for this repo's own suites)."
     required: false
     default: "latest"
 runs:
