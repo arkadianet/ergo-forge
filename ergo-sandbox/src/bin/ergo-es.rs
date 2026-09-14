@@ -1139,7 +1139,7 @@ fn cmd_hunt(args: &[String]) -> Result<(), String> {
                     _ => String::new(),
                 };
                 println!(
-                    "    {:?} height {:>8}  {shape:<8}  {:<11}cost {}{detail}",
+                    "    {:?} height {:>8}  {shape:<8}  {:<11} cost {}{detail}",
                     p.kind,
                     p.height,
                     verdict_str(p.verdict),

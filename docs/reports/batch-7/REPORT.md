@@ -213,7 +213,7 @@ No post-session verification was claimed by this implementation session. The
 retained commit messages and logs are available for the later authorised commit
 step outside the read-only Git metadata restriction.
 
-## Post-session verification
+## Post-session re-verification
 
 After the implementation session ended, the same tree was re-verified outside
 its sandbox with this batch's build directory (`$CARGO_TARGET_DIR`), before the

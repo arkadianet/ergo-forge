@@ -302,7 +302,13 @@ pub fn hunt(tree_bytes: &[u8], opts: &HuntOptions) -> Result<Hunt, SandboxError>
                             minimum_output_value(b, index as u16, caps.min_value_per_byte)?;
                         }
                     }
-                    sc.cost_limit = Some(caps.block_cost_limit);
+                    // The budget is the node's block cost limit, stated
+                    // explicitly for the cost probe; no lower limit is invented,
+                    // and the other probes keep the evaluator's default (the
+                    // same value) implicitly.
+                    if kind == ProbeKind::CostLimit {
+                        sc.cost_limit = Some(caps.block_cost_limit);
+                    }
                 }
                 let o = eval_scenario(&sc)?;
                 let cost_exhausted = o

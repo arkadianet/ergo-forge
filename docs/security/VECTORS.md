@@ -244,7 +244,7 @@ Instruments: `lint:upgrade-hook`, `scenario`, `manual`.
 
 Suites: [examples/contracts/vectors/mutable-upgrade-digest/contract.test.json](../../examples/contracts/vectors/mutable-upgrade-digest/contract.test.json), [examples/contracts/vectors/mutable-upgrade-digest/fixed.test.json](../../examples/contracts/vectors/mutable-upgrade-digest/fixed.test.json).
 
-The pair uses a synthetic R4 digest and changes it during a same-script continuation; the fixed branch carries the old digest. A reviewer identifies who can write the digest, the authorised upgrade procedure and whether every continuation preserves or authorises it. trust-assumptions currently covers extracted data-input provenance, not SELF upgrade hooks; I04 is future work. I04 now supplies lint:upgrade-hook as a LOW static observation for recognised mutable continuations; the versioned I04 pair and batch-7 sweep record its precision. The earlier future-work note describes the S00 baseline.
+The pair uses a synthetic R4 digest and changes it during a same-script continuation; the fixed branch carries the old digest. A reviewer identifies who can write the digest, the authorised upgrade procedure and whether every continuation preserves or authorises it. trust-assumptions covers extracted data-input provenance, not SELF upgrade hooks. I04 now supplies lint:upgrade-hook as a LOW static observation for recognised mutable continuations; the versioned I04 pair and batch-7 sweep record its precision. The earlier future-work note describes the S00 baseline.
 
 ### Compiled constants differ from the reviewed deployment
 
