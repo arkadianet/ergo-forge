@@ -53,7 +53,7 @@ class ReleaseTests(unittest.TestCase):
         implemented = {u['id'] for u in policy['units'] if u['implemented']}
         self.assertLessEqual(implemented, set(re.findall(r'\b[WSIXE]\d{2}\b', section)))
         spec = (ROOT / 'docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md').read_text()
-        for batch in range(10):
+        for batch in range(11):
             pattern = rf'^\| {batch} \| ([^|]+) \|'
             expected = re.search(pattern, spec, re.M)
             actual = re.search(pattern, section, re.M)

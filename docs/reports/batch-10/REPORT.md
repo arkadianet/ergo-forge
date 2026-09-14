@@ -267,9 +267,9 @@ included. Logs contain portable locations; hashes cover the retained log bytes.
 
 | Artifact | SHA-256 |
 |---|---|
-| [X01.json](X01.json) | `974aaae190e69912a71a6de14067852481d5129bfea621066e46434f3eac0a5c` |
-| [X02.json](X02.json) | `2e6ce6079004ee306b8fed302a1a9fc5e9996414ac317b13f091af5d7352345d` |
-| [X03.json](X03.json) | `2df652b288d1ad62f5b6d6755a09df32d9219b05fe0a139fb7f49dee7c5bde98` |
+| [X01.json](X01.json) | `5022b7d6eb108ae550d1dc5af6c61fc6b31541c1143812813e7cb689db7b979a` |
+| [X02.json](X02.json) | `fd8cebec33cf3083effe19fc3426e524c5b01bfdc99a877c1d19171ac142207d` |
+| [X03.json](X03.json) | `59f2a4b39ffaa011739ba81d5dc2e34d3f44604aae7504b74c888971568db772` |
 | [through-completed.json](through-completed.json) | `2bf873fadcbd0cdd7cddf92be41ea3e1287ea68d726c5fdd0eb194447f0e371c` |
 | [P08.json](P08.json) | `a9bfb5aa37318410a872f68edfaa31530d4dbcce9f9ab193903c2c986cbd823f` |
 | [ci.json](ci.json) | `1bda39a24468439d8916c60df46fc02c295ef374a290f5bdc134307b41d04788` |

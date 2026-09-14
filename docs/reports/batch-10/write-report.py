@@ -19,7 +19,7 @@ required = [
     'python3 scripts/test_lockfile_action.py',
     'python3 scripts/test_release.py',
     'python3 scripts/test_ci_workflow.py',
-    next(r['command'] for r in rows if r['command'].startswith('node --test ui/tests/attack.test.js')),
+    next((r['command'] for r in rows if r['command'].startswith('node --test ui/tests/attack.test.js')), 'node --test ui/tests/attack.test.js'),
     *[f'python3 scripts/roadmap_gate.py --require {u} --report docs/reports/batch-10/{u}.json' for u in ['X01','X02','X03']],
     'python3 scripts/roadmap_gate.py --through-completed --report docs/reports/batch-10/through-completed.json',
     'python3 scripts/roadmap_gate.py --require P08 --report docs/reports/batch-10/P08.json',
@@ -227,5 +227,12 @@ implementation session. The maintainer still needed to create the prepared
 commits outside the read-only index restriction, merge, and then decide when
 to cut v0.5.0. Nothing was pushed or tagged by this session.
 '''
+
+# Preserve the post-session re-verification section appended after the
+# implementation session; regenerating the report must never drop evidence.
+_existing = (REPORT / 'REPORT.md').read_text() if (REPORT / 'REPORT.md').exists() else ''
+_marker = '\n## Post-session re-verification\n'
+if _marker in _existing:
+    text = text.rstrip() + '\n' + _marker + _existing.split(_marker, 1)[1]
 (REPORT / 'REPORT.md').write_text(text)
 print(f'Report regenerated from {len(rows)} observed commands; required validation complete: {complete}')
