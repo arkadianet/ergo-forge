@@ -1030,7 +1030,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
       "tests": [
         "node_vectors_pass_on_new_rev"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "S03",
@@ -1059,7 +1059,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
         "release_action_points_at_tagged_binary",
         "changelog_lists_every_batch"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "X03",
@@ -1073,7 +1073,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
         "node_checkout_is_cached",
         "cost_trace_runs_in_its_own_job"
       ],
-      "implemented": false
+      "implemented": true
     }
   ],
   "thresholds": {

@@ -1,0 +1,78 @@
+{
+  "status": "prepared; worktree index refused writes",
+  "steps": [
+    {
+      "step": 1,
+      "files": [
+        "ergo-sandbox/Cargo.toml",
+        "ergo-sandbox/examples/measure_d00_inventory.rs",
+        "ergo-sandbox/src/evidence/validate.rs",
+        "ergo-sandbox/src/hunt.rs",
+        "ergo-sandbox/src/map/check_relation.rs",
+        "ergo-sandbox/tests/baseline_support/mod.rs",
+        "ergo-sandbox/tests/claim_replay.rs",
+        "ergo-sandbox/tests/decompile_roundtrip.rs",
+        "ergo-sandbox/tests/evidence_wire.rs",
+        "ergo-sandbox/tests/fixtures/evidence/generate_wire_vectors.rs",
+        "ergo-sandbox/tests/lockfile.rs",
+        "ergo-sandbox/tests/mapping_actions.rs",
+        "ergo-sandbox/tests/mapping_context_boundary.rs",
+        "ergo-sandbox/tests/mapping_inventory.rs",
+        "ergo-sandbox/tests/mapping_necessity.rs",
+        "ergo-sandbox/tests/node_validation.rs",
+        "ergo-sandbox/tests/obligation_reports.rs",
+        "ergo-sandbox/tests/property_evaluation.rs",
+        "ergo-sandbox/tests/property_inventory.rs",
+        "ergo-sandbox/tests/property_replay_boundary.rs",
+        "ergo-sandbox/tests/property_replay_support/mod.rs",
+        "ergo-sandbox/tests/property_support/mod.rs",
+        "ergo-sandbox/tests/transaction_proofs.rs",
+        "ergo-web/tests/checklist.rs",
+        "ergo-web/tests/evidence_replay.rs",
+        "Cargo.toml",
+        "Cargo.lock",
+        "ui/tests/evidence-replay.test.js",
+        "docs/roadmap-metrics.json",
+        "docs/roadmap-stops.json",
+        "ergo-sandbox/tests/engine_support",
+        "ergo-sandbox/tests/fixtures/node_corpus_expectations.json",
+        "docs/reports/batch-10/baseline",
+        "docs/reports/batch-10/roadmap-metrics-before.json",
+        "docs/reports/batch-10/engine-before.json",
+        "docs/reports/batch-10/engine-after.json",
+        "docs/reports/batch-10/engine-comparison.json"
+      ],
+      "note": "Engine changes only in Cargo.toml/Cargo.lock; retain workspace 0.3.0 until step 2. Baseline support version expectations follow that intermediate workspace version."
+    },
+    {
+      "step": 2,
+      "files": [
+        "Cargo.toml",
+        "Cargo.lock",
+        "README.md",
+        "CHANGELOG.md",
+        ".github/actions/test/action.yml",
+        "scripts/test_release.py",
+        "scripts/requirements-test.txt"
+      ],
+      "note": "Version hunks to 0.5.0, corresponding baseline-support version expectation hunks, release docs and tests."
+    },
+    {
+      "step": 3,
+      "files": [
+        ".github/workflows/ci.yml",
+        "scripts/test_ci_workflow.py"
+      ]
+    },
+    {
+      "step": 4,
+      "files": [
+        "docs/ROADMAP.md",
+        "docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md",
+        "scripts/test_roadmap_gate.py",
+        "docs/reports/batch-10"
+      ],
+      "note": "Remaining report artifacts and logs; archive files needed by step 1 already belong there."
+    }
+  ]
+}

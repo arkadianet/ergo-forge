@@ -150,7 +150,7 @@ A checklist row and a `trust_assumptions` extension: script hash stored in a reg
 **X01 — Engine bump (3 days).** Move the pinned node rev forward to the current arkadianet/ergo main; rerun the decompile corpus and the P03 vectors; record the scoreboard. A regression in exact round-trips is a stop, not a reason to patch the decompiler.
 Gate: existing corpus expectations, `node_vectors_pass_on_new_rev`.
 
-**X02 — Release 0.4.0 (1 day).** Binaries, container, CI action `version: latest` pointing at it, changelog from the batch table.
+**X02 — Release 0.5.0 (1 day).** Prepare binaries/container workflow wiring, CI action `version: latest`, and the batch-table changelog. Existing tags v0.4.0 and v0.4.1 already used crate version 0.3.0, so the next version is 0.5.0. Tagging and publishing follow merge as maintainer actions.
 Gate: `release_action_points_at_tagged_binary`, `changelog_lists_every_batch`.
 
 **X03 — CI time (1 day).** Cache the node sibling checkout and split cost-trace into a separate job.
@@ -172,7 +172,7 @@ Order is by user value first, with each security unit landing before the surface
 | 7 | S04, I04 | 3 | Immobilisation probes, storage rent, upgrade-hook row |
 | 8 | I03 | 3 | Watch for on-chain script changes |
 | 9 | W05, S05 | 4 | Two binding recipes; incident scaffold |
-| 10 | X01, X02, X03 | 5 | Engine bump, 0.4.0 release, faster CI |
+| 10 | X01, X02, X03 | 5 | Engine bump, 0.5.0 release preparation, faster CI |
 | 11 | S03 | 3 | Multi-instance drain axis, then a checkpoint |
 | 12 | Checkpoint | 1 | Scoreboard review; decide E01 and the next plan |
 
@@ -198,7 +198,7 @@ Record-only, extending `docs/roadmap-metrics.json`. No unit is complete because 
 | Deployed-corpus false positives per lint (reviewed) | recorded in `audit-sweep.md` | S02 |
 | Incidents in the replay corpus | 1 (USE) | S05 |
 | Recipes with a caught mutant | 0/16 | W05 |
-| Exact decompile round-trips | 238/329 committed | X01 |
+| Exact decompile round-trips | 238/329 historical baseline; 264/357 current bundled; 79/92 seed; 270/279 mainnet | X01, batch 10 measurements |
 | Node-validated claims (P05 families) | as recorded | E00 |
 | Play exports that round-trip through the CLI | n/a | W02 |
 
@@ -230,10 +230,10 @@ To be installed by W00 as a **separate `roadmap-policy:v2` block** in `docs/ROAD
     {"id": "I03", "implemented": true, "depends": ["I02"], "days": 3, "package": "ergo-sandbox", "target": "watch", "tests": ["watch_reports_script_change_under_nft", "watch_never_broadcasts"]},
     {"id": "W05", "implemented": true, "depends": ["S02"], "days": 2, "package": "ergo-sandbox", "target": "compose_recipes", "tests": ["new_recipes_have_independent_expectations", "new_recipe_mutants_are_caught"]},
     {"id": "S05", "implemented": true, "depends": ["W00"], "days": 2, "package": "ergo-sandbox", "target": "incident_scaffold", "tests": ["incident_scaffold_reproduces_use_boxes", "incident_scaffold_never_fills_expectations"]},
-    {"id": "X01", "implemented": false, "depends": ["W00"], "days": 3, "package": "ergo-sandbox", "target": "node_validation", "tests": ["node_vectors_pass_on_new_rev"]},
+    {"id": "X01", "implemented": true, "depends": ["W00"], "days": 3, "package": "ergo-sandbox", "target": "node_validation", "tests": ["node_vectors_pass_on_new_rev"]},
     {"id": "S03", "implemented": false, "depends": ["S02", "X01"], "days": 3, "package": "ergo-sandbox", "target": "drain_promotion", "tests": ["two_instance_mutant_is_found_and_control_is_not", "caps_and_truncation_are_recorded"]},
-    {"id": "X02", "implemented": false, "depends": ["X01"], "days": 1, "package": "scripts", "target": "test_release", "tests": ["release_action_points_at_tagged_binary", "changelog_lists_every_batch"]},
-    {"id": "X03", "implemented": false, "depends": ["W00"], "days": 1, "package": "scripts", "target": "test_ci_workflow", "tests": ["node_checkout_is_cached", "cost_trace_runs_in_its_own_job"]}
+    {"id": "X02", "implemented": true, "depends": ["X01"], "days": 1, "package": "scripts", "target": "test_release", "tests": ["release_action_points_at_tagged_binary", "changelog_lists_every_batch"]},
+    {"id": "X03", "implemented": true, "depends": ["W00"], "days": 1, "package": "scripts", "target": "test_ci_workflow", "tests": ["node_checkout_is_cached", "cost_trace_runs_in_its_own_job"]}
   ]
 }
 ```
