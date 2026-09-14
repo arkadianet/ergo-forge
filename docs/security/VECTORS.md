@@ -220,14 +220,14 @@ ID: `shared-payment-across-instances`.
 
 Each input script runs in the context of the whole transaction. If two instances independently require a single output to pay at least their own value, both may count that same output while the second instance’s value leaves elsewhere. The constraint needs aggregate accounting or an explicit rule that only one instance may appear.
 
-Instruments: `scenario`, `manual`.
+Instruments: `scenario`, `drain`, `manual`.
 
 - Exhibits the mechanism: [examples/contracts/vectors/shared-payment-across-instances/vulnerable.es](../../examples/contracts/vectors/shared-payment-across-instances/vulnerable.es). Authored counterexample; accepts the adversarial suite context.
 - Control: [examples/contracts/vectors/shared-payment-across-instances/fixed.es](../../examples/contracts/vectors/shared-payment-across-instances/fixed.es). Refuses that same context; accepts the intended control context.
 
 Suites: [examples/contracts/vectors/shared-payment-across-instances/contract.test.json](../../examples/contracts/vectors/shared-payment-across-instances/contract.test.json), [examples/contracts/vectors/shared-payment-across-instances/fixed.test.json](../../examples/contracts/vectors/shared-payment-across-instances/fixed.test.json).
 
-Both input indices are tested in the shared context, using distinct input creation heights and one payment to a fixed public key; the other output is unrestricted attacker receipt. The fixed teaching contract permits one matching-script input, so it refuses the duplicate-instance context and accepts the ordinary single-instance spend. A reviewer checks how instances and obligations are distinguished, whether a singleton assumption is established, and whether one output discharges more than one payment. The drain multi-instance axis S03 is not implemented.
+Both input indices are tested in the shared context, using distinct input creation heights and one payment to a fixed public key; the other output is unrestricted attacker receipt. The fixed teaching contract permits one matching-script input, so it refuses the duplicate-instance context and accepts the ordinary single-instance spend. A reviewer checks how instances and obligations are distinguished, whether a singleton assumption is established, and whether one output discharges more than one payment. S03 supplies the drain hunt's two-instance family (`synthesis.multiInstance`): from one declared protected instance it derives a second instance of the same script with its own singleton and hunts the derived request inside an equal slice of the same probe cap; the pair in examples/mutants/search.json records that the family finds this counterexample and not the fixed control. A hit is an unsigned preflight candidate until a caller declares the derived box and promotes it through P06.
 
 ## 12. Deployment drift and upgrade hooks
 
