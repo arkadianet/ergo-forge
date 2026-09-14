@@ -962,7 +962,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
         "immobilisation_probes_report_unspendable_not_safe",
         "storage_rent_line_is_static"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "I04",
@@ -975,7 +975,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
       "tests": [
         "upgrade_hook_mutant_is_caught"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "I03",

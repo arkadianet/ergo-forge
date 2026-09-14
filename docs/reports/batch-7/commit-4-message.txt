@@ -1,0 +1,8 @@
+docs(roadmap): register S04 and I04 and retain batch 7 evidence
+
+Mark both complete v2 unit records implemented and record observed validation
+exits, retained command logs, boundaries and session limitations. Preserve the
+frozen v1 policy and historical mapping/property and mutation baselines.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

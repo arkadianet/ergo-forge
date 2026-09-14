@@ -1,0 +1,323 @@
+{
+  "formatVersion": 1,
+  "baseRevision": "1d53b2f",
+  "branch": "v2/batch-7",
+  "cargoTargetDir": "$CARGO_TARGET_DIR",
+  "commands": [
+    {
+      "command": "cargo fmt --all",
+      "exitStatus": "0",
+      "log": "logs/fmt-step1.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.4
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test immobilisation --test hunt --test cli_hunt",
+      "exitStatus": "101",
+      "log": "logs/s04-target.log",
+      "exitCode": 101,
+      "elapsedSeconds": 3.52
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test immobilisation --test hunt --test cli_hunt",
+      "exitStatus": "101",
+      "log": "logs/s04-types.log",
+      "exitCode": 101,
+      "elapsedSeconds": 8.61
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test immobilisation --test hunt --test cli_hunt",
+      "exitStatus": "0",
+      "log": "logs/s04-behavior.log",
+      "exitCode": 0,
+      "elapsedSeconds": 5.9
+    },
+    {
+      "command": "cargo fmt --all",
+      "exitStatus": "0",
+      "log": "logs/fmt-step2.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.62
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test upgrade_hook",
+      "exitStatus": "101",
+      "log": "logs/i04-precision.log",
+      "exitCode": 101,
+      "elapsedSeconds": 2.11
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test mutation_corpus upgrade_hook_mutant_is_caught -- --exact",
+      "exitStatus": "0",
+      "log": "logs/pairs.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.85
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test upgrade_hook --test audit --test more_lints --test delegated_reserves",
+      "exitStatus": "0",
+      "log": "logs/lint-precision.log",
+      "exitCode": 0,
+      "elapsedSeconds": 2.33
+    },
+    {
+      "command": "bash -c 'cargo run --release -p ergo-sandbox --example audit_sweep > docs/reports/batch-7/audit-sweep.json'",
+      "exitStatus": "0",
+      "log": "logs/sweep.log",
+      "exitCode": 0,
+      "elapsedSeconds": 11.54
+    },
+    {
+      "command": "bash -c 'cargo run --release -p ergo-sandbox --example audit_sweep > docs/reports/batch-7/audit-sweep.json'",
+      "exitStatus": "0",
+      "log": "logs/sweep-narrowed.log",
+      "exitCode": 0,
+      "elapsedSeconds": 11.52
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test immobilisation",
+      "exitStatus": "101",
+      "log": "logs/s04-boundaries.log",
+      "exitCode": 101,
+      "elapsedSeconds": 3.07
+    },
+    {
+      "command": "python3 scripts/render_vectors.py",
+      "exitStatus": "0",
+      "log": "logs/vectors.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.03
+    },
+    {
+      "command": "cargo test -p ergo-web --test http",
+      "exitStatus": "0",
+      "log": "logs/http.log",
+      "exitCode": 0,
+      "elapsedSeconds": 9.17
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test immobilisation cost_probe_reports_engine_exhaustion_at_the_existing_block_budget -- --exact",
+      "exitStatus": "0",
+      "log": "logs/s04-cost.log",
+      "exitCode": 0,
+      "elapsedSeconds": 53.01
+    },
+    {
+      "command": "cargo fmt --all",
+      "exitStatus": "0",
+      "log": "logs/fmt-final-edit.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.4
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "exitStatus": "0",
+      "log": "logs/fmt.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.4
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "exitStatus": "0",
+      "log": "logs/clippy.log",
+      "exitCode": 0,
+      "elapsedSeconds": 6.43
+    },
+    {
+      "command": "node --test ui/tests/attack.test.js ui/tests/checklist.test.js ui/tests/claim-labels.test.js ui/tests/evidence-replay.test.js ui/tests/hunt-read.test.js ui/tests/play-export.test.js ui/tests/share.test.js ui/tests/verify.test.js",
+      "exitStatus": "0",
+      "log": "logs/dom.log",
+      "exitCode": 0,
+      "elapsedSeconds": 15.39
+    },
+    {
+      "command": "python3 scripts/test_roadmap_gate.py",
+      "exitStatus": "0",
+      "log": "logs/roadmap-tests.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.72
+    },
+    {
+      "command": "python3 scripts/test_lockfile_action.py",
+      "exitStatus": "0",
+      "log": "logs/lockfile-tests.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.05
+    },
+    {
+      "command": "git add ergo-sandbox/src/hunt.rs ergo-sandbox/src/rent.rs ergo-sandbox/src/bin/ergo-es.rs ergo-sandbox/tests/hunt.rs ergo-sandbox/tests/cli_hunt.rs ergo-sandbox/tests/immobilisation.rs ergo-web/src/dto.rs ergo-web/tests/http.rs",
+      "exitStatus": "128",
+      "log": "logs/stage-step1.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "git commit -F docs/reports/batch-7/commit-1-message.txt",
+      "exitStatus": "128",
+      "log": "logs/commit-step1.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.01
+    },
+    {
+      "command": "git add ergo-sandbox/src/audit/lints/upgrade_hook.rs ergo-sandbox/src/audit/lints/mod.rs ergo-sandbox/src/audit/mod.rs ergo-sandbox/tests/upgrade_hook.rs ergo-sandbox/tests/mutation_corpus.rs examples/mutants/i04 examples/mutants/mutants.json examples/mutants/answer-key.json examples/mutants/README.md docs/security/vectors.json docs/security/VECTORS.md docs/audit-sweep.md docs/reports/batch-7/audit-sweep.json docs/reports/batch-7/site-review.json docs/reports/batch-7/initial-audit-sweep.json docs/reports/batch-7/initial-site-review.json",
+      "exitStatus": "128",
+      "log": "logs/stage-step2.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "git commit -F docs/reports/batch-7/commit-2-message.txt",
+      "exitStatus": "128",
+      "log": "logs/commit-step2.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "git add ui/app.js ui/index.html ui/hunt-read.js ui/claim-labels.js ui/tests/hunt-read.test.js ui/tests/claim-labels.test.js scripts/roadmap_gate.py",
+      "exitStatus": "128",
+      "log": "logs/stage-step3.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "git commit -F docs/reports/batch-7/commit-3-message.txt",
+      "exitStatus": "128",
+      "log": "logs/commit-step3.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present",
+      "exitStatus": "0",
+      "log": "logs/workspace.log",
+      "exitCode": 0,
+      "elapsedSeconds": 973.12
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require S04 --report docs/reports/batch-7/S04.json",
+      "exitStatus": "0",
+      "log": "logs/gate-s04.log",
+      "exitCode": 0,
+      "elapsedSeconds": 15.95
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require I04 --report docs/reports/batch-7/I04.json",
+      "exitStatus": "0",
+      "log": "logs/gate-i04.log",
+      "exitCode": 0,
+      "elapsedSeconds": 341.65
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test mapping_inventory --test property_inventory",
+      "exitStatus": "0",
+      "log": "logs/inventories.log",
+      "exitCode": 0,
+      "elapsedSeconds": 3.42
+    },
+    {
+      "command": "python3 docs/reports/batch-7/check-integrity.py",
+      "exitStatus": "0",
+      "log": "logs/integrity.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.13
+    },
+    {
+      "command": "git diff --check",
+      "exitStatus": "0",
+      "log": "logs/whitespace.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.06
+    },
+    {
+      "command": "python3 scripts/render_vectors.py --check",
+      "exitStatus": "0",
+      "log": "logs/vectors-final.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.03
+    },
+    {
+      "command": "node --test ui/tests/attack.test.js ui/tests/checklist.test.js ui/tests/claim-labels.test.js ui/tests/evidence-replay.test.js ui/tests/hunt-read.test.js ui/tests/play-export.test.js ui/tests/share.test.js ui/tests/verify.test.js",
+      "exitStatus": "0",
+      "log": "logs/dom-final.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.5
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require S04 --report docs/reports/batch-7/S04.json",
+      "exitStatus": "0",
+      "log": "logs/gate-s04-final.log",
+      "exitCode": 0,
+      "elapsedSeconds": 16.2
+    },
+    {
+      "command": "git add docs/ROADMAP.md docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md scripts/test_roadmap_gate.py docs/reports/batch-7",
+      "exitStatus": "128",
+      "log": "logs/stage-step4.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "git add -f docs/reports/batch-7/logs",
+      "exitStatus": "128",
+      "log": "logs/stage-logs.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "git commit -F docs/reports/batch-7/commit-4-message.txt",
+      "exitStatus": "128",
+      "log": "logs/commit-step4.log",
+      "exitCode": 128,
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "python3 docs/reports/batch-7/check-integrity.py",
+      "exitStatus": "0",
+      "log": "logs/final-integrity.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.13
+    },
+    {
+      "command": "git diff --check",
+      "exitStatus": "0",
+      "log": "logs/final-whitespace.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.05
+    },
+    {
+      "command": "python3 (draft inline report-path audit)",
+      "exitStatus": "no observed exit",
+      "log": "logs/draft-report-path-audit.log",
+      "note": "The inline audit raised AssertionError on the standard interpreter shebang. The enclosing shell continued, so no standalone Python exit was captured. Both report helpers are invoked via python3; their shebangs were removed and the final audit was recorded separately."
+    },
+    {
+      "command": "python3 docs/reports/batch-7/check-report.py",
+      "exitStatus": "1",
+      "log": "logs/final-report-audit.log",
+      "exitCode": 1,
+      "elapsedSeconds": 0.07
+    },
+    {
+      "command": "python3 docs/reports/batch-7/check-report.py",
+      "exitStatus": "0",
+      "log": "logs/final-report-audit-corrected.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.03
+    },
+    {
+      "command": "git diff --check",
+      "exitStatus": "0",
+      "log": "logs/report-whitespace.log",
+      "exitCode": 0,
+      "elapsedSeconds": 0.05
+    }
+  ],
+  "postSession": [
+    {
+      "command": "cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present",
+      "exitCode": 0,
+      "log": "docs/reports/batch-7/logs/workspace-post-session.log",
+      "note": "Post-session re-verification outside the implementation sandbox; the same log records the S04 and I04 gate runs (exit 0) that wrote the committed S04.json and I04.json."
+    }
+  ]
+}

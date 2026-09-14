@@ -1,0 +1,138 @@
+{
+  "formatVersion": 1,
+  "results": [
+    {
+      "unit": "scoreboard",
+      "status": "passed"
+    },
+    {
+      "unit": "W00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "S00",
+      "status": "passed",
+      "detail": "required tests executed"
+    },
+    {
+      "unit": "S04",
+      "status": "passed",
+      "detail": "required tests executed"
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import sys, unittest\ndef names(suite):\n    for test in suite:\n        if isinstance(test, unittest.TestSuite):\n            yield from names(test)\n        else:\n            yield test.id().rsplit('.', 1)[-1].removeprefix('test_')\nloader = unittest.TestLoader()\nsuite = loader.discover('scripts', pattern=sys.argv[1] + '.py')\nif loader.errors:\n    sys.exit('\\n'.join(loader.errors))\nfor name in names(suite):\n    print(name + ': test')\n",
+        "test_roadmap_gate"
+      ],
+      "exitCode": 0,
+      "output": "ci_accepts_only_validated_recorded_stops_not_completion: test\nci_rejects_corrupt_stop_evidence: test\nci_rejects_failed_missing_and_blocked_units: test\nci_reports_future_units_as_not_started_without_running_them: test\ncommand_normalizes_before_printing_recording_and_hashing: test\nabsolute_cargo_target_is_normalized_before_report_hashing: test\ndependencies_are_in_policy_order: test\nextra_commands_cannot_be_omitted: test\nfuture_units_fail_as_unimplemented_not_missing_gate: test\ni01_extras_require_the_verify_dom_test: test\nincomplete_stop_record_is_rejected: test\nmalformed_inputs_still_write_a_failing_report: test\nmissing_evidence_is_distinct_from_product_failure: test\nmissing_scoreboard_is_rejected: test\npolicy_requires_unique_block_and_known_completion: test\npolicy_v2_block_parses: test\npython_targets_require_discovered_executed_unskipped_names: test\nrequired_names_must_be_discovered_and_executed: test\nresolution_requires_exact_policy_record_and_decision: test\nrunner_captures_diagnostics_without_weakening_execution_checks: test\ns01_extras_require_the_checklist_dom_test: test\nscoreboard_cannot_self_attest_changed_measurements: test\nscoreboard_reads_every_baseline_artifact: test\nskipped_tests_are_rejected: test\nstatic_lint_namespace_does_not_relax_frozen_hunt_measurements: test\nthresholds_are_read_from_policy: test\nunknown_unit_is_rejected: test\nw02_and_w03_extras_require_their_dom_tests: test\nw04_extras_require_both_dom_tests: test\nzero_test_filter_is_rejected: test\n",
+      "outputSha256": "b9384d8cbd9869dcedad495df8910ec200a3710e329722870149d36dc0f1e927"
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-b",
+        "-v",
+        "-s",
+        "scripts",
+        "-p",
+        "test_roadmap_gate.py"
+      ],
+      "exitCode": 0,
+      "output": "test_ci_accepts_only_validated_recorded_stops_not_completion (test_roadmap_gate.CiGovernanceTests.test_ci_accepts_only_validated_recorded_stops_not_completion) ... ok\ntest_ci_rejects_corrupt_stop_evidence (test_roadmap_gate.CiGovernanceTests.test_ci_rejects_corrupt_stop_evidence) ... ok\ntest_ci_rejects_failed_missing_and_blocked_units (test_roadmap_gate.CiGovernanceTests.test_ci_rejects_failed_missing_and_blocked_units) ... ok\ntest_ci_reports_future_units_as_not_started_without_running_them (test_roadmap_gate.CiGovernanceTests.test_ci_reports_future_units_as_not_started_without_running_them) ... ok\ntest_command_normalizes_before_printing_recording_and_hashing (test_roadmap_gate.CiGovernanceTests.test_command_normalizes_before_printing_recording_and_hashing) ... ok\ntest_absolute_cargo_target_is_normalized_before_report_hashing (test_roadmap_gate.RoadmapGateTests.test_absolute_cargo_target_is_normalized_before_report_hashing) ... ok\ntest_dependencies_are_in_policy_order (test_roadmap_gate.RoadmapGateTests.test_dependencies_are_in_policy_order) ... ok\ntest_extra_commands_cannot_be_omitted (test_roadmap_gate.RoadmapGateTests.test_extra_commands_cannot_be_omitted) ... ok\ntest_future_units_fail_as_unimplemented_not_missing_gate (test_roadmap_gate.RoadmapGateTests.test_future_units_fail_as_unimplemented_not_missing_gate) ... ok\ntest_i01_extras_require_the_verify_dom_test (test_roadmap_gate.RoadmapGateTests.test_i01_extras_require_the_verify_dom_test) ... ok\ntest_incomplete_stop_record_is_rejected (test_roadmap_gate.RoadmapGateTests.test_incomplete_stop_record_is_rejected) ... ok\ntest_malformed_inputs_still_write_a_failing_report (test_roadmap_gate.RoadmapGateTests.test_malformed_inputs_still_write_a_failing_report) ... ok\ntest_missing_evidence_is_distinct_from_product_failure (test_roadmap_gate.RoadmapGateTests.test_missing_evidence_is_distinct_from_product_failure) ... ok\ntest_missing_scoreboard_is_rejected (test_roadmap_gate.RoadmapGateTests.test_missing_scoreboard_is_rejected) ... ok\ntest_policy_requires_unique_block_and_known_completion (test_roadmap_gate.RoadmapGateTests.test_policy_requires_unique_block_and_known_completion) ... ok\ntest_policy_v2_block_parses (test_roadmap_gate.RoadmapGateTests.test_policy_v2_block_parses) ... ok\ntest_python_targets_require_discovered_executed_unskipped_names (test_roadmap_gate.RoadmapGateTests.test_python_targets_require_discovered_executed_unskipped_names) ... ok\ntest_required_names_must_be_discovered_and_executed (test_roadmap_gate.RoadmapGateTests.test_required_names_must_be_discovered_and_executed) ... ok\ntest_resolution_requires_exact_policy_record_and_decision (test_roadmap_gate.RoadmapGateTests.test_resolution_requires_exact_policy_record_and_decision) ... ok\ntest_runner_captures_diagnostics_without_weakening_execution_checks (test_roadmap_gate.RoadmapGateTests.test_runner_captures_diagnostics_without_weakening_execution_checks) ... ok\ntest_s01_extras_require_the_checklist_dom_test (test_roadmap_gate.RoadmapGateTests.test_s01_extras_require_the_checklist_dom_test) ... ok\ntest_scoreboard_cannot_self_attest_changed_measurements (test_roadmap_gate.RoadmapGateTests.test_scoreboard_cannot_self_attest_changed_measurements) ... ok\ntest_scoreboard_reads_every_baseline_artifact (test_roadmap_gate.RoadmapGateTests.test_scoreboard_reads_every_baseline_artifact) ... ok\ntest_skipped_tests_are_rejected (test_roadmap_gate.RoadmapGateTests.test_skipped_tests_are_rejected) ... ok\ntest_static_lint_namespace_does_not_relax_frozen_hunt_measurements (test_roadmap_gate.RoadmapGateTests.test_static_lint_namespace_does_not_relax_frozen_hunt_measurements) ... ok\ntest_thresholds_are_read_from_policy (test_roadmap_gate.RoadmapGateTests.test_thresholds_are_read_from_policy) ... ok\ntest_unknown_unit_is_rejected (test_roadmap_gate.RoadmapGateTests.test_unknown_unit_is_rejected) ... ok\ntest_w02_and_w03_extras_require_their_dom_tests (test_roadmap_gate.RoadmapGateTests.test_w02_and_w03_extras_require_their_dom_tests) ... ok\ntest_w04_extras_require_both_dom_tests (test_roadmap_gate.RoadmapGateTests.test_w04_extras_require_both_dom_tests) ... ok\ntest_zero_test_filter_is_rejected (test_roadmap_gate.RoadmapGateTests.test_zero_test_filter_is_rejected) ... ok\n\n----------------------------------------------------------------------\nRan 30 tests in 0.825s\n\nOK\n",
+      "outputSha256": "7dceb461eb52624f79cfd9d3e98fa5895f75357f1fbcdec5b42327b15c91de39"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "vector_catalogue",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 2.11s\n     Running tests/vector_catalogue.rs ($CARGO_TARGET_DIR/release/deps/vector_catalogue-54a7e2627cc2f090)\nevery_named_instrument_exists: test\nevery_vector_has_examples_or_is_marked_manual: test\n\n2 tests, 0 benchmarks\n",
+      "outputSha256": "614043c7b9da35a99bfef2553010467d743ca61c87b6eecfdf883270d46d9bd6"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "vector_catalogue",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/vector_catalogue.rs ($CARGO_TARGET_DIR/release/deps/vector_catalogue-54a7e2627cc2f090)\n\nrunning 2 tests\ntest every_named_instrument_exists ... ok\ntest every_vector_has_examples_or_is_marked_manual ... ok\n\nsuccesses:\n\nsuccesses:\n    every_named_instrument_exists\n    every_vector_has_examples_or_is_marked_manual\n\ntest result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s\n\n",
+      "outputSha256": "d3c39ced54c099e28edaf71e85967dc6df0adfa8fefd2133b9216941f4028fc0"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "immobilisation",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "output": "   Compiling ergo-sandbox v0.3.0 (<repo>/ergo-sandbox)\n    Finished `release` profile [optimized] target(s) in 0.74s\n     Running tests/immobilisation.rs ($CARGO_TARGET_DIR/release/deps/immobilisation-5e03613f85735588)\ncost_probe_reports_engine_exhaustion_at_the_existing_block_budget: test\nimmobilisation_probes_report_unspendable_not_safe: test\nminimum_outputs_and_cost_budget_are_recorded: test\nminimum_value_matches_node_structural_rule_and_rejects_one_less: test\nstorage_rent_line_is_static: test\n\n5 tests, 0 benchmarks\n",
+      "outputSha256": "69b6631502d391053b3931581c5efef75eb3baa419feb97eac2c19bc50504d75"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "ergo-sandbox",
+        "--test",
+        "immobilisation",
+        "--",
+        "--show-output"
+      ],
+      "exitCode": 0,
+      "output": "    Finished `release` profile [optimized] target(s) in 0.07s\n     Running tests/immobilisation.rs ($CARGO_TARGET_DIR/release/deps/immobilisation-5e03613f85735588)\n\nrunning 5 tests\ntest storage_rent_line_is_static ... ok\ntest minimum_value_matches_node_structural_rule_and_rejects_one_less ... ok\ntest minimum_outputs_and_cost_budget_are_recorded ... ok\ntest immobilisation_probes_report_unspendable_not_safe ... ok\ntest cost_probe_reports_engine_exhaustion_at_the_existing_block_budget ... ok\n\nsuccesses:\n\nsuccesses:\n    cost_probe_reports_engine_exhaustion_at_the_existing_block_budget\n    immobilisation_probes_report_unspendable_not_safe\n    minimum_outputs_and_cost_budget_are_recorded\n    minimum_value_matches_node_structural_rule_and_rejects_one_less\n    storage_rent_line_is_static\n\ntest result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.86s\n\n",
+      "outputSha256": "5bdecbbca93fa0f14ca5744b714dc7bd848e6e3bde698ecb1aca6773b7345c52"
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "ui/tests/hunt-read.test.js"
+      ],
+      "exitCode": 0,
+      "output": "TAP version 13\n# Subtest: Read keeps rent static and immobilisation scoped and synthetic\nok 1 - Read keeps rent static and immobilisation scoped and synthetic\n  ---\n  duration_ms: 6.798145\n  type: 'test'\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 210.27077\n",
+      "outputSha256": "aec69cfc40930241d84b015916548b0861f7b4cd41a12c516e39abf2b6b592a5"
+    }
+  ],
+  "evidenceHashes": {
+    "docs/ingestion-lithos-results.json": "1c43bc46d910b11d4e970ce714657175515a0cf61e1ec420b4c58a3d4e7bc69e",
+    "ergo-sandbox/tests/fixtures/decompile_corpus_expectations.json": "5d2bfc24d758dac520e24968793fe95a87c1cc673d54fe577d4a93b89768aa69",
+    "examples/mutants/answer-key.custody-v1.json": "4d038f5ab7722e954c44c426719237c9df2098e689f54eb4c679f3348b485259",
+    "examples/mutants/answer-key.json": "560a1247352e12c06e4f9570b68d4c3ce4b3629026287a2cd3a6494f58150ed0",
+    "docs/roadmap-metrics.json": "4cc60a3f4b342aebe85b91a17ff64c7b79d6fcace73ad0518e7c49e3a57c134d"
+  },
+  "policySha256": "432011b56b0da8208bdb90cfdfc516d2a85946b0728a73ec43ab3aee926babca",
+  "ciAccepted": true,
+  "passed": true
+}
