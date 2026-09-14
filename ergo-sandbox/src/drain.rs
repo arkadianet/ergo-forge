@@ -26,6 +26,12 @@
 //!   protected boxes drop to a minimal keep-value and one token of each id,
 //!   and the first free-payee output receives everything else, with exact
 //!   conservation for the preflight candidate;
+//! - **the two-instance family** (S03, opt-in via `synthesis.multiInstance`):
+//!   for each declared `protected` input, a derived request adds a second
+//!   instance of the same script (next creation height, its own hypothetical
+//!   singleton) and is hunted unchanged inside an equal slice of the probe
+//!   cap; the merged report records every run, and a hit names the run it
+//!   came from. Promotion stays explicit: the caller declares the derived box;
 //! - **output synthesis** (phase 2, opt-in via the request's `synthesis`
 //!   block): blind re-treeing or sourced prefix padding of one declared
 //!   fixed-payee output, companion re-creations with padded token layouts (fillers
@@ -163,6 +169,15 @@ pub struct Synthesis {
     /// to land at pinned indices like `OUTPUTS(0)`).
     #[serde(default)]
     pub permute_outputs: bool,
+    /// S03: the two-instance family. For each declared `protected` input the
+    /// hunt derives a second instance of the same script — same value,
+    /// tokens and registers, the next creation height, and its own
+    /// hypothetical singleton in place of the protocol NFT — declares it as
+    /// one more `protected` input, and runs the unchanged hunt on that
+    /// derived request inside an equal slice of the probe cap. Off by
+    /// default; with it off the report is byte-identical to today.
+    #[serde(default)]
+    pub multi_instance: bool,
 }
 
 fn default_max_successor_states() -> usize {
@@ -186,6 +201,7 @@ impl Default for Synthesis {
             mints: false,
             max_output_permutations: DEFAULT_OUTPUT_PERMUTATIONS,
             permute_outputs: false,
+            multi_instance: false,
         }
     }
 }
@@ -534,6 +550,51 @@ pub struct SynthesisRecord {
     /// explore: raise `maxProbes`, or narrow the enabled degrees.
     pub thin_slices: usize,
     pub shapes: Vec<ShapeTally>,
+    /// S03: present only when the two-instance family ran. Absent (not
+    /// `null`) otherwise, so a report without the family is byte-identical
+    /// to a report produced before the family existed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub multi_instance: Option<MultiInstanceRecord>,
+}
+
+/// S03 record: how the two-instance family spent its share of the cap.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MultiInstanceRecord {
+    /// Declared `protected` inputs, each of which yields one derived run.
+    pub protected_inputs: usize,
+    /// The probe cap each run (the base run and every derived run) received:
+    /// the request's cap split evenly, remainder to the earliest runs. Same
+    /// total cap as a run without the family; nothing is widened.
+    pub cap_per_run: Vec<usize>,
+    /// Where the family sits in the pinned order: outside every synthesis
+    /// axis. Each derived request is hunted with the unchanged axes.
+    pub position_in_axis_order: &'static str,
+    pub runs: Vec<MultiInstanceRun>,
+}
+
+/// One run of the family: the base request, or one derived request.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MultiInstanceRun {
+    pub label: String,
+    /// The declared `protected` input the second instance was derived from
+    /// (`None` for the base run).
+    pub derived_from: Option<usize>,
+    /// The exact box the family added. A caller who wants to promote a hit
+    /// from this run declares this box (with a hypothetical id) as one more
+    /// `protected` input and promotes that explicit request: the family
+    /// never bypasses the P06 rule that every candidate input is declared.
+    pub derived_input: Option<ScenarioBox>,
+    /// The singleton the derived instance carries instead of the protocol
+    /// NFT it was cloned from, when the original carried one.
+    pub derived_nft: Option<String>,
+    pub probes_total: usize,
+    pub probes_run: usize,
+    pub oracle_calls: usize,
+    pub capped: bool,
+    pub hits: usize,
+    pub verdict: DrainVerdict,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -611,6 +672,212 @@ pub struct DrainReport {
 /// Run the phase-1 drain hunt. Marshalling errors are `Err`; every other
 /// outcome — including `invalidShape` — is a report.
 pub fn drain_hunt(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
+    if req.synthesis.multi_instance {
+        return drain_hunt_multi_instance(req);
+    }
+    drain_hunt_single(req)
+}
+
+/// S03: derive the second instance of a declared protected box. Same script,
+/// value, tokens and registers; the next creation height; no declared id
+/// (the hunt seeds one, and a caller who promotes declares a hypothetical
+/// one). When the original's `tokens(0)` is a protocol NFT the copy carries
+/// its own singleton instead — two instances of one contract each hold
+/// their own NFT; a second copy of a singleton is not a shape the chain can
+/// produce, so the family never asks the oracle about one.
+pub fn second_instance(
+    original: &ScenarioBox,
+    protocol_nfts: &HashSet<String>,
+) -> (ScenarioBox, Option<String>) {
+    let mut copy = original.clone();
+    copy.box_id = None;
+    copy.creation_height = original.creation_height.saturating_add(1);
+    let mut derived_nft = None;
+    if let Some(first) = copy.tokens.first_mut() {
+        if protocol_nfts.contains(&first.id.to_lowercase()) {
+            let seed = format!("drain|second-instance|{}", first.id.to_lowercase());
+            let id = hex::encode(ergo_primitives::digest::blake2b256(seed.as_bytes()).as_bytes());
+            first.id = id.clone();
+            derived_nft = Some(id);
+        }
+    }
+    (copy, derived_nft)
+}
+
+/// S03: the two-instance family. The base request and one derived request
+/// per protected input each run the unchanged hunt inside an equal slice of
+/// the request's probe cap; the reports are merged and the family's own
+/// tally is recorded. Same caps, same objective, same accounting; a hit's
+/// witness is the derived request's, and its shape label names the run.
+fn drain_hunt_multi_instance(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
+    let protected: Vec<usize> = req
+        .inputs
+        .iter()
+        .enumerate()
+        .filter(|(_, i)| i.role == DrainRole::Protected)
+        .map(|(i, _)| i)
+        .collect();
+    let nfts: HashSet<String> = req
+        .protocol_nfts
+        .iter()
+        .map(|s| s.trim().to_lowercase())
+        .collect();
+    let runs = 1 + protected.len();
+    let total_cap = max_probe_cap(req);
+    let base_slice = total_cap / runs;
+    let extra = total_cap % runs;
+    let cap_per_run: Vec<usize> = (0..runs)
+        .map(|i| (base_slice + usize::from(i < extra)).max(1))
+        .collect();
+
+    // Requests: the base (family off), then one derived request per protected input.
+    /// One run the family schedules: the base request, or a derived one.
+    struct Planned {
+        label: String,
+        derived_from: Option<usize>,
+        derived_input: Option<ScenarioBox>,
+        derived_nft: Option<String>,
+        request: DrainRequest,
+    }
+    let mut requests: Vec<Planned> = Vec::with_capacity(runs);
+    let mut base = req.clone();
+    base.synthesis.multi_instance = false;
+    base.max_probes = Some(cap_per_run[0]);
+    requests.push(Planned {
+        label: "base".into(),
+        derived_from: None,
+        derived_input: None,
+        derived_nft: None,
+        request: base,
+    });
+    for (k, &p) in protected.iter().enumerate() {
+        let (copy, derived_nft) = second_instance(&req.inputs[p].box_, &nfts);
+        let mut derived = req.clone();
+        derived.synthesis.multi_instance = false;
+        derived.max_probes = Some(cap_per_run[k + 1]);
+        derived.inputs.push(DrainInput {
+            role: DrainRole::Protected,
+            box_: copy.clone(),
+        });
+        if let Some(id) = &derived_nft {
+            derived.protocol_nfts.push(id.clone());
+        }
+        requests.push(Planned {
+            label: format!("two-instance(protected={p})"),
+            derived_from: Some(p),
+            derived_input: Some(copy),
+            derived_nft,
+            request: derived,
+        });
+    }
+
+    let mut merged: Option<DrainReport> = None;
+    let mut best_total: u128 = 0;
+    let mut record_runs: Vec<MultiInstanceRun> = Vec::with_capacity(runs);
+    for Planned {
+        label,
+        derived_from,
+        derived_input,
+        derived_nft,
+        request,
+    } in requests
+    {
+        let mut report = drain_hunt_single(&request)?;
+        let hit_total = |hit: &DrainHit| -> u128 {
+            hit.accounting
+                .extracted
+                .values()
+                .filter_map(|v| v.parse::<u128>().ok())
+                .sum()
+        };
+        record_runs.push(MultiInstanceRun {
+            label: label.clone(),
+            derived_from,
+            derived_input,
+            derived_nft,
+            probes_total: report.probes_total,
+            probes_run: report.probes_run,
+            oracle_calls: report.oracle_calls,
+            capped: report.capped,
+            hits: report.hits,
+            verdict: report.verdict,
+        });
+        if let Some(hit) = report.best.as_mut() {
+            if derived_from.is_some() {
+                hit.shape = format!("{label}: {}", hit.shape);
+            }
+        }
+        match merged.as_mut() {
+            None => {
+                best_total = report.best.as_ref().map(&hit_total).unwrap_or(0);
+                merged = Some(report);
+            }
+            Some(acc) => {
+                let prefix = format!("{label}: ");
+                acc.notes
+                    .extend(report.notes.iter().map(|n| format!("{prefix}{n}")));
+                acc.probes_total += report.probes_total;
+                acc.probes_run += report.probes_run;
+                acc.oracle_calls += report.oracle_calls;
+                acc.hits += report.hits;
+                acc.capped |= report.capped;
+                acc.rejections.conservation += report.rejections.conservation;
+                acc.rejections.missing_key += report.rejections.missing_key;
+                acc.rejections.script += report.rejections.script;
+                acc.rejections.invalid += report.rejections.invalid;
+                for d in report.nft_detached {
+                    if !acc.nft_detached.iter().any(|x| x.detail == d.detail) {
+                        acc.nft_detached.push(d);
+                    }
+                }
+                if acc.first_accounting.is_none() {
+                    acc.first_accounting = report.first_accounting;
+                }
+                if let Some(hit) = report.best {
+                    let total = hit_total(&hit);
+                    if acc.best.is_none() || total > best_total {
+                        best_total = total;
+                        acc.best = Some(hit);
+                    }
+                }
+                // Shape tallies of derived runs are appended under their label so
+                // the family's traversal is readable next to the base run's.
+                for mut t in report.synthesis.shapes {
+                    t.shape = format!("{prefix}{}", t.shape);
+                    acc.synthesis.shapes.push(t);
+                }
+                acc.synthesis.thin_slices += report.synthesis.thin_slices;
+            }
+        }
+    }
+    let mut merged = merged.expect("at least the base run");
+    // An invalid shape on the base request is the whole answer; derived runs
+    // inherit the same declaration errors.
+    if merged.verdict != DrainVerdict::InvalidShape {
+        let objective_incomplete = merged.verdict == DrainVerdict::IncompleteObjective;
+        merged.verdict = if objective_incomplete {
+            DrainVerdict::IncompleteObjective
+        } else if merged.hits > 0 {
+            DrainVerdict::Drainable
+        } else {
+            DrainVerdict::NotUnderProbes
+        };
+        merged.preflight = DrainPreflight::new(merged.verdict);
+    }
+    merged.synthesis.caps.max_probes = total_cap;
+    merged.notes.push(format!(
+        "two-instance family: the probe cap {total_cap} was split across {runs} runs (base + one derived request per protected input); a miss on every run is still \"not under these probes\""
+    ));
+    merged.synthesis.multi_instance = Some(MultiInstanceRecord {
+        protected_inputs: protected.len(),
+        cap_per_run,
+        position_in_axis_order: "outside the synthesis axes: each derived request is hunted with the unchanged pinned order",
+        runs: record_runs,
+    });
+    Ok(merged)
+}
+
+fn drain_hunt_single(req: &DrainRequest) -> Result<DrainReport, SandboxError> {
     let mut notes: Vec<String> = Vec::new();
 
     // ── attacker tree ──
@@ -1332,6 +1599,7 @@ fn synthesis_record(
         slice_floor,
         thin_slices,
         shapes,
+        multi_instance: None,
     }
 }
 

@@ -57,16 +57,26 @@ pub fn historical_bytes(workspace: &Path, path: &str) -> Vec<u8> {
         return historical;
     }
     if path == "docs/roadmap-metrics.json" {
-        // X01 appends its measured scoreboard; authenticate the complete
-        // historical artifact against the original manifest digest below.
+        // X01 appends its measured scoreboard and S03 its family measurement;
+        // authenticate the complete historical artifact against the original
+        // manifest digest below. Only these appended keys are admitted.
         let historical =
             std::fs::read(workspace.join("docs/reports/batch-10/roadmap-metrics-before.json"))
                 .unwrap();
         let mut live: Value = serde_json::from_slice(&current).unwrap();
         let extension = live.as_object_mut().unwrap().remove("scoreboard").unwrap();
         assert_eq!(
-            extension.as_object().unwrap().keys().collect::<Vec<_>>(),
-            vec!["X01"]
+            extension
+                .as_object()
+                .unwrap()
+                .keys()
+                .collect::<std::collections::BTreeSet<_>>(),
+            ["S03", "X01"]
+                .iter()
+                .map(|s| s.to_string())
+                .collect::<std::collections::BTreeSet<_>>()
+                .iter()
+                .collect()
         );
         assert_eq!(
             live,

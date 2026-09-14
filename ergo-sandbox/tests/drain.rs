@@ -1413,3 +1413,21 @@ fn the_data_input_axis_appends_an_attacker_box_and_is_off_by_default() {
         "observed register values must be in the family: {data_shapes:?}"
     );
 }
+
+/// S03: with the two-instance degree off (absent or explicit `false`), the
+/// report is byte-identical to a report produced before the family existed:
+/// the family's record is absent, not empty.
+#[test]
+fn absent_two_instance_degree_is_byte_identical() {
+    let absent = drain(use_lp_request(None));
+    let mut explicit_off = use_lp_request(None);
+    explicit_off["synthesis"] = json!({"multiInstance": false});
+    let off = drain(explicit_off);
+    let a = serde_json::to_string(&absent).unwrap();
+    let b = serde_json::to_string(&off).unwrap();
+    assert_eq!(a, b);
+    assert!(
+        !a.contains("multiInstance"),
+        "no family record without the degree"
+    );
+}
