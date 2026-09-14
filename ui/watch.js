@@ -1,6 +1,8 @@
 "use strict";
 // Source observations only. Baselines live in page memory; all data renders as text.
 const Watch = (() => {
+  // Mirrors ergo_sandbox::watch::MAX_REPORTS so limits fail locally with a reason.
+  const MAX_PAIRS = 64;
   const pending = new WeakMap();
   const unavailable = "no explorer configured (explorer-dependency)";
   function element(root, tag, text) {
@@ -127,7 +129,10 @@ const Watch = (() => {
         const nfts = split(get("nfts").value).map(n => n.toLowerCase());
         const registers = split(get("registers").value);
         if (!nfts.length || nfts.some(n => !/^[0-9a-f]{64}$/.test(n))) throw new Error("Enter 64-hex NFT IDs");
+        if (new Set(nfts).size !== nfts.length) throw new Error("NFT IDs must be unique");
+        if (nfts.length > MAX_PAIRS) throw new Error(`At most ${MAX_PAIRS} NFTs per watch`);
         if (registers.some(r => !/^R[4-9]$/.test(r))) throw new Error("Register names must be R4–R9");
+        if (new Set(registers).size !== registers.length) throw new Error("Register names must be unique");
         const supplied = get("baseline").value.trim();
         const baselineBoxes = supplied ? Object.fromEntries(nfts.map(n => [n, JSON.parse(supplied)])) : { ...baselines };
         const reports = await load({ watches: [{ lockfile, nfts, registers, baselineBoxes }] }, result,

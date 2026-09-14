@@ -122,6 +122,12 @@ test("watch upload, input edits and stale completions cannot preserve old observ
   assert.equal(get("result").querySelectorAll("[data-nft]").length, 0);
   assert.equal(get("run").disabled, false);
   get("registers").value = "R10"; await module.run(); assert.match(get("result").textContent, /Register names/);
+  get("registers").value = "R4 R4"; await module.run(); assert.match(get("result").textContent, /Register names must be unique/);
+  get("registers").value = "R4";
+  get("nfts").value = `${nft} ${nft.toUpperCase()}`; await module.run(); assert.match(get("result").textContent, /NFT IDs must be unique/);
+  get("nfts").value = Array.from({ length: 65 }, (_, i) => i.toString(16).padStart(64, "0")).join(" ");
+  await module.run(); assert.match(get("result").textContent, /At most 64 NFTs/);
+  get("nfts").value = nft;
   let upload;
   Object.defineProperty(get("file"), "files", { configurable: true, value: [{ size: 20, text: () => new Promise(resolve => { upload = resolve; }) }] });
   const uploading = get("file").onchange();
