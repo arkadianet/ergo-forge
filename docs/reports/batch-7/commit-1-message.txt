@@ -1,0 +1,8 @@
+feat(hunt): add bounded immobilisation probes and static rent basis
+
+Record absent-register, minimum-output-value and block-budget samples with
+caps, truncation, errors and synthetic provenance. Expose a static Read rent
+estimate citing the frozen parameters and P03 storage-rent-acceptance basis.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

@@ -1426,7 +1426,14 @@
    "lint": "unauthenticated-code-execution",
    "mutantFindings": 1,
    "controlFindings": 0
-  }
+  },
+{
+ "id": "I04-01-v1",
+ "version": 1,
+ "lint": "upgrade-hook",
+ "mutantFindings": 1,
+ "controlFindings": 0
+}
  ]
 }
 }

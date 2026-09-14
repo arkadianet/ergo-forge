@@ -1,0 +1,8 @@
+feat(audit): observe mutable upgrade hooks on recognised continuations
+
+Add an independent LOW upgrade-hook lint without changing existing lints.
+Register the versioned mutant/control pair and checklist instrument; retain
+initial and narrowed corpus sweeps with every new site reviewed.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

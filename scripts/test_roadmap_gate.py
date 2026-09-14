@@ -41,7 +41,7 @@ class RoadmapGateTests(unittest.TestCase):
         union = gate.union_policy([v1, v2])
         for unit in v2['units']:
             self.assertEqual(gate.select_units(union, unit['id'])[-1], unit)
-        self.assertEqual({u['id'] for u in v2['units'] if u['implemented']}, {'W00', 'S00', 'W01', 'S02', 'S01', 'W06', 'I01', 'I02', 'W02', 'W03', 'W04'})
+        self.assertEqual({u['id'] for u in v2['units'] if u['implemented']}, {'W00', 'S00', 'W01', 'S02', 'S01', 'W06', 'I01', 'I02', 'W02', 'W03', 'W04', 'S04', 'I04'})
         archived = (gate.ROOT / 'docs/reports/ROADMAP-v1-queue.md').read_text()
         self.assertIn(original_doc[original_doc.index('## 2. '):original_doc.index('## 4. ')], archived)
         self.assert_status('missing-gate', lambda: gate.policy_v2_from(current_doc + gate.V2_MARKER, v1))
@@ -112,7 +112,7 @@ class RoadmapGateTests(unittest.TestCase):
 
     def test_w02_and_w03_extras_require_their_dom_tests(self):
         from types import SimpleNamespace
-        for uid, filename in [('W02', 'play-export'), ('W03', 'share')]:
+        for uid, filename in [('W02', 'play-export'), ('W03', 'share'), ('S04', 'hunt-read')]:
             expected = [('node', ['node', '--test', f'ui/tests/{filename}.test.js'])]
             self.assertEqual(gate.extras(uid), expected)
             unit = next(u for u in gate.load_policies()[1]['units'] if u['id'] == uid)

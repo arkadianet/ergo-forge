@@ -1116,6 +1116,17 @@ fn cmd_hunt(args: &[String]) -> Result<(), String> {
             for res in &r.residuals {
                 println!("  observed proof requirement under these probes: {res}");
             }
+            println!("  {}", r.observation);
+            println!(
+                "  synthetic probes: {}/{}; truncated: {}; positional box cap: {}; budget: {}",
+                r.probes.len(),
+                r.caps.max_probes,
+                r.truncated,
+                r.caps.max_boxes_per_collection,
+                r.caps.block_cost_limit
+            );
+            println!("  register reads: {}", r.register_reads.join(", "));
+            println!("  basis: {}", r.caps.basis);
             println!("  probes:");
             for p in &r.probes {
                 let shape = match p.output {
@@ -1128,7 +1139,8 @@ fn cmd_hunt(args: &[String]) -> Result<(), String> {
                     _ => String::new(),
                 };
                 println!(
-                    "    height {:>8}  {shape:<8}  {:<11}cost {}{detail}",
+                    "    {:?} height {:>8}  {shape:<8}  {:<11} cost {}{detail}",
+                    p.kind,
                     p.height,
                     verdict_str(p.verdict),
                     p.cost
@@ -1317,7 +1329,7 @@ fn hunt_verdict_str(v: ergo_sandbox::hunt::HuntVerdict) -> &'static str {
         SpendableByAnyone => "sample passed without a proof (full node validation has not run)",
         MovableByAnyone => "preserving-output sample passed (full node validation has not run)",
         RequiresProof => "requires proof",
-        NotUnderProbes => "not under probes",
+        NotUnderProbes => "not spendable under these probes",
     }
 }
 

@@ -23,15 +23,15 @@ fn a_trivially_true_contract_is_spendable_by_anyone() {
 }
 
 #[test]
-fn every_hunt_runs_three_heights_times_two_output_shapes() {
+fn every_hunt_records_legacy_and_immobilisation_probes() {
     let h = run("sigmaProp(true)");
-    assert_eq!(h.probes.len(), 6, "{h:?}");
+    assert_eq!(h.probes.len(), 12, "{h:?}");
     let attacker = h
         .probes
         .iter()
         .filter(|p| p.output == OutputShape::Attacker)
         .count();
-    assert_eq!(attacker, 3);
+    assert_eq!(attacker, 6);
     let heights: std::collections::BTreeSet<u32> = h.probes.iter().map(|p| p.height).collect();
     assert_eq!(
         heights,

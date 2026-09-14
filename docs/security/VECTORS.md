@@ -178,7 +178,7 @@ Instruments: `lint:unchecked-get`, `hunt`, `scenario`, `node-validated`, `manual
 - Exhibits the mechanism: [examples/contracts/basics/unguarded-register-read.es](../../examples/contracts/basics/unguarded-register-read.es). The absent SELF R4 read throws.
 - Control: [examples/contracts/basics/guarded-register-read.es](../../examples/contracts/basics/guarded-register-read.es). The same absent register is explicitly refused without an unguarded read.
 
-The guarded control removes the unchecked read; it does not make an already malformed box spendable. Hunt samples three heights and two output shapes, without context variables; it has no general cost-limit or missing-register campaign. Full validation of supplied canonical requests checks consensus constraints; the P03 node_validation target includes output-constraint-rejection, aggregate-cost-rejection and storage-rent-acceptance. A reviewer checks that a valid creation path establishes required SELF fields, estimates worst-case cost and box size, funds outputs under the supplied parameters, and reviews storage-rent eligibility and its effect on reserves. The named P03 cases are not blanket liveness certification.
+The guarded control removes the unchecked read; it does not make an already malformed box spendable. Hunt samples three heights and two output shapes, without context variables; it has no general cost-limit or missing-register campaign. Full validation of supplied canonical requests checks consensus constraints; the P03 node_validation target includes output-constraint-rejection, aggregate-cost-rejection and storage-rent-acceptance. A reviewer checks that a valid creation path establishes required SELF fields, estimates worst-case cost and box size, funds outputs under the supplied parameters, and reviews storage-rent eligibility and its effect on reserves. The named P03 cases are not blanket liveness certification. S04 adds six bounded immobilisation samples (absent registers, minimum-valued outputs and explicit block-budget reduction) to the six height/output samples described above. Results record the probe set, box/probe caps, truncation, engine errors and costs; no sample establishes universal liveness. Read now labels the rent line static and cites the frozen constants and P03:storage-rent-acceptance.
 
 ## 9. Sigma-proposition mistakes
 
@@ -237,14 +237,14 @@ ID: `mutable-upgrade-digest`.
 
 A script hash stored in a register can authorise a later change of guarding code. If an ordinary continuation can rewrite that register without the intended approval, the next spend can select different code while following the apparent upgrade rule. Preserving the current script alone does not preserve this future authority.
 
-Instruments: `scenario`, `manual`.
+Instruments: `lint:upgrade-hook`, `scenario`, `manual`.
 
 - Exhibits the mechanism: [examples/contracts/vectors/mutable-upgrade-digest/vulnerable.es](../../examples/contracts/vectors/mutable-upgrade-digest/vulnerable.es). Authored counterexample; accepts the adversarial suite context.
 - Control: [examples/contracts/vectors/mutable-upgrade-digest/fixed.es](../../examples/contracts/vectors/mutable-upgrade-digest/fixed.es). Refuses that same context; accepts the intended control context.
 
 Suites: [examples/contracts/vectors/mutable-upgrade-digest/contract.test.json](../../examples/contracts/vectors/mutable-upgrade-digest/contract.test.json), [examples/contracts/vectors/mutable-upgrade-digest/fixed.test.json](../../examples/contracts/vectors/mutable-upgrade-digest/fixed.test.json).
 
-The pair uses a synthetic R4 digest and changes it during a same-script continuation; the fixed branch carries the old digest. A reviewer identifies who can write the digest, the authorised upgrade procedure and whether every continuation preserves or authorises it. trust-assumptions currently covers extracted data-input provenance, not SELF upgrade hooks; I04 is future work.
+The pair uses a synthetic R4 digest and changes it during a same-script continuation; the fixed branch carries the old digest. A reviewer identifies who can write the digest, the authorised upgrade procedure and whether every continuation preserves or authorises it. trust-assumptions covers extracted data-input provenance, not SELF upgrade hooks. I04 now supplies lint:upgrade-hook as a LOW static observation for recognised mutable continuations; the versioned I04 pair and batch-7 sweep record its precision. The earlier future-work note describes the S00 baseline.
 
 ### Compiled constants differ from the reviewed deployment
 

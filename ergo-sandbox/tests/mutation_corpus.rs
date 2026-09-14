@@ -1005,7 +1005,8 @@ fn new_lint_mutants_are_caught_and_controls_are_clean() {
             "unconstrained-outputs",
             "successor-field-drift",
             "trivial-sigma-branch",
-            "unauthenticated-code-execution"
+            "unauthenticated-code-execution",
+            "upgrade-hook"
         ])
     );
 }
@@ -1013,11 +1014,24 @@ fn new_lint_mutants_are_caught_and_controls_are_clean() {
 /// A review must cover the actual corpus and every currently reported S02 site.
 #[test]
 fn deployed_corpus_sweep_is_recorded() {
+    check_sweep(
+        "batch-2",
+        BTreeSet::from([
+            "unconstrained-outputs",
+            "successor-field-drift",
+            "trivial-sigma-branch",
+            "unauthenticated-code-execution",
+        ]),
+    );
+    check_sweep("batch-7", BTreeSet::from(["upgrade-hook"]));
+}
+
+fn check_sweep(batch: &str, lints: BTreeSet<&str>) {
     use sha2::{Digest, Sha256};
     use std::path::Path;
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
     let corpus_root = root.join("examples/contracts");
-    let report = root.join("docs/reports/batch-2");
+    let report = root.join("docs/reports").join(batch);
     let bytes = std::fs::read(report.join("audit-sweep.json")).unwrap();
     let sweep: Value = serde_json::from_slice(&bytes).expect("completed sweep JSON");
     let review: Value =
@@ -1026,12 +1040,6 @@ fn deployed_corpus_sweep_is_recorded() {
     assert_eq!(review["sweepSha256"], hex::encode(Sha256::digest(&bytes)));
     assert_eq!(review["method"], "static-analysis");
     assert_eq!(sweep["treeVersion"], 3);
-    let lints = BTreeSet::from([
-        "unconstrained-outputs",
-        "successor-field-drift",
-        "trivial-sigma-branch",
-        "unauthenticated-code-execution",
-    ]);
     assert_eq!(
         review["decisions"]
             .as_object()
@@ -1189,4 +1197,16 @@ fn deployed_corpus_sweep_is_recorded() {
         reported.into_keys().collect(),
         "every reported site reviewed exactly once"
     );
+}
+
+/// I04's versioned pair is also exercised by the shared mechanical-pair gate.
+#[test]
+fn upgrade_hook_mutant_is_caught() {
+    let corpus: Value = serde_json::from_str(CORPUS).unwrap();
+    let pairs = corpus["staticLintPairs"]["pairs"].as_array().unwrap();
+    assert_eq!(
+        pairs.iter().filter(|p| p["lint"] == "upgrade-hook").count(),
+        1
+    );
+    new_lint_mutants_are_caught_and_controls_are_clean();
 }

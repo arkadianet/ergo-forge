@@ -1,0 +1,8 @@
+feat(read): render immobilisation observations and static storage rent
+
+Show probe families, caps, truncation, output values, budget exhaustion and
+absent reads in Read. Keep rent explicitly static and probe misses scoped.
+Exercise the production renderer with DOM tests and register S04's extra.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

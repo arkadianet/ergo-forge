@@ -52,3 +52,13 @@ historical field of the live answer key to equal that archive; only the new stat
 namespace is outside the frozen hunt measurement.
 Direct AST precision tests in `more_lints.rs` additionally cover deserialisation
 forms the pinned compiler does not emit, labelled separately from compiled pairs.
+
+## I04 upgrade-hook pair (v1)
+
+`i04/v1/upgrade-hook-{control,mutant}.es` adds `I04-01-v1` only in the
+append-only `staticLintPairs` namespace. Removing the same-register equality
+from the same-script continuation produces exactly one `upgrade-hook` LOW
+observation; the control produces none for that lint. The new sibling leaves
+`trust-assumptions` and every existing lint unchanged. Branch authority is a
+static observation, with no claim about an executable or exploitable upgrade.
+The deployed-corpus measurement and every new site review are in batch-7.

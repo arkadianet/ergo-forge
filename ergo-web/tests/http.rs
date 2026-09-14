@@ -200,7 +200,17 @@ async fn hunt_reports_a_trivially_true_tree_as_spendable_by_anyone() {
         .await
         .unwrap();
     assert_eq!(res["verdict"], "spendableByAnyone", "{res}");
-    assert_eq!(res["probes"].as_array().unwrap().len(), 6);
+    assert_eq!(res["probes"].as_array().unwrap().len(), 12);
+    assert_eq!(res["caps"]["maxProbes"], 12);
+    assert_eq!(res["nodeValidated"], false);
+    assert_eq!(res["rentLine"]["provenance"], "static");
+    assert_eq!(res["rentLine"]["nodeValidated"], false);
+    assert_eq!(res["rentLine"]["estimate"], res["rent"]);
+    assert!(res["rentLine"]["basis"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|b| b == "P03:storage-rent-acceptance"));
     assert_eq!(res["selfSynthetic"], true);
 }
 

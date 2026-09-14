@@ -71,8 +71,8 @@ test("production Read and Write handlers render both signs of synthetic hunt", a
     const document = elements();
     document.getElementById("compiled").hidden = false;
     document.getElementById("mode-write").hidden = false;
-    const response = { verdict, selfSynthetic: true, probes: [], residuals: [] };
-    const context = vm.createContext({ document, ClaimLabels: { renderHunt, renderPreflight, renderTriage }, fetch: async () => ({ ok: true, json: async () => response }) });
+    const response = { verdict, selfSynthetic: true, probes: [], residuals: [], caps: { maxProbes: 12, maxBoxesPerCollection: 16, blockCostLimit: 8001091, minValuePerByte: 360 } };
+    const context = vm.createContext({ document, HuntRead: require("../hunt-read.js"), ClaimLabels: { renderHunt, renderPreflight, renderTriage }, fetch: async () => ({ ok: true, json: async () => response }) });
     // Execute the shipped reader functions and the complete Write request handler.
     // Extraction only avoids editor/bootstrap side effects; assertions grade DOM output.
     const readerEnd = app.indexOf("// The editor: CodeMirror");

@@ -31,7 +31,7 @@ fn hunt_reports_a_trivially_true_sample_without_node_validation() {
         "stdout: {out}"
     );
     // One line per probe with height, shape, and verdict.
-    assert_eq!(out.matches("PASS").count(), 6, "stdout: {out}");
+    assert_eq!(out.matches("PASS").count(), 12, "stdout: {out}");
 }
 
 #[test]
@@ -60,7 +60,10 @@ fn hunt_warns_when_self_is_synthetic_and_probes_error() {
     let tree = tree_hex("sigmaProp(SELF.R4[Int].get > 0)");
     let (ok, out, _) = ergo_es(&["hunt", &tree]);
     assert!(ok);
-    assert!(out.contains("not under probes"), "stdout: {out}");
+    assert!(
+        out.contains("not spendable under these probes"),
+        "stdout: {out}"
+    );
     assert!(out.contains("synthetic"), "stdout: {out}");
 }
 

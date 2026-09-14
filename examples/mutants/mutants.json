@@ -1648,7 +1648,22 @@
    "originalSource": "sigmaProp(substConstants(SELF.propositionBytes, Coll(0), Coll(HEIGHT)).size > 0)\n",
    "mutatedSource": "sigmaProp(substConstants(getVar[Coll[Byte]](1).get, Coll(0), Coll(HEIGHT)).size > 0)\n",
    "params": {}
-  }
+  },
+{
+ "id": "I04-01-v1",
+ "version": 1,
+ "lint": "upgrade-hook",
+ "operator": "replace-expression",
+ "diff": {
+  "find": " && next.R4[Coll[Byte]].get == SELF.R4[Coll[Byte]].get",
+  "replace": ""
+ },
+ "originalPath": "examples/mutants/i04/v1/upgrade-hook-control.es",
+ "mutatedPath": "examples/mutants/i04/v1/upgrade-hook-mutant.es",
+ "originalSource": "{\n  val next = OUTPUTS(0)\n  val upgrade = blake2b256(next.propositionBytes) == SELF.R4[Coll[Byte]].get\n  val continue = next.propositionBytes == SELF.propositionBytes && next.value >= SELF.value && next.R4[Coll[Byte]].get == SELF.R4[Coll[Byte]].get\n  sigmaProp(upgrade || continue)\n}\n",
+ "mutatedSource": "{\n  val next = OUTPUTS(0)\n  val upgrade = blake2b256(next.propositionBytes) == SELF.R4[Coll[Byte]].get\n  val continue = next.propositionBytes == SELF.propositionBytes && next.value >= SELF.value\n  sigmaProp(upgrade || continue)\n}\n",
+ "params": {}
+}
  ]
 }
 }

@@ -1,0 +1,21 @@
+{
+  "method": "static-analysis",
+  "nodeValidated": false,
+  "sweepSha256": "464784d1ea358d38161d773c230e00a0c9b017ecca3ddf1ad73bdef944621d81",
+  "sites": [
+    {
+      "contract": "rosen-bridge/Commitment.es",
+      "lint": "upgrade-hook",
+      "nodeId": 402,
+      "outcome": "benign",
+      "reason": "Commitment redemption transfers X-RWT into a permit whose code is selected by SELF.R7; it is not a same-script continuation. R7 is the permit script digest, not continuing commitment state. Token-id continuity alone conflated a typed contract transition with a mutable hook. Narrowed the recogniser to require same-script equality; the final sweep excludes this site."
+    },
+    {
+      "contract": "vectors/mutable-upgrade-digest/vulnerable.es",
+      "lint": "upgrade-hook",
+      "nodeId": 8,
+      "outcome": "true-positive",
+      "reason": "The authored same-script continuation preserves value but omits R4 equality; the alternative selects code by SELF.R4. No sigma guard is recognised on the continuation. The fixed source carries R4 on that path and does not report. This is a true-positive static pattern, not a validated upgrade."
+    }
+  ]
+}

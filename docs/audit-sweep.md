@@ -242,3 +242,36 @@ All ten are retained as failed records, never counted as clean:
 | `lsp/tests/main.test.es` | parse error: syntax error at offset 0: expected expression |
 | `lsp/tests/simple.test.es` | parse error: syntax error at offset 0: expected expression |
 | `lsp/tests/template.test.es` | parse error: syntax error at offset 0: expected expression |
+
+## I04 sweep — 2026-09-14
+
+`cargo run --release -p ergo-sandbox --example audit_sweep` exited **0**, using
+this batch's `$CARGO_TARGET_DIR`. The final [raw sweep](reports/batch-7/audit-sweep.json)
+and [site review](reports/batch-7/site-review.json) cover **124 files: 114 complete,
+0 partial, 10 compile failures**. This is the bundled corpus, including authored
+vectors and recipes; the spec's historical 79 is not this denominator. The same
+ten compile failures and reasons recorded in S02 above remained unanalysed.
+No deployment identity or transaction acceptance was established by this sweep.
+
+The sibling `upgrade-hook` leaves all nine existing lints unchanged. It recognises
+direct output bytes or blake2b256 comparisons to SELF/input/data-input registers,
+then looks for same-script continuations with no same-typed-register equality on
+that path. Result aliases, conjunctions, disjunctions, allOf/anyOf and if branches
+are bounded to 64 alternatives and depth 128; unsupported/computed boxes and
+over-cap expressions remain undecided. Named sigma guards are syntactic authority
+requirements, not proof of reachability, signing ability or approval.
+
+Ship upgrade-hook at LOW review priority for same-script continuations only; token transfers and unrecognised continuations remain undecided.
+
+The [initial sweep](reports/batch-7/initial-audit-sweep.json) reported two sites.
+[Every initial site was reviewed](reports/batch-7/initial-site-review.json).
+Rosen `Commitment.es` node 402 was a benign commitment-to-permit redemption: R7
+selects the permit script, and X-RWT moves to the permit. Token identity alone
+did not establish a continuing commitment or a rewritten future upgrade hook.
+The recogniser was narrowed to same-script continuations, with a negative test
+for token transfer to a hook destination. The final sweep reports only the
+authored pair below. No precision-regression stop was needed after narrowing.
+
+| Contract | Lint | Node | Outcome | Review reason |
+| --- | --- | ---: | --- | --- |
+| `vectors/mutable-upgrade-digest/vulnerable.es` | `upgrade-hook` | 8 | true-positive | The authored same-script continuation preserves value but omits R4 equality; the alternative selects code by SELF.R4. No sigma guard is recognised on the continuation. The fixed source carries R4 on that path and does not report. This is a true-positive static pattern, not a validated upgrade. |

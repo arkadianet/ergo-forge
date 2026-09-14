@@ -133,6 +133,12 @@ pub struct HuntRequest {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ProbeDto {
+    pub kind: ergo_sandbox::hunt::ProbeKind,
+    pub observation: &'static str,
+    pub cost_limit: u64,
+    pub cost_exhausted: bool,
+    pub erroring_reads: Vec<String>,
+    pub output_values: Vec<i64>,
     pub height: u32,
     pub output: &'static str,
     pub verdict: &'static str,
@@ -144,6 +150,12 @@ pub struct ProbeDto {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct HuntResponse {
+    pub rent_line: ergo_sandbox::rent::RentLine,
+    pub caps: ergo_sandbox::hunt::ProbeCaps,
+    pub probe_set: Vec<ergo_sandbox::hunt::ProbeKind>,
+    pub truncated: bool,
+    pub register_reads: Vec<String>,
+    pub observation: &'static str,
     #[serde(flatten)]
     pub claim: ergo_sandbox::claim::ClaimMetadata,
     /// Storage rent for the box hunted (the supplied `selfBox` when given,
@@ -167,7 +179,13 @@ impl HuntResponse {
     ) -> Self {
         Self {
             claim: h.claim,
+            rent_line: ergo_sandbox::rent::read_line(rent.clone()),
             rent,
+            caps: h.caps.clone(),
+            probe_set: h.probe_set.clone(),
+            truncated: h.truncated,
+            register_reads: h.register_reads.clone(),
+            observation: h.observation,
             tree_hex,
             address,
             verdict: match h.verdict {
@@ -182,6 +200,12 @@ impl HuntResponse {
                 .probes
                 .iter()
                 .map(|p| ProbeDto {
+                    kind: p.kind,
+                    observation: p.observation,
+                    cost_limit: p.cost_limit,
+                    cost_exhausted: p.cost_exhausted,
+                    erroring_reads: p.erroring_reads.clone(),
+                    output_values: p.output_values.clone(),
                     height: p.height,
                     output: match p.output {
                         OutputShape::Attacker => "attacker",
@@ -391,34 +415,5 @@ pub fn rent_for(
     tree_bytes: &[u8],
     b: Option<&ergo_sandbox::ScenarioBox>,
 ) -> ergo_sandbox::rent::RentEstimate {
-    match b {
-        Some(b) => {
-            let amounts: Vec<u64> = b.tokens.iter().map(|t| t.amount).collect();
-            // Each register's canonical serialized constant (type + value),
-            // which is what the box serialization carries.
-            let regs: Vec<Vec<u8>> = b
-                .registers
-                .values()
-                .map(|tv| match (tv.r#type.as_str(), tv.value.as_str()) {
-                    ("raw", Some(h)) => hex::decode(h).unwrap_or_default(),
-                    _ => ergo_sandbox::parse_typed_value(&tv.r#type, &tv.value)
-                        .ok()
-                        .and_then(|(t, v)| {
-                            let mut w = ergo_primitives::writer::VlqWriter::new();
-                            ergo_ser::sigma_value::write_constant(&mut w, &t, &v)
-                                .ok()
-                                .map(|_| w.result())
-                        })
-                        .unwrap_or_default(),
-                })
-                .collect();
-            let created = if b.creation_height > 0 {
-                Some(b.creation_height)
-            } else {
-                None
-            };
-            ergo_sandbox::rent::estimate(tree_bytes, &amounts, &regs, created)
-        }
-        None => ergo_sandbox::rent::estimate(tree_bytes, &[], &[], None),
-    }
+    ergo_sandbox::rent::estimate_for(tree_bytes, b)
 }
