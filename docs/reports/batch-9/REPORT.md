@@ -185,15 +185,18 @@ session trailers. No commit was created because Git could not write index.lock.
 
 | Artifact | SHA-256 |
 |---|---|
-| [W05.json](W05.json) | `360de305f28076ad65f9441454edc7320657b027dad8a51174431b782ccda5f5` |
-| [S05.json](S05.json) | `b2958f2a8c2279a1aed8f4e287e077d0ea80d1bb96576b93905dd2f3b082c52e` |
+| [W05.json](W05.json) | `10d88691deb528e544c28cd70da77fc5221914129b60b6adabddd2e444bfe6d5` |
+| [S05.json](S05.json) | `6b716df294d4a73ed2594a80078d54f49d28adb884b53356ed1dc78d81099b83` |
 | [decompile-w05.json](decompile-w05.json) | `1c93693e81553b2c03dbb3c7923193136da2513fc179a3f65d0fec55089df1de` |
 
 ## Post-session
 
-No post-session checks or externally supplied passes were claimed. All observed
-results above came from this implementation session. The live explorer path
-and Git commits remained unverified/unperformed for the reasons recorded above.
+No post-session checks or externally supplied passes were claimed by the
+implementation session itself. All observed results above came from that
+session. The live explorer path remained unverified for the reasons recorded
+above; the commits were created afterwards from the prepared messages.
+
+Post-session ledger entry: `cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present` exited **0** ([log](logs/workspace-post-session.log)). Post-session re-verification outside the implementation sandbox; the same log records the W05 and S05 gate runs (exit 0) that wrote the committed W05.json and S05.json.
 
 ## Post-session re-verification
 

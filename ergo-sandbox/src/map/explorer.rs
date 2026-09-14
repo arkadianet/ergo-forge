@@ -269,7 +269,9 @@ fn transaction_boxes(
                     .ok_or_else(|| {
                         SourceError::Backend(format!("box {id}: missing/invalid creationHeight"))
                     })?;
-                parsed.box_id = b["boxId"].as_str().unwrap().to_string();
+                // Keep the transaction reference's own spelling: an explorer that
+                // lower-cases hydrated ids must not change the incident artifacts.
+                parsed.box_id = id.to_string();
                 parsed.ergo_tree = b["ergoTree"].as_str().unwrap().to_string();
                 for (token, raw) in parsed
                     .tokens
@@ -486,6 +488,12 @@ mod tests {
         bad = b.clone();
         bad["boxId"] = json!("00".repeat(32));
         assert!(transaction_boxes(&tx, |_| Ok(bad.clone())).is_err());
+        // Case-only differences are accepted, but the reference spelling wins.
+        let mut lower = b.clone();
+        lower["boxId"] = json!("ab".repeat(32));
+        let kept = transaction_boxes(&tx, |_| Ok(lower.clone())).unwrap();
+        assert_eq!(kept.inputs[0].box_id, "AB".repeat(32));
+        assert_eq!(kept.data_inputs[0].box_id, "AB".repeat(32));
     }
 
     #[test]

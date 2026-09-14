@@ -168,8 +168,20 @@ session trailers. No commit was created because Git could not write index.lock.
 
 ## Post-session
 
-No post-session checks or externally supplied passes were claimed. All observed
-results above came from this implementation session. The live explorer path
-and Git commits remained unverified/unperformed for the reasons recorded above.
+No post-session checks or externally supplied passes were claimed by the
+implementation session itself. All observed results above came from that
+session. The live explorer path remained unverified for the reasons recorded
+above; the commits were created afterwards from the prepared messages.
 '''
+# Post-session evidence lives in the ledger's `postSession` entries and in the
+# re-verification section appended to REPORT.md after the session. Regenerating
+# the report must render the former and preserve the latter, never drop them.
+import json as _json
+_ledger = _json.loads((report / 'commands.json').read_text())
+for _entry in _ledger.get('postSession', []):
+    text += f"\nPost-session ledger entry: `{_entry['command']}` exited **{_entry['exitCode']}** ([log]({_entry['log'].removeprefix('docs/reports/batch-9/')})). {_entry.get('note', '')}\n"
+_existing = (report / 'REPORT.md').read_text() if (report / 'REPORT.md').exists() else ''
+_marker = '\n## Post-session re-verification\n'
+if _marker in _existing:
+    text = text.rstrip() + '\n' + _marker + _existing.split(_marker, 1)[1]
 (report / 'REPORT.md').write_text(text)
