@@ -23,7 +23,11 @@ for command in required:
     row = matches[-1] if matches else {'exitStatus': 'no observed exit', 'log': ''}
     label = 'node --test (all 10 UI test files, passed explicitly)' if command.startswith('node ') else command
     status.append(f"| `{label}` | {row['exitStatus']} | [{Path(row['log']).name}]({row['log']}) |")
-all_commands = [f"| {i} | `{r['command'].replace('|', '&#124;')}` | {r['exitStatus']} | [{Path(r['log']).name}]({r['log']}) |" for i, r in enumerate(rows, 1)]
+all_commands = [
+    f"| {i} | `{r['command'].replace('|', '&#124;')}` | {r['exitStatus']} | {r.get('elapsedSeconds', '')} "
+    f"| [{Path(r['log']).name}]({r['log']}) | `{r.get('logSha256', '')}` |"
+    for i, r in enumerate(rows, 1)
+]
 hashes = []
 for name in ['W05.json', 'S05.json', 'decompile-w05.json']:
     p = report / name
@@ -144,8 +148,8 @@ with exit status, elapsed time and its log. Earlier failures remain visible.
 The adapter-only filter run executed one library test and zero integration
 tests; it was not counted as integration or gate evidence.
 
-| # | Command | Exit | Log |
-|---:|---|---:|---|
+| # | Command | Exit | Seconds | Log | Log SHA-256 |
+|---:|---|---:|---:|---|---|
 ''' + '\n'.join(all_commands) + '''
 
 ## Integrity and prepared commits

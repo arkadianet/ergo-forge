@@ -121,53 +121,53 @@ with exit status, elapsed time and its log. Earlier failures remain visible.
 The adapter-only filter run executed one library test and zero integration
 tests; it was not counted as integration or gate evidence.
 
-| # | Command | Exit | Log |
-|---:|---|---:|---|
-| 1 | `cargo test -p ergo-sandbox --test compose_recipes` | 101 | [recipes-first.log](logs/recipes-first.log) |
-| 2 | `cargo test -p ergo-sandbox --test compose_recipes` | 101 | [recipes-corrected.log](logs/recipes-corrected.log) |
-| 3 | `cargo test -p ergo-sandbox --test compose_recipes --test incident_scaffold` | 101 | [focused.log](logs/focused.log) |
-| 4 | `cargo test -p ergo-sandbox --test compose_recipes --test incident_scaffold --lib incident_transaction_adapter` | 0 | [focused-corrected.log](logs/focused-corrected.log) |
-| 5 | `cargo fmt --all` | 0 | [fmt-implementation.log](logs/fmt-implementation.log) |
-| 6 | `cargo test -p ergo-sandbox --test compose_recipes --test incident_scaffold` | 0 | [recipe-incident-tests.log](logs/recipe-incident-tests.log) |
-| 7 | `node --test ui/tests/binding-recipes.test.js` | 0 | [binding-dom.log](logs/binding-dom.log) |
-| 8 | `cargo fmt --all` | 0 | [fmt-finalize.log](logs/fmt-finalize.log) |
-| 9 | `cargo clippy --workspace --all-targets -- -D warnings` | 0 | [clippy.log](logs/clippy.log) |
-| 10 | `cargo test -p ergo-sandbox --test compose_recipes` | 0 | [recipe-final.log](logs/recipe-final.log) |
-| 11 | `git add examples/contracts/recipes/pool-bound-swap.es examples/contracts/recipes/pool-bound-swap.test.json examples/contracts/recipes/successor-locked-vault.es examples/contracts/recipes/successor-locked-vault.test.json examples/mutants/recipes.json examples/mutants/w05/v1 ergo-sandbox/tests/compose_recipes.rs ergo-sandbox/tests/mutation_corpus.rs` | 128 | [git-add-step1.log](logs/git-add-step1.log) |
-| 12 | `git commit -F docs/reports/batch-9/commit-1-message.txt` | 128 | [git-commit-step1.log](logs/git-commit-step1.log) |
-| 13 | `python3 scripts/test_roadmap_gate.py` | 0 | [roadmap-tests.log](logs/roadmap-tests.log) |
-| 14 | `python3 scripts/test_lockfile_action.py` | 0 | [lockfile-action.log](logs/lockfile-action.log) |
-| 15 | `node --test ui/tests/attack.test.js ui/tests/binding-recipes.test.js ui/tests/checklist.test.js ui/tests/claim-labels.test.js ui/tests/cost-spans.test.js ui/tests/evidence-replay.test.js ui/tests/explain.test.js ui/tests/play-export.test.js ui/tests/share.test.js ui/tests/verify.test.js` | 0 | [dom-all.log](logs/dom-all.log) |
-| 16 | `cargo fmt --all -- --check` | 0 | [fmt-check.log](logs/fmt-check.log) |
-| 17 | `cargo test -p ergo-sandbox --test incident_scaffold` | 0 | [incident-final.log](logs/incident-final.log) |
-| 18 | `git add ergo-sandbox/src/incident.rs ergo-sandbox/src/bin/incident/mod.rs ergo-sandbox/src/bin/ergo-es.rs ergo-sandbox/src/lib.rs ergo-sandbox/src/map/source.rs ergo-sandbox/src/map/explorer.rs ergo-sandbox/tests/incident_scaffold.rs docs/incident-scaffold.md` | 128 | [git-add-step2.log](logs/git-add-step2.log) |
-| 19 | `git commit -F docs/reports/batch-9/commit-2-message.txt` | 128 | [git-commit-step2.log](logs/git-commit-step2.log) |
-| 20 | `git add ui/app.js ui/tests/binding-recipes.test.js` | 128 | [git-add-step3.log](logs/git-add-step3.log) |
-| 21 | `git commit -F docs/reports/batch-9/commit-3-message.txt` | 128 | [git-commit-step3.log](logs/git-commit-step3.log) |
-| 22 | `cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present` | 101 | [workspace.log](logs/workspace.log) |
-| 23 | `cargo test -p ergo-sandbox --test recognize every_recipe_is_put_into_words_completely` | 101 | [recipe-recognition.log](logs/recipe-recognition.log) |
-| 24 | `cargo test -p ergo-sandbox --test recognize --test compose_recipes` | 101 | [recognition-and-recipes.log](logs/recognition-and-recipes.log) |
-| 25 | `DC_REPORT="$PWD/docs/reports/batch-9/decompile-measurement.json" cargo test -p ergo-sandbox --test decompile_corpus bundled_contracts_and_compiled_fixtures_round_trip` | 101 | [decompile-measurement.log](logs/decompile-measurement.log) |
-| 26 | `cargo test -p ergo-sandbox --test recognize` | 101 | [recognition-final.log](logs/recognition-final.log) |
-| 27 | `python3 scripts/roadmap_gate.py --require W05 --report docs/reports/batch-9/W05.json` | 0 | [gate-w05.log](logs/gate-w05.log) |
-| 28 | `python3 scripts/roadmap_gate.py --require S05 --report docs/reports/batch-9/S05.json` | 0 | [gate-s05.log](logs/gate-s05.log) |
-| 29 | `cargo test -p ergo-sandbox --test mapping_inventory --test property_inventory` | 0 | [inventories.log](logs/inventories.log) |
-| 30 | `cargo test -p ergo-sandbox --test recognize --test compose_recipes` | 0 | [recognition-recipes-complete.log](logs/recognition-recipes-complete.log) |
-| 31 | `cargo fmt --all` | 0 | [fmt-integration.log](logs/fmt-integration.log) |
-| 32 | `DC_REPORT="$PWD/docs/reports/batch-9/decompile-measurement.json" cargo test -p ergo-sandbox --test decompile_corpus bundled_contracts_and_compiled_fixtures_round_trip` | 101 | [decompile-final-measurement.log](logs/decompile-final-measurement.log) |
-| 33 | `cargo test -p ergo-sandbox --test decompile_corpus bundled_contracts_and_compiled_fixtures_round_trip` | 0 | [decompile-inventory-final.log](logs/decompile-inventory-final.log) |
-| 34 | `cargo clippy --workspace --all-targets -- -D warnings` | 0 | [clippy-final.log](logs/clippy-final.log) |
-| 35 | `cargo fmt --all -- --check` | 0 | [fmt-check-final.log](logs/fmt-check-final.log) |
-| 36 | `python3 docs/reports/batch-9/check-integrity.py` | 0 | [integrity.log](logs/integrity.log) |
-| 37 | `git diff --check` | 0 | [whitespace.log](logs/whitespace.log) |
-| 38 | `git add docs/ROADMAP.md docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md scripts/roadmap_gate.py scripts/test_roadmap_gate.py docs/reports/batch-9` | 128 | [git-add-step4.log](logs/git-add-step4.log) |
-| 39 | `git add -f docs/reports/batch-9/logs` | 128 | [git-add-logs.log](logs/git-add-logs.log) |
-| 40 | `git commit -F docs/reports/batch-9/commit-4-message.txt` | 128 | [git-commit-step4.log](logs/git-commit-step4.log) |
-| 41 | `python3 scripts/roadmap_gate.py --require W05 --report docs/reports/batch-9/W05.json` | 0 | [gate-w05-final.log](logs/gate-w05-final.log) |
-| 42 | `python3 scripts/roadmap_gate.py --require S05 --report docs/reports/batch-9/S05.json` | 0 | [gate-s05-final.log](logs/gate-s05-final.log) |
-| 43 | `python3 docs/reports/batch-9/check-integrity.py` | 0 | [integrity-final.log](logs/integrity-final.log) |
-| 44 | `cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present` | 0 | [workspace-final.log](logs/workspace-final.log) |
-| 45 | `python3 docs/reports/batch-9/check-integrity.py` | 0 | [integrity-completed.log](logs/integrity-completed.log) |
+| # | Command | Exit | Seconds | Log | Log SHA-256 |
+|---:|---|---:|---:|---|---|
+| 1 | `cargo test -p ergo-sandbox --test compose_recipes` | 101 | 16.84 | [recipes-first.log](logs/recipes-first.log) | `4b8c50ff20982c75925af82b5f1229d24c4295bc45ab70897e561a35026dc966` |
+| 2 | `cargo test -p ergo-sandbox --test compose_recipes` | 101 | 0.82 | [recipes-corrected.log](logs/recipes-corrected.log) | `b2a0d371e3a9800005e2e24f4fdeb9efc562503bb1492d377033ca6f8e6c2c1b` |
+| 3 | `cargo test -p ergo-sandbox --test compose_recipes --test incident_scaffold` | 101 | 4.99 | [focused.log](logs/focused.log) | `d0b8480d50788fd4597b9670fda14e2c2b15e082ae531341014a13249d2c20d6` |
+| 4 | `cargo test -p ergo-sandbox --test compose_recipes --test incident_scaffold --lib incident_transaction_adapter` | 0 | 4.96 | [focused-corrected.log](logs/focused-corrected.log) | `88742231fadd98b0e53c963d2b58c6af1af3a2275d11115ca2c271b89873918c` |
+| 5 | `cargo fmt --all` | 0 | 0.43 | [fmt-implementation.log](logs/fmt-implementation.log) | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| 6 | `cargo test -p ergo-sandbox --test compose_recipes --test incident_scaffold` | 0 | 2.88 | [recipe-incident-tests.log](logs/recipe-incident-tests.log) | `77a0b85af604234e65e3ecc99a4368ba0d652dfe289b4a90f7e548363dfbd764` |
+| 7 | `node --test ui/tests/binding-recipes.test.js` | 0 | 0.26 | [binding-dom.log](logs/binding-dom.log) | `33858d113ab2bdcb581560bb077b883389032b351a085287df39b0e69d8163a0` |
+| 8 | `cargo fmt --all` | 0 | 0.41 | [fmt-finalize.log](logs/fmt-finalize.log) | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| 9 | `cargo clippy --workspace --all-targets -- -D warnings` | 0 | 12.98 | [clippy.log](logs/clippy.log) | `f52ff47a235af3e1622a48d116161964c33c9a3c8563099c72c32141c5ec4dea` |
+| 10 | `cargo test -p ergo-sandbox --test compose_recipes` | 0 | 2.41 | [recipe-final.log](logs/recipe-final.log) | `04807396ff71d05222819c6a9ec28f8e8bd1d7c8e91d45eca54d10622e67c414` |
+| 11 | `git add examples/contracts/recipes/pool-bound-swap.es examples/contracts/recipes/pool-bound-swap.test.json examples/contracts/recipes/successor-locked-vault.es examples/contracts/recipes/successor-locked-vault.test.json examples/mutants/recipes.json examples/mutants/w05/v1 ergo-sandbox/tests/compose_recipes.rs ergo-sandbox/tests/mutation_corpus.rs` | 128 | 0.0 | [git-add-step1.log](logs/git-add-step1.log) | `2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab` |
+| 12 | `git commit -F docs/reports/batch-9/commit-1-message.txt` | 128 | 0.0 | [git-commit-step1.log](logs/git-commit-step1.log) | `2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab` |
+| 13 | `python3 scripts/test_roadmap_gate.py` | 0 | 0.71 | [roadmap-tests.log](logs/roadmap-tests.log) | `e4caed7dbf6265b8e0075962d66a20c457da807ada36819c346736092a3a0e89` |
+| 14 | `python3 scripts/test_lockfile_action.py` | 0 | 0.05 | [lockfile-action.log](logs/lockfile-action.log) | `d094b1bd2c8318c96097f80c50da282add5b2972970a77046de8db6c8935f6ca` |
+| 15 | `node --test ui/tests/attack.test.js ui/tests/binding-recipes.test.js ui/tests/checklist.test.js ui/tests/claim-labels.test.js ui/tests/cost-spans.test.js ui/tests/evidence-replay.test.js ui/tests/explain.test.js ui/tests/play-export.test.js ui/tests/share.test.js ui/tests/verify.test.js` | 0 | 30.27 | [dom-all.log](logs/dom-all.log) | `50fab24e588db71070f42642d6391d0cc69959970d466bbb314d65df2942b7ba` |
+| 16 | `cargo fmt --all -- --check` | 0 | 1.07 | [fmt-check.log](logs/fmt-check.log) | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| 17 | `cargo test -p ergo-sandbox --test incident_scaffold` | 0 | 15.55 | [incident-final.log](logs/incident-final.log) | `4f0d2e54c0321a2d795bbf1731cd8dd5cc2294327fa0cf069898318391b8bc4f` |
+| 18 | `git add ergo-sandbox/src/incident.rs ergo-sandbox/src/bin/incident/mod.rs ergo-sandbox/src/bin/ergo-es.rs ergo-sandbox/src/lib.rs ergo-sandbox/src/map/source.rs ergo-sandbox/src/map/explorer.rs ergo-sandbox/tests/incident_scaffold.rs docs/incident-scaffold.md` | 128 | 0.0 | [git-add-step2.log](logs/git-add-step2.log) | `2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab` |
+| 19 | `git commit -F docs/reports/batch-9/commit-2-message.txt` | 128 | 0.0 | [git-commit-step2.log](logs/git-commit-step2.log) | `2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab` |
+| 20 | `git add ui/app.js ui/tests/binding-recipes.test.js` | 128 | 0.0 | [git-add-step3.log](logs/git-add-step3.log) | `2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab` |
+| 21 | `git commit -F docs/reports/batch-9/commit-3-message.txt` | 128 | 0.0 | [git-commit-step3.log](logs/git-commit-step3.log) | `2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab` |
+| 22 | `cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present` | 101 | 35.6 | [workspace.log](logs/workspace.log) | `5e637d48426d85f557a7d500f9170ddadb24be71a8563497bee2974c504f5ea5` |
+| 23 | `cargo test -p ergo-sandbox --test recognize every_recipe_is_put_into_words_completely` | 101 | 0.45 | [recipe-recognition.log](logs/recipe-recognition.log) | `8e7c08ef4ba4f486632cd934bb06a24b8ce143e7d3683bebb724dce247078c78` |
+| 24 | `cargo test -p ergo-sandbox --test recognize --test compose_recipes` | 101 | 2.18 | [recognition-and-recipes.log](logs/recognition-and-recipes.log) | `55c42ac3c3f84446eaee7a253f97abcf428eee87bb1bbf5da2d0061d9350faa4` |
+| 25 | `DC_REPORT="$PWD/docs/reports/batch-9/decompile-measurement.json" cargo test -p ergo-sandbox --test decompile_corpus bundled_contracts_and_compiled_fixtures_round_trip` | 101 | 1.6 | [decompile-measurement.log](logs/decompile-measurement.log) | `936e24bf08f69de0e1332ed88418861d50d10a13ecaecbd4f2716c3efce829ea` |
+| 26 | `cargo test -p ergo-sandbox --test recognize` | 101 | 0.11 | [recognition-final.log](logs/recognition-final.log) | `77144e34673ef26e55ce27efd20309c69727611e410dbb56bcd7f5439d624b25` |
+| 27 | `python3 scripts/roadmap_gate.py --require W05 --report docs/reports/batch-9/W05.json` | 0 | 179.87 | [gate-w05.log](logs/gate-w05.log) | `66a3dd61cd9c0bca4fca7c6e27f4a21056c7247fde72ef28a9e714848f17ea9e` |
+| 28 | `python3 scripts/roadmap_gate.py --require S05 --report docs/reports/batch-9/S05.json` | 0 | 2.36 | [gate-s05.log](logs/gate-s05.log) | `2bee30247915006690c245d5d89af8db344e4f913fe5bc0f44302514076cba93` |
+| 29 | `cargo test -p ergo-sandbox --test mapping_inventory --test property_inventory` | 0 | 1.23 | [inventories.log](logs/inventories.log) | `ff256642dd6dc8d6328710d9c7086dc4e74eec4e2fc2652d273ac7afd356bd09` |
+| 30 | `cargo test -p ergo-sandbox --test recognize --test compose_recipes` | 0 | 2.08 | [recognition-recipes-complete.log](logs/recognition-recipes-complete.log) | `75f95fc90c2805f3f3761c8d43405dc4121a1931f783f7e75cee2a93c2e9ad59` |
+| 31 | `cargo fmt --all` | 0 | 0.4 | [fmt-integration.log](logs/fmt-integration.log) | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| 32 | `DC_REPORT="$PWD/docs/reports/batch-9/decompile-measurement.json" cargo test -p ergo-sandbox --test decompile_corpus bundled_contracts_and_compiled_fixtures_round_trip` | 101 | 1.52 | [decompile-final-measurement.log](logs/decompile-final-measurement.log) | `7658e8fca8bb28c6b9026f61a2d4758775940c9ffe8f7dba533d06c0e5df727c` |
+| 33 | `cargo test -p ergo-sandbox --test decompile_corpus bundled_contracts_and_compiled_fixtures_round_trip` | 0 | 1.49 | [decompile-inventory-final.log](logs/decompile-inventory-final.log) | `5f757def9bbbae6b863c380da064a93c971d0d0c1faeb21cc5bb2d6ab9a7c965` |
+| 34 | `cargo clippy --workspace --all-targets -- -D warnings` | 0 | 11.19 | [clippy-final.log](logs/clippy-final.log) | `0c5bee21dd709deb0ee5e5187e27ea3c941dd39fc78f6136f8ffdcb46fec3210` |
+| 35 | `cargo fmt --all -- --check` | 0 | 0.42 | [fmt-check-final.log](logs/fmt-check-final.log) | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| 36 | `python3 docs/reports/batch-9/check-integrity.py` | 0 | 0.67 | [integrity.log](logs/integrity.log) | `8625a5242b5ffe29509ff2a392cb18a654103f5e08eabad3e228617eed72f191` |
+| 37 | `git diff --check` | 0 | 0.05 | [whitespace.log](logs/whitespace.log) | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| 38 | `git add docs/ROADMAP.md docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md scripts/roadmap_gate.py scripts/test_roadmap_gate.py docs/reports/batch-9` | 128 | 0.0 | [git-add-step4.log](logs/git-add-step4.log) | `2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab` |
+| 39 | `git add -f docs/reports/batch-9/logs` | 128 | 0.0 | [git-add-logs.log](logs/git-add-logs.log) | `2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab` |
+| 40 | `git commit -F docs/reports/batch-9/commit-4-message.txt` | 128 | 0.0 | [git-commit-step4.log](logs/git-commit-step4.log) | `2551ea43ccf3532ffa340043e8ae43fefd9b839639345abd6918ab77656b62ab` |
+| 41 | `python3 scripts/roadmap_gate.py --require W05 --report docs/reports/batch-9/W05.json` | 0 | 180.4 | [gate-w05-final.log](logs/gate-w05-final.log) | `1497eb22b6ef0468faabee7b1fddae8b29038918e2e1b409a8e956c2a7168d14` |
+| 42 | `python3 scripts/roadmap_gate.py --require S05 --report docs/reports/batch-9/S05.json` | 0 | 2.4 | [gate-s05-final.log](logs/gate-s05-final.log) | `03492121febfe7ba836502eba3397ac5cdc3fe641f5c8916c4272b611ac390d1` |
+| 43 | `python3 docs/reports/batch-9/check-integrity.py` | 0 | 0.71 | [integrity-final.log](logs/integrity-final.log) | `8625a5242b5ffe29509ff2a392cb18a654103f5e08eabad3e228617eed72f191` |
+| 44 | `cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present` | 0 | 873.65 | [workspace-final.log](logs/workspace-final.log) | `1b77e5efeb97d109f1076ef7a74b6ab3e2c288ff19b3c7d35022fa7b5f66d31e` |
+| 45 | `python3 docs/reports/batch-9/check-integrity.py` | 0 | 0.68 | [integrity-completed.log](logs/integrity-completed.log) | `8625a5242b5ffe29509ff2a392cb18a654103f5e08eabad3e228617eed72f191` |
 
 ## Integrity and prepared commits
 
