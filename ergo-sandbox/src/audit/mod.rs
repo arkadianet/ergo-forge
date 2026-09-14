@@ -32,6 +32,7 @@ const LINTS: &[fn(&Node) -> Vec<Finding>] = &[
     lints::trivial_sigma_branch,
     lints::unauthenticated_code_execution,
     lints::trust_assumptions,
+    lints::upgrade_hook,
 ];
 
 /// Recovery coverage of the lifted representation, not property/audit completeness.

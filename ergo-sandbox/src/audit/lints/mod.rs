@@ -23,3 +23,6 @@ pub use trivial_sigma_branch::trivial_sigma_branch;
 
 pub mod unauthenticated_code_execution;
 pub use unauthenticated_code_execution::unauthenticated_code_execution;
+
+pub mod upgrade_hook;
+pub use upgrade_hook::upgrade_hook;

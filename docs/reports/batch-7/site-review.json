@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "method": "static-analysis",
+  "nodeValidated": false,
+  "sweepSha256": "770d53cee90436cddf67585deb7e95cdf875e4a1bede39f43ddc2b069a1f5f1f",
+  "decisions": {
+    "upgrade-hook": {
+      "reviewPriority": "LOW",
+      "decision": "Ship upgrade-hook at LOW review priority for same-script continuations only; token transfers and unrecognised continuations remain undecided."
+    }
+  },
+  "sites": [
+    {
+      "contract": "vectors/mutable-upgrade-digest/vulnerable.es",
+      "lint": "upgrade-hook",
+      "nodeId": 8,
+      "outcome": "true-positive",
+      "reason": "The authored same-script continuation preserves value but omits R4 equality; the alternative selects code by SELF.R4. No sigma guard is recognised on the continuation. The fixed source carries R4 on that path and does not report. This is a true-positive static pattern, not a validated upgrade."
+    }
+  ]
+}
