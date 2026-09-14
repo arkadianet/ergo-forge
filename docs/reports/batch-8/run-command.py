@@ -25,7 +25,12 @@ with log.open('w') as output:
         output.flush()
     code = process.wait()
 entry = dict(command=portable(shlex.join(args)), exitCode=code, exitStatus=str(code), log='logs/' + log.name, elapsedSeconds=round(time.monotonic()-start, 2))
-with open(Path(tempfile.gettempdir()) / 'forge-b8-command-ledger.lock', 'w') as lock:
+lock_fd = os.open(
+    Path(tempfile.gettempdir()) / 'forge-b8-command-ledger.lock',
+    os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW,
+    0o600,
+)
+with os.fdopen(lock_fd, 'r+') as lock:
     fcntl.flock(lock, fcntl.LOCK_EX)
     ledger = report / 'commands.json'
     data = json.loads(ledger.read_text()) if ledger.exists() else {'environment': {'CARGO_TARGET_DIR': '$CARGO_TARGET_DIR'}, 'commands': [], 'postSession': []}
