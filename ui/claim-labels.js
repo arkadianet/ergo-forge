@@ -4,8 +4,8 @@ const ClaimLabels = (() => {
   const verdicts = {
     spendableByAnyone: ["Sample passed without a proof", "warn"],
     movableByAnyone: ["Preserving-output sample passed", "warn"],
-    requiresProof: ["Proof requirements observed under these probes", "neutral"],
-    notUnderProbes: ["No sample passed (not a proof of safety)", "neutral"],
+    requiresProof: ["Not spendable under these probes; proof requirements observed", "neutral"],
+    notUnderProbes: ["Not spendable under these probes", "neutral"],
   };
   const synthetic = "SELF was synthetic (no registers, value 0). Supply a box to test its scenario; full node validation has not run.";
   function renderHunt(h, verdict, warning) {

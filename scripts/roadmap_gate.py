@@ -315,6 +315,8 @@ def extras(unit):
         return [('node', ['node', '--test', 'ui/tests/evidence-replay.test.js'])]
     if unit == 'I01':
         return [('node', ['node', '--test', 'ui/tests/verify.test.js'])]
+    if unit == 'S04':
+        return [('node', ['node', '--test', 'ui/tests/hunt-read.test.js'])]
     if unit == 'S01':
         return [('node', ['node', '--test', 'ui/tests/checklist.test.js'])]
     return []

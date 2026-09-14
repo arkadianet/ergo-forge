@@ -341,11 +341,12 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
          that does <em>not</em> mean the contract is clean.)</p>
 
       <h2>Spendability</h2>
-      <p class="hint">Can someone with no key spend this box? Six probes on the
+      <p class="hint">Can someone with no key spend this box? Bounded spend and immobilisation probes on the
          consensus reducer, no proof, no context variables. A hit is a passing sampled scenario; full node validation has not run.
          A miss only means "not under these probes".</p>
       <p id="hunt-verdict" class="hunt-verdict"></p>
-      <p id="hunt-rent" class="hint"></p>
+      <div id="hunt-rent" class="hint"></div>
+      <div id="hunt-scope" class="hint"></div>
       <p id="hunt-synthetic" class="hint" hidden>SELF was synthetic (no
          registers, value 0) — register reads error out. Describe the real box
          below and re-run its scenario; full node validation has not run.</p>
@@ -354,7 +355,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
       <details>
         <summary>Probes</summary>
         <table class="probes">
-          <thead><tr><th>height</th><th>outputs</th><th>verdict</th><th>detail</th></tr></thead>
+          <thead><tr><th>probe</th><th>height</th><th>outputs</th><th>verdict</th><th>cost / budget</th><th>detail</th></tr></thead>
           <tbody id="hunt-probes"></tbody>
         </table>
       </details>
@@ -538,6 +539,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
   <script src="vendor/blake2b.js"></script>
   <script src="vendor/sha256.js"></script>
   <script src="claim-labels.js"></script>
+  <script src="hunt-read.js"></script>
   <script src="evidence-replay.js"></script>
   <script src="attack.js"></script>
   <script src="checklist.js"></script>

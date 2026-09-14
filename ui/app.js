@@ -220,6 +220,7 @@ async function huntFor(input, network) {
   $("hunt-probes").textContent = "";
   $("hunt-residuals").textContent = "";
   $("hunt-rent").textContent = "";
+  $("hunt-scope").textContent = "";
   $("hunt-synthetic").hidden = true;
   const verdictEl = $("hunt-verdict");
   verdictEl.textContent = "Hunting…";
@@ -281,7 +282,7 @@ function renderHunt(h) {
   // The real box is the fix; put the form in front of the user.
   if (undeterminedOnSynthetic) $("self-box").closest("details").open = true;
 
-  $("hunt-rent").textContent = h.rent ? rentSentence(h.rent, { network: $("network").value }) : "";
+  HuntRead.render(h, { rent: $("hunt-rent"), probes: $("hunt-probes"), scope: $("hunt-scope") });
   const res = $("hunt-residuals");
   res.textContent = "";
   for (const r of h.residuals) {
@@ -290,23 +291,7 @@ function renderHunt(h) {
     res.appendChild(li);
   }
 
-  const tb = $("hunt-probes");
-  tb.textContent = "";
-  for (const p of h.probes) {
-    const tr = document.createElement("tr");
-    tr.dataset.verdict = p.verdict;
-    for (const cell of [
-      String(p.height),
-      p.output,
-      p.verdict,
-      p.error ? `error: ${p.error}` : p.reducedTo || "",
-    ]) {
-      const td = document.createElement("td");
-      td.textContent = cell;
-      tr.appendChild(td);
-    }
-    tb.appendChild(tr);
-  }
+
 }
 
 // ── write mode: editor, params, compile ─────────────────────────────────
