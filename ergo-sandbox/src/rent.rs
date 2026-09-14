@@ -70,3 +70,59 @@ pub fn estimate(
         next_collection_height: creation_height.map(|h| h.saturating_add(STORAGE_PERIOD)),
     }
 }
+
+/// Rent for the context box, or minimal synthetic SELF, using the frozen estimate.
+pub fn estimate_for(tree_bytes: &[u8], b: Option<&crate::ScenarioBox>) -> RentEstimate {
+    match b {
+        Some(b) => {
+            let amounts: Vec<u64> = b.tokens.iter().map(|t| t.amount).collect();
+            // Each register's canonical serialized constant (type + value),
+            // which is what the box serialization carries.
+            let regs: Vec<Vec<u8>> = b
+                .registers
+                .values()
+                .map(|tv| match (tv.r#type.as_str(), tv.value.as_str()) {
+                    ("raw", Some(h)) => hex::decode(h).unwrap_or_default(),
+                    _ => crate::parse_typed_value(&tv.r#type, &tv.value)
+                        .ok()
+                        .and_then(|(t, v)| {
+                            let mut w = ergo_primitives::writer::VlqWriter::new();
+                            ergo_ser::sigma_value::write_constant(&mut w, &t, &v)
+                                .ok()
+                                .map(|_| w.result())
+                        })
+                        .unwrap_or_default(),
+                })
+                .collect();
+            let created = if b.creation_height > 0 {
+                Some(b.creation_height)
+            } else {
+                None
+            };
+            crate::rent::estimate(tree_bytes, &amounts, &regs, created)
+        }
+        None => crate::rent::estimate(tree_bytes, &[], &[], None),
+    }
+}
+
+/// Static Read text and its evidence basis. The cited accepted P03 vector is
+/// distinct from this estimate; no future claim or collection is predicted.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RentLine {
+    pub provenance: crate::checklist::Provenance,
+    pub node_validated: bool,
+    pub text: &'static str,
+    pub basis: [&'static str; 3],
+    pub estimate: RentEstimate,
+}
+
+pub fn read_line(estimate: RentEstimate) -> RentLine {
+    RentLine {
+        provenance: crate::checklist::Provenance::Static,
+        node_validated: false,
+        text: "After four years, anyone may claim this box for the rent through the miner storage-rent path. Static estimate under frozen mainnet parameters; collection is not predicted.",
+        basis: ["ergo-sandbox/src/rent.rs::STORAGE_PERIOD", "ergo-sandbox/src/rent.rs::STORAGE_FEE_FACTOR", "P03:storage-rent-acceptance"],
+        estimate,
+    }
+}
