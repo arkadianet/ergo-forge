@@ -989,7 +989,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
         "watch_reports_script_change_under_nft",
         "watch_never_broadcasts"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "W05",

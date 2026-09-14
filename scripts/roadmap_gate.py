@@ -313,6 +313,8 @@ def extras(unit):
         return [('python', [sys.executable, '-m', 'unittest', 'discover', '-s', 'scripts', '-p', 'test_roadmap_gate.py']), ('node', ['node', '--test', 'ui/tests/claim-labels.test.js'])]
     if unit == 'P08':
         return [('node', ['node', '--test', 'ui/tests/evidence-replay.test.js'])]
+    if unit == 'I03':
+        return [('node', ['node', '--test', 'ui/tests/watch.test.js'])]
     if unit == 'I01':
         return [('node', ['node', '--test', 'ui/tests/verify.test.js'])]
     if unit == 'S04':

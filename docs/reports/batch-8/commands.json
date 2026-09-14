@@ -1,0 +1,267 @@
+{
+  "environment": {
+    "CARGO_TARGET_DIR": "$CARGO_TARGET_DIR"
+  },
+  "commands": [
+    {
+      "command": "cargo fmt --all",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/fmt-step1.log",
+      "elapsedSeconds": 0.43
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test watch -p ergo-web --test watch",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/watch-rust.log",
+      "elapsedSeconds": 20.59
+    },
+    {
+      "command": "git add Cargo.lock ergo-sandbox/src/watch.rs ergo-sandbox/src/lib.rs ergo-sandbox/src/bin/ergo-es.rs ergo-sandbox/src/bin/watching/mod.rs ergo-sandbox/tests/watch.rs ergo-sandbox/tests/fixtures/watch/holder.json ergo-web/Cargo.toml ergo-web/src/routes/watch.rs ergo-web/src/routes/mod.rs ergo-web/src/app.rs ergo-web/tests/watch.rs docs/immutability.md",
+      "exitCode": 128,
+      "exitStatus": "128",
+      "log": "logs/git-add-step1.log",
+      "elapsedSeconds": 0.01
+    },
+    {
+      "command": "git commit -F docs/reports/batch-8/commit-1-message.txt",
+      "exitCode": 128,
+      "exitStatus": "128",
+      "log": "logs/git-commit-step1.log",
+      "elapsedSeconds": 0.01
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/clippy.log",
+      "elapsedSeconds": 11.52
+    },
+    {
+      "command": "node --test ui/tests/watch.test.js",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/watch-dom.log",
+      "elapsedSeconds": 0.95
+    },
+    {
+      "command": "cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present",
+      "exitCode": 101,
+      "exitStatus": "101",
+      "log": "logs/workspace.log",
+      "elapsedSeconds": 17.41
+    },
+    {
+      "command": "git add ui/watch.js ui/tests/watch.test.js ui/app.js ui/index.html",
+      "exitCode": 128,
+      "exitStatus": "128",
+      "log": "logs/git-add-step2.log",
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "git commit -F docs/reports/batch-8/commit-2-message.txt",
+      "exitCode": 128,
+      "exitStatus": "128",
+      "log": "logs/git-commit-step2.log",
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "python3 scripts/test_lockfile_action.py",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/lock-action-tests.log",
+      "elapsedSeconds": 0.13
+    },
+    {
+      "command": "python3 scripts/test_roadmap_gate.py",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/roadmap-tests.log",
+      "elapsedSeconds": 2.6
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --test decompile_corpus",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/corpus-fixture-boundary.log",
+      "elapsedSeconds": 26.83
+    },
+    {
+      "command": "node --test ui/tests/attack.test.js ui/tests/checklist.test.js ui/tests/claim-labels.test.js ui/tests/evidence-replay.test.js ui/tests/play-export.test.js ui/tests/share.test.js ui/tests/verify.test.js ui/tests/watch.test.js",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/dom-all.log",
+      "elapsedSeconds": 36.66
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require I03 --report docs/reports/batch-8/I03.json",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/gate-i03.log",
+      "elapsedSeconds": 4.08
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/clippy-final.log",
+      "elapsedSeconds": 0.31
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/fmt-check.log",
+      "elapsedSeconds": 0.44
+    },
+    {
+      "command": "python3 docs/reports/batch-8/check-integrity.py",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/integrity.log",
+      "elapsedSeconds": 0.04
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/whitespace.log",
+      "elapsedSeconds": 0.05
+    },
+    {
+      "command": "cargo test -p ergo-sandbox --no-default-features --test watch",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/watch-no-default-features.log",
+      "elapsedSeconds": 8.46
+    },
+    {
+      "command": "cargo build --workspace --bins",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/restore-workspace-binaries.log",
+      "elapsedSeconds": 4.97
+    },
+    {
+      "command": "python3 docs/reports/batch-8/check-integrity.py",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/integrity-report.log",
+      "elapsedSeconds": 0.04
+    },
+    {
+      "command": "node --test ui/tests/attack.test.js ui/tests/checklist.test.js ui/tests/claim-labels.test.js ui/tests/evidence-replay.test.js ui/tests/play-export.test.js ui/tests/share.test.js ui/tests/verify.test.js ui/tests/watch.test.js",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/dom-all-final.log",
+      "elapsedSeconds": 0.46
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require I03 --report docs/reports/batch-8/I03.json",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/gate-i03-final.log",
+      "elapsedSeconds": 2.21
+    },
+    {
+      "command": "cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present",
+      "exitCode": 101,
+      "exitStatus": "101",
+      "log": "logs/workspace-final.log",
+      "elapsedSeconds": 858.3
+    },
+    {
+      "command": "cargo fmt --all",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/fmt-http-memory.log",
+      "elapsedSeconds": 0.48
+    },
+    {
+      "command": "cargo test --locked -p ergo-sandbox --test property_inventory -p ergo-web --test watch",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/property-and-watch.log",
+      "elapsedSeconds": 1.44
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/fmt-check-final.log",
+      "elapsedSeconds": 0.44
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/clippy-memory-http.log",
+      "elapsedSeconds": 3.09
+    },
+    {
+      "command": "python3 scripts/roadmap_gate.py --require I03 --report docs/reports/batch-8/I03.json",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/gate-i03-locked-dependencies.log",
+      "elapsedSeconds": 2.54
+    },
+    {
+      "command": "cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/workspace-complete.log",
+      "elapsedSeconds": 904.39
+    },
+    {
+      "command": "python3 docs/reports/batch-8/check-integrity.py",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/integrity-final.log",
+      "elapsedSeconds": 0.17
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/whitespace-final.log",
+      "elapsedSeconds": 0.06
+    },
+    {
+      "command": "git add docs/ROADMAP.md docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md scripts/roadmap_gate.py scripts/test_roadmap_gate.py docs/reports/batch-8",
+      "exitCode": 128,
+      "exitStatus": "128",
+      "log": "logs/git-add-step3.log",
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "git add -f docs/reports/batch-8/logs",
+      "exitCode": 128,
+      "exitStatus": "128",
+      "log": "logs/git-add-logs.log",
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "git commit -F docs/reports/batch-8/commit-3-message.txt",
+      "exitCode": 128,
+      "exitStatus": "128",
+      "log": "logs/git-commit-step3.log",
+      "elapsedSeconds": 0.0
+    },
+    {
+      "command": "git status --short",
+      "exitCode": 0,
+      "exitStatus": "0",
+      "log": "logs/git-status-final.log",
+      "elapsedSeconds": 0.06
+    }
+  ],
+  "postSession": [
+    {
+      "command": "cargo test --workspace -- --skip seed_corpus_holds_the_exact_floor_when_checkout_present",
+      "exitCode": 0,
+      "log": "docs/reports/batch-8/logs/workspace-post-session.log",
+      "note": "Post-session re-verification outside the implementation sandbox; the same log records the I03 gate run (exit 0) that wrote the committed I03.json."
+    }
+  ]
+}

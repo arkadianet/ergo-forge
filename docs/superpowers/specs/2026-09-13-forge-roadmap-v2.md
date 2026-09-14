@@ -227,7 +227,7 @@ To be installed by W00 as a **separate `roadmap-policy:v2` block** in `docs/ROAD
     {"id": "W04", "implemented": true, "depends": ["W00"], "days": 3, "package": "ergo-web", "target": "write_cost_explain", "tests": ["hot_spots_map_to_source_spans", "explain_subexpression_matches_full_reduction", "cost_trace_route_is_behind_feature_flag"]},
     {"id": "S04", "implemented": true, "depends": ["S00"], "days": 2, "package": "ergo-sandbox", "target": "immobilisation", "tests": ["immobilisation_probes_report_unspendable_not_safe", "storage_rent_line_is_static"]},
     {"id": "I04", "implemented": true, "depends": ["S02"], "days": 1, "package": "ergo-sandbox", "target": "mutation_corpus", "tests": ["upgrade_hook_mutant_is_caught"]},
-    {"id": "I03", "implemented": false, "depends": ["I02"], "days": 3, "package": "ergo-sandbox", "target": "watch", "tests": ["watch_reports_script_change_under_nft", "watch_never_broadcasts"]},
+    {"id": "I03", "implemented": true, "depends": ["I02"], "days": 3, "package": "ergo-sandbox", "target": "watch", "tests": ["watch_reports_script_change_under_nft", "watch_never_broadcasts"]},
     {"id": "W05", "implemented": false, "depends": ["S02"], "days": 2, "package": "ergo-sandbox", "target": "compose_recipes", "tests": ["new_recipes_have_independent_expectations", "new_recipe_mutants_are_caught"]},
     {"id": "S05", "implemented": false, "depends": ["W00"], "days": 2, "package": "ergo-sandbox", "target": "incident_scaffold", "tests": ["incident_scaffold_reproduces_use_boxes", "incident_scaffold_never_fills_expectations"]},
     {"id": "X01", "implemented": false, "depends": ["W00"], "days": 3, "package": "ergo-sandbox", "target": "node_validation", "tests": ["node_vectors_pass_on_new_rev"]},

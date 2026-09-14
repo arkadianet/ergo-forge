@@ -1,0 +1,8 @@
+chore(roadmap): register I03 Watch and record batch 8 evidence
+
+Register I03 in both v2 policy records and require its DOM test in gate extras.
+Record commands, observed exits, gate evidence, scope integrity and the session's
+read-only Git limitation without changing frozen policies or previous reports.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg
