@@ -527,6 +527,24 @@ fn caps_and_truncation_are_recorded() {
     assert_eq!(report.preflight.method, "unsigned-preflight");
     // And under the full cap the pair's caps are the ones the registry records.
     assert_eq!(pair["caps"]["maxProbes"], 50000);
+
+    // Fewer probes than runs: the slices still sum to the cap; the run with no
+    // budget is recorded as truncated and never run.
+    let mut starved = pair_request(&counterexample, true);
+    starved.max_probes = Some(1);
+    let report = hunt(&starved);
+    let record = report.synthesis.multi_instance.as_ref().unwrap();
+    assert_eq!(record.cap_per_run, vec![1, 0]);
+    assert_eq!(report.synthesis.caps.max_probes, 1);
+    assert_eq!(report.probes_run, 1);
+    assert_eq!(record.runs[1].probes_run, 0);
+    assert_eq!(record.runs[1].oracle_calls, 0);
+    assert!(record.runs[1].capped);
+    assert!(report.capped);
+    assert!(report
+        .notes
+        .iter()
+        .any(|n| n.contains("no probe budget left after allocation")));
 }
 
 /// The family reports the derived box; a caller who declares it (with a

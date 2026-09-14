@@ -46,9 +46,10 @@
       "log": "docs/reports/batch-11/logs/verification.log"
     },
     {
-      "command": "cargo test --workspace (no skips)",
+      "command": "cargo test --workspace",
       "exitCode": 0,
-      "log": "docs/reports/batch-11/logs/verification.log"
+      "log": "docs/reports/batch-11/logs/verification.log",
+      "note": "no test filter and no --skip: the whole workspace suite, including the seed-corpus floor and the mutation-corpus measurement"
     },
     {
       "command": "cargo test -p ergo-sandbox -p ergo-web --features cost-trace -- --skip the_corpus_is_measured_and_does_not_regress",

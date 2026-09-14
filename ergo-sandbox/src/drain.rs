@@ -726,8 +726,12 @@ fn drain_hunt_multi_instance(req: &DrainRequest) -> Result<DrainReport, SandboxE
     let total_cap = max_probe_cap(req);
     let base_slice = total_cap / runs;
     let extra = total_cap % runs;
+    // With fewer probes than runs, the earliest runs take one probe each and
+    // the rest get none: the slices always sum to the declared cap. A run
+    // with a zero slice is recorded as truncated and never handed to the
+    // hunt (whose own floor is one probe).
     let cap_per_run: Vec<usize> = (0..runs)
-        .map(|i| (base_slice + usize::from(i < extra)).max(1))
+        .map(|i| base_slice + usize::from(i < extra))
         .collect();
 
     // Requests: the base (family off), then one derived request per protected input.
@@ -782,6 +786,29 @@ fn drain_hunt_multi_instance(req: &DrainRequest) -> Result<DrainReport, SandboxE
         request,
     } in requests
     {
+        let slice = request.max_probes.unwrap_or(0);
+        if slice == 0 {
+            // Allocation left this run nothing: recorded, not run.
+            record_runs.push(MultiInstanceRun {
+                label: label.clone(),
+                derived_from,
+                derived_input,
+                derived_nft,
+                probes_total: 0,
+                probes_run: 0,
+                oracle_calls: 0,
+                capped: true,
+                hits: 0,
+                verdict: DrainVerdict::NotUnderProbes,
+            });
+            if let Some(acc) = merged.as_mut() {
+                acc.capped = true;
+                acc.notes.push(format!(
+                    "{label}: no probe budget left after allocation; not run"
+                ));
+            }
+            continue;
+        }
         let mut report = drain_hunt_single(&request)?;
         let hit_total = |hit: &DrainHit| -> u128 {
             hit.accounting

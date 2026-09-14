@@ -113,7 +113,7 @@ workspace suite ran with no skips.
 | `cargo test -p ergo-sandbox --test drain_promotion` | 0 |
 | `cargo test -p ergo-sandbox --test drain` | 0 |
 | `cargo test -p ergo-sandbox --test vector_catalogue` | 0 |
-| `cargo test --workspace (no skips)` | 0 |
+| `cargo test --workspace` (no test filter, no `--skip`) | 0 |
 | `cargo test -p ergo-sandbox -p ergo-web --features cost-trace -- --skip the_corpus_is_measured_and_does_not_regress` | 0 |
 | `cargo test -p ergo-web --no-default-features` | 0 |
 | `cargo test -p ergo-sandbox --test mapping_inventory --test property_inventory --test mutation_corpus` | 0 |
@@ -128,3 +128,15 @@ what each taught. The committed `S03.json` written by the gate run hashes as
 After that run, one comment-only edit was made (the module doc bullet in
 `drain.rs` describing the family); `cargo fmt --all -- --check` and `cargo check`
 were re-run on the final tree and exited 0.
+
+## Review follow-up
+
+CodeRabbit's first review found that the per-run floor of one probe let the
+slices sum to more than the requested cap when `maxProbes` was smaller than
+the number of runs. The slices now always sum to the cap; a run left with no
+budget is recorded as truncated and never run (`caps_and_truncation_are_recorded`
+covers `maxProbes = 1`). The ledger now records the executable workspace
+command with the no-filter condition as a note. After the fix,
+`cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets -- -D warnings`,
+`cargo test -p ergo-sandbox --test drain_promotion` and
+`cargo test -p ergo-sandbox --test drain` were re-run and exited 0.
