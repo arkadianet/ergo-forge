@@ -1,0 +1,8 @@
+feat(watch): observe locked script and register bytes under NFTs
+
+Reuse the bounded lockfile holder comparison and retain source provenance,
+explicit unverified reasons, and caller-owned register baselines. Add the watch
+CLI and configured-explorer-only HTTP route with fixture and in-process tests.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

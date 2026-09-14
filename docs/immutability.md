@@ -135,3 +135,98 @@ Every verify/lock result carries `identity::LIMITATION`. Structural identity
 under constant substitution does not establish behavioural equivalence, safety,
 deployment or compiler/source provenance. Static findings only set review
 priority. Box observations and structural verification are not node validation.
+
+## Watch: source observations under protocol NFTs (I03)
+
+```sh
+ergo-es watch contract.lock.json --nft <tokenId> --register R4 R5 --json
+ergo-es watch contract.lock.json --nft <tokenId> --register R4 \
+  --baseline box.json --explorer https://your-explorer.example --json
+```
+
+`ergo_sandbox::watch::observe(&[WatchInput], Option<&dyn ChainSource>)` returns
+one `WatchReport` per lockfile/NFT pair. The CLI applies every repeated `--nft`
+to every supplied lockfile; the HTTP/library shape allows different NFT lists
+for each lockfile. It accepts at most 64 pairs and unique register names R4–R9
+per lockfile. Malformed inputs and excess pairs fail before any source call.
+Watch compares the supplied lock's `treeHex`; it does not recompile or establish
+that the lock's source or metadata is authentic. Use `verify-lock` for that
+independent compilation comparison.
+
+Each report includes `nft`, `lockfileFingerprint`, `chainSource` (`kind`, `url`),
+`height`, `live` (the unchanged I02 `LiveComparison`), `registers`,
+`baselineBox`, `baselineOrigin`, the full identity `limitation`, and an explicit
+`observation` statement. The fingerprint is SHA-256 of compact schema-1 Lockfile
+JSON emitted by serde: schema field order, parameter names sorted, no trailing
+newline. Input JSON whitespace and object key order do not affect it.
+`height` is the source height read immediately before that NFT lookup; it is
+neither the holder's creation height nor an atomic chain snapshot. `live.boxId`
+identifies the holder returned by the source. Chain membership and currentness
+are **not independently verified**.
+
+The existing `lockfile::compare_live` checks singleton metadata and one unspent
+holder page (offset 0, limit 2), then delegates to `compare_live_box`. Watch
+captures that same response for registers; it never fetches a second version
+of the box. Zero or multiple holders, inconsistent token data, incomplete
+responses, missing height and source failures remain `unverified`. Transport
+retries remain those of the existing explorer adapter; there is no pagination
+or background polling. Without an explorer the exact reason is
+`no explorer configured (explorer-dependency)`, including in HTTP 200 reports.
+An explicit CLI `--explorer` or `EXPLORER_URL` can configure the source; there
+is no default public URL. Featureless builds retain the offline path and report
+an explicitly configured but unavailable explorer adapter as `unverified`.
+
+Each watched register reports `current`, `expected`, `status` and `reason`.
+Values are serialized constant hex as supplied, compared as bytes (hex case is
+irrelevant), with no interpretation of upgrade authority or behavior. A missing
+or invalid hex value on either side is `unverified`: the ChainBox format cannot
+distinguish an absent register from one omitted by the source. Otherwise the
+status is `unchanged` or `changed`. With no supplied baseline, the first complete
+observation establishes it and explicitly says that no earlier value was
+supplied. `unchanged` on that first observation asserts no history.
+
+The response's `baselineBox` can be saved and supplied on the next invocation.
+A first baseline is returned only when all watched registers have readable
+values. A supplied baseline is retained even across failed observations. CLI
+`--baseline box.json` uses that supplied box as the register reference for every
+requested pair. It accepts the `ChainBox` shape: `boxId`, `ergoTree`, `value`,
+optional `tokens` (`id`, `amount`), and `additionalRegisters` (raw hex strings or
+objects with `serializedValue`; `registers` is an alias). Baselines are caller
+references; Watch does not attest their chain or NFT membership.
+
+| CLI exit | Meaning |
+|---|---|
+| 0 | Every script is `bytes_match`; all watched registers are `unchanged` |
+| 3 | At least one script is `bytes_differ` or register is `changed` |
+| 4 | Any script or watched register is `unverified`; takes precedence over 3 |
+| 1 | Input error; no complete report batch |
+
+`POST /api/v1/watch` accepts inline lockfiles with per-lockfile inputs:
+
+```json
+{
+  "watches": [{
+    "lockfile": {"...": "complete schema-1 lock object"},
+    "nfts": ["<64-hex-token-id>"],
+    "registers": ["R4"],
+    "baselineBoxes": {"<64-hex-token-id>": {"...": "supplied ChainBox"}}
+  }]
+}
+```
+
+`registers` and `baselineBoxes` are optional. The response is an array of reports.
+The route only uses `state.cfg.explorer_url`; request URLs and fixture overrides
+are rejected. It shares the request body cap, rate limiter and engine budget.
+No request or baseline is stored server-side. The Read **Watch** section accepts
+a pasted or uploaded lockfile, NFT IDs, register names and an optional baseline
+box. It retains first-observation baselines in page memory for repeated clicks;
+editing inputs or pressing **Reset baseline** clears them. Reloading the page
+clears them too. Watch is disabled with an explanation when no explorer is
+configured. The lockfile defines Watch's comparison independently of the tree
+currently displayed by Read.
+
+Watch constructs no transaction, signs nothing and broadcasts nothing. Tests
+use fixtures and in-process HTTP requests with no network. The recording fixture
+asserts the exact bounded reads; source checks guard the module, CLI and route
+against signing/broadcast dependencies. Static findings remain review priorities;
+Watch reports only the supplied script and register byte observations.

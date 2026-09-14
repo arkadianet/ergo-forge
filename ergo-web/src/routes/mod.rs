@@ -18,3 +18,4 @@ pub mod replay;
 pub mod test;
 pub mod validate;
 pub mod verify;
+pub mod watch;

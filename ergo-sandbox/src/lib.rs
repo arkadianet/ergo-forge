@@ -75,6 +75,7 @@ pub mod testsuite;
 pub mod tree;
 pub mod txcheck;
 pub mod verify;
+pub mod watch;
 
 pub use audit::{Finding, Severity};
 pub use compile::{compile_source, compile_source_raw, CompileOutput};

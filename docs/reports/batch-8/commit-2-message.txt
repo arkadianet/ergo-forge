@@ -1,0 +1,8 @@
+feat(ui): add source observation Watch controls to Read
+
+Load a lockfile and protocol NFTs, report script and register byte facts, and
+retain per-NFT baselines only in page memory. Gate access on the configured
+explorer and invalidate stale requests when inputs change. Add DOM coverage.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

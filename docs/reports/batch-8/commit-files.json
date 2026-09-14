@@ -1,0 +1,28 @@
+{
+  "1": [
+    "ergo-sandbox/src/watch.rs",
+    "ergo-sandbox/src/lib.rs",
+    "ergo-sandbox/src/bin/ergo-es.rs",
+    "ergo-sandbox/src/bin/watching/mod.rs",
+    "ergo-sandbox/tests/watch.rs",
+    "ergo-sandbox/tests/fixtures/watch/holder.fixture",
+    "ergo-web/src/routes/watch.rs",
+    "ergo-web/src/routes/mod.rs",
+    "ergo-web/src/app.rs",
+    "ergo-web/tests/watch.rs",
+    "docs/immutability.md"
+  ],
+  "2": [
+    "ui/watch.js",
+    "ui/tests/watch.test.js",
+    "ui/app.js",
+    "ui/index.html"
+  ],
+  "3": [
+    "docs/ROADMAP.md",
+    "docs/superpowers/specs/2026-09-13-forge-roadmap-v2.md",
+    "scripts/roadmap_gate.py",
+    "scripts/test_roadmap_gate.py",
+    "docs/reports/batch-8"
+  ]
+}
