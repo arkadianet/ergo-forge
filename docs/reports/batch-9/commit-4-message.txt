@@ -1,0 +1,4 @@
+chore(roadmap): register W05 and S05 with batch 9 evidence
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

@@ -1,0 +1,69 @@
+[
+  {
+    "bucket": "recompiles-but-differs",
+    "id": "examples/contracts/recipes/pool-bound-swap.es",
+    "params": {
+      "poolNFT": {
+        "type": "Coll[Byte]",
+        "value": "0101010101010101010101010101010101010101010101010101010101010101"
+      }
+    },
+    "raw_placeholders": 0,
+    "recompiled_tree": "1b9f0213040404040400040004020404040404000e200101010101010101010101010101010101010101010101010101010101010101050204000400050204020402040204020100010095ed92b1a4730093b1a57301d804d601b2a4730200d602db63087201d603b2a5730300d604b2a573040095ed93b17202730593b1db630872037306d802d605b27202730700d6067308d1ededededededededed938c7205017206938c7205027309938cb2db63087203730a00017206938cb2db63087203730b0002730c93c27203c27201938cb2db63087203730d00018cb27202730e0001929c7ec17203067e8cb2db63087203730f0002069c7ec17201067e8cb27202731000020693c27204c2a792c17204c1a793db63087204db6308a7d17311d17312",
+    "source": "if (INPUTS.size >= 2 && OUTPUTS.size == 2) { val v = INPUTS(0); val v2 = v.tokens; val v3 = OUTPUTS(0); val v4 = OUTPUTS(1); if (v2.size == 2 && v3.tokens.size == 2) { val v5 = v2(0); val v6 = fromBase16(\"0101010101010101010101010101010101010101010101010101010101010101\"); sigmaProp(v5._1 == v6 && v5._2 == 1L && v3.tokens(0)._1 == v6 && v3.tokens(0)._2 == 1L && v3.propositionBytes == v.propositionBytes && v3.tokens(1)._1 == v2(1)._1 && v3.value.toBigInt * v3.tokens(1)._2.toBigInt >= v.value.toBigInt * v2(1)._2.toBigInt && v4.propositionBytes == SELF.propositionBytes && v4.value >= SELF.value && v4.tokens == SELF.tokens) } else sigmaProp(false) } else sigmaProp(false)",
+    "tree": "1bfb01010e20010101010101010101010101010101010101010101010101010101010101010195ed92b1a4040493b1a50404d804d601b2a4040000d602db63087201d603b2a5040000d604b2a504020095ed93b17202040493b1db630872030404d802d605b27202040000d6067300d1ededededededededed938c7205017206938c7205020502938cb2db63087203040000017206938cb2db6308720304000002050293c27203c27201938cb2db63087203040200018cb2720204020001929c7ec17203067e8cb2db6308720304020002069c7ec17201067e8cb27202040200020693c27204c2a792c17204c1a793db63087204db6308a7d10100d10100",
+    "truncated": false
+  },
+  {
+    "bucket": "recompiles-but-differs",
+    "id": "examples/contracts/recipes/successor-locked-vault.es",
+    "params": {
+      "floorValue": {
+        "type": "Long",
+        "value": 101
+      },
+      "vaultNFT": {
+        "type": "Coll[Byte]",
+        "value": "0101010101010101010101010101010101010101010101010101010101010101"
+      }
+    },
+    "raw_placeholders": 0,
+    "recompiled_tree": "1bde010b040204000400040005010e200101010101010101010101010101010101010101010101010101010101010101050205ca0105000501010095ed93b1a5730091b1db6308a77301d807d601db6308a7d602b27201730200d603b2a5730300d604c6a70405d605c6a7050ed606e572047304d607830002d1edededededededededededed938c7202017305938c720202730693c27203c2a793db63087203720192c17203c1a792c172037307e67204e672059272067308e6c67203040593e5c67203040573097206e6c67203050e93e5c67203050e7207e572057207d1730a",
+    "source": "if (OUTPUTS.size == 1 && SELF.tokens.size > 0) { val v = SELF.tokens; val v2 = v(0); val v3 = OUTPUTS(0); val v4 = SELF.R4[Long]; val v5 = SELF.R5[Coll[Byte]]; val v6 = v4.getOrElse(-1L); val v7 = Coll[Byte](); sigmaProp(v2._1 == fromBase16(\"0101010101010101010101010101010101010101010101010101010101010101\") && v2._2 == 1L && v3.propositionBytes == SELF.propositionBytes && v3.tokens == v && v3.value >= SELF.value && v3.value >= 101L && v4.isDefined && v5.isDefined && v6 >= 0L && v3.R4[Long].isDefined && v3.R4[Long].getOrElse(-1L) == v6 && v3.R5[Coll[Byte]].isDefined && v3.R5[Coll[Byte]].getOrElse(v7) == v5.getOrElse(v7)) } else sigmaProp(false)",
+    "tree": "1bcc01020e20010101010101010101010101010101010101010101010101010101010101010105ca0195ed93b1a5040291b1db6308a70400d807d601db6308a7d602b27201040000d603b2a5040000d604c6a70405d605c6a7050ed606e572040501d607830002d1edededededededededededed938c7202017300938c720202050293c27203c2a793db63087203720192c17203c1a792c172037301e67204e672059272060500e6c67203040593e5c67203040505017206e6c67203050e93e5c67203050e7207e572057207d10100",
+    "truncated": false
+  },
+  {
+    "aliases": [
+      "/scenarios/0/inputs/0/ergoTree",
+      "/scenarios/0/outputs/0/ergoTree",
+      "/scenarios/1/inputs/0/ergoTree",
+      "/scenarios/1/outputs/0/ergoTree",
+      "/scenarios/2/inputs/0/ergoTree",
+      "/scenarios/2/outputs/0/ergoTree",
+      "/scenarios/3/inputs/0/ergoTree",
+      "/scenarios/3/outputs/0/ergoTree",
+      "/scenarios/3/outputs/2/ergoTree",
+      "/scenarios/4/inputs/0/ergoTree",
+      "/scenarios/4/outputs/0/ergoTree"
+    ],
+    "bucket": "byte-identical",
+    "id": "examples/contracts/recipes/pool-bound-swap.test.json#/scenarios/0/inputs/0/ergoTree",
+    "raw_placeholders": 0,
+    "source": "true",
+    "tree": "10010101d17300",
+    "truncated": false
+  },
+  {
+    "aliases": [
+      "/scenarios/5/outputs/0/ergoTree",
+      "/scenarios/7/outputs/1/ergoTree"
+    ],
+    "bucket": "byte-identical",
+    "id": "examples/contracts/recipes/successor-locked-vault.test.json#/scenarios/5/outputs/0/ergoTree",
+    "raw_placeholders": 0,
+    "source": "true",
+    "tree": "10010101d17300",
+    "truncated": false
+  }
+]

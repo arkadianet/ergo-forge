@@ -12,8 +12,8 @@ use ergo_sandbox::{compile_source, eval_scenario, inspect, Scenario};
 use ergo_ser::address::NetworkPrefix;
 
 mod deployment;
-mod watching;
 mod incident;
+mod watching;
 
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();

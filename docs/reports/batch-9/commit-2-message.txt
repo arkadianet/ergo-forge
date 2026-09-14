@@ -1,0 +1,4 @@
+feat(incident): scaffold authored suites from transaction boxes
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WwVySagCnCMChPM4C65WYg

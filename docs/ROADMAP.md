@@ -1003,7 +1003,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
         "new_recipes_have_independent_expectations",
         "new_recipe_mutants_are_caught"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "S05",
@@ -1017,7 +1017,7 @@ own completed prefix. Only v2 units can be reported as `not-started` by CI.
         "incident_scaffold_reproduces_use_boxes",
         "incident_scaffold_never_fills_expectations"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "X01",
