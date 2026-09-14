@@ -1,3 +1,4 @@
+mod engine_support;
 use ergo_sandbox::{
     evidence::{
         validate::{validate, ValidationRequest},
@@ -23,7 +24,9 @@ fn fixture(id: &str) -> SuppliedTrace {
         .as_array()
         .unwrap()
         .iter()
-        .map(|r| serde_json::from_value(r["request"].clone()).unwrap())
+        .map(|r| {
+            engine_support::on_current_engine(serde_json::from_value(r["request"].clone()).unwrap())
+        })
         .collect();
     SuppliedTrace {
         root: steps[0].case.premises().boxes.value().unwrap().clone(),

@@ -1,4 +1,6 @@
 //! S01 gates run through a real HTTP server, using S00 and P05 fixtures.
+#[path = "../../ergo-sandbox/tests/engine_support/request.rs"]
+mod engine_support;
 use serde_json::{json, Value};
 
 async fn spawn() -> String {
@@ -136,6 +138,9 @@ async fn checklist_answer_carries_provenance() {
     }
 
     let bundle = fixture("ergo-sandbox/tests/fixtures/evidence/claim-vectors/use-incident.fixture");
+    let mut bundle: ergo_sandbox::evidence::replay::ReplayBundle =
+        serde_json::from_value(bundle).unwrap();
+    bundle.execution = engine_support::on_current_engine(bundle.execution);
     let target = fixture("examples/incidents/use-lp-drain.deployed-swap.test.json")["tree"].clone();
     let evidence = post(&base, json!({"input":target,"evidence":{"vectorIds":["positional-reserve-binding"],"bundle":bundle}})).await;
     assert_rows(&evidence);

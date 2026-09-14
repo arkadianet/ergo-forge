@@ -100,10 +100,7 @@ pub enum NetworkRules {
     },
 }
 impl NetworkRules {
-    pub fn node(
-        &self,
-        activated_script_version: u8,
-    ) -> Result<Option<ReemissionRuleInputs>, String> {
+    pub fn node(&self) -> Result<Option<ReemissionRuleInputs>, String> {
         match self {
             Self::Disabled {
                 description,
@@ -122,11 +119,7 @@ impl NetworkRules {
                 if !reader.is_empty() {
                     return Err("trailing network-rule tree bytes".into());
                 }
-                ergo_ser::ergo_tree::check_tree_version_supported(
-                    &parsed,
-                    activated_script_version,
-                )
-                .map_err(err)?;
+                ergo_ser::ergo_tree::check_tree_version_supported(&parsed).map_err(err)?;
                 ergo_ser::ergo_tree::check_header_size_bit(&parsed).map_err(err)?;
                 ergo_ser::ergo_tree::check_resolvable_methods(&parsed).map_err(err)?;
                 ergo_ser::ergo_tree::check_sigma_prop_root(&parsed).map_err(err)?;
@@ -259,7 +252,7 @@ pub fn validate(request: &ValidationRequest) -> Result<AcceptedExecution, Valida
         .map_err(input)?;
     let rules = required(&request.network_rules, "network rules")
         .map_err(input)?
-        .node(context.activated_script_version)
+        .node()
         .map_err(input)?;
     let policy = required(&request.local_policy, "local policy").map_err(input)?;
     let prior = *required(&request.prior_block_cost, "prior block cost").map_err(input)?;

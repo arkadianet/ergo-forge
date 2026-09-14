@@ -1,4 +1,5 @@
 //! M04 fixed-inventory action checks and fresh canonical omission replay.
+mod engine_support;
 #[allow(dead_code)]
 mod mapping_support;
 use ergo_sandbox::{
@@ -26,6 +27,7 @@ fn inventory() -> Vec<(Value, Value, Requirement)> {
         "../../../../docs/mapping/m03-mapping-results.json",
         "7c64e6d0a26c05720128d2dc4891e408d76bdbd6a7d5ff226e0bf4d9b9087ba6",
     );
+    let claims = engine_support::mapping_revisions().expected(&claims);
     assert_eq!(manifest["cases"].as_array().unwrap().len(), 32);
     assert_eq!(answers["cases"].as_array().unwrap().len(), 32);
     assert_eq!(claims["cases"].as_array().unwrap().len(), 32);
@@ -120,7 +122,24 @@ fn disposition(action: Action, r: Requirement) -> Disposition {
 fn evidence(path: &str, result: &Value) {
     let path = root().join("../../../../docs/mapping").join(path);
     let bytes = std::fs::read(&path).unwrap();
-    assert_eq!(serde_json::from_slice::<Value>(&bytes).unwrap(), *result);
+    let mut revisions = engine_support::mapping_revisions();
+    // Actions name claim digests. Derive their historical identities from the
+    // authenticated cases, then re-key them; do not replace expected verdicts.
+    for (c, _, r) in inventory() {
+        let mut old = serde_json::to_value(&r).unwrap();
+        for field in ["nodeRevision", "compilerRevision"] {
+            old["claim"]["premises"][field]["value"] = json!(engine_support::fixture_revision());
+        }
+        old["derivation"] = Value::Null;
+        let old: Requirement = serde_json::from_value(old).unwrap();
+        for v in c["vectors"].as_array().unwrap() {
+            revisions.seed(&serde_json::to_value(action(&c, v, &old)).unwrap());
+        }
+    }
+    assert_eq!(
+        revisions.expected(&serde_json::from_slice::<Value>(&bytes).unwrap()),
+        *result
+    );
     println!("evidence {} sha256={}", path.display(), sha(&bytes));
 }
 #[test]
@@ -256,6 +275,7 @@ fn data_outputs_and_unrelated_inputs_cannot_satisfy_spend() {
         "../../../../docs/mapping/m03-mapping-results.json",
         "7c64e6d0a26c05720128d2dc4891e408d76bdbd6a7d5ff226e0bf4d9b9087ba6",
     );
+    let claims = engine_support::mapping_revisions().expected(&claims);
     for (fixture, row) in extra["cases"]
         .as_array()
         .unwrap()
@@ -325,11 +345,13 @@ fn data_outputs_and_unrelated_inputs_cannot_satisfy_spend() {
     println!("data/output/unrelated inputs cannot satisfy Spend; missing/duplicate subject, stale proof, unknown bindings and versions fail closed");
 }
 fn request(entry: &Value) -> ValidationRequest {
-    serde_json::from_value(pinned(
-        &format!("m03/{}", entry["path"].as_str().unwrap()),
-        entry["sha256"].as_str().unwrap(),
-    ))
-    .unwrap()
+    engine_support::on_current_engine(
+        serde_json::from_value(pinned(
+            &format!("m03/{}", entry["path"].as_str().unwrap()),
+            entry["sha256"].as_str().unwrap(),
+        ))
+        .unwrap(),
+    )
 }
 fn witness(p: &RelationProposal, req: ValidationRequest) -> OmissionWitness {
     OmissionWitness {
@@ -364,6 +386,7 @@ fn accepted_omission_refutes_only_matching_claim_and_premises() {
         .chain(extra["vectors"].as_array().unwrap())
         .collect();
     let mut rows = vec![];
+    let prior = engine_support::mapping_revisions().expected(&prior);
     for old in prior.as_array().unwrap() {
         let p: RelationProposal = serde_json::from_value(old["claim"].clone()).unwrap();
         let entry = entries.iter().find(|e| e["id"] == old["vector"]).unwrap();

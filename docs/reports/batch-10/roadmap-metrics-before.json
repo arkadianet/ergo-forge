@@ -196,57 +196,5 @@
   "obligationReviewDuplication": {
     "value": null,
     "producer": "P07 obligation_reports curated anchors; real-audit case set separately required"
-  },
-  "scoreboard": {
-    "X01": {
-      "beforeRevision": "9468043396e5daa2828211bcff4234bc70fae4f0",
-      "afterRevision": "016533194f94ad95b1a87df70bb9bfce493922e2",
-      "before": {
-        "seed": {
-          "entries": 87,
-          "exact": 74
-        },
-        "mainnet": {
-          "entries": 279,
-          "exact": 270
-        }
-      },
-      "after": {
-        "seed": {
-          "entries": 92,
-          "exact": 79
-        },
-        "mainnet": {
-          "entries": 279,
-          "exact": 270
-        }
-      },
-      "lostPreviouslyExactRows": {
-        "seed": 0,
-        "mainnet": 0
-      },
-      "p03": {
-        "beforePassed": 9,
-        "afterPassed": 9,
-        "vectorsChanged": false,
-        "historicalRequestsRequireExplicitNewRevision": true
-      },
-      "committedBaseline": {
-        "exact": 238,
-        "obtainedTrees": 329,
-        "entries": 339
-      },
-      "currentBundledInventory": {
-        "exact": 264,
-        "obtainedTrees": 357,
-        "entries": 367
-      },
-      "decision": "advance-pin",
-      "report": "docs/reports/batch-10/REPORT.md",
-      "measurements": {
-        "engine-before.json": "603aaa89ea3d5cc3857a7ea6308d4e2d14485006e1dfa96d4a2e16a90fbd0922",
-        "engine-after.json": "e9f2f18eb000a35796ae4b90a5434b6dd8f6e100d4906cd17705cedeffd9944d"
-      }
-    }
   }
 }

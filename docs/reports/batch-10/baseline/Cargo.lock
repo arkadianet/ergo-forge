@@ -599,8 +599,8 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
 name = "ergo-chain-spec"
-version = "0.7.0"
-source = "git+https://github.com/arkadianet/ergo?rev=016533194f94ad95b1a87df70bb9bfce493922e2#016533194f94ad95b1a87df70bb9bfce493922e2"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=9468043396e5daa2828211bcff4234bc70fae4f0#9468043396e5daa2828211bcff4234bc70fae4f0"
 dependencies = [
  "ergo-primitives",
  "ergo-ser",
@@ -609,8 +609,8 @@ dependencies = [
 
 [[package]]
 name = "ergo-compiler"
-version = "0.7.0"
-source = "git+https://github.com/arkadianet/ergo?rev=016533194f94ad95b1a87df70bb9bfce493922e2#016533194f94ad95b1a87df70bb9bfce493922e2"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=9468043396e5daa2828211bcff4234bc70fae4f0#9468043396e5daa2828211bcff4234bc70fae4f0"
 dependencies = [
  "base64 0.22.1",
  "bs58",
@@ -623,8 +623,8 @@ dependencies = [
 
 [[package]]
 name = "ergo-crypto"
-version = "0.7.0"
-source = "git+https://github.com/arkadianet/ergo?rev=016533194f94ad95b1a87df70bb9bfce493922e2#016533194f94ad95b1a87df70bb9bfce493922e2"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=9468043396e5daa2828211bcff4234bc70fae4f0#9468043396e5daa2828211bcff4234bc70fae4f0"
 dependencies = [
  "blake2",
  "ergo-chain-spec",
@@ -637,8 +637,8 @@ dependencies = [
 
 [[package]]
 name = "ergo-primitives"
-version = "0.7.0"
-source = "git+https://github.com/arkadianet/ergo?rev=016533194f94ad95b1a87df70bb9bfce493922e2#016533194f94ad95b1a87df70bb9bfce493922e2"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=9468043396e5daa2828211bcff4234bc70fae4f0#9468043396e5daa2828211bcff4234bc70fae4f0"
 dependencies = [
  "blake2",
  "hex",
@@ -674,8 +674,8 @@ dependencies = [
 
 [[package]]
 name = "ergo-ser"
-version = "0.7.0"
-source = "git+https://github.com/arkadianet/ergo?rev=016533194f94ad95b1a87df70bb9bfce493922e2#016533194f94ad95b1a87df70bb9bfce493922e2"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=9468043396e5daa2828211bcff4234bc70fae4f0#9468043396e5daa2828211bcff4234bc70fae4f0"
 dependencies = [
  "bs58",
  "ergo-primitives",
@@ -686,8 +686,8 @@ dependencies = [
 
 [[package]]
 name = "ergo-sigma"
-version = "0.7.0"
-source = "git+https://github.com/arkadianet/ergo?rev=016533194f94ad95b1a87df70bb9bfce493922e2#016533194f94ad95b1a87df70bb9bfce493922e2"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=9468043396e5daa2828211bcff4234bc70fae4f0#9468043396e5daa2828211bcff4234bc70fae4f0"
 dependencies = [
  "bytes",
  "ergo-crypto",
@@ -706,8 +706,8 @@ dependencies = [
 
 [[package]]
 name = "ergo-state"
-version = "0.7.0"
-source = "git+https://github.com/arkadianet/ergo?rev=016533194f94ad95b1a87df70bb9bfce493922e2#016533194f94ad95b1a87df70bb9bfce493922e2"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=9468043396e5daa2828211bcff4234bc70fae4f0#9468043396e5daa2828211bcff4234bc70fae4f0"
 dependencies = [
  "bincode",
  "blake2",
@@ -732,8 +732,8 @@ dependencies = [
 
 [[package]]
 name = "ergo-validation"
-version = "0.7.0"
-source = "git+https://github.com/arkadianet/ergo?rev=016533194f94ad95b1a87df70bb9bfce493922e2#016533194f94ad95b1a87df70bb9bfce493922e2"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=9468043396e5daa2828211bcff4234bc70fae4f0#9468043396e5daa2828211bcff4234bc70fae4f0"
 dependencies = [
  "ergo-chain-spec",
  "ergo-crypto",
@@ -751,8 +751,8 @@ dependencies = [
 
 [[package]]
 name = "ergo-wallet"
-version = "0.7.0"
-source = "git+https://github.com/arkadianet/ergo?rev=016533194f94ad95b1a87df70bb9bfce493922e2#016533194f94ad95b1a87df70bb9bfce493922e2"
+version = "0.6.0"
+source = "git+https://github.com/arkadianet/ergo?rev=9468043396e5daa2828211bcff4234bc70fae4f0#9468043396e5daa2828211bcff4234bc70fae4f0"
 dependencies = [
  "aes-gcm",
  "bip39",

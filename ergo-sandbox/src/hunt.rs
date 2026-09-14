@@ -62,7 +62,10 @@ pub struct ProbeCaps {
 
 pub const MAX_PROBES: usize = 12;
 pub const MAX_BOXES: usize = 16;
-pub const NODE_RULE_BASIS: &str = "arkadianet/ergo@9468043396e5daa2828211bcff4234bc70fae4f0: ergo-validation/src/tx/structural.rs::check_output_box; context.rs::ProtocolParams::mainnet_default; ergo-sandbox/src/eval.rs::DEFAULT_COST_LIMIT";
+pub fn node_rule_basis() -> &'static str {
+    static BASIS: std::sync::OnceLock<String> = std::sync::OnceLock::new();
+    BASIS.get_or_init(|| format!("arkadianet/ergo@{}: ergo-validation/src/tx/structural.rs::check_output_box; context.rs::ProtocolParams::mainnet_default; ergo-sandbox/src/eval.rs::DEFAULT_COST_LIMIT", crate::evidence::case::engine_revision()))
+}
 
 /// Caller-controlled knobs. `Default` is the anonymous hunt: synthetic SELF,
 /// default base height, mainnet.
@@ -185,7 +188,7 @@ pub fn hunt(tree_bytes: &[u8], opts: &HuntOptions) -> Result<Hunt, SandboxError>
         max_boxes_per_collection: MAX_BOXES,
         block_cost_limit: crate::eval::DEFAULT_COST_LIMIT,
         min_value_per_byte: params.min_value_per_byte,
-        basis: NODE_RULE_BASIS,
+        basis: node_rule_basis(),
     };
 
     let tree_hex = hex::encode(tree_bytes);

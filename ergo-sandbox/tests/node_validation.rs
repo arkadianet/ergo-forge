@@ -1,3 +1,4 @@
+mod engine_support;
 use ergo_primitives::reader::VlqReader;
 use ergo_sandbox::evidence::{
     validate::{validate, ValidationRequest},
@@ -39,7 +40,7 @@ fn cases() -> Vec<(Value, ValidationRequest)> {
     assert_eq!(manifest["formatVersion"], 1);
     let rev = ergo_sandbox::evidence::validate::node_revision();
     assert_eq!(rev, ergo_sandbox::evidence::case::engine_revision());
-    assert_eq!(manifest["nodeRevision"], rev);
+    assert_eq!(manifest["nodeRevision"], engine_support::fixture_revision());
     let rows = manifest["cases"].as_array().unwrap();
     let p = policy();
     assert!(rows.len() as u64 >= p["thresholds"]["nodeVectorCasesMin"].as_u64().unwrap());
@@ -62,7 +63,7 @@ fn cases() -> Vec<(Value, ValidationRequest)> {
     assert_eq!(actual, required);
     let mut loaded = vec![];
     for row in rows {
-        assert_eq!(row["nodeRevision"], rev);
+        assert_eq!(row["nodeRevision"], manifest["nodeRevision"]);
         assert_eq!(row["propertyVersion"], "none-P03");
         assert_eq!(row["claimStatus"], "no-property-claim");
         assert_eq!(row["publicationEligibility"], "public-authored");
@@ -91,8 +92,14 @@ fn cases() -> Vec<(Value, ValidationRequest)> {
             value,
             "no premise disappears during import"
         );
-        assert_eq!(request.case.premises().engine_revision, rev);
-        loaded.push((row.clone(), request));
+        assert_eq!(
+            request.case.premises().engine_revision,
+            manifest["nodeRevision"]
+        );
+        let request = engine_support::on_current_engine(request);
+        let mut row = row.clone();
+        row["nodeRevision"] = json!(rev);
+        loaded.push((row, request));
     }
     loaded
 }
@@ -278,4 +285,34 @@ fn accepted_execution_cannot_be_deserialized_or_fabricated() {
         stored["status"], "node-accepted",
         "stored JSON cannot change the new node result"
     );
+}
+
+#[test]
+fn node_vectors_pass_on_new_rev() {
+    let expected = "016533194f94ad95b1a87df70bb9bfce493922e2";
+    let recorded = ergo_sandbox::evidence::case::engine_revision();
+    assert_eq!(
+        recorded, expected,
+        "X01 must run on the measured new revision"
+    );
+    for manifest in [
+        include_str!("../../Cargo.toml"),
+        include_str!("../Cargo.toml"),
+    ] {
+        for line in manifest
+            .lines()
+            .filter(|line| line.contains("git = ") && line.contains("arkadianet/ergo"))
+        {
+            let pin = line
+                .split("rev = \"")
+                .nth(1)
+                .unwrap()
+                .split('"')
+                .next()
+                .unwrap();
+            assert_eq!(pin, recorded, "split engine pin: {line}");
+        }
+    }
+    assert_ne!(recorded, engine_support::fixture_revision());
+    full_pipeline_matches_pinned_node_vectors();
 }

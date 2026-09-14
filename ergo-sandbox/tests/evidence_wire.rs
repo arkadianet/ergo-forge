@@ -1,3 +1,5 @@
+#[path = "engine_support/request.rs"]
+mod engine_support;
 use ergo_primitives::{digest::blake2b256, reader::VlqReader};
 use ergo_sandbox::evidence::{
     wire::{BoxMaterial, CandidateSpec, CreationReference, WireBox, WireTransaction},
@@ -54,10 +56,7 @@ fn material(b: &WireBox) -> BoxMaterial {
 #[test]
 fn wire_box_id_matches_full_serialization() {
     let f = fixtures();
-    assert_eq!(
-        f["engineRevision"],
-        ergo_sandbox::evidence::case::engine_revision()
-    );
+    assert_eq!(f["engineRevision"], engine_support::fixture_revision());
     assert_eq!(f["nodeValidated"], false);
     let bs = boxes(&f);
     assert!(

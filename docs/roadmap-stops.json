@@ -51,7 +51,7 @@
         ],
         "exitCode": 0,
         "evidenceHashes": {
-          "ergo-sandbox/tests/mapping_context_boundary.rs": "207723a25d8a71b06ba6dda05c558c9469985a1c485d93e219cf867ffe77ef90",
+          "docs/reports/batch-10/baseline/ergo-sandbox/tests/mapping_context_boundary.rs": "207723a25d8a71b06ba6dda05c558c9469985a1c485d93e219cf867ffe77ef90",
           "docs/mapping/m05-stop-results.json": "2ebb00ce2d46a258f45b36f40f0f8b7994698d0f5ad6f25aad4ad86984518497",
           "ergo-sandbox/tests/fixtures/mapping/m05-stop/different-true-expression.fixture": "0c1daddc6a9b2c6a96e4297ca036eed77f6b19f9b1264579f7af324b95f744da",
           "ergo-sandbox/tests/fixtures/mapping/m05-stop/false-expression.fixture": "476e6d0b1136336ed078ded89ac56c8ce8dd33388e484e03601463ef6b90c119",

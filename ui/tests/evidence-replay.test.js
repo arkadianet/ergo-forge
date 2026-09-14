@@ -10,7 +10,19 @@ const { bind } = require("../evidence-replay.js");
 const { renderPreflight } = require("../claim-labels.js");
 const root = path.resolve(__dirname, "../..");
 function fixture(name) {
-  return JSON.parse(fs.readFileSync(path.join(root, `ergo-sandbox/tests/fixtures/evidence/claim-vectors/${name}.fixture`), "utf8"));
+  const bundle = JSON.parse(fs.readFileSync(path.join(root, `ergo-sandbox/tests/fixtures/evidence/claim-vectors/${name}.fixture`), "utf8"));
+  const historical = JSON.parse(fs.readFileSync(path.join(root, "ergo-sandbox/tests/fixtures/evidence/manifest.json"), "utf8")).nodeRevision;
+  const pin = fs.readFileSync(path.join(root, "Cargo.toml"), "utf8").match(/^ergo-compiler\s*=.*rev = "([0-9a-f]{40})"/m)[1];
+  assert.equal(bundle.execution.case.premises.engineRevision, historical);
+  // Historical bundles remain rejected. This is a fresh test execution whose
+  // only changed premise is its explicitly recorded engine revision.
+  if (historical !== pin) {
+    const stale = replay(bundle).result;
+    assert.equal(stale.nodeValidated, false);
+    assert.equal(stale.status, "incomplete-or-invalid-premises");
+  }
+  bundle.execution.case.premises.engineRevision = pin;
+  return bundle;
 }
 function page() {
   return parseHTML(fs.readFileSync(path.join(root, "ui/index.html"), "utf8")).document;
