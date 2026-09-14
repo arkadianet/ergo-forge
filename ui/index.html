@@ -405,6 +405,25 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
         <div class="table-scroll" tabindex="0" aria-label="Contract references"><table class="probes"><thead><tr><th>From → to</th><th>Reference type</th><th>Code location</th></tr></thead><tbody id="map-edges"></tbody></table></div>
       </div>
     </details>
+    <details id="watch-panel">
+      <summary>Watch</summary>
+      <p class="hint">Observe script bytes under protocol NFTs and changes in selected upgrade-hook registers. The lockfile is the comparison reference. Nothing is signed or broadcast; nothing is stored server-side.</p>
+      <p id="watch-availability" class="hint" role="status">no explorer configured (explorer-dependency)</p>
+      <label for="watch-lockfile">Paste a contract.lock.json</label>
+      <textarea id="watch-lockfile" rows="5" spellcheck="false"></textarea>
+      <label for="watch-file">Or upload a lockfile</label>
+      <input id="watch-file" type="file" accept=".json,application/json">
+      <label for="watch-nfts">NFT IDs (one per line, or separated by spaces or commas)</label>
+      <textarea id="watch-nfts" rows="2" spellcheck="false"></textarea>
+      <label for="watch-registers">Upgrade-hook registers to watch (optional, R4–R9)</label>
+      <input id="watch-registers" type="text" spellcheck="false" placeholder="R4 R5">
+      <label for="watch-baseline">Baseline box JSON (optional)</label>
+      <textarea id="watch-baseline" rows="3" spellcheck="false" placeholder='{"boxId":"…","ergoTree":"…","value":1000000,"additionalRegisters":{"R4":"040e"}}'></textarea>
+      <p class="hint">Without a supplied box, the first complete register observation establishes the baseline. It stays in page memory for repeated clicks; editing inputs, resetting or reloading clears it. A first observation does not establish earlier history.</p>
+      <button id="watch-run" type="button" class="secondary" disabled>Watch</button>
+      <button id="watch-reset" type="button" class="secondary">Reset baseline</button>
+      <div id="watch-result" role="status" aria-live="polite"></div>
+    </details>
     <details id="reader-tools"><summary>Test the contract you’re reading</summary><p id="reader-test-context" class="hint">Read a contract first. Scenarios and suites here use that contract’s ErgoTree.</p><div id="read-dev-slot"></div></details>
     </section>
   </main>
@@ -546,6 +565,7 @@ sigmaProp(HEIGHT > $unlockHeight)</textarea>
   <script src="verify.js"></script>
   <script src="cost-spans.js"></script>
   <script src="explain.js"></script>
+  <script src="watch.js"></script>
   <script src="play-export.js"></script>
   <script src="share.js"></script>
   <script src="app.js"></script>

@@ -2130,6 +2130,7 @@ $("prove-run").addEventListener("click", async () => {
 
 // ── chain lookups (only when the instance is configured with an explorer) ──
 
+const watchPanel = Watch.mount($("watch-panel"));
 let fetchedBoxes = [];
 
 async function loadConfig() {
@@ -2138,6 +2139,7 @@ async function loadConfig() {
     if (!res.ok) throw new Error("Configuration unavailable");
     const cfg = await res.json();
     explorerConfig = cfg;
+    watchPanel.configure(cfg);
     if (cfg.height) { chainHeight = cfg.height; chainHeightAt = Date.now(); chainNetwork = cfg.network || "mainnet"; }
     $("reader-connection").textContent = cfg.explorer
       ? `Chain lookup available on ${cfg.network}. Addresses and ErgoTree hex are read locally; box IDs are fetched when you press Read.`
