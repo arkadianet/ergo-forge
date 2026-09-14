@@ -807,6 +807,8 @@ function buildStepEl(id) {
 }
 
 const RECIPE_TITLES = {
+  "pool-bound-swap": "Pool-bound swap",
+  "successor-locked-vault": "Successor-locked vault",
   "time-lock": "Lock savings until a date",
   "inheritance": "Inheritance / backup access",
   "two-of-three": "Shared account (2 of 3 must agree)",
