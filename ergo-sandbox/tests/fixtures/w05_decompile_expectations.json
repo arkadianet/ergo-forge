@@ -1,0 +1,26 @@
+{
+  "examples/contracts/recipes/pool-bound-swap.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "tree_sha256": "430c90051c6690ee7d3e6053b6924821062cc3d218fbc1299006439ccd4a79f3",
+    "truncated": false
+  },
+  "examples/contracts/recipes/pool-bound-swap.test.json#/scenarios/0/inputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d",
+    "truncated": false
+  },
+  "examples/contracts/recipes/successor-locked-vault.es": {
+    "bucket": "recompiles-but-differs",
+    "raw_placeholders": 0,
+    "tree_sha256": "d2c1c8aa0d10c9ee6c95ad0622dcedf24f3a4ec6f4721d41f965b709af92bee5",
+    "truncated": false
+  },
+  "examples/contracts/recipes/successor-locked-vault.test.json#/scenarios/5/outputs/0/ergoTree": {
+    "bucket": "byte-identical",
+    "raw_placeholders": 0,
+    "tree_sha256": "22c9ed8001a5f77ea607328d432bf1ff4e857f487c22a3f6be3557ce7beb926d",
+    "truncated": false
+  }
+}

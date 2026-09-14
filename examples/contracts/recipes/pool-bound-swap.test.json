@@ -1,0 +1,246 @@
+{
+  "source": "/**\n * Authorize a swap against one named pool, identifying it before doing reserve arithmetic.\n * Walkthrough: put the pool at INPUTS(0) and this authorizer at INPUTS(1).\n * Return the pool at OUTPUTS(0) and this authorizer at OUTPUTS(1), keeping\n * the pool singleton NFT. The reserve product may only grow; pool token type,\n * pool script and authorizer value and tokens are preserved. Exactly two\n * outputs are allowed in this teaching shape. Try a junk-token decoy at\n * INPUTS(0): matching arithmetic must still fail the pool identity check.\n * The suites are synthetic reductions, not complete signed transactions.\n * @param poolNFT Which pool? \u2014 Its singleton NFT id, held in token slot zero.\n */\n@contract def poolBoundSwap(poolNFT: Coll[Byte]) = {\n  if (INPUTS.size >= 2 && OUTPUTS.size == 2) {\n    val pool = INPUTS(0)\n    val next = OUTPUTS(0)\n    val order = OUTPUTS(1)\n    if (pool.tokens.size == 2 && next.tokens.size == 2) {\n      val identified = pool.tokens(0)._1 == poolNFT\n      sigmaProp(identified &&\n        pool.tokens(0)._2 == 1L && next.tokens(0)._1 == poolNFT && next.tokens(0)._2 == 1L &&\n        next.propositionBytes == pool.propositionBytes &&\n        next.tokens(1)._1 == pool.tokens(1)._1 &&\n        next.value.toBigInt * next.tokens(1)._2.toBigInt >= pool.value.toBigInt * pool.tokens(1)._2.toBigInt &&\n        order.propositionBytes == SELF.propositionBytes &&\n        order.value >= SELF.value && order.tokens == SELF.tokens)\n    } else sigmaProp(false)\n  } else sigmaProp(false)\n}\n",
+  "params": {
+    "poolNFT": {
+      "type": "Coll[Byte]",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  },
+  "network": "mainnet",
+  "scenarios": [
+    {
+      "height": 100,
+      "selfIndex": 1,
+      "inputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 100
+            }
+          ]
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "$self"
+        }
+      ],
+      "outputs": [
+        {
+          "value": 20000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 50
+            }
+          ]
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "$self"
+        }
+      ],
+      "name": "honest swap",
+      "expect": "pass"
+    },
+    {
+      "height": 100,
+      "selfIndex": 1,
+      "inputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 100
+            }
+          ]
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "$self"
+        }
+      ],
+      "outputs": [
+        {
+          "value": 20000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 50
+            }
+          ]
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "$self"
+        }
+      ],
+      "name": "decoy at pool position",
+      "expect": "fail"
+    },
+    {
+      "height": 100,
+      "selfIndex": 1,
+      "inputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 100
+            }
+          ]
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "$self"
+        }
+      ],
+      "outputs": [
+        {
+          "value": 20000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 49
+            }
+          ]
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "$self"
+        }
+      ],
+      "name": "reserve product falls",
+      "expect": "fail"
+    },
+    {
+      "height": 100,
+      "selfIndex": 1,
+      "inputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 100
+            }
+          ]
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "$self"
+        }
+      ],
+      "outputs": [
+        {
+          "value": 20000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 50
+            }
+          ]
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "$self"
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "10010101d17300"
+        }
+      ],
+      "name": "extra output",
+      "expect": "fail"
+    },
+    {
+      "height": 100,
+      "selfIndex": 1,
+      "inputs": [
+        {
+          "value": 10000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 100
+            }
+          ]
+        },
+        {
+          "value": 1000000,
+          "ergoTree": "$self"
+        }
+      ],
+      "outputs": [
+        {
+          "value": 20000000,
+          "ergoTree": "10010101d17300",
+          "tokens": [
+            {
+              "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amount": 1
+            },
+            {
+              "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "amount": 50
+            }
+          ]
+        },
+        {
+          "value": 999999,
+          "ergoTree": "$self"
+        }
+      ],
+      "name": "authorizer value drops",
+      "expect": "fail"
+    }
+  ]
+}
