@@ -36,6 +36,29 @@ test("malformed payloads are rejected before use", () => {
   for (const fragment of ["", "!", "a", "e30=", "_w", "not-json"]) assert.throws(()=>Share.decodeShare(fragment));
 });
 
+test("shared payloads reject unsafe parameter names and signing material", () => {
+  const unsafeParam={s:"",p:{"<img src=x onerror=alert(1)>":{type:"Int",value:1}}};
+  const secretCase={...suite,scenarios:[{...suite.scenarios[0],secrets:[{dlog:"00".repeat(31)+"01"}]}]};
+  const partyCase={...suite,scenarios:[{...suite.scenarios[0],parties:[{name:"alice",secrets:[{dlog:"00".repeat(31)+"01"}]}]}]};
+  for (const value of [unsafeParam,{k:"suite",v:1,suite:secretCase},{k:"suite",v:1,suite:partyCase},{k:"suite",v:1,suite:{...suite,secrets:[{dlog:"00".repeat(31)+"01"}]}}]) {
+    assert.throws(()=>Share.encodeShare(value),/parameter names|secrets or parties/);
+    assert.throws(()=>Share.decodeShare(raw(value)),/parameter names|secrets or parties/);
+  }
+  assert.doesNotThrow(()=>Share.encodeShare({k:"suite",v:1,suite}));
+});
+
+test("parameter names render as text rather than markup", () => {
+  const document=page();
+  const context=vm.createContext({document,$:id=>document.getElementById(id),paramTypes:["Int"],guessType:()=>"Int",placeholderFor:()=>""});
+  const start=app.indexOf("function renderParams(");
+  const end=app.indexOf("function guessType",start);
+  vm.runInContext(app.slice(start,end),context);
+  vm.runInContext('renderParams([{name:"<img src=x onerror=alert(1)>",typeHint:"Int"}])',context);
+  const row=document.querySelector("#params-rows tr");
+  assert.equal(row.querySelectorAll("img,script").length,0);
+  assert.match(row.textContent,/\$<img src=x onerror=alert\(1\)>/);
+});
+
 test("Play requires an explicit confirm control; cancel and loading never replace or save", () => {
   const root=page().getElementById("share-confirm");let replacements=0, received;
   const state=playState();

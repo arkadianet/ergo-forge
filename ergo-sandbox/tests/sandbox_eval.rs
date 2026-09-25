@@ -189,6 +189,23 @@ fn unparseable_tree_bytes_are_a_boundary_error() {
     ));
 }
 
+#[test]
+fn standalone_tree_input_must_consume_all_bytes() {
+    let trailing = format!("{HEIGHT_TREE}00");
+    let sc: Scenario =
+        serde_json::from_str(&format!(r#"{{"height":100,"tree":"{trailing}"}}"#)).unwrap();
+    let err = eval_scenario(&sc).unwrap_err().to_string();
+    assert!(err.contains("trailing"), "{err}");
+
+    let overlong = "10810001d17300";
+    let bytes = hex::decode(overlong).unwrap();
+    assert!(ergo_sandbox::inspect::parse_tree(&bytes).is_ok());
+    assert!(ergo_sandbox::inspect::parse_tree_complete(&bytes).is_ok());
+    let sc: Scenario =
+        serde_json::from_str(&format!(r#"{{"height":100,"tree":"{overlong}"}}"#)).unwrap();
+    assert_eq!(eval_scenario(&sc).unwrap().verdict, Verdict::Pass);
+}
+
 // ----- cost -----
 
 #[test]

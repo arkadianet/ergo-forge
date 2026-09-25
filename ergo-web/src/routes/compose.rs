@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 use std::sync::Arc;
 
 use axum::{extract::State, Json};
-use ergo_sandbox::compose::{compose, Spec};
+use ergo_sandbox::compose::{compose, validate_public_limits, Spec};
 use ergo_sandbox::testsuite::{run, SuiteResult};
 use serde::{Deserialize, Serialize};
 
@@ -39,21 +39,24 @@ pub async fn compose_route(
     State(state): State<Arc<AppState>>,
     ApiJson(req): ApiJson<ComposeRequest>,
 ) -> Result<Json<ComposeResponse>, ApiError> {
-    let composed =
-        compose(&req.spec, &req.params).map_err(|e| ApiError::InvalidInput(e.to_string()))?;
-    let results = match (&composed.suite, req.run) {
-        (Some(suite), true) => {
-            let suite = suite.clone();
-            let r = state
-                .engine
-                .run(move || run(&suite))
-                .await
-                .ok_or(ApiError::Internal)?
+    validate_public_limits(&req.spec, &req.params)
+        .map_err(|e| ApiError::InvalidInput(e.to_string()))?;
+    let should_run = req.run;
+    let (composed, results) = state
+        .engine
+        .run(move || {
+            let composed = compose(&req.spec, &req.params)
                 .map_err(|e| ApiError::InvalidInput(e.to_string()))?;
-            Some(r)
-        }
-        _ => None,
-    };
+            let results = match (&composed.suite, should_run) {
+                (Some(suite), true) => {
+                    Some(run(suite).map_err(|e| ApiError::InvalidInput(e.to_string()))?)
+                }
+                _ => None,
+            };
+            Ok::<_, ApiError>((composed, results))
+        })
+        .await
+        .ok_or(ApiError::Internal)??;
     Ok(Json(ComposeResponse {
         claim: composed.claim,
         source: composed.source,

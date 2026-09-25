@@ -580,6 +580,36 @@ async fn test_endpoint_runs_a_suite_and_reports_each_case() {
 }
 
 #[tokio::test]
+async fn test_endpoint_rejects_an_oversized_case_count() {
+    let base = spawn().await;
+    let scenarios = (0..=ergo_web::app::MAX_PUBLIC_SUITE_CASES)
+        .map(|i| {
+            serde_json::json!({
+                "name": format!("case-{i}"),
+                "expect": "pass",
+                "height": 1
+            })
+        })
+        .collect::<Vec<_>>();
+    let r = reqwest::Client::new()
+        .post(format!("{base}/api/v1/test"))
+        .json(&serde_json::json!({
+            "source": "sigmaProp(true)",
+            "scenarios": scenarios
+        }))
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(r.status(), 400);
+    let body: serde_json::Value = r.json().await.unwrap();
+    assert_eq!(body["error"]["code"], "invalid_input");
+    assert!(body["error"]["message"]
+        .as_str()
+        .unwrap()
+        .contains("more than"));
+}
+
+#[tokio::test]
 async fn test_endpoint_reports_a_non_compiling_contract_as_400() {
     let base = spawn().await;
     let r = reqwest::Client::new()
@@ -984,6 +1014,29 @@ async fn compose_returns_source_params_and_a_run_suite_when_values_are_given() {
     assert!(res["suite"]["scenarios"].as_array().unwrap().len() >= 3);
     assert_eq!(res["results"]["failed"], 0, "{res}");
     assert!(res["results"]["passed"].as_u64().unwrap() >= 3);
+}
+
+#[tokio::test]
+async fn compose_rejects_public_world_shapes_before_generation() {
+    let base = spawn().await;
+    let r = reqwest::Client::new()
+        .post(format!("{base}/api/v1/compose"))
+        .json(&serde_json::json!({
+            "spec": { "paths": [
+                { "name": "count", "who": { "anyOne": true }, "conditions": [ { "inputCount": "n" } ] }
+            ] },
+            "params": { "n": { "type": "Int", "value": ergo_sandbox::compose::MAX_PUBLIC_COMPOSE_BOXES + 1 } }
+        }))
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(r.status(), 400);
+    let body: serde_json::Value = r.json().await.unwrap();
+    assert_eq!(body["error"]["code"], "invalid_input");
+    assert!(body["error"]["message"]
+        .as_str()
+        .unwrap()
+        .contains("public compose limit"));
 }
 
 #[tokio::test]

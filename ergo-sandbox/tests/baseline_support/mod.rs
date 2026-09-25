@@ -38,6 +38,10 @@ pub fn historical_bytes(workspace: &Path, path: &str) -> Vec<u8> {
                     })
                     .collect::<Vec<_>>()
                     .join("[[package]]");
+                expected = expected.replace(
+                    "[[package]]\nname = \"rustls\"\nversion = \"0.23.43\"\nsource = \"registry+https://github.com/rust-lang/crates.io-index\"\nchecksum = \"0283386ce02abc0151e1761d08802dfe86c173b0b494af5cbc086574e453da06\"",
+                    "[[package]]\nname = \"rustls\"\nversion = \"0.23.45\"\nsource = \"registry+https://github.com/rust-lang/crates.io-index\"\nchecksum = \"0d41d731c7d2f962d1ccc364cec258de3c0e93b38c2fb3ba97ac74513048d634\"",
+                );
             }
         } else {
             // Only the new node API's explicit activation argument is permitted.

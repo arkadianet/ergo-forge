@@ -388,7 +388,9 @@ function renderParams(needs) {
     const tr = document.createElement("tr");
     tr.dataset.name = n.name;
     const td1 = document.createElement("td");
-    td1.innerHTML = "<code>$" + n.name + "</code>";
+    const name = document.createElement("code");
+    name.textContent = "$" + n.name;
+    td1.appendChild(name);
     const td2 = document.createElement("td");
     const sel = document.createElement("select");
     for (const t of paramTypes) {

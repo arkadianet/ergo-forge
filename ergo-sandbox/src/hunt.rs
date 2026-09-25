@@ -167,7 +167,7 @@ fn attacker_tree_hex() -> &'static str {
 /// that ran and failed or errored is a normal probe outcome.
 pub fn hunt(tree_bytes: &[u8], opts: &HuntOptions) -> Result<Hunt, SandboxError> {
     // Fail fast on bytes the reducer could never run, before building probes.
-    let tree = crate::inspect::parse_tree(tree_bytes)?;
+    let tree = crate::inspect::parse_tree_complete(tree_bytes)?;
     let lifted = crate::lift_tree(&tree, false);
     let mut vals = crate::audit::boxrefs::Vals::new();
     crate::audit::boxrefs::collect_vals(&lifted.node, &mut vals);

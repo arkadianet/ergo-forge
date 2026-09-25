@@ -156,6 +156,15 @@ pub fn parse_tree(bytes: &[u8]) -> Result<ErgoTree, crate::SandboxError> {
     read_ergo_tree(&mut r).map_err(|e| crate::SandboxError::Tree(e.to_string()))
 }
 
+pub fn parse_tree_complete(bytes: &[u8]) -> Result<ErgoTree, SandboxError> {
+    let mut r = VlqReader::new(bytes);
+    let tree = read_ergo_tree(&mut r).map_err(|e| SandboxError::Tree(e.to_string()))?;
+    if r.remaining() != 0 {
+        return Err(SandboxError::Tree("trailing bytes after ErgoTree".into()));
+    }
+    Ok(tree)
+}
+
 /// Render an ErgoTree's wire bytes as a human-readable report: header info,
 /// the constants table, the structural body, and a byte-identity note.
 pub fn tree_report(bytes: &[u8]) -> Result<String, SandboxError> {
