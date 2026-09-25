@@ -18,7 +18,7 @@
 //! paths a scenario satisfies), not from the evaluator — so running the
 //! suite checks that the assembled ErgoScript means what the spec says.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use serde::{Deserialize, Serialize};
 
@@ -553,8 +553,9 @@ const NANO: &str = "in nanoERG — 1 ERG = 1,000,000,000 nanoERG.";
 /// Parameters the spec needs, in first-use order, with types.
 fn params_of(spec: &Spec) -> Vec<ParamNeed> {
     let mut out: Vec<ParamNeed> = Vec::new();
+    let mut seen = BTreeSet::new();
     let mut push = |name: &str, tpe: &str, desc: String| {
-        if !out.iter().any(|p| p.name == name) {
+        if seen.insert(name.to_string()) {
             out.push(ParamNeed {
                 name: name.to_string(),
                 type_hint: Some(tpe.to_string()),
@@ -764,6 +765,12 @@ pub fn validate_public_limits(
     if spec.witness.len() > MAX_PUBLIC_COMPOSE_PARAMS {
         return Err(limit(format!(
             "at most {MAX_PUBLIC_COMPOSE_PARAMS} witness values are allowed"
+        )));
+    }
+    let referenced_params = params_of(spec).len();
+    if referenced_params > MAX_PUBLIC_COMPOSE_PARAMS {
+        return Err(limit(format!(
+            "at most {MAX_PUBLIC_COMPOSE_PARAMS} referenced parameters are allowed"
         )));
     }
     let mut cases = 0usize;
@@ -1391,6 +1398,23 @@ fn bump(tpe: &str, v: &serde_json::Value) -> serde_json::Value {
     v.clone()
 }
 
+fn check_world_limits(w: &World, path: &str) -> Result<(), ComposeError> {
+    let shapes = [
+        ("inputs", 1usize.saturating_add(w.extra_inputs.len())),
+        ("outputs", w.outputs.len()),
+        ("data inputs", w.data_inputs.len()),
+    ];
+    for (name, count) in shapes {
+        if count > MAX_PUBLIC_COMPOSE_BOXES {
+            return Err(ComposeError::BadRule(
+                path.into(),
+                format!("{name} may contain at most {MAX_PUBLIC_COMPOSE_BOXES} boxes"),
+            ));
+        }
+    }
+    Ok(())
+}
+
 /// A world that satisfies every condition of `p`: with this box carrying
 /// a token when a rule refers to its tokens, else (a tokenless box is a
 /// valid state too) without.
@@ -1628,6 +1652,7 @@ fn satisfying_world_from(
             "no single transaction meets every condition at once".into(),
         ));
     }
+    check_world_limits(&w, &p.name)?;
     Ok(w)
 }
 
@@ -1886,6 +1911,7 @@ fn violating_world(
             unreachable!("lowered")
         }
     }
+    check_world_limits(&w, &p.name)?;
     Ok(w)
 }
 

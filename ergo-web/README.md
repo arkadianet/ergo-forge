@@ -416,9 +416,9 @@ this envelope. Panics never reach the client. An `invalid_input` message for a
 bad tree carries the parser's reason (offset, opcode): it describes the
 caller's own bytes, not server state, and is the useful part of the reply.
 
-Limits: request bodies capped at 1 MiB (a model-swept suite is ~100 KB); test suites are capped at 128 cases; public Compose requests are capped at 128 generated cases, 64 boxes per shape, 64 keys per path, and 128 parameter values. At most 64 engine requests (all engine routes, one shared semaphore) in flight, with the rest queued. The
-limit is scoped to the engine routes so the health check and the static UI
-stay answerable while the engine is saturated; it also bounds the number of
+Limits: request bodies capped at 1 MiB (a model-swept suite is ~100 KB); test suites are capped at 128 cases; public Compose requests are capped at 128 generated cases, 64 boxes per shape, 64 keys per path, and 128 parameter values/referenced names. At most 64 blocking jobs submitted through `EngineBudget::run` (one shared semaphore) are in flight, with the rest queued. The budget covers blocking engine work; `/api/v1/lookup` does not acquire this semaphore. The
+health check and the static UI stay answerable while blocking engine work is
+saturated; it also bounds the number of
 large-stack threads alive at once. Per-IP rate
 limiting is deliberately left to the reverse proxy.
 
