@@ -81,6 +81,10 @@ fn assert_rows(body: &Value) {
     }
     assert_eq!(body["method"], "static-analysis");
     assert_eq!(body["nodeValidated"], false);
+    assert!(body["coverage"]["rows"]
+        .as_array()
+        .is_some_and(|rows| !rows.is_empty()));
+    assert!(body["flow"]["flows"].is_array());
 }
 
 #[tokio::test]
@@ -175,7 +179,9 @@ async fn checklist_never_emits_a_score() {
                             "passedcount",
                             "countofpassed",
                             "ranking",
-                            "coverage"
+                            "share",
+                            "weight",
+                            "rate"
                         ]
                         .iter()
                         .any(|word| key.contains(word)),

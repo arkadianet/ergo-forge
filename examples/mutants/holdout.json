@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "namespace": "holdout",
+  "version": 1,
+  "method": "bounded-scenario-sampling",
+  "authority": "preflight",
+  "nodeValidated": false,
+  "catalogueClaim": "none — these pairs are discrimination material for the spend hunt's attackability axis. They add no S00 vector row and assert no defect in any contract they contain.",
+  "note": "A HOLDOUT is a set the instrument is measured on and was not built from. This namespace is not that yet, and the manifest says so in every row. Each `expectedVerdict` was recorded from the instrument's own output on 2026-09-26, by an author with the instrument in front of them, in the same change. A recorded expectation that reproduces is therefore SELF-CONSISTENCY, not a discovery: the harness reports it under `selfConsistency` and reports the discovery denominator separately. Nothing here is node-validated, nothing is an accepted execution, and no verdict is a property violation. A miss is never safe: `notUnderProbes` and `requiresProof` say only that these probes produced no pass and no residual respectively.",
+  "independence": {
+    "rule": "An item may enter the discovery denominator only when its `authoring` is `independent` AND the measured corpus scan finds neither a verbatim file nor a shared clause in the visible corpus. The eligible denominator is DERIVED from those two facts by the harness; this text states the rule and asserts nothing about the outcome.",
+    "authoringValues": {
+      "independent": "authored by someone with no access to the instrument's output for this namespace",
+      "instrument-visible": "authored with the instrument's output in hand — reproduces expectations, earns no discovery credit"
+    }
+  },
+  "caps": {
+    "height": 1500000,
+    "network": "testnet",
+    "treeVersion": 3,
+    "maxProbes": 12,
+    "maxBoxesPerCollection": 16,
+    "blockCostLimit": 8001091,
+    "probeSet": ["spend", "registers-absent", "minimum-output-value", "cost-limit"],
+    "selfBoxDefault": "none — the instrument's synthetic SELF (no registers, value 0), declared per item where a real box is supplied"
+  },
+  "shadowPolicy": {
+    "expectedProbeCount": 12,
+    "requirePairedOutputShapes": true,
+    "requireProbeLabels": true,
+    "maxText": 512
+  },
+  "exposureScan": {
+    "roots": ["examples/contracts", "examples/tests", "examples/mutants"],
+    "excluded": ["examples/mutants/holdout", "examples/mutants/holdout.json"],
+    "extensions": [".es", ".json"],
+    "maxFiles": 4096,
+    "maxBytes": 16777216,
+    "minClauseChars": 32
+  },
+  "pairs": [
+    {
+      "id": "H01-v1",
+      "class": "unbound-successor-script",
+      "operator": "delete-clause",
+      "controlPath": "examples/mutants/holdout/v1/h01-successor-binding-control.es",
+      "counterexamplePath": "examples/mutants/holdout/v1/h01-successor-binding-counterexample.es",
+      "diff": { "find": "next.propositionBytes == SELF.propositionBytes && ", "replace": "" },
+      "basis": "The successor's propositionBytes equality is the only clause the attacker's pay-back sample fails: the pay-back carries SELF's value and tokens under its own script. Deleting it leaves a value floor the sample satisfies, so the pair separates on this instrument and the separation is attributable to the deleted clause.",
+      "catalogueVector": null
+    },
+    {
+      "id": "H02-v1",
+      "class": "successor-preservation-without-key",
+      "operator": "delete-clause",
+      "controlPath": "examples/mutants/holdout/v1/h02-key-guard-control.es",
+      "counterexamplePath": "examples/mutants/holdout/v1/h02-key-guard-counterexample.es",
+      "diff": { "find": "PK(\"3WwbzW6u8hKWBcL1W7kNVMr25s2UHfSBnYtwSHvrRQt7DdPuoXrt\") && ", "replace": "" },
+      "basis": "With the key the record's only evidence is a residual proposition; without it the preserve sample passes. The pair separates, and the difference is the key requirement — not a claim that a keyless preservation step is a defect. Whether it is intended is the author's claim, which this namespace does not make.",
+      "catalogueVector": null,
+      "instrumentLimit": "The counterexample retains `OUTPUTS.size == 1`, and this instrument cannot see it: every probe builds exactly one output, so the clause is inert under these probes. The harness measures that inertness rather than leaving it as a claim."
+    },
+    {
+      "id": "H03-v1",
+      "class": "unconditional-successor-preservation",
+      "operator": "delete-clause",
+      "controlPath": "examples/mutants/holdout/v1/h03-time-lock-control.es",
+      "counterexamplePath": "examples/mutants/holdout/v1/h03-time-lock-counterexample.es",
+      "diff": { "find": "HEIGHT > 2999999 && ", "replace": "" },
+      "basis": "The height bound is the only clause the preserve sample fails: it is beyond every sampled height, so the control's evidence is 'no probe passed and no residual observed'. Deleting it leaves the successor binding, which the preserve sample satisfies. The control's `notUnderProbes` is a statement about these probes, never a safety claim.",
+      "catalogueVector": null
+    },
+    {
+      "id": "H04-v1",
+      "class": "unbound-successor-script-with-reserve-carried",
+      "operator": "delete-clause",
+      "controlPath": "examples/mutants/holdout/v1/h04-successor-token-floor-control.es",
+      "counterexamplePath": "examples/mutants/holdout/v1/h04-successor-token-floor-counterexample.es",
+      "diff": { "find": "next.propositionBytes == SELF.propositionBytes && ", "replace": "" },
+      "basis": "The token-amount floor is satisfied by both samples, so the pair separates on the successor's propositionBytes equality and not on the floor: the floor's presence must not hide the separation. A declared self box supplies the token — see `instrumentLimit`.",
+      "catalogueVector": null,
+      "instrumentLimit": "Both items run against a caller-supplied SELF carrying one token. Under the instrument's synthetic SELF (no tokens) the same counterexample reports `notUnderProbes`, because `tokens(0)` throws. The self box is therefore part of the measurement, not decoration, and is declared per item."
+    }
+  ],
+  "items": [
+    {
+      "id": "H01-v1-control",
+      "pair": "H01-v1",
+      "role": "control",
+      "path": "examples/mutants/holdout/v1/h01-successor-binding-control.es",
+      "sha256": "9bfaf126db9056497ce47c660e93e5e3278c5377a616754557d52f01e7c750e9",
+      "treeSha256": "0d4cedd4ea0cde985f2799386622ef7723d5d285e98406ec93ce85909b6b4f12",
+      "selfBox": null,
+      "expectedVerdict": "movableByAnyone",
+      "expectedBasis": "The preserve sample copies SELF's script and value, so the successor's script binding and value floor both hold; the attacker's own script fails the propositionBytes equality. One preserve sample passed and no attacker sample did.",
+      "authoring": "instrument-visible"
+    },
+    {
+      "id": "H01-v1-counterexample",
+      "pair": "H01-v1",
+      "role": "counterexample",
+      "path": "examples/mutants/holdout/v1/h01-successor-binding-counterexample.es",
+      "sha256": "b3fa7c2c541a87a88939d10b68af1765fd62343dbdfef496e569d89bbdc3b72f",
+      "treeSha256": "ed57d30b4d168a657c33363f0dc1cbb229e8e3f94359d970081af342ff9c6c2c",
+      "selfBox": null,
+      "expectedVerdict": "spendableByAnyone",
+      "expectedBasis": "Only the value floor remains, and the attacker's pay-back sample carries SELF's own value, so a probe passed with no proof. SELF is synthetic (no registers, value 0), so the floor is trivially satisfied and this says nothing about a funded box.",
+      "authoring": "instrument-visible"
+    },
+    {
+      "id": "H02-v1-control",
+      "pair": "H02-v1",
+      "role": "control",
+      "path": "examples/mutants/holdout/v1/h02-key-guard-control.es",
+      "sha256": "9ada2de052df3fdfa57f3e05b6aeeac92ba1a2a5203db82bcdbf9b6f45637f1c",
+      "treeSha256": "fae5539c327645128d9a10c5250db310331362630c1fee48032da19ea48d6a32",
+      "selfBox": null,
+      "expectedVerdict": "requiresProof",
+      "expectedBasis": "The key is required, so no sample passes and the record's evidence is a residual `ProveDlog` proposition. `requiresProof` is neither safe nor vulnerable: it says only that these probes reduced to a proof requirement.",
+      "authoring": "instrument-visible"
+    },
+    {
+      "id": "H02-v1-counterexample",
+      "pair": "H02-v1",
+      "role": "counterexample",
+      "path": "examples/mutants/holdout/v1/h02-key-guard-counterexample.es",
+      "sha256": "c986e9e53b23a0c9f5a03d48a9bcbb908bcfcfa655d99d83939085a1dbab4b7d",
+      "treeSha256": "628e03dbc09580b83ed8c09bc018a9c6375e7f437f0e3d8b3e49069e1f5e334b",
+      "selfBox": null,
+      "expectedVerdict": "movableByAnyone",
+      "expectedBasis": "The successor binding alone holds for the preserve sample. The counterexample is the same binding without a key, so the record reports a keyless preservation step and no loss.",
+      "authoring": "instrument-visible"
+    },
+    {
+      "id": "H03-v1-control",
+      "pair": "H03-v1",
+      "role": "control",
+      "path": "examples/mutants/holdout/v1/h03-time-lock-control.es",
+      "sha256": "3eccc290bb0adb42c71bd3438918eba2f0f7f264e32689a44bd89a821664466f",
+      "treeSha256": "305a1d15982319011b8cafa3fdbf847f31cbfd2e5d46d7351edfe196c69185fa",
+      "selfBox": null,
+      "expectedVerdict": "notUnderProbes",
+      "expectedBasis": "The height bound is beyond every sampled height and the successor binding fails the attacker sample, so no probe passed and no residual was observed. This is explicitly not a safety statement: a contract that is unspendable under twelve synthetic samples has not been shown safe.",
+      "authoring": "instrument-visible"
+    },
+    {
+      "id": "H03-v1-counterexample",
+      "pair": "H03-v1",
+      "role": "counterexample",
+      "path": "examples/mutants/holdout/v1/h03-time-lock-counterexample.es",
+      "sha256": "a2b55c7b1fcb5cfc584c3761505625ba2605d7c804a2a95eb29612c2953bd64f",
+      "treeSha256": "58b3450345f9f2bfa9715a4a189bd23e83c059a80044ee576bd5f2b264a132f1",
+      "selfBox": null,
+      "expectedVerdict": "movableByAnyone",
+      "expectedBasis": "Without the height bound the successor binding is the whole condition, which the preserve sample satisfies. The transition under test is that the release became unconditional.",
+      "authoring": "instrument-visible"
+    },
+    {
+      "id": "H04-v1-control",
+      "pair": "H04-v1",
+      "role": "control",
+      "path": "examples/mutants/holdout/v1/h04-successor-token-floor-control.es",
+      "sha256": "4a72322cb8cdf3bcdb6a69c0d7af912255c1a77e15a8b0beef22ed63866587d8",
+      "treeSha256": "5c8e440c543dff7b8ee510e75c61edddc0620df8b043bbdb6518cc81f6328b6b",
+      "selfBox": {
+        "value": 1000000,
+        "tokens": [
+          {
+            "id": "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099",
+            "amount": 1000000
+          }
+        ]
+      },
+      "expectedVerdict": "movableByAnyone",
+      "expectedBasis": "With a supplied SELF carrying one token, the successor's token-amount floor holds for the preserve sample (which copies SELF's tokens) and the attacker's own script still fails the propositionBytes equality.",
+      "authoring": "instrument-visible"
+    },
+    {
+      "id": "H04-v1-counterexample",
+      "pair": "H04-v1",
+      "role": "counterexample",
+      "path": "examples/mutants/holdout/v1/h04-successor-token-floor-counterexample.es",
+      "sha256": "5f8ef0744d32d68374dcd6287ffdfdc6c93c32c374e5c2b42c996f791a4a897b",
+      "treeSha256": "e7669dd68bd60b43a07c3918426a4d0623fa2a4b970dc1433d005ede90b2cea8",
+      "selfBox": {
+        "value": 1000000,
+        "tokens": [
+          {
+            "id": "804a66426283b8281240df8f9de783651986f20ad6391a71b26b9e7d6faad099",
+            "amount": 1000000
+          }
+        ]
+      },
+      "expectedVerdict": "spendableByAnyone",
+      "expectedBasis": "The token-amount floor alone is satisfied by the attacker's pay-back sample, which carries SELF's tokens, so a probe passed with no proof. Under the instrument's synthetic SELF the same contract reports `notUnderProbes` because `tokens(0)` throws — which is why the self box is declared rather than defaulted.",
+      "authoring": "instrument-visible"
+    }
+  ]
+}

@@ -27,7 +27,11 @@ use crate::SandboxError;
 /// One adversarial edit applied to a drafted transaction. Operations are pure
 /// and deterministic: each rewrites the request, and the sequence is applied in
 /// order before the transaction is evaluated once.
-#[derive(Debug, Clone, Deserialize)]
+///
+/// `Serialize` is for the experiment record: a search that proposes these
+/// operations echoes the exact sequence it ran, and the same JSON is accepted
+/// back as a request.
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "op", rename_all = "camelCase")]
 pub enum AttackOp {
     /// Reorder the transaction inputs by a permutation of their current
@@ -97,6 +101,30 @@ pub struct AttackResult {
     pub diff: Vec<InputDiff>,
 }
 
+/// Align two drafts' per-input verdicts by box id: the entries both drafts
+/// carry, with each one's verdict and whether it changed. A diff is only
+/// meaningful for a box present in both, so an input the operations added or
+/// removed is absent rather than compared against nothing.
+pub(crate) fn diff_inputs(before: &PlayResult, after: &PlayResult) -> Vec<InputDiff> {
+    let before_by_id: BTreeMap<&str, &str> = before
+        .inputs
+        .iter()
+        .map(|r| (r.box_id.as_str(), r.verdict))
+        .collect();
+    after
+        .inputs
+        .iter()
+        .filter_map(|r| {
+            before_by_id.get(r.box_id.as_str()).map(|b| InputDiff {
+                box_id: r.box_id.clone(),
+                before: (*b).to_string(),
+                after: r.verdict.to_string(),
+                changed: *b != r.verdict,
+            })
+        })
+        .collect()
+}
+
 /// Apply the operations to the draft and evaluate the result, diffing each
 /// input's verdict against the un-mutated draft.
 pub fn apply_attack(req: &AttackRequest) -> Result<AttackResult, SandboxError> {
@@ -108,30 +136,10 @@ pub fn apply_attack(req: &AttackRequest) -> Result<AttackResult, SandboxError> {
     }
     let result = apply(&mutated)?;
 
-    // Align by box id: a diff is only meaningful for inputs present in both
-    // drafts at the same identity.
-    let before_by_id: BTreeMap<&str, &str> = before
-        .inputs
-        .iter()
-        .map(|r| (r.box_id.as_str(), r.verdict))
-        .collect();
-    let diff = result
-        .inputs
-        .iter()
-        .filter_map(|r| {
-            before_by_id.get(r.box_id.as_str()).map(|b| InputDiff {
-                box_id: r.box_id.clone(),
-                before: (*b).to_string(),
-                after: r.verdict.to_string(),
-                changed: *b != r.verdict,
-            })
-        })
-        .collect();
-
     Ok(AttackResult {
+        diff: diff_inputs(&before, &result),
         result,
         applied: req.operations.len(),
-        diff,
     })
 }
 
@@ -153,7 +161,13 @@ fn permute<T: Clone>(items: &[T], order: &[usize], what: &str) -> Result<Vec<T>,
         .collect()
 }
 
-fn apply_op(req: &mut PlayRequest, op: &AttackOp) -> Result<(), SandboxError> {
+/// Apply one operation to the draft, refusing what the draft cannot accept
+/// (an index past the input list, an order that is not a permutation, a token
+/// slot no box could carry). A refusal is an `Err` for the caller to classify,
+/// never a silent no-op: the adversary search proposes operations without
+/// knowing which ones the draft accepts, and must tell a refused operation from
+/// one that applied.
+pub(crate) fn apply_op(req: &mut PlayRequest, op: &AttackOp) -> Result<(), SandboxError> {
     match op {
         AttackOp::ReorderInputs { order } => {
             req.tx.inputs = permute(&req.tx.inputs, order, "reorderInputs")?;
@@ -422,6 +436,11 @@ fn insert_decoy(
     Ok(())
 }
 
+/// `sigmaProp(true)`, hex: the spender's own script, valid in every network
+/// and version. Used for a decoy's script and as the sink a carried-forward
+/// step returns its value through, so the two never drift apart.
+pub(crate) const ANYONE_TREE: &str = "10010101d17300";
+
 /// Token slots a decoy always carries, even when the lift did not recognise a
 /// `tokens(i)` access — enough to cover the small indices scripts read.
 const DEFAULT_TOKEN_SLOTS: usize = 4;
@@ -463,7 +482,7 @@ fn build_decoy(shape: &SlotShape, at_index: usize) -> ScenarioBox {
         .collect();
     // A trivially satisfiable script so the decoy is spendable in the draft;
     // the point of the experiment is the *other* inputs' scripts.
-    let anyone = "10010101d17300".to_string();
+    let anyone = ANYONE_TREE.to_string();
     ScenarioBox {
         value: 1_000_000,
         ergo_tree: Some(anyone),
@@ -498,7 +517,7 @@ fn swap_data_input(req: &mut PlayRequest, index: usize) -> Result<(), SandboxErr
 /// The most tokens one box may carry: the wire format's cap. Both attacker
 /// experiment bounds hang off it — shifts prepend to a box, and a decoy
 /// carries one junk token per positional slot the script reads.
-const MAX_BOX_TOKENS: usize = 255;
+pub(crate) const MAX_BOX_TOKENS: usize = 255;
 
 fn shift_token_indices(req: &mut PlayRequest, input: usize, by: usize) -> Result<(), SandboxError> {
     if by > MAX_BOX_TOKENS {

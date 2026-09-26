@@ -9,7 +9,7 @@
 //! with the caller: the request carries the boxes, the response the new
 //! ones. Nothing here touches a network.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use serde::{Deserialize, Serialize};
 
@@ -17,7 +17,10 @@ use crate::prove::{PartySpec, SecretSpec};
 use crate::scenario::{ScenarioBox, TypedValue};
 use crate::{eval_scenario, SandboxError, Scenario, Verdict};
 
-#[derive(Debug, Clone, Deserialize)]
+/// A drafted transaction. `Serialize` is for the experiment record only: a
+/// draft is hashed into a replay fingerprint, never echoed into a result body
+/// with its secrets in it.
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlayRequest {
     pub height: u32,
@@ -28,7 +31,7 @@ pub struct PlayRequest {
     pub network: Option<String>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlayTx {
     pub inputs: Vec<PlayInput>,
@@ -38,7 +41,7 @@ pub struct PlayTx {
     pub outputs: Vec<ScenarioBox>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlayInput {
     pub box_id: String,
@@ -243,13 +246,15 @@ pub fn apply(req: &PlayRequest) -> Result<PlayResult, SandboxError> {
 
     // Conservation.
     let mut problems = Vec::new();
-    let erg_in: u64 = inputs.iter().map(|b| b.value.max(0) as u64).sum();
-    let erg_out: u64 = outputs.iter().map(|b| b.value.max(0) as u64).sum();
-    if erg_in != erg_out {
+    let erg_in_total: u128 = inputs.iter().map(|b| b.value.max(0) as u128).sum();
+    let erg_out_total: u128 = outputs.iter().map(|b| b.value.max(0) as u128).sum();
+    if erg_in_total != erg_out_total {
         problems.push(format!(
-            "ERG not conserved: inputs {erg_in}, outputs {erg_out}"
+            "ERG not conserved: inputs {erg_in_total}, outputs {erg_out_total}"
         ));
     }
+    let erg_in = erg_in_total.min(u64::MAX as u128) as u64;
+    let erg_out = erg_out_total.min(u64::MAX as u128) as u64;
     let mut tin: BTreeMap<String, u128> = BTreeMap::new();
     let mut tout: BTreeMap<String, u128> = BTreeMap::new();
     for b in inputs {
@@ -287,4 +292,144 @@ pub fn apply(req: &PlayRequest) -> Result<PlayResult, SandboxError> {
         erg_in,
         erg_out,
     })
+}
+
+// ── Carrying a step forward ─────────────────────────────────────────────────
+
+/// What a following step can be drafted from, and what the box cap cost.
+pub(crate) struct NextStep {
+    /// The draft: the carried boxes, the transaction that spends them, and the
+    /// height one above the step that produced them.
+    pub request: PlayRequest,
+    /// Boxes available before the cap.
+    pub available: usize,
+    /// Boxes carried after the cap.
+    pub carried: usize,
+    /// Current input box id → the fresh id of its recreated output. This is a
+    /// positional experiment lineage, not a chain identity or a proof that the
+    /// two boxes are the same UTXO.
+    pub lineage: BTreeMap<String, String>,
+}
+
+/// The draft for the step *after* an applied transaction: the boxes that
+/// transaction produced, plus the boxes it left unspent, capped at `max_boxes`
+/// and spent together. Each carried box is recreated as an output with the
+/// same script, value, tokens and registers, so the next step runs against the
+/// same contract shape rather than a synthetic `sigmaProp(true)` sink.
+///
+/// This is what makes a multi-step experiment possible: the next step's script
+/// runs on boxes the previous step produced, so a sequence can work a position
+/// over several moves. Recreated outputs receive fresh Play ids and heights;
+/// they are still the same declared contract shape, not a new protocol state.
+///
+/// `None` when the transaction left nothing spendable: it produced no output,
+/// or every box it left has no id to spend by. The cap keeps outputs first and
+/// then the remaining unspent boxes in their declared order; a data input the
+/// cap dropped is dropped from the transaction too rather than left dangling.
+/// A carried input brings no secrets and no context variables: the next step is
+/// the spender's own transaction, and a script that needed a key will ask for
+/// one again over there.
+pub(crate) fn next_step_draft(
+    req: &PlayRequest,
+    result: &PlayResult,
+    max_boxes: usize,
+) -> Result<Option<NextStep>, SandboxError> {
+    if result.outputs.is_empty() {
+        return Ok(None);
+    }
+    let spent: BTreeSet<String> = req
+        .tx
+        .inputs
+        .iter()
+        .map(|i| i.box_id.to_lowercase())
+        .collect();
+    let mut seen: BTreeSet<String> = BTreeSet::new();
+    let mut boxes: Vec<ScenarioBox> = Vec::new();
+    let mut available = 0usize;
+    // Outputs lead so the cap keeps the material this step just created.
+    for o in &result.outputs {
+        if let Some(id) = o.box_id.as_deref() {
+            if seen.insert(id.to_lowercase()) {
+                available += 1;
+                boxes.push(o.clone());
+            }
+        }
+    }
+    for b in req.boxes.iter().filter(|b| {
+        b.box_id
+            .as_deref()
+            .is_some_and(|id| !spent.contains(&id.to_lowercase()))
+    }) {
+        if let Some(id) = b.box_id.as_deref() {
+            if seen.insert(id.to_lowercase()) {
+                available += 1;
+                boxes.push(b.clone());
+            }
+        }
+    }
+    boxes.truncate(max_boxes.max(1));
+    if boxes.is_empty() {
+        return Ok(None);
+    }
+    let carried = boxes.len();
+
+    // Recreate each carried box as an output with a fresh identity. This keeps
+    // the next step's scripts and reserves meaningful while conserving value
+    // and tokens exactly, without minting a universal pass-through box.
+    let outputs: Vec<ScenarioBox> = boxes
+        .iter()
+        .map(|b| {
+            let mut output = b.clone();
+            output.box_id = None;
+            output.creation_height = 0;
+            output
+        })
+        .collect();
+
+    let carried_ids: BTreeSet<String> = boxes
+        .iter()
+        .map(|b| b.box_id.clone().unwrap_or_default().to_lowercase())
+        .collect();
+    let inputs: Vec<PlayInput> = boxes
+        .iter()
+        .map(|b| PlayInput {
+            box_id: b.box_id.clone().unwrap_or_default(),
+            context_vars: Default::default(),
+            secrets: Vec::new(),
+            parties: Vec::new(),
+        })
+        .collect();
+    let data_inputs: Vec<String> = req
+        .tx
+        .data_inputs
+        .iter()
+        .filter(|id| carried_ids.contains(&id.to_lowercase()))
+        .cloned()
+        .collect();
+    let parent_ids: Vec<String> = req
+        .tx
+        .inputs
+        .iter()
+        .map(|input| input.box_id.to_lowercase())
+        .collect();
+    let child_ids: Vec<String> = boxes
+        .iter()
+        .filter_map(|box_| box_.box_id.as_ref().map(|id| id.to_lowercase()))
+        .collect();
+    let lineage: BTreeMap<String, String> = parent_ids.into_iter().zip(child_ids).collect();
+    Ok(Some(NextStep {
+        request: PlayRequest {
+            height: req.height.saturating_add(1),
+            boxes,
+            tx: PlayTx {
+                inputs,
+                data_inputs,
+                outputs,
+            },
+            network: req.network.clone(),
+        },
+        available,
+        carried,
+        lineage,
+    }))
 }

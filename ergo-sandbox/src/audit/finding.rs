@@ -82,6 +82,15 @@ impl Serialize for Finding {
     }
 }
 
+/// Cap one rendered snippet at [`SNIPPET_MAX`] characters.
+#[must_use]
+pub fn bounded(mut s: String) -> String {
+    if s.chars().count() > SNIPPET_MAX {
+        s = s.chars().take(SNIPPET_MAX - 1).collect::<String>() + "…";
+    }
+    s
+}
+
 /// Render `n` as a one-line snippet, collapsed and length-capped.
 #[must_use]
 pub fn snippet(n: &Node) -> String {
@@ -89,8 +98,5 @@ pub fn snippet(n: &Node) -> String {
     if s.contains('\n') {
         s = s.split_whitespace().collect::<Vec<_>>().join(" ");
     }
-    if s.chars().count() > SNIPPET_MAX {
-        s = s.chars().take(SNIPPET_MAX - 1).collect::<String>() + "…";
-    }
-    s
+    bounded(s)
 }

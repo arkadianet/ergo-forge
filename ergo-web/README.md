@@ -323,6 +323,37 @@ back with `boxId` and `creationHeight` set, ready to be the next `boxes`.
 `ok` is true only when every input passed (or its proof was accepted) and
 nothing is unbalanced; nothing is applied server-side.
 
+### `POST /api/v2/adversary`
+
+Bounded, seeded multi-step search over a Play draft. The request is the Play
+shape plus `options`:
+
+```json
+{
+  "height": 1000,
+  "boxes": [],
+  "tx": {"inputs": [], "dataInputs": [], "outputs": []},
+  "options": {"seed":"review-1","maxDepth":2,"maxProbes":32,"maxOpsPerStep":3,"maxUnspent":24}
+}
+```
+
+The search reuses the adversarial operation algebra, carries outputs into the
+next step, and delta-debugs the first verdict change. The response records
+caps, truncation, rejections, notes, a trace fingerprint and a synthetic
+`nodeValidated: false` claim. `NoFlipUnderProbes` means only that this seed and
+these caps found nothing; it is not a safety result. The route runs behind the
+shared engine budget.
+
+### `POST /api/v1/checklist` coverage and flow fields
+
+Checklist responses also include `coverage` (instrument availability, never a
+score or percentage) and `flow` (bounded spender-controlled source-to-sink
+review obligations). `coverage.availability` is `ran`, `partial`,
+`not-registered` or `not-static`: `ran` means the registered lint executed over
+the recovered tree, not that its own bound covered every construct, and a name
+outside the audit registry is never reported as having run. A bound or a
+missing flow is reported as unknown, not as evidence of safety.
+
 ### `POST /api/v1/point`
 
 `{secret, base?}` → `{point, generator, address?, testnetAddress?}`: the public point of a 32-byte

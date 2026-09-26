@@ -41,6 +41,7 @@
 //! assert!(outcome.cost > 0);
 //! ```
 
+pub mod adversary;
 pub mod attack;
 pub mod audit;
 pub mod avl;
@@ -71,6 +72,7 @@ pub mod prove;
 pub mod recognize;
 pub mod rent;
 pub mod scenario;
+pub mod shadow_model;
 pub mod source_positions;
 pub mod testsuite;
 pub mod tree;
@@ -78,6 +80,7 @@ pub mod txcheck;
 pub mod verify;
 pub mod watch;
 
+pub use adversary::{search as adversary_search, SearchReport, SearchRequest};
 pub use audit::{Finding, Severity};
 pub use compile::{compile_source, compile_source_raw, CompileOutput};
 pub use decompile::{lift_tree, Lifted, Node, NodeKind};

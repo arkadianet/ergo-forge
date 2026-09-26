@@ -198,7 +198,7 @@ fn every_vector_has_examples_or_is_marked_manual() {
 fn every_named_instrument_exists() {
     // Read the production registry rather than keeping a second list of lint IDs.
     let registry = include_str!("../src/audit/mod.rs")
-        .split("const LINTS:")
+        .split("pub const LINTS:")
         .nth(1)
         .unwrap()
         .split("= &[")
@@ -208,22 +208,34 @@ fn every_named_instrument_exists() {
         .next()
         .unwrap();
     let mut lint_ids = BTreeSet::new();
-    for line in registry.lines() {
-        if let Some(name) = line.trim().strip_prefix("lints::") {
-            let name = name.trim_end_matches(',');
-            let source = std::fs::read_to_string(
-                root().join(format!("ergo-sandbox/src/audit/lints/{name}.rs")),
-            )
+    // `Lint::new("<id>", lints::<module>)`, however rustfmt wraps the entry.
+    for entry in registry
+        .split("Lint::new(")
+        .skip(1)
+        .map(|entry| entry.split(')').next().unwrap())
+    {
+        let id = entry.split('"').nth(1).expect("registry entry names an id");
+        let module = entry
+            .split("lints::")
+            .nth(1)
+            .expect("registry entry names a pass")
+            .trim()
+            .trim_end_matches(',');
+        // The id the registry advertises must be the id the pass stamps on its
+        // own findings, so availability cannot be reported under another name.
+        let source = std::fs::read_to_string(
+            root().join(format!("ergo-sandbox/src/audit/lints/{module}.rs")),
+        )
+        .unwrap();
+        let emitted = source
+            .split("lint: \"")
+            .nth(1)
+            .unwrap()
+            .split('"')
+            .next()
             .unwrap();
-            let id = source
-                .split("lint: \"")
-                .nth(1)
-                .unwrap()
-                .split('"')
-                .next()
-                .unwrap();
-            lint_ids.insert(id.to_owned());
-        }
+        assert_eq!(emitted, id, "registry id and finding id differ");
+        assert!(lint_ids.insert(id.to_owned()), "duplicate registry id {id}");
     }
     assert!(!lint_ids.is_empty());
     for row in catalogue()["vectors"].as_array().unwrap() {

@@ -56,6 +56,9 @@ fn main() -> ExitCode {
         "test" => cmd_test(rest),
         "validate-tx" => cmd_validate_tx(rest),
         "drain" => cmd_drain(rest),
+        "adversary" => cmd_adversary(rest),
+        "property-template" => cmd_property_template(rest),
+        "shadow-check" => cmd_shadow_check(rest),
         "compose" => cmd_compose(rest),
         "point" => cmd_point(rest),
         "help" | "--help" | "-h" => {
@@ -169,21 +172,34 @@ USAGE:
       Sample spending without a key; full node validation has not run. Six probes (three
       heights x attacker/preserve output) on the consensus reducer.
       --mainnet tallies the corpus; hits go to stderr for hand checks.
-  ergo-es map <seed> [--depth N] [--max-nodes N] [--json]
-             [--source fixture.json | --explorer URL] [--tx | --address]
-      Protocol map: from one NFT, address or transaction, the whole contract
-      set and how each contract identifies the others. Edges are typed
-      (nft / script-hash / self-successor / positional / data-input) and
-      set-level findings name the box at risk. --source replays a recorded
-      fixture offline; without it the live explorer is used.
-  ergo-es drain <request.json> [--json]
-      Drain hunt, phase 1: can a transaction that holds no key extract value
-      from the protected boxes, over the shapes an attacker can build? The
-      request labels every input (protected / companion / attacker /
-      external), fixes the transaction shape, and names the protocol's
-      singleton NFTs. Probes permute the inputs and substitute a generic
-      decoy family; hits carry a reproducible witness. --json prints the
-      full report with the witness bundle.
+   ergo-es map <seed> [--depth N] [--max-nodes N] [--json]
+              [--source fixture.json | --explorer URL] [--tx | --address]
+       Protocol map: from one NFT, address or transaction, the whole contract
+       set and how each contract identifies the others. Edges are typed
+       (nft / script-hash / self-successor / positional / data-input) and
+       set-level findings name the box at risk. --source replays a recorded
+       fixture offline; without it the live explorer is used.
+   ergo-es drain <request.json> [--json]
+       Drain hunt, phase 1: can a transaction that holds no key extract value
+       from the protected boxes, over the shapes an attacker can build? The
+       request labels every input (protected / companion / attacker /
+       external), fixes the transaction shape, and names the protocol's
+       singleton NFTs. Probes permute the inputs and substitute a generic
+       decoy family; hits carry a reproducible witness. --json prints the
+       full report with the witness bundle.
+   ergo-es adversary <request.json> [--json]
+       Bounded seeded search over multi-step Play drafts. Reuses the attack
+       operation algebra, carries outputs forward, shrinks the first verdict
+       change, and records every cap. Synthetic: node validation has not run.
+   ergo-es property-template <template.json> [--json]
+       Expand a property-template:v1 document and re-check the result through
+       the existing author-property:v1 declaration parser.
+   ergo-es shadow-check <record.json> [--policy policy.json] [--json]
+       Check bookkeeping consistency of a recorded probe result. This is not
+       a second reducer and cannot report node acceptance or a property
+       violation.
+
+
 "
     );
 }
@@ -1503,6 +1519,114 @@ fn cmd_drain(args: &[String]) -> Result<(), String> {
             }
         );
         println!("  witness: rerun with --json for the full bundle");
+    }
+    Ok(())
+}
+
+/// `ergo-es adversary <request.json> [--json]`
+fn cmd_adversary(args: &[String]) -> Result<(), String> {
+    use ergo_sandbox::adversary::{search, SearchRequest, SearchVerdict};
+
+    let path = args
+        .iter()
+        .find(|a| !a.starts_with("--"))
+        .ok_or("adversary needs a request JSON path")?;
+    let text = read_input(path)?;
+    let request: SearchRequest = serde_json::from_str(&text).map_err(|e| format!("{path}: {e}"))?;
+    let report = ergo_sandbox::decompile::with_large_stack(move || search(&request))
+        .map_err(|e| e.to_string())?;
+    if args.iter().any(|a| a == "--json") {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
+        );
+        return Ok(());
+    }
+    let verdict = match report.verdict {
+        SearchVerdict::Flipped => "verdict changed",
+        SearchVerdict::NoFlipUnderProbes => "not under probes",
+    };
+    println!("adversary: {verdict} (synthetic; node validation has not run)");
+    println!(
+        "  seed: {}, depth: {}, probes: {}, truncated: {}",
+        report.caps.seed, report.depth_reached, report.probes, report.truncated
+    );
+    for note in &report.notes {
+        println!("  note: {note}");
+    }
+    if let Some(best) = &report.best {
+        println!(
+            "  hit: step {} depth {} ({} op(s) after shrink)",
+            best.step,
+            best.depth,
+            best.minimal_ops.len()
+        );
+    }
+    Ok(())
+}
+
+/// `ergo-es property-template <template.json> [--json]`
+fn cmd_property_template(args: &[String]) -> Result<(), String> {
+    use ergo_sandbox::properties::template::Template;
+
+    let path = args
+        .iter()
+        .find(|a| !a.starts_with("--"))
+        .ok_or("property-template needs a template JSON path")?;
+    let text = read_input(path)?;
+    let template = Template::parse(&text).map_err(|e| e.to_string())?;
+    let declaration = template.declaration().map_err(|e| e.to_string())?;
+    let expanded = template.expand().map_err(|e| e.to_string())?;
+    if args.iter().any(|a| a == "--json") {
+        let value = serde_json::json!({
+            "schemaVersion": "property-template-expanded:v1",
+            "name": template.name(),
+            "digest": declaration.digest(),
+            "declaration": serde_json::from_str::<serde_json::Value>(&expanded)
+                .map_err(|e| e.to_string())?,
+        });
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&value).map_err(|e| e.to_string())?
+        );
+    } else {
+        println!("template: {}", template.name());
+        println!("declaration digest: {}", declaration.digest());
+        println!("{expanded}");
+    }
+    Ok(())
+}
+
+/// `ergo-es shadow-check <record.json> [--policy policy.json] [--json]`
+fn cmd_shadow_check(args: &[String]) -> Result<(), String> {
+    use ergo_sandbox::shadow_model::{RecordedEval, ShadowModel, ShadowPolicy};
+
+    let path = args
+        .iter()
+        .find(|a| !a.starts_with("--"))
+        .ok_or("shadow-check needs a record JSON path")?;
+    let text = read_input(path)?;
+    let record: RecordedEval = serde_json::from_str(&text).map_err(|e| format!("{path}: {e}"))?;
+    let policy = match flag_value(args, "--policy")? {
+        Some(policy_path) => {
+            let policy_text = read_input(&policy_path)?;
+            serde_json::from_str(&policy_text).map_err(|e| format!("{policy_path}: {e}"))?
+        }
+        None => ShadowPolicy::default(),
+    };
+    let subject = flag_value(args, "--subject")?.unwrap_or_else(|| path.clone());
+    let report = ShadowModel::new(policy).observe(&subject, &record);
+    if args.iter().any(|a| a == "--json") {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
+        );
+    } else {
+        println!("shadow: {:?} (not node validation)", report.signal);
+        for divergence in &report.divergences {
+            println!("  {:?}: {}", divergence.kind, divergence.detail);
+        }
+        println!("  not evaluated: {}", report.not_evaluated.join(", "));
     }
     Ok(())
 }

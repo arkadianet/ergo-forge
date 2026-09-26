@@ -2795,16 +2795,20 @@ impl Iterator for ComboCounter {
 
 /// Lexicographic arrangements of `n` slots, capped at `max`. The first is the
 /// identity (declared order). Deterministic; `truncated` reports a cap hit.
-fn permutations(n: usize, max: usize) -> (Vec<Vec<usize>>, bool) {
+///
+/// `pub(crate)` for the adversary search, which draws its input reorderings
+/// from the same bounded enumeration instead of a second permutation scheme:
+/// one arrangement set, one truncation flag.
+pub(crate) fn permutations(n: usize, max: usize) -> (Vec<Vec<usize>>, bool) {
     if n == 0 {
         return (vec![vec![]], false);
     }
-    let total: u128 = (1..=n as u128).product();
+    let total: Option<u128> = (1..=n as u128).try_fold(1u128, |acc, i| acc.checked_mul(i));
     let mut out = Vec::new();
     let mut cur: Vec<usize> = (0..n).collect();
     loop {
         out.push(cur.clone());
-        if out.len() >= max || out.len() as u128 >= total {
+        if out.len() >= max || total.is_some_and(|total| out.len() as u128 >= total) {
             break;
         }
         // Next lexicographic permutation of `cur`.
@@ -2822,7 +2826,7 @@ fn permutations(n: usize, max: usize) -> (Vec<Vec<usize>>, bool) {
         cur.swap(i - 1, j);
         cur[i..].reverse();
     }
-    let truncated = out.len() < total as usize;
+    let truncated = total.is_none_or(|total| (out.len() as u128) < total);
     (out, truncated)
 }
 
