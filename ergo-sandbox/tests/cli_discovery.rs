@@ -71,3 +71,24 @@ fn the_discovery_commands_emit_bounded_json() {
     assert_eq!(adversary["method"], "adversary-search");
     assert!(adversary["fingerprint"].as_str().is_some());
 }
+
+#[test]
+fn shadow_flags_before_the_record_do_not_become_the_record_path() {
+    let record = temp(
+        "shadow-flags-record",
+        &json!({"method": "hunt", "verdict": "notUnderProbes", "probes": []}),
+    );
+    let policy = temp("shadow-flags-policy", &json!({}));
+    let report = run(&[
+        "shadow-check".into(),
+        "--policy".into(),
+        policy.display().to_string(),
+        "--subject".into(),
+        "flag-order".into(),
+        record.display().to_string(),
+        "--json".into(),
+    ]);
+    assert_eq!(report["subject"], "flag-order");
+    std::fs::remove_file(record).unwrap();
+    std::fs::remove_file(policy).unwrap();
+}

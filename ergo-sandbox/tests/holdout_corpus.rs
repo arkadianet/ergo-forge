@@ -1146,11 +1146,16 @@ fn a_contradictory_record_is_reported_as_divergence() {
             .any(|d| d.kind.wire_name() == "recordTooLarge"),
         "kilobytes of residual text are past the record-size bound, and the record says so"
     );
+    assert!(report.unchecked.contains(&"residual-has-a-probe"));
+    assert_eq!(report.evaluated, vec!["record-size"]);
+    // Detail truncation still applies to an interpretable, in-cap record.
+    verbose.residuals = vec!["P".repeat(model.policy().max_text())];
+    let report = model.observe("long-residual", &verbose);
     let orphan = report
         .divergences
         .iter()
         .find(|d| d.kind.wire_name() == "residualWithoutProbe")
-        .expect("an orphan residual is still reported when its field is enormous");
+        .expect("an in-cap orphan residual is reported");
     assert_eq!(
         orphan.detail.chars().count(),
         MAX_RESIDUAL_TEXT,
@@ -1745,4 +1750,31 @@ fn the_output_count_clause_is_invisible_to_this_instrument() {
          this pair's evidence, and the manifest must then be updated deliberately",
         pair.id
     );
+}
+
+#[test]
+fn an_oversized_record_leaves_relations_and_policy_unchecked() {
+    let policy: ShadowPolicy = serde_json::from_value(serde_json::json!({
+        "expectedProbeCount": 2, "requirePairedOutputShapes": true, "requireProbeLabels": true
+    }))
+    .unwrap();
+    let record: RecordedEval = serde_json::from_value(serde_json::json!({
+        "method": "hunt", "verdict": "spendableByAnyone", "probes": [],
+        "observation": "x".repeat(100_000), "nodeValidated": true
+    }))
+    .unwrap();
+    let report = ShadowModel::new(policy).observe("oversized", &record);
+    assert_eq!(report.signal, Signal::Divergent);
+    assert_eq!(report.evaluated, vec!["record-size"]);
+    assert_eq!(report.divergences.len(), 1);
+    for rule in [
+        "aggregate-supported-by-probes",
+        "token-vocabulary",
+        "no-node-validation",
+        "policy.probe-count",
+        "policy.shape-pairing",
+        "policy.probe-labels",
+    ] {
+        assert!(report.unchecked.contains(&rule), "{report:?}");
+    }
 }

@@ -194,7 +194,7 @@ USAGE:
    ergo-es property-template <template.json> [--json]
        Expand a property-template:v1 document and re-check the result through
        the existing author-property:v1 declaration parser.
-   ergo-es shadow-check <record.json> [--policy policy.json] [--json]
+   ergo-es shadow-check <record.json> [--policy policy.json] [--subject label] [--json]
        Check bookkeeping consistency of a recorded probe result. This is not
        a second reducer and cannot report node acceptance or a property
        violation.
@@ -1597,13 +1597,11 @@ fn cmd_property_template(args: &[String]) -> Result<(), String> {
     Ok(())
 }
 
-/// `ergo-es shadow-check <record.json> [--policy policy.json] [--json]`
+/// `ergo-es shadow-check <record.json> [--policy policy.json] [--subject label] [--json]`
 fn cmd_shadow_check(args: &[String]) -> Result<(), String> {
     use ergo_sandbox::shadow_model::{RecordedEval, ShadowModel, ShadowPolicy};
 
-    let path = args
-        .iter()
-        .find(|a| !a.starts_with("--"))
+    let path = positional_after_flags(args, &["--policy", "--subject"])
         .ok_or("shadow-check needs a record JSON path")?;
     let text = read_input(path)?;
     let record: RecordedEval = serde_json::from_str(&text).map_err(|e| format!("{path}: {e}"))?;

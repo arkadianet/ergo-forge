@@ -523,6 +523,26 @@ impl ShadowModel {
                     record.residuals.len()
                 )),
             );
+            out.unchecked.extend([
+                "aggregate-supported-by-probes",
+                "residual-has-a-probe",
+                "erroring-reads-disclosed",
+                "synthetic-self-erroring-reads",
+                "no-pass-on-exhausted-budget",
+                "token-vocabulary",
+                "provenance-disclosed",
+                "no-node-validation",
+            ]);
+            if self.policy.expected_probe_count.is_some() {
+                out.unchecked.push("policy.probe-count");
+            }
+            if self.policy.require_paired_output_shapes {
+                out.unchecked.push("policy.shape-pairing");
+            }
+            if self.policy.require_probe_labels {
+                out.unchecked.push("policy.probe-labels");
+            }
+            return report(subject, record, out);
         }
         out.ran("token-vocabulary");
         let class_known = AGGREGATE_CLASSES.iter().any(|(c, _)| *c == record.verdict);
@@ -729,31 +749,35 @@ impl ShadowModel {
             }
         }
 
-        let signal = if out.has(DivergenceClass::Violation) {
-            Signal::Divergent
-        } else if out.has(DivergenceClass::Refusal) {
-            Signal::Underdetermined
-        } else {
-            Signal::Consistent
-        };
-        let mut not_evaluated: Vec<&'static str> = NOT_EVALUATED.to_vec();
-        if record.truncated {
-            not_evaluated.push("probe-coverage (the record discloses a truncation)");
-        }
-        ShadowReport {
-            subject: subject.to_string(),
-            method: METHOD,
-            authority: AUTHORITY,
-            node_validated: false,
-            severity_meaning: SEVERITY_MEANING,
-            signal,
-            evaluated: out.evaluated,
-            unchecked: out.unchecked,
-            divergences: out.divergences,
-            not_evaluated,
-            prose_used: false,
-            refusal: refusal(),
-        }
+        report(subject, record, out)
+    }
+}
+
+fn report(subject: &str, record: &RecordedEval, out: Findings) -> ShadowReport {
+    let signal = if out.has(DivergenceClass::Violation) {
+        Signal::Divergent
+    } else if out.has(DivergenceClass::Refusal) {
+        Signal::Underdetermined
+    } else {
+        Signal::Consistent
+    };
+    let mut not_evaluated: Vec<&'static str> = NOT_EVALUATED.to_vec();
+    if record.truncated {
+        not_evaluated.push("probe-coverage (the record discloses a truncation)");
+    }
+    ShadowReport {
+        subject: subject.to_string(),
+        method: METHOD,
+        authority: AUTHORITY,
+        node_validated: false,
+        severity_meaning: SEVERITY_MEANING,
+        signal,
+        evaluated: out.evaluated,
+        unchecked: out.unchecked,
+        divergences: out.divergences,
+        not_evaluated,
+        prose_used: false,
+        refusal: refusal(),
     }
 }
 
