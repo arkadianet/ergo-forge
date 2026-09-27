@@ -7,9 +7,7 @@
 //! `ergo-validation/src/tx/script/mod.rs::validate_scripts` field-for-field;
 //! the difference is only where the inputs come from (JSON, not wire boxes).
 
-use ergo_primitives::reader::VlqReader;
 use ergo_ser::address::{encode_p2s, NetworkPrefix};
-use ergo_ser::ergo_tree::read_ergo_tree;
 use ergo_sigma::evaluator::{reduce_expr_traced_with_cost, EvalBox, ReductionContext, TraceEntry};
 use ergo_sigma::reduce::verify_spending_proof_with_context_and_cost;
 use serde::Serialize;
@@ -154,8 +152,7 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
         }
     };
 
-    let mut r = VlqReader::new(&tree_bytes);
-    let tree = read_ergo_tree(&mut r).map_err(|e| SandboxError::Tree(e.to_string()))?;
+    let tree = crate::inspect::parse_tree_complete(&tree_bytes)?;
 
     // 2. Box collections. SELF is ALWAYS INPUTS(0) — the invariant
     // `CONTEXT.INPUTS(0) == SELF` relies on. An omitted `inputs` list

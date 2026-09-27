@@ -12,6 +12,12 @@ pub async fn test_route(
     State(state): State<std::sync::Arc<AppState>>,
     ApiJson(suite): ApiJson<Suite>,
 ) -> Result<Json<SuiteResult>, ApiError> {
+    if suite.scenarios.len() > crate::app::MAX_PUBLIC_SUITE_CASES {
+        return Err(ApiError::InvalidInput(format!(
+            "suite has more than {} cases",
+            crate::app::MAX_PUBLIC_SUITE_CASES
+        )));
+    }
     let substituted = suite
         .source
         .as_deref()

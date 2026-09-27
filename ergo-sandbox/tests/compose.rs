@@ -5,7 +5,7 @@
 
 use std::collections::BTreeMap;
 
-use ergo_sandbox::compose::{compose, Spec};
+use ergo_sandbox::compose::{compose, validate_public_limits, Spec};
 use ergo_sandbox::testsuite;
 use ergo_sandbox::TypedValue;
 
@@ -20,6 +20,56 @@ fn tv(t: &str, v: serde_json::Value) -> TypedValue {
         r#type: t.into(),
         value: v,
     }
+}
+
+#[test]
+fn public_limits_reject_unbounded_world_shapes() {
+    let input_count = spec(
+        r#"{"paths":[{"name":"count","who":{"anyOne":true},"conditions":[{"inputCount":"n"}]}]}"#,
+    );
+    let mut values = BTreeMap::new();
+    values.insert("n".into(), tv("Int", serde_json::json!(100_000)));
+    let err = validate_public_limits(&input_count, &values).unwrap_err();
+    assert!(err.to_string().contains("public compose limit"), "{err}");
+
+    let paths = (0..129)
+        .map(|i| format!(r#"{{"name":"p{i}","who":{{"anyOf":["k"]}}}}"#))
+        .collect::<Vec<_>>()
+        .join(",");
+    let many_paths = spec(&format!(r#"{{"paths":[{paths}]}}"#));
+    let err = validate_public_limits(&many_paths, &BTreeMap::new()).unwrap_err();
+    assert!(err.to_string().contains("generated cases"), "{err}");
+
+    let unique_paths = (0..64)
+        .map(|i| format!(r#"{{"name":"p{i}","who":{{"anyOf":["a{i}","b{i}","c{i}"]}}}}"#))
+        .collect::<Vec<_>>()
+        .join(",");
+    let too_many_names = spec(&format!(r#"{{"paths":[{unique_paths}]}}"#));
+    let err = validate_public_limits(&too_many_names, &BTreeMap::new()).unwrap_err();
+    assert!(err.to_string().contains("referenced parameters"), "{err}");
+}
+
+#[test]
+fn generated_worlds_cannot_exceed_public_box_limits() {
+    let rules = (0..65)
+        .map(|_| r#"{"box":{"which":"output","index":"any","valueAtLeast":"amount"}}"#)
+        .collect::<Vec<_>>()
+        .join(",");
+    let many_outputs = spec(&format!(
+        r#"{{"paths":[{{"name":"many","who":{{"anyOne":true}},"conditions":[{rules}]}}]}}"#
+    ));
+    let mut values = BTreeMap::new();
+    values.insert("amount".into(), tv("Long", serde_json::json!(1)));
+    let err = compose(&many_outputs, &values).unwrap_err().to_string();
+    assert!(err.contains("outputs may contain at most 64"), "{err}");
+
+    let count = spec(
+        r#"{"paths":[{"name":"count","who":{"anyOne":true},"conditions":[{"inputCount":"n"}]}]}"#,
+    );
+    values.clear();
+    values.insert("n".into(), tv("Int", serde_json::json!(64)));
+    let err = compose(&count, &values).unwrap_err().to_string();
+    assert!(err.contains("inputs may contain at most 64"), "{err}");
 }
 
 #[test]

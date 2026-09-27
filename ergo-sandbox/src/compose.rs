@@ -18,7 +18,7 @@
 //! paths a scenario satisfies), not from the evaluator — so running the
 //! suite checks that the assembled ErgoScript means what the spec says.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use serde::{Deserialize, Serialize};
 
@@ -553,8 +553,9 @@ const NANO: &str = "in nanoERG — 1 ERG = 1,000,000,000 nanoERG.";
 /// Parameters the spec needs, in first-use order, with types.
 fn params_of(spec: &Spec) -> Vec<ParamNeed> {
     let mut out: Vec<ParamNeed> = Vec::new();
+    let mut seen = BTreeSet::new();
     let mut push = |name: &str, tpe: &str, desc: String| {
-        if !out.iter().any(|p| p.name == name) {
+        if seen.insert(name.to_string()) {
             out.push(ParamNeed {
                 name: name.to_string(),
                 type_hint: Some(tpe.to_string()),
@@ -741,6 +742,93 @@ fn validate(spec: &Spec) -> Result<(), ComposeError> {
                 _ => {}
             }
         }
+    }
+    Ok(())
+}
+
+pub const MAX_PUBLIC_COMPOSE_CASES: usize = 128;
+pub const MAX_PUBLIC_COMPOSE_BOXES: usize = 64;
+pub const MAX_PUBLIC_COMPOSE_KEYS: usize = 64;
+pub const MAX_PUBLIC_COMPOSE_PARAMS: usize = 128;
+pub const MAX_PUBLIC_COMPOSE_REGISTERS: usize = 16;
+
+pub fn validate_public_limits(
+    spec: &Spec,
+    values: &BTreeMap<String, TypedValue>,
+) -> Result<(), ComposeError> {
+    let limit = |message: String| ComposeError::BadRule("public compose limit".into(), message);
+    if values.len() > MAX_PUBLIC_COMPOSE_PARAMS {
+        return Err(limit(format!(
+            "at most {MAX_PUBLIC_COMPOSE_PARAMS} parameter values are allowed"
+        )));
+    }
+    if spec.witness.len() > MAX_PUBLIC_COMPOSE_PARAMS {
+        return Err(limit(format!(
+            "at most {MAX_PUBLIC_COMPOSE_PARAMS} witness values are allowed"
+        )));
+    }
+    let referenced_params = params_of(spec).len();
+    if referenced_params > MAX_PUBLIC_COMPOSE_PARAMS {
+        return Err(limit(format!(
+            "at most {MAX_PUBLIC_COMPOSE_PARAMS} referenced parameters are allowed"
+        )));
+    }
+    let mut cases = 0usize;
+    for path in &spec.paths {
+        let keys = match &path.who {
+            Who::AnyOne { .. } => 0,
+            Who::AnyOf { any_of } => any_of.len(),
+            Who::AllOf { all_of } => all_of.len(),
+            Who::KOf { keys, .. } => keys.len(),
+        };
+        if keys > MAX_PUBLIC_COMPOSE_KEYS {
+            return Err(limit(format!(
+                "at most {MAX_PUBLIC_COMPOSE_KEYS} keys are allowed per path"
+            )));
+        }
+        cases = cases.saturating_add(path.conditions.len().saturating_add(1));
+        for condition in &path.conditions {
+            match condition {
+                Condition::InputCount(name) | Condition::OutputCount(name) => {
+                    if let Some(value) = values.get(name) {
+                        let count = value
+                            .value
+                            .as_i64()
+                            .or_else(|| value.value.as_str().and_then(|v| v.parse().ok()));
+                        if let Some(count) = count {
+                            if count < 0 || count as usize > MAX_PUBLIC_COMPOSE_BOXES {
+                                return Err(limit(format!(
+                                    "`{name}` must be between 0 and {MAX_PUBLIC_COMPOSE_BOXES}"
+                                )));
+                            }
+                        }
+                    }
+                }
+                Condition::Box(rule) => {
+                    if rule.registers.len() > MAX_PUBLIC_COMPOSE_REGISTERS {
+                        return Err(limit(format!(
+                            "at most {MAX_PUBLIC_COMPOSE_REGISTERS} registers are allowed per box rule"
+                        )));
+                    }
+                    if let Some(Index::At(index)) = rule.index {
+                        if index >= MAX_PUBLIC_COMPOSE_BOXES {
+                            return Err(limit(format!(
+                                "box index must be below {MAX_PUBLIC_COMPOSE_BOXES}"
+                            )));
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+    if spec.paths.iter().any(|path| !path.conditions.is_empty()) {
+        cases = cases.saturating_add(1);
+    }
+    if cases > MAX_PUBLIC_COMPOSE_CASES {
+        return Err(limit(format!(
+            "at most {MAX_PUBLIC_COMPOSE_CASES} generated cases are allowed"
+        )));
     }
     Ok(())
 }
@@ -1310,6 +1398,23 @@ fn bump(tpe: &str, v: &serde_json::Value) -> serde_json::Value {
     v.clone()
 }
 
+fn check_world_limits(w: &World, path: &str) -> Result<(), ComposeError> {
+    let shapes = [
+        ("inputs", 1usize.saturating_add(w.extra_inputs.len())),
+        ("outputs", w.outputs.len()),
+        ("data inputs", w.data_inputs.len()),
+    ];
+    for (name, count) in shapes {
+        if count > MAX_PUBLIC_COMPOSE_BOXES {
+            return Err(ComposeError::BadRule(
+                path.into(),
+                format!("{name} may contain at most {MAX_PUBLIC_COMPOSE_BOXES} boxes"),
+            ));
+        }
+    }
+    Ok(())
+}
+
 /// A world that satisfies every condition of `p`: with this box carrying
 /// a token when a rule refers to its tokens, else (a tokenless box is a
 /// valid state too) without.
@@ -1547,6 +1652,7 @@ fn satisfying_world_from(
             "no single transaction meets every condition at once".into(),
         ));
     }
+    check_world_limits(&w, &p.name)?;
     Ok(w)
 }
 
@@ -1805,6 +1911,7 @@ fn violating_world(
             unreachable!("lowered")
         }
     }
+    check_world_limits(&w, &p.name)?;
     Ok(w)
 }
 

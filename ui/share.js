@@ -4,6 +4,7 @@ const Share = (() => {
   // 7 KiB including #s= leaves room for an ordinary origin/path below 8 KiB.
   const FRAGMENT_CAP = 7 * 1024;
   const PREFIX = "#s=";
+  const PARAM_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/;
   const object = value => value !== null && typeof value === "object" && !Array.isArray(value);
   const network = value => value === "mainnet" || value === "testnet";
   const uint = value => Number.isSafeInteger(value) && value >= 0;
@@ -24,6 +25,7 @@ const Share = (() => {
     for (const t of b.tokens || []) requireThat(object(t) && hex(t.id) && t.id.length === 64 && uint(t.amount) && t.amount > 0, `${what} token is invalid`);
   }
   function validateCaseScenario(c) {
+    requireThat(!Object.hasOwn(c, "secrets") && !Object.hasOwn(c, "parties"), "shared cases may not contain secrets or parties");
     requireThat(c.treeVersion == null || (uint(c.treeVersion) && c.treeVersion <= 255), "treeVersion must be 0..255");
     requireThat(c.selfIndex == null || uint(c.selfIndex), "selfIndex must be a nonnegative integer");
     if (c.selfBox != null) validateBox(c.selfBox, "selfBox");
@@ -39,6 +41,7 @@ const Share = (() => {
   }
   function validateSuite(suite) {
     requireThat(object(suite), "suite must be an object");
+    requireThat(!Object.hasOwn(suite, "secrets") && !Object.hasOwn(suite, "parties"), "shared suites may not contain secrets or parties");
     requireThat(suite.nodeValidated == null || suite.nodeValidated === false, "shared suites are not node-validated");
     requireThat((typeof suite.source === "string") !== (typeof suite.tree === "string"), "suite needs exactly one source or tree");
     requireThat(suite.tree == null || hex(suite.tree), "suite tree must be hex");
@@ -60,6 +63,7 @@ const Share = (() => {
     if (!Object.hasOwn(state, "k")) {
       requireThat(typeof state.s === "string", "Write source must be a string");
       requireThat(state.p == null || object(state.p), "Write params must be an object");
+      for (const name of Object.keys(state.p || {})) requireThat(PARAM_NAME.test(name), "Write parameter names must be identifiers");
       requireThat(state.n == null || network(state.n), "unknown Write network");
       return state;
     }

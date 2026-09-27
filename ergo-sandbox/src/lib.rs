@@ -86,7 +86,7 @@ pub use drain::{
 };
 pub use eval::{eval_scenario, EvalOutcome, Verdict, DEFAULT_COST_LIMIT};
 pub use hunt::{hunt, Hunt, HuntOptions, HuntVerdict};
-pub use inspect::{sigma_boolean_pretty, tree_report, tree_structure};
+pub use inspect::{parse_tree_complete, sigma_boolean_pretty, tree_report, tree_structure};
 pub use map::{map, map_owned, MapOptions, ProtocolMap, Seed};
 pub use scenario::{parse_typed_value, Scenario, ScenarioBox, TypedValue};
 

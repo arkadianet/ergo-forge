@@ -13,6 +13,7 @@ use crate::engine::EngineBudget;
 /// Model-swept suites (examples/tests/gen) run to ~100 KB; CPU is guarded by
 /// the engine budget, not by this cap.
 pub const MAX_BODY_BYTES: usize = 1024 * 1024;
+pub const MAX_PUBLIC_SUITE_CASES: usize = 128;
 
 /// Engine jobs on the blocking pool at once, one shared budget. Each one
 /// holds a large-stack thread, so this is also the bound on those threads.
