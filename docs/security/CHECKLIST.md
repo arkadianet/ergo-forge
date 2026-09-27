@@ -87,7 +87,7 @@ constrained.
 Checklist responses additionally carry `coverage` and `flow`. `coverage` reports
 instrument availability and observation counts only; it has no score, share or
 verdict. Availability comes from the audit registry, so a lint a document names
-but the registry does not run is reported as `not-registered`, never as an
+but the registry does not run is reported as `unregistered`, never as an
 instrument that ran. `ran` records that a registered lint executed over the
 recovered tree and nothing more: it does not assert that the lint's own analysis
 bound covered every construct, and it is not a clean-bill-of-health. `coverage`

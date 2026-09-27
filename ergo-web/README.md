@@ -349,7 +349,7 @@ shared engine budget.
 Checklist responses also include `coverage` (instrument availability, never a
 score or percentage) and `flow` (bounded spender-controlled source-to-sink
 review obligations). `coverage.availability` is `ran`, `partial`,
-`not-registered` or `not-static`: `ran` means the registered lint executed over
+`unregistered` or `not-static`: `ran` means the registered lint executed over
 the recovered tree, not that its own bound covered every construct, and a name
 outside the audit registry is never reported as having run. A bound or a
 missing flow is reported as unknown, not as evidence of safety.
