@@ -319,6 +319,7 @@ pub fn eval_scenario(sc: &Scenario) -> Result<EvalOutcome, SandboxError> {
         last_block_utxo_root,
         activated_script_version: sc.activated_script_version.unwrap_or(3),
         ergo_tree_version: tree.version,
+        validation_settings: Default::default(),
     };
 
     // 6. Bounded cost budget (never `recording_only()` — this is a

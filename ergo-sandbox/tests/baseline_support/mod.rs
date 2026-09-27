@@ -27,7 +27,13 @@ pub fn historical_bytes(workspace: &Path, path: &str) -> Vec<u8> {
                     .split("[[package]]")
                     .map(|block| {
                         if block.contains("git+https://github.com/arkadianet/ergo?") {
-                            block.replace("version = \"0.6.0\"", "version = \"0.7.0\"")
+                            let block = block.replace("version = \"0.6.0\"", "version = \"0.8.0\"");
+                            if block.starts_with("\nname = \"ergo-state\"\n") {
+                                // Node a203cc02: ergo-state now depends on serde_json.
+                                block.replace(" \"serde\",\n", " \"serde\",\n \"serde_json\",\n")
+                            } else {
+                                block
+                            }
                         } else if block.starts_with("\nname = \"ergo-sandbox\"\n")
                             || block.starts_with("\nname = \"ergo-web\"\n")
                         {
@@ -44,14 +50,17 @@ pub fn historical_bytes(workspace: &Path, path: &str) -> Vec<u8> {
                 );
             }
         } else {
-            // Only the new node API's explicit activation argument is permitted.
+            // Only the node API edits are permitted: the explicit activation argument (X01)
+            // and the validation settings node a203cc02 adds to the protocol parameters.
             expected = expected.replace(
                 "pub fn node(&self) -> Result<Option<ReemissionRuleInputs>, String> {",
                 "pub fn node(\n        &self,\n        activated_script_version: u8,\n    ) -> Result<Option<ReemissionRuleInputs>, String> {")
                 .replace("ergo_ser::ergo_tree::check_tree_version_supported(&parsed).map_err(err)?;",
                     "ergo_ser::ergo_tree::check_tree_version_supported(\n                    &parsed,\n                    activated_script_version,\n                )\n                .map_err(err)?;")
                 .replace("required(&request.network_rules, \"network rules\")\n        .map_err(input)?\n        .node()",
-                    "required(&request.network_rules, \"network rules\")\n        .map_err(input)?\n        .node(context.activated_script_version)");
+                    "required(&request.network_rules, \"network rules\")\n        .map_err(input)?\n        .node(context.activated_script_version)")
+                .replace("            storage_period: self.storage_period,\n",
+                    "            storage_period: self.storage_period,\n            validation_settings: Default::default(),\n");
         }
         assert_eq!(
             current,

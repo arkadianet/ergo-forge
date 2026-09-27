@@ -210,11 +210,15 @@ fn mandatory_local_execution_does_not_authenticate_exact_code() {
     let result = json!({"version":"m05-stop-evidence:v1","caseId":fixture["id"],"claim":claim,"claimDigest":claim.claim_digest(),"premiseDigest":claim.premises.digest(),"proposedExactDigestClaim":proposed,"executions":rows,"conclusion":"Same root, SELF, state and guard accept distinct code digests. Mandatory local execution alone cannot establish exact authenticated Execute(input,var,codeDigest)."});
     let path = root().join("../../../../docs/mapping/m05-stop-results.json");
     let raw = std::fs::read(&path).unwrap();
-    assert_eq!(
-        engine_support::RevisionMap::default()
-            .expected(&serde_json::from_slice::<Value>(&raw).unwrap()),
-        result
-    );
+    let mut expected = engine_support::RevisionMap::default()
+        .expected(&serde_json::from_slice::<Value>(&raw).unwrap());
+    for row in expected["executions"].as_array_mut().unwrap() {
+        if let Some(cost) = row["execution"]["totalBlockCost"].as_u64() {
+            let key = format!("m05/{}", row["id"].as_str().unwrap());
+            row["execution"]["totalBlockCost"] = json!(engine_support::corrected_cost(&key, cost));
+        }
+    }
+    assert_eq!(expected, result);
     println!("evidence {} sha256={}", path.display(), sha(&raw));
     println!("M05 coverage stop: pinned supported context_scope-positive lacks exact-code authentication; M00-M04 claims and all 67 expected action dispositions preserved");
 }

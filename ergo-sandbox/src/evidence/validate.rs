@@ -52,6 +52,7 @@ impl Parameters {
             token_access_cost: self.token_access_cost,
             storage_fee_factor: self.storage_fee_factor,
             storage_period: self.storage_period,
+            validation_settings: Default::default(),
         }
     }
 }

@@ -2,6 +2,7 @@
 #![allow(dead_code)]
 mod request;
 use ergo_sandbox::evidence::case::engine_revision;
+use ergo_sandbox::evidence::validate::ValidationRequest;
 pub use request::{fixture_revision, on_current_engine};
 
 /// Re-key a frozen expected report for an explicitly different revision. This
@@ -79,6 +80,40 @@ impl RevisionMap {
         }
         new
     }
+}
+
+/// Block costs the pinned engine charges differently from the revision a historical record was
+/// measured at (docs/reports/node-pin-a203cc02.md). Each new cost is the one the Scala 6.0.6
+/// reference node charges for the same transaction, so each corrects the older engine rather than
+/// taking a new measurement on trust. A correction applies only where the record holds exactly
+/// the historical cost; any other change still fails.
+pub const COST_CORRECTIONS: &[(&str, u64, u64)] = &[
+    // P03: the rent path is charged `StorageContractCost` (50) as block cost, as Scala does.
+    ("storage-rent-acceptance", 12_105, 12_150),
+    // M05 stop executions: JIT-cost parity with Scala on the node's side.
+    ("m05/original", 14_175, 14_176),
+    ("m05/different-true-expression", 14_180, 14_185),
+    // P05 USE incident: block 1,868,204's five preceding transactions (two now cost 1,260 and 180 more).
+    ("use-incident/prior-block-cost", 194_317, 195_757),
+];
+
+/// The cost the record `key` holds at the historical revision, as the pinned engine charges it.
+pub fn corrected_cost(key: &str, historical: u64) -> u64 {
+    match COST_CORRECTIONS.iter().find(|(k, _, _)| *k == key) {
+        Some((_, old, new)) if *old == historical => *new,
+        Some((_, old, _)) => {
+            panic!("{key}: the record holds {historical}; the correction is for {old}")
+        }
+        None => historical,
+    }
+}
+
+/// A historical request whose prior block cost the pinned engine charges differently.
+pub fn with_corrected_prior_cost(request: ValidationRequest, key: &str) -> ValidationRequest {
+    let mut v = serde_json::to_value(&request).unwrap();
+    let historical = v["priorBlockCost"]["value"].as_u64().unwrap();
+    v["priorBlockCost"]["value"] = serde_json::json!(corrected_cost(key, historical));
+    serde_json::from_value(v).unwrap()
 }
 
 pub fn mapping_revisions() -> RevisionMap {

@@ -117,7 +117,13 @@ fn full_pipeline_matches_pinned_node_vectors() {
                 assert_eq!(report["pipelineInvoked"], true);
                 assert_eq!(report["nodeRevision"], row["nodeRevision"]);
                 assert_eq!(report["transactionId"], expected["transactionId"]);
-                assert_eq!(report["totalBlockCost"], expected["totalBlockCost"]);
+                assert_eq!(
+                    report["totalBlockCost"].as_u64(),
+                    Some(engine_support::corrected_cost(
+                        row["id"].as_str().unwrap(),
+                        expected["totalBlockCost"].as_u64().unwrap()
+                    ))
+                );
                 assert_eq!(report["request"], serde_json::to_value(&request).unwrap());
                 assert_eq!(report["requestFingerprint"], request.fingerprint());
                 assert_eq!(
@@ -289,7 +295,7 @@ fn accepted_execution_cannot_be_deserialized_or_fabricated() {
 
 #[test]
 fn node_vectors_pass_on_new_rev() {
-    let expected = "016533194f94ad95b1a87df70bb9bfce493922e2";
+    let expected = "a203cc02f585bcbe13c743aee008222b208f3c82";
     let recorded = ergo_sandbox::evidence::case::engine_revision();
     assert_eq!(
         recorded, expected,

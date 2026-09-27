@@ -43,9 +43,11 @@ write("registry", "examples/contracts/protocols/registry/registry.es", {"registr
     reg_case("register a new name with the prover's proof and the new digest, paying the fee: no key needed", "pass", insert_carol),
     reg_case("the fee one nanoERG short: only the registrar could sign that", "needsProof", insert_carol, fee=10**8 - 1, residual=A[:8]),
     reg_case("successor keeps the OLD digest: refused", "needsProof", insert_carol, out_tree="@avl.names", residual=A[:8]),
-    reg_case("a proof for a lookup does not authenticate an insert", "needsProof", [{"lookup": {"key": alice_name}}], residual=A[:8]),
-    reg_case("registering a name that already exists: the tree refuses the proof", "needsProof", [{"lookup": {"key": alice_name}}],
-             vars={"0": cb("@avl.names.proof"), "1": cb(alice_name), "2": cb("03")}, out_tree="@avl.names", residual=A[:8]),
+    # This tree is pre-v3 (no v6 method stamps it), and on a pre-v3 tree a refused insert throws, as the
+    # Scala node does (CErgoTreeEvaluator.insert_eval; sigmastate#908): the spend fails outright.
+    reg_case("a proof for a lookup does not authenticate an insert: the refused insert throws on this pre-v3 tree", "error", [{"lookup": {"key": alice_name}}]),
+    reg_case("registering a name that already exists: the tree refuses the proof, and on this pre-v3 tree that throws", "error", [{"lookup": {"key": alice_name}}],
+             vars={"0": cb("@avl.names.proof"), "1": cb(alice_name), "2": cb("03")}, out_tree="@avl.names"),
     {"name": "the registrar may spend freely (an upgrade), proving with the registrar's key", "expect": "needsProof", "expectResidual": A[:8], "height": 1,
      "avl": {"names": {"keyLength": 32, "entries": [[alice_name, "01"]], "operations": []}},
      "selfBox": {"value": 10**9, "tokens": [{"id": NFT, "amount": 1}], "registers": {"R4": {"type": "AvlTree", "value": "@avl.names"}}}},

@@ -1,0 +1,10 @@
+   Compiling ring v0.17.14
+   Compiling rustls v0.23.43
+    Checking rustls-webpki v0.103.15
+    Checking ureq v3.4.1
+    Checking tokio-rustls v0.26.4
+    Checking hyper-rustls v0.27.9
+    Checking reqwest v0.12.28
+    Checking ergo-sandbox v0.5.0 (<repo>/ergo-sandbox)
+    Checking ergo-web v0.5.0 (<repo>/ergo-web)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 38.76s
