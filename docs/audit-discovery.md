@@ -24,9 +24,11 @@ counterexamples on top of the pinned Forge engine. It does not certify safety.
   algebra, carries outputs forward, and delta-debugs the first verdict change.
   Reports carry caps, truncation, rejections, provenance and a replay
   fingerprint. Carried boxes are recreated with the same contract shape and
-  a lineage map, so a depth-two step is compared with the parent it actually
-  mutated rather than with an unrelated box-id set. They are always synthetic
-  and never node-validated.
+  evaluated once before mutation, spending a probe, so a depth-two step is
+  compared with the unmutated draft it actually changes. A carried draft whose
+  balances or construction fail is rejected; inputs that lost their proofs in
+  the carry still serve as a parent. Reports are always synthetic and never
+  node-validated.
 - **Flow review obligations** — `ergo_sandbox::audit::flow` performs bounded,
   fail-closed source-to-sink analysis over the lifted tree. Unmodelled values
   taint rather than sanitise. `flow_paths` renders the result as review

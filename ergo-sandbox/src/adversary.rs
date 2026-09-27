@@ -40,7 +40,7 @@
 //! sequence. It does not keep hunting for a better one, so the reported witness
 //! is the first in the pinned order, not the shortest of all witnesses.
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -278,9 +278,7 @@ pub struct SearchStep {
     /// witness and is distinguished by `problems`.
     pub ok: bool,
     /// Inputs whose verdict differs from the parent draft this step mutated.
-    /// Carried outputs keep a positional lineage map so a recreated box is
-    /// compared with its parent rather than treated as a new, unobservable
-    /// input. The map is an experiment correspondence, not a chain identity.
+    /// Each carried draft is evaluated before mutation, so box ids align.
     pub flipped: Vec<Flip>,
     /// Conservation and construction problems Play reported.
     pub problems: Vec<String>,
@@ -629,9 +627,38 @@ fn candidates(draft: &PlayRequest, caps: &SearchCaps) -> (Vec<AttackOp>, Vec<Str
     (ops, notes)
 }
 
+fn different_register_value(tv: &crate::scenario::TypedValue) -> Option<serde_json::Value> {
+    Some(match tv.r#type.as_str() {
+        "Boolean" => json!(!tv.value.as_bool()?),
+        "Byte" | "Short" | "Int" | "Long" => {
+            let current = tv
+                .value
+                .as_i64()
+                .or_else(|| tv.value.as_str()?.parse::<i64>().ok())?;
+            json!(if current == 0 { 1 } else { 0 })
+        }
+        "BigInt" => {
+            let zero = tv
+                .value
+                .as_str()?
+                .trim()
+                .parse::<i128>()
+                .is_ok_and(|n| n == 0);
+            json!(if zero { "1" } else { "0" })
+        }
+        t if t.starts_with("Coll[") => {
+            if tv.value.as_array().is_some_and(|v| v.is_empty()) || tv.value == json!("") {
+                return None;
+            }
+            json!([])
+        }
+        _ => return None,
+    })
+}
+
 /// The bounded edit list for `tamperField`, in priority order: what a spender
-/// breaks first — an output's value, a spent box's value, a token amount, a
-/// register. Token amounts go up by one rather than to zero, because the wire
+/// breaks first — a spent box's token amount, box values, output tokens, then
+/// registers. Token amounts go up by one rather than to zero, because the wire
 /// requires a strictly positive amount and a zeroed token is a mutation the box
 /// builder refuses before any script runs. Registers are only edited where a
 /// box already carries them, so a tamper cannot fail the dense-from-R4 register
@@ -647,22 +674,6 @@ fn tamper_candidates(draft: &PlayRequest) -> (Vec<AttackOp>, Vec<String>) {
             value,
         });
     };
-    for i in 0..draft.tx.outputs.len() {
-        push("output", i, "value", json!(0));
-    }
-    for i in 0..draft.tx.inputs.len() {
-        push("input", i, "value", json!(0));
-    }
-    for (i, output) in draft.tx.outputs.iter().enumerate() {
-        for (t, token) in output.tokens.iter().take(4).enumerate() {
-            push(
-                "output",
-                i,
-                &format!("tokenAmount:{t}"),
-                json!(token.amount.saturating_add(1)),
-            );
-        }
-    }
     for (i, input) in draft.tx.inputs.iter().enumerate() {
         for (t, token) in box_of(draft, &input.box_id)
             .map(|b| b.tokens.as_slice())
@@ -679,13 +690,32 @@ fn tamper_candidates(draft: &PlayRequest) -> (Vec<AttackOp>, Vec<String>) {
             );
         }
     }
+    for i in 0..draft.tx.outputs.len() {
+        push("output", i, "value", json!(0));
+    }
+    for i in 0..draft.tx.inputs.len() {
+        push("input", i, "value", json!(0));
+    }
+    for (i, output) in draft.tx.outputs.iter().enumerate() {
+        for (t, token) in output.tokens.iter().take(4).enumerate() {
+            push(
+                "output",
+                i,
+                &format!("tokenAmount:{t}"),
+                json!(token.amount.saturating_add(1)),
+            );
+        }
+    }
     for (i, output) in draft.tx.outputs.iter().enumerate() {
         for (name, tv) in &output.registers {
+            let Some(value) = different_register_value(tv) else {
+                continue;
+            };
             push(
                 "output",
                 i,
                 name,
-                json!({ "type": tv.r#type, "value": tv.value }),
+                json!({ "type": tv.r#type, "value": value }),
             );
         }
     }
@@ -695,11 +725,14 @@ fn tamper_candidates(draft: &PlayRequest) -> (Vec<AttackOp>, Vec<String>) {
             .into_iter()
             .flatten()
         {
+            let Some(value) = different_register_value(tv) else {
+                continue;
+            };
             push(
                 "input",
                 i,
                 name,
-                json!({ "type": tv.r#type, "value": tv.value }),
+                json!({ "type": tv.r#type, "value": value }),
             );
         }
     }
@@ -764,38 +797,6 @@ fn sample_sequences(
     out
 }
 
-fn diff_step(
-    parent: &PlayResult,
-    child: &PlayResult,
-    lineage: &BTreeMap<String, String>,
-) -> Vec<InputDiff> {
-    if lineage.is_empty() {
-        return diff_inputs(parent, child);
-    }
-    let child_by_id: BTreeMap<String, &crate::play::PlayInputResult> = child
-        .inputs
-        .iter()
-        .map(|input| (input.box_id.to_lowercase(), input))
-        .collect();
-    parent
-        .inputs
-        .iter()
-        .filter_map(|before| {
-            let id = lineage
-                .get(&before.box_id.to_lowercase())
-                .map(String::as_str)
-                .unwrap_or(before.box_id.as_str());
-            let after = child_by_id.get(&id.to_lowercase())?;
-            Some(InputDiff {
-                box_id: before.box_id.clone(),
-                before: before.verdict.to_string(),
-                after: after.verdict.to_string(),
-                changed: before.verdict != after.verdict,
-            })
-        })
-        .collect()
-}
-
 /// The flipped entries of a per-input diff.
 fn flips(diff: &[InputDiff]) -> Vec<Flip> {
     diff.iter()
@@ -812,18 +813,13 @@ fn flips(diff: &[InputDiff]) -> Vec<Flip> {
 /// transaction that itself evaluated clean, `None` otherwise — a trial that
 /// breaks the balances is not a reduction, exactly as it is not a witness.
 /// `None` also covers a draft the trial cannot be applied to. One probe.
-fn flips_under(
-    draft: &PlayRequest,
-    ops: &[AttackOp],
-    parent: &PlayResult,
-    lineage: &BTreeMap<String, String>,
-) -> Option<PlayResult> {
+fn flips_under(draft: &PlayRequest, ops: &[AttackOp], parent: &PlayResult) -> Option<PlayResult> {
     let mut mutated = draft.clone();
     for op in ops {
         apply_op(&mut mutated, op).ok()?;
     }
     let result = play::apply(&mutated).ok()?;
-    (result.problems.is_empty() && !flips(&diff_step(parent, &result, lineage)).is_empty())
+    (result.problems.is_empty() && !flips(&diff_inputs(parent, &result)).is_empty())
         .then_some(result)
 }
 
@@ -837,7 +833,6 @@ fn ddmin(
     ops: &[AttackOp],
     found: PlayResult,
     parent: &PlayResult,
-    lineage: &BTreeMap<String, String>,
     budget: &mut Budget,
 ) -> (Vec<AttackOp>, PlayResult, bool) {
     let mut best = ops.to_vec();
@@ -861,7 +856,7 @@ fn ddmin(
             if !budget.spend_shrink() {
                 return (best, result, true);
             }
-            if let Some(trial_result) = flips_under(draft, &trial, parent, lineage) {
+            if let Some(trial_result) = flips_under(draft, &trial, parent) {
                 best = trial;
                 result = trial_result;
                 reduced = true;
@@ -973,13 +968,12 @@ pub fn search(req: &SearchRequest) -> Result<SearchReport, SandboxError> {
     // Steps whose verdict changed but whose own transaction did not evaluate
     // clean: recorded, counted here, and never a witness.
     let mut ineligible = 0usize;
-    let mut frontier: Vec<(PlayRequest, PlayResult, BTreeMap<String, String>)> =
-        vec![(req.draft.clone(), baseline.clone(), BTreeMap::new())];
+    let mut frontier: Vec<(PlayRequest, PlayResult)> = vec![(req.draft.clone(), baseline.clone())];
 
     'levels: for depth in 1..=caps.max_depth {
         let levels_left = caps.max_depth - depth + 1;
-        let mut next: Vec<(PlayRequest, PlayResult, BTreeMap<String, String>)> = Vec::new();
-        for (draft, parent, lineage) in &frontier {
+        let mut next: Vec<(PlayRequest, PlayResult)> = Vec::new();
+        for (draft, parent) in &frontier {
             if budget.left() == 0 {
                 exhausted = true;
                 break 'levels;
@@ -1029,11 +1023,9 @@ pub fn search(req: &SearchRequest) -> Result<SearchReport, SandboxError> {
                     });
                     continue;
                 }
+                budget.spend();
                 let result = match play::apply(&mutated) {
-                    Ok(result) => {
-                        budget.spend();
-                        result
-                    }
+                    Ok(result) => result,
                     Err(e) => {
                         rejections.invalid += 1;
                         steps.push(SearchStep {
@@ -1050,7 +1042,7 @@ pub fn search(req: &SearchRequest) -> Result<SearchReport, SandboxError> {
                         continue;
                     }
                 };
-                let diff = diff_step(parent, &result, lineage);
+                let diff = diff_inputs(parent, &result);
                 let flipped = flips(&diff);
                 if let Some(cause) = classify(&result) {
                     add(&mut rejections, cause);
@@ -1085,8 +1077,8 @@ pub fn search(req: &SearchRequest) -> Result<SearchReport, SandboxError> {
                     // hunting on for a shorter sequence would be a different
                     // experiment than the one asked for.
                     let (minimal_ops, minimal_result, shrink_truncated) =
-                        ddmin(draft, &ops, result, parent, lineage, &mut budget);
-                    let witness_diff = diff_step(parent, &minimal_result, lineage);
+                        ddmin(draft, &ops, result, parent, &mut budget);
+                    let witness_diff = diff_inputs(parent, &minimal_result);
                     let applied = minimal_ops.len();
                     best = Some(SearchHit {
                         step: index,
@@ -1118,7 +1110,28 @@ pub fn search(req: &SearchRequest) -> Result<SearchReport, SandboxError> {
                                 truncated = true;
                             }
                             if next.len() < caps.max_frontier {
-                                next.push((step.request, result.clone(), step.lineage));
+                                if budget.left() == 0 {
+                                    exhausted = true;
+                                    break 'levels;
+                                }
+                                // The next level compares against this unmutated
+                                // carried draft, judged like a step: inputs that
+                                // lost their proofs in the carry still count as a
+                                // parent, but broken balances do not.
+                                budget.spend();
+                                match play::apply(&step.request) {
+                                    Ok(parent) if parent.problems.is_empty() => {
+                                        next.push((step.request, parent));
+                                    }
+                                    Ok(parent) => {
+                                        if let Some(cause) = classify(&parent) {
+                                            add(&mut rejections, cause);
+                                        } else {
+                                            rejections.invalid += 1;
+                                        }
+                                    }
+                                    Err(_) => rejections.invalid += 1,
+                                }
                             } else {
                                 rejections.frontier_full += 1;
                                 truncated = true;

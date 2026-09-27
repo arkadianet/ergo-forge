@@ -305,10 +305,6 @@ pub(crate) struct NextStep {
     pub available: usize,
     /// Boxes carried after the cap.
     pub carried: usize,
-    /// Current input box id → the fresh id of its recreated output. This is a
-    /// positional experiment lineage, not a chain identity or a proof that the
-    /// two boxes are the same UTXO.
-    pub lineage: BTreeMap<String, String>,
 }
 
 /// The draft for the step *after* an applied transaction: the boxes that
@@ -406,17 +402,6 @@ pub(crate) fn next_step_draft(
         .filter(|id| carried_ids.contains(&id.to_lowercase()))
         .cloned()
         .collect();
-    let parent_ids: Vec<String> = req
-        .tx
-        .inputs
-        .iter()
-        .map(|input| input.box_id.to_lowercase())
-        .collect();
-    let child_ids: Vec<String> = boxes
-        .iter()
-        .filter_map(|box_| box_.box_id.as_ref().map(|id| id.to_lowercase()))
-        .collect();
-    let lineage: BTreeMap<String, String> = parent_ids.into_iter().zip(child_ids).collect();
     Ok(Some(NextStep {
         request: PlayRequest {
             height: req.height.saturating_add(1),
@@ -430,6 +415,5 @@ pub(crate) fn next_step_draft(
         },
         available,
         carried,
-        lineage,
     }))
 }
