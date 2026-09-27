@@ -1,0 +1,59 @@
+{
+  "id" : "use-prior-2",
+  "scala" : {
+    "ergo_version" : "6.0.6",
+    "sigma_version" : "6.0.6",
+    "tx_bytes_blake2b256" : "2b5a56dc2714ebcd1eceaef086edfcc12d4d63eb30ca8a42257ad7df04b57b60",
+    "request" : {
+      "height" : 1868204,
+      "pre_header" : {
+        "version" : 4,
+        "parent_id" : "71b29999204aee33af5dda49eb8dde4ac7a7ccd035b9199f6dab77552d3ca3e3",
+        "timestamp" : 1788813125484,
+        "n_bits" : 104808097,
+        "votes" : "000000",
+        "miner_pk" : "0204b680ae52835e22f12fc3c51c4cd9e18852ac4f4a8131be29920678aceeeebe"
+      },
+      "fixture_blake2b256" : "f820bbc0b37680efc09170e4dca2bf014a2684fa98e666709bd70f0a84f697a5",
+      "min_value_per_byte" : 360,
+      "input_ids" : [
+        "02264f9eb0d441d9ab578ae6b16e7d0e7ae687e690900ab37f9a78d2317d81d4",
+        "2cdbbe179b6a0093397837c88d7123ea78809e436bb5a7b68e6c66c2360bfa2b",
+        "e6ebf1947b3a64e925cf1a0f21254d401f5a54b97ecd67d1eb54a4e90a923f84",
+        "fc2b10d448890e83018afebbfafb239e785e42d91cfa5be52d31e80089afc0ce"
+      ],
+      "data_input_ids" : [
+      ],
+      "activated_script_version" : 3,
+      "last_headers" : 0
+    },
+    "tx_id" : "2b5a56dc2714ebcd1eceaef086edfcc12d4d63eb30ca8a42257ad7df04b57b60",
+    "stateless_ok" : true,
+    "accepted" : true,
+    "total_block_cost" : 23106,
+    "failing_input" : null,
+    "error" : null,
+    "per_input" : [
+      {
+        "index" : 0,
+        "ok" : true,
+        "block_cost" : 50
+      },
+      {
+        "index" : 1,
+        "ok" : true,
+        "block_cost" : 50
+      },
+      {
+        "index" : 2,
+        "ok" : true,
+        "block_cost" : 50
+      },
+      {
+        "index" : 3,
+        "ok" : true,
+        "block_cost" : 50
+      }
+    ]
+  }
+}

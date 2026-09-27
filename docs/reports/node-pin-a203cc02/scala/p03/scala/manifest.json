@@ -1,0 +1,225 @@
+{
+  "ergo_version" : "6.0.6",
+  "sigma_version" : "6.0.6",
+  "java" : "17.0.17+10-LTS",
+  "script_blake2b256" : "7346c75f56bcbdb4e037b772a5f4886750a77f5c7b47e73c6c2f7ecc99c907b1",
+  "loaded_jars" : {
+    "ergo-core" : {
+      "path" : "<provision>/ivy/local/org.ergoplatform/ergo-core_2.12/6.0.6/jars/ergo-core_2.12.jar",
+      "sha256" : "1573c2c96eab4632744531bcb34a41bf3b10bf5db71241a8ab5bdd989a7fb7fc"
+    },
+    "ergo-wallet" : {
+      "path" : "<provision>/ivy/local/org.ergoplatform/ergo-wallet_2.12/6.0.6/jars/ergo-wallet_2.12.jar",
+      "sha256" : "8c5b856e10051827ebb7ca8eeddeccb2b701f9f4430661d3d4db7405f9476a86"
+    },
+    "avldb" : {
+      "path" : "<provision>/ivy/local/org.ergoplatform/avldb_2.12/6.0.6/jars/avldb_2.12.jar",
+      "sha256" : "30adee2a9d090a2f58675b21d7a80e55ebb93701d300460fb954af92877f228b"
+    },
+    "sigma-state" : {
+      "path" : "<coursier>/v1/https/repo1.maven.org/maven2/org/scorexfoundation/sigma-state_2.12/6.0.6/sigma-state_2.12-6.0.6.jar",
+      "sha256" : "91423ee0dc5857ee53568e655fcc77abdc36f67f735897eefee576a4e37f1898"
+    }
+  },
+  "classpath" : [
+    {
+      "jar" : "algebra_2.12-2.0.0-M2.jar",
+      "sha256" : "461acb40d654f78288908cfb298600b9ee60f77c9e74f9e883c7b2f9a21fe0a5"
+    },
+    {
+      "jar" : "animal-sniffer-annotations-1.14.jar",
+      "sha256" : "2068320bd6bad744c3673ab048f67e30bef8f518996fa380033556600669905d"
+    },
+    {
+      "jar" : "avldb_2.12.jar",
+      "sha256" : "30adee2a9d090a2f58675b21d7a80e55ebb93701d300460fb954af92877f228b"
+    },
+    {
+      "jar" : "bcprov-jdk15to18-1.85.1.jar",
+      "sha256" : "ffd4186dab3cb1663572f493814c4ecdfdc6c950783b566072907c6d32dc10bc"
+    },
+    {
+      "jar" : "cats-core_2.12-2.13.0.jar",
+      "sha256" : "4b92d574b01cf448018707de8bf20a2c37d0f6c6bd657a0f3c1be762761a310e"
+    },
+    {
+      "jar" : "cats-kernel_2.12-2.13.0.jar",
+      "sha256" : "daeb592b533bd9d6400aac1397d780ff22ca672e98f4dc69c08fd0ceba3fa0ed"
+    },
+    {
+      "jar" : "circe-core_2.12-0.14.15.jar",
+      "sha256" : "1bb842f33a9f9e6540669a2926468500c7d8f782f417c15c76ca77eca26125b1"
+    },
+    {
+      "jar" : "circe-generic_2.12-0.14.15.jar",
+      "sha256" : "08da76041a9f216ef91e8d2fc2973672d45471e3127aea81fb9c971002714596"
+    },
+    {
+      "jar" : "circe-jawn_2.12-0.14.15.jar",
+      "sha256" : "82744fca9206db561a81090715d79efaeb6c720d1bea753cc579f34eb1a82cc3"
+    },
+    {
+      "jar" : "circe-numbers_2.12-0.14.15.jar",
+      "sha256" : "a7bd4db65baa06d3f50b7488ec572cf1f49beab06e850b4012885b730e5a93c8"
+    },
+    {
+      "jar" : "circe-parser_2.12-0.14.15.jar",
+      "sha256" : "2d3542ebb5cc6a30518a11e54c3055c588ce19e8e10813134064ac6761cc590f"
+    },
+    {
+      "jar" : "config-1.3.4.jar",
+      "sha256" : "8aa8931d8143154f86d393d4a85cfa207a884f16469cdf314dc8d6abba3f1438"
+    },
+    {
+      "jar" : "debox_2.12-0.10.0.jar",
+      "sha256" : "7e1a47b430e6ad9bb7943b384805f99140554e4fe53aa787721dc4e49a7932e9"
+    },
+    {
+      "jar" : "ergo-core_2.12.jar",
+      "sha256" : "1573c2c96eab4632744531bcb34a41bf3b10bf5db71241a8ab5bdd989a7fb7fc"
+    },
+    {
+      "jar" : "ergo-wallet_2.12.jar",
+      "sha256" : "8c5b856e10051827ebb7ca8eeddeccb2b701f9f4430661d3d4db7405f9476a86"
+    },
+    {
+      "jar" : "error_prone_annotations-2.0.18.jar",
+      "sha256" : "cb4cfad870bf563a07199f3ebea5763f0dec440fcda0b318640b1feaa788656b"
+    },
+    {
+      "jar" : "fastparse_2.12-2.3.3.jar",
+      "sha256" : "99ebdabb902a79b9fedd90d6f2b459eff6982849ecd0a80f958218bad9175120"
+    },
+    {
+      "jar" : "ficus_2.12-1.4.7.jar",
+      "sha256" : "ae0834b6d7ed386c0c8aa3c4eeca33d1b4932b6562f0ce047a5a52eb0343ca22"
+    },
+    {
+      "jar" : "geny_2.12-0.6.10.jar",
+      "sha256" : "07be2815eae87b0f0397f4ea628c4002d744b7be43a04b73fc62429e67ff6915"
+    },
+    {
+      "jar" : "guava-23.0.jar",
+      "sha256" : "7baa80df284117e5b945b19b98d367a85ea7b7801bd358ff657946c3bd1b6596"
+    },
+    {
+      "jar" : "j2objc-annotations-1.1.jar",
+      "sha256" : "2994a7eb78f2710bd3d3bfb639b2c94e219cedac0d4d084d516e78c16dddecf6"
+    },
+    {
+      "jar" : "jawn-parser_2.12-1.6.0.jar",
+      "sha256" : "3ac478a24fd55caed61c2ccb10dda337549409684decc1279a2e71b45da3ea2f"
+    },
+    {
+      "jar" : "jsr305-3.0.2.jar",
+      "sha256" : "766ad2a0783f2687962c8ad74ceecc38a28b9f72a2d085ee438b7813e928d0c7"
+    },
+    {
+      "jar" : "leveldb-0.12.jar",
+      "sha256" : "3c12eafb8bff359f97aec4d7574480cfc06e83f44704de020a1c0627651ba4b6"
+    },
+    {
+      "jar" : "leveldb-api-0.12.jar",
+      "sha256" : "3af7f350ab81cba9a35cbf874e64c9086fdbc5464643fdac00a908bbf6f5bfed"
+    },
+    {
+      "jar" : "leveldbjni-all-1.18.3.jar",
+      "sha256" : "18da00444c77080d4422b16c9d4750c4addabda350b702b4a6d628b86658e585"
+    },
+    {
+      "jar" : "logback-classic-1.2.13.jar",
+      "sha256" : "937afb220b91d8a394d78befdbf587c71aeed289d582e2a91e72a7d92172371d"
+    },
+    {
+      "jar" : "logback-core-1.2.13.jar",
+      "sha256" : "07b1586faf220c05821d0f3ed8e2e417e214c83f40641f76e8a90b134c31ff6b"
+    },
+    {
+      "jar" : "machinist_2.12-0.6.8.jar",
+      "sha256" : "570aede4e5e88f4f881aa6a49d958b76af3457aa3662bd590d254eb7d64c08e0"
+    },
+    {
+      "jar" : "macro-compat_2.12-1.1.1.jar",
+      "sha256" : "8b1514ec99ac9c7eded284367b6c9f8f17a097198a44e6f24488706d66bbd2b8"
+    },
+    {
+      "jar" : "scala-collection-compat_2.12-2.7.0.jar",
+      "sha256" : "fb68864a0248af0979d45921869eb1230b5926aa61e5c0a8737c3f73ae582e92"
+    },
+    {
+      "jar" : "scala-library-2.12.21.jar",
+      "sha256" : "e2f4040c95cc4dd1cfeaae38bdde596e4b36933632451efa7d8564c6a359510c"
+    },
+    {
+      "jar" : "scala-logging_2.12-3.9.5.jar",
+      "sha256" : "392979e5525856737a6f2398e25789d0b2057c8e3c55045a6e8d9704c21de7a6"
+    },
+    {
+      "jar" : "scala-reflect-2.12.21.jar",
+      "sha256" : "8b91a08ba69a0564689793e732f06768d0914ec9e90fa8c3d1b55c5bf4600c14"
+    },
+    {
+      "jar" : "scodec-bits_2.12-1.1.34.jar",
+      "sha256" : "3754e6ed81d25c872dee8383e27830eac474f77251af0bf5d06ec5bc78bcfb3d"
+    },
+    {
+      "jar" : "scorex-util_2.12-0.2.2.jar",
+      "sha256" : "4e3b0422a747b02fc83a7fd7659fc4453abc813c7b95ab858d13f63832bdd80e"
+    },
+    {
+      "jar" : "scrypto_2.12-3.1.1.jar",
+      "sha256" : "a9b44951038cd4049b997cebfb24c64b3b664a2427ac550be09030ad4119830a"
+    },
+    {
+      "jar" : "shapeless_2.12-2.3.13.jar",
+      "sha256" : "b5e71ed111548ebff93272d710402a6c40fbcc6b50c2d2d6f164b0e3c315c001"
+    },
+    {
+      "jar" : "sigma-state_2.12-6.0.6.jar",
+      "sha256" : "91423ee0dc5857ee53568e655fcc77abdc36f67f735897eefee576a4e37f1898"
+    },
+    {
+      "jar" : "slf4j-api-1.7.36.jar",
+      "sha256" : "d3ef575e3e4979678dc01bf1dcce51021493b4d11fb7f1be8ad982877c16a1c0"
+    },
+    {
+      "jar" : "sourcecode_2.12-0.2.3.jar",
+      "sha256" : "f686fc27121eace778250557d391cbbfe46843ab91fe107a8600564a492c83d2"
+    },
+    {
+      "jar" : "spire-macros_2.12-0.17.0-M1.jar",
+      "sha256" : "8d687fc799a295a7c99751062bca24d8ce857bedaadbf7d0bdc98a819cce3316"
+    },
+    {
+      "jar" : "spire-platform_2.12-0.16.2.jar",
+      "sha256" : "38fb668da6b6e3f1c71347868c2360f934352e656acc7c92489e444f28434e97"
+    },
+    {
+      "jar" : "spire-util_2.12-0.16.2.jar",
+      "sha256" : "0a6cbe2ce91ba32f699fbc96188af1f9583091e2dda00b98f5e088a9dc2eeb1d"
+    },
+    {
+      "jar" : "spire_2.12-0.16.2.jar",
+      "sha256" : "113ad947fcdb0c387e96384be9193f624d8513b6e554441b8b86dcc9bbf189a5"
+    },
+    {
+      "jar" : "supertagged_2.12-2.0-RC2.jar",
+      "sha256" : "a14e9782f09d747323dacac7adcdefa9aa105012c5c42017971868c5c663a7b7"
+    }
+  ],
+  "classpath_other" : [
+    "tools/scala-oracle",
+    "tools/scala-oracle/.scala-build/scala-oracle_a883f4446c/classes/main"
+  ],
+  "resources" : {
+    "mainnet.conf" : "81b7c666a9b105e6038cbcc4ee1945a1f8496f941dd08c669737586c7b2ef66d",
+    "application.conf" : "9c707935c8ef4e0f215a4fcfba2ebc9f4112ea8e66f2f7d975b7cbd9086c79cf"
+  },
+  "chain_config_sha256" : "72f63abe7d6ed2676a14f824ebc71d755976cbb7d0db61349a85cdc6310e79ae",
+  "relay_policy" : {
+    "max_transaction_cost" : 4900000,
+    "max_transaction_size" : 98304
+  },
+  "vectors" : 1,
+  "oracle_errors" : 0
+}

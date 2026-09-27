@@ -1,0 +1,194 @@
+   Compiling ring v0.17.14
+   Compiling rustls v0.23.43
+   Compiling rustls-webpki v0.103.15
+   Compiling tokio-rustls v0.26.4
+   Compiling ureq v3.4.1
+   Compiling hyper-rustls v0.27.9
+   Compiling reqwest v0.12.28
+   Compiling ergo-sandbox v0.5.0 (<repo>/ergo-sandbox)
+   Compiling ergo-web v0.5.0 (<repo>/ergo-web)
+    Finished `test` profile [optimized + debuginfo] target(s) in 21.72s
+     Running unittests src/lib.rs ($CARGO_TARGET_DIR/debug/deps/ergo_web-4c3b466f9fb3436a)
+
+running 11 tests
+test input::tests::empty_is_invalid_input ... ok
+test input::tests::a_known_mainnet_address_resolves_to_the_same_tree ... ok
+test ratelimit::tests::a_bucket_allows_a_burst_then_refuses_with_a_wait ... ok
+test input::tests::oversized_is_too_large ... ok
+test routes::explain::tests::residual_rendering_is_lossless_or_explicitly_unavailable ... ok
+test routes::inspect::tests::absent_network_is_mainnet ... ok
+test routes::inspect::tests::only_exact_spellings_are_accepted ... ok
+test input::tests::garbage_is_invalid_input ... ok
+test routes::compile::tests::write_failure_keeps_zero_without_claiming_a_source_position ... ok
+test input::tests::valid_hex_resolves ... ok
+test engine::tests::a_permit_is_held_until_the_blocking_job_finishes ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.46s
+
+     Running unittests src/main.rs ($CARGO_TARGET_DIR/debug/deps/ergo_web-924f8062de580182)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/checklist.rs ($CARGO_TARGET_DIR/debug/deps/checklist-54dc0341b99c2851)
+
+running 6 tests
+test checklist_preflight_is_only_a_supplied_transaction_check ... ok
+test checklist_defaults_to_unchecked ... ok
+test checklist_never_emits_a_score ... ok
+test checklist_rejects_mismatched_or_forged_artifacts ... ok
+test checklist_uses_inspect_network_resolution_and_limits ... ok
+test checklist_answer_carries_provenance ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/evidence_replay.rs ($CARGO_TARGET_DIR/debug/deps/evidence_replay-80e060db2139d45e)
+
+running 4 tests
+test replay_request_never_fetches_or_broadcasts ... ok
+   Compiling ring v0.17.14
+   Compiling rustls v0.23.43
+   Compiling rustls-webpki v0.103.15
+   Compiling ureq v3.4.1
+   Compiling ergo-sandbox v0.5.0 (<repo>/ergo-sandbox)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 12.49s
+test http_and_cli_replay_have_identical_semantic_results ... ok
+test legacy_preflight_does_not_use_node_claim_badge ... ok
+test historical_and_hypothetical_state_labels_are_visible ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.96s
+
+     Running tests/http.rs ($CARGO_TARGET_DIR/debug/deps/http-6e3d15523a309600)
+
+running 50 tests
+test compile_errors_carry_an_offset ... ok
+test compile_missing_params_is_a_structured_400 ... ok
+test compile_accepts_an_eip5_template_with_params ... ok
+test compile_returns_tree_addresses_roundtrip_and_findings ... ok
+test eval_rejects_a_scenario_with_neither_tree_nor_source ... ok
+test eval_keeps_a_runtime_exception_as_an_error_verdict ... ok
+test eval_reports_a_failing_scenario_as_a_verdict_not_an_error ... ok
+test eval_runs_a_source_scenario_to_a_verdict ... ok
+test garbage_input_is_a_400 ... ok
+test examples_serve_raw_es_files_and_recipe_docs ... ok
+test eval_compile_errors_are_invalid_input_with_the_reason ... ok
+test config_reports_the_chain_height_when_an_explorer_is_configured ... ok
+test guarded_get_returns_no_findings ... ok
+test compose_without_values_returns_no_suite_and_rejects_a_bad_spec ... ok
+test compile_with_params_fills_the_environment ... ok
+test health_returns_ok ... ok
+test eval_returns_the_trace_and_a_p2pk_residual ... ok
+test compile_findings_carry_source_offsets ... ok
+test examples_list_and_fetch ... ok
+test an_unknown_example_is_a_404_in_the_error_envelope ... ok
+test compose_returns_source_params_and_a_run_suite_when_values_are_given ... ok
+test lookup_by_address_returns_boxes_in_scenario_shape_with_raw_registers ... ok
+test hunt_reports_a_trivially_true_tree_as_spendable_by_anyone ... ok
+test hunt_accepts_a_self_box_and_a_height ... ok
+test malformed_json_body_is_a_json_400 ... ok
+test lookup_is_not_configured_by_default ... ok
+test hunt_accepts_data_inputs ... ok
+test lookup_by_box_id_returns_that_box ... ok
+test point_derives_the_public_point_of_a_secret ... ok
+test inspect_and_compile_put_the_contract_into_words ... ok
+test hunt_rejects_a_bad_self_box_as_invalid_input ... ok
+test a_fetched_box_feeds_the_hunt_as_self_box ... ok
+test hunt_rent_grows_with_a_typed_register_of_real_size ... ok
+test inspect_fields_are_camel_case_like_the_other_endpoints ... ok
+test legacy_http_envelopes_preserve_claim_labels ... ok
+test play_applies_a_transaction_and_returns_new_boxes ... ok
+test compile_does_not_claim_substituted_offsets_are_authored_positions ... ok
+test engine_requests_over_the_per_ip_budget_get_a_json_429 ... ok
+test a_deeply_nested_contract_does_not_kill_the_server ... ok
+test test_endpoint_runs_a_suite_and_reports_each_case ... ok
+test compile_phases_distinguish_source_zero_from_unpositioned_zero ... ok
+test test_endpoint_reports_a_non_compiling_contract_as_400 ... ok
+test validate_tx_runs_every_input_script_and_reports_balances ... ok
+test validate_tx_without_boxes_and_without_an_explorer_reports_missing ... ok
+test unknown_network_is_a_400 ... ok
+test testnet_network_encodes_a_testnet_address ... ok
+test unguarded_get_returns_one_high_finding ... ok
+test oversized_body_413_is_json ... ok
+test validate_tx_fetches_missing_boxes_from_the_explorer_when_configured ... ok
+test rate_limit_is_off_by_default ... ok
+
+test result: ok. 50 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/lock.rs ($CARGO_TARGET_DIR/debug/deps/lock-4299961955aafcaa)
+
+running 1 test
+test lock_route_uses_compile_inputs_and_exact_source_text ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/map.rs ($CARGO_TARGET_DIR/debug/deps/map-fd00ff6657f153e9)
+
+running 6 tests
+test live_map_requires_configuration_and_matching_network ... ok
+test caps_and_unresolved_references_are_not_silently_omitted ... ok
+test live_map_uses_configured_explorer_and_reports_missing_seed ... ok
+test all_seed_kinds_and_exact_box_frontier ... ok
+test offline_map_reaches_related_source_and_preserves_typed_edges ... ok
+test invalid_inputs_and_recording_gaps_are_json_errors ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/negative_space.rs ($CARGO_TARGET_DIR/debug/deps/negative_space-1b01b93a62b762e1)
+
+running 2 tests
+test negative_space_lines_have_anchors ... ok
+test negative_space_is_labelled_static ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/play_export.rs ($CARGO_TARGET_DIR/debug/deps/play_export-e3b79f04f5bdb9c2)
+
+running 4 tests
+test exported_case_names_only_the_suite_contract ... ok
+test export_rejects_bad_selection_kind_missing_boxes_and_oversized_bodies ... ok
+test signing_material_is_omitted_and_unsigned_expectation_is_named ... ok
+test play_export_roundtrips_through_cli_test_runner ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/share_links.rs ($CARGO_TARGET_DIR/debug/deps/share_links-62214838fbb5088d)
+
+running 2 tests
+test share_link_roundtrips_play_state ... ok
+test share_link_over_cap_is_refused_with_size ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running tests/verify.rs ($CARGO_TARGET_DIR/debug/deps/verify-735c385a4c85db5e)
+
+running 1 test
+test verify_http_outcomes_and_compile_shape ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/watch.rs ($CARGO_TARGET_DIR/debug/deps/watch-73ad5239745308f7)
+
+running 2 tests
+test watch_route_returns_unverified_without_explorer_and_keeps_no_baseline ... ok
+test watch_route_rejects_urls_unknown_fields_bad_inputs_and_oversized_body ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/write_cost_explain.rs ($CARGO_TARGET_DIR/debug/deps/write_cost_explain-252d5813919112c5)
+
+running 5 tests
+test hot_spots_map_to_source_spans ... ok
+test cost_trace_route_is_behind_feature_flag ... ok
+test explain_rejects_bad_selections_and_preserves_partial_runs ... ok
+test explain_keeps_unicode_substitution_and_sigma_trace_limits_explicit ... ok
+test explain_subexpression_matches_full_reduction ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+   Doc-tests ergo_web
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

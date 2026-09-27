@@ -27,6 +27,16 @@ their outcomes; no previously exact seed or mainnet row was lost. The compiler, 
 and validator continue to share one Cargo pin. See `docs/reports/batch-10/` for
 the measured revision pair and exact per-corpus outcomes.
 
+The pin then moved again, `016533194f94ad95b1a87df70bb9bfce493922e2` →
+`a203cc02f585bcbe13c743aee008222b208f3c82` (node 0.8.0). Seed and mainnet stayed
+79/92 and 270/279, row for row, and all nine P03 vectors kept their outcomes. Four
+recorded block costs move with the node's Scala-parity cost fixes: the P03
+storage-rent acceptance, two M05 stop executions and the USE incident's preceding
+transactions. The records stay as they were; the tests correct each cost by key to
+the value the Scala 6.0.6 node charges. Two `registry` example scenarios now expect the
+error the Scala node raises for a refused insert on a pre-v3 tree. See
+`docs/reports/node-pin-a203cc02.md`.
+
 The existing test action downloads the matching `ergo-es` asset from a named
 tag or the latest release. The 0.5.0 source includes `verify-lock`, satisfying
 its lockfile compatibility probe once `v0.5.0` becomes the latest release.

@@ -1,0 +1,113 @@
+{
+  "id" : "use-prior-4",
+  "scala" : {
+    "ergo_version" : "6.0.6",
+    "sigma_version" : "6.0.6",
+    "tx_bytes_blake2b256" : "5762701690e4142df0a5ca1001ac58d10bac740c5bda03c5560780d892e85040",
+    "request" : {
+      "height" : 1868204,
+      "pre_header" : {
+        "version" : 4,
+        "parent_id" : "71b29999204aee33af5dda49eb8dde4ac7a7ccd035b9199f6dab77552d3ca3e3",
+        "timestamp" : 1788813125484,
+        "n_bits" : 104808097,
+        "votes" : "000000",
+        "miner_pk" : "0204b680ae52835e22f12fc3c51c4cd9e18852ac4f4a8131be29920678aceeeebe"
+      },
+      "fixture_blake2b256" : "f820bbc0b37680efc09170e4dca2bf014a2684fa98e666709bd70f0a84f697a5",
+      "min_value_per_byte" : 360,
+      "input_ids" : [
+        "0ed42127253ed9cf602da9bbc2663524d086906842713cfdb9e71037133790c6",
+        "1caa54fc10df864e3709f3e9013cb4191e5415367fa8e88a55bc5f05999a7186",
+        "253f68e7145250897a7f271410c96c86b463805520cfc3d60cd702f3091e152f",
+        "4afe737fcf47f3e6dee27935026d262b398620a690348511b3f872b9ee966eee",
+        "4f53fb547d075412ef1dc1fb38ffe6eecbc959daa5fb1ea87580dbc1c115a95d",
+        "660fda5855bbc2a27a6e4c3f8de1f8ddd5e5579ebc40eb0f7eb773ba161f338c",
+        "6754e57e5fd8781bf6dc25bf420186b562c37bbc97174f118fccecff2cce5c37",
+        "6ea12ba0a376a538cc521ae2f11850bff94e446bd4681f64d28ffeb24f8afcf4",
+        "73acc0d75a510947f50656a18829a8fa27129b3d18c77416145e49207cfd7848",
+        "73f2304a8f06fc8e92cfd3e4a556e736b622fb6a2822ca042685878119aaecf9",
+        "98250f298a06d29b210cf1fd30a9ff0e2d734e878b4b6b4b43b62716ad0d0e7b",
+        "99fd10115e4fc52204fcb3c46f0f5246fa02c9c19d0edba89981afe0e239618e",
+        "9b866035c06276b678e0206abebc1be6ccee7f0796763d352302651115692428"
+      ],
+      "data_input_ids" : [
+      ],
+      "activated_script_version" : 3,
+      "last_headers" : 0
+    },
+    "tx_id" : "30c1cacc7f4e30f1b52f1f1da35ae93750bf9187461eb374ecf9d9f9ade3d719",
+    "stateless_ok" : true,
+    "accepted" : true,
+    "total_block_cost" : 57839,
+    "failing_input" : null,
+    "error" : null,
+    "per_input" : [
+      {
+        "index" : 0,
+        "ok" : true,
+        "block_cost" : 410
+      },
+      {
+        "index" : 1,
+        "ok" : true,
+        "block_cost" : 410
+      },
+      {
+        "index" : 2,
+        "ok" : true,
+        "block_cost" : 403
+      },
+      {
+        "index" : 3,
+        "ok" : true,
+        "block_cost" : 410
+      },
+      {
+        "index" : 4,
+        "ok" : true,
+        "block_cost" : 410
+      },
+      {
+        "index" : 5,
+        "ok" : true,
+        "block_cost" : 410
+      },
+      {
+        "index" : 6,
+        "ok" : true,
+        "block_cost" : 403
+      },
+      {
+        "index" : 7,
+        "ok" : true,
+        "block_cost" : 410
+      },
+      {
+        "index" : 8,
+        "ok" : true,
+        "block_cost" : 410
+      },
+      {
+        "index" : 9,
+        "ok" : true,
+        "block_cost" : 410
+      },
+      {
+        "index" : 10,
+        "ok" : true,
+        "block_cost" : 410
+      },
+      {
+        "index" : 11,
+        "ok" : true,
+        "block_cost" : 410
+      },
+      {
+        "index" : 12,
+        "ok" : true,
+        "block_cost" : 410
+      }
+    ]
+  }
+}

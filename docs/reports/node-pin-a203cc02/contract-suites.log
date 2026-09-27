@@ -1,0 +1,284 @@
+== examples/tests/amm-pool.test.json
+contract: nfPiFMxDK9XD8e4GzyQatyFx44qGBtFXqyNLDXd3UVCgop5aQqZ5E5jeJ9xh33Diy5oa9X1vWuX5E25YwyR3sp3qs7EQ8bJzKQ3RT5Jorrr7MiFa1JcoMTdemgEzRSTJj4TM9XMdEhzQiBDu7oqygPasUh4uJat4UsBsZiKFn3HXWUVkZQEGCUQYzy2SRUnNoKze5U8EADjhcEpsofLan7VSoknjJ9VMbrKgimFD8XRPaKuuBuU4CDHoWTABmvnxwemSCnmSgJX3kMizEgiEpj8ekZay6t6KUw8aRqShck83Ko4jTES52nFZgsgCT4E6jaG3z1eUfmPUg6bTazXJVVNp7yGMbwrutwoaMa2f3hTWjLbNAsLKUEhACQjS3jc3B1gF4TQNwTh3wHyaJeom9EwjDViBXEsrJpRjVJXBkFEGgFDTspUiP6fdvMtjP5EsdZ3t4dgNGUBoAiSnyzeEygMw2hXab7tifAu3Syo1ukJDwWHF181wbSXVZhUFvfwAzUemMZAu9qvAA9GAwHLQAv7Qv7CY6VU7nmVkUc4d5C8wySDQxuHUXpJUZPJkUjggKqM8otWSEwWNDk3aC6e63uqWe4ZsJDdJGLfEhDwiFC9FGkG9ssVnMsFnse
+  ok    swap 215.496 ERG in, the most Y the curv… expected pass          got pass          cost 153
+  ok    swap 215.496 ERG in, one unit of Y too m… expected fail          got fail          cost 175
+  ok    swap 28.666 ERG in, the most Y the curve… expected pass          got pass          cost 153
+  ok    swap 28.666 ERG in, one unit of Y too ma… expected fail          got fail          cost 175
+  ok    swap 53.941 ERG in, the most Y the curve… expected pass          got pass          cost 153
+  ok    swap 53.941 ERG in, one unit of Y too ma… expected fail          got fail          cost 175
+  ok    swap 319.498 ERG in, the most Y the curv… expected pass          got pass          cost 153
+  ok    swap 319.498 ERG in, one unit of Y too m… expected fail          got fail          cost 175
+  ok    swap 118.244 ERG in, the most Y the curv… expected pass          got pass          cost 153
+  ok    swap 118.244 ERG in, one unit of Y too m… expected fail          got fail          cost 175
+  ok    swap 47.506 ERG in, the most Y the curve… expected pass          got pass          cost 153
+  ok    swap 47.506 ERG in, one unit of Y too ma… expected fail          got fail          cost 175
+  ok    swap 229.596 ERG in, the most Y the curv… expected pass          got pass          cost 153
+  ok    swap 229.596 ERG in, one unit of Y too m… expected fail          got fail          cost 175
+  ok    swap 129.249 ERG in, the most Y the curv… expected pass          got pass          cost 153
+  ok    swap 129.249 ERG in, one unit of Y too m… expected fail          got fail          cost 175
+  ok    swap 195804716 Y in, the most ERG the cu… expected pass          got pass          cost 153
+  ok    swap 195804716 Y in, one nanoERG too man… expected fail          got fail          cost 175
+  ok    swap 1184364967 Y in, the most ERG the c… expected pass          got pass          cost 153
+  ok    swap 1184364967 Y in, one nanoERG too ma… expected fail          got fail          cost 175
+  ok    swap 912648019 Y in, the most ERG the cu… expected pass          got pass          cost 153
+  ok    swap 912648019 Y in, one nanoERG too man… expected fail          got fail          cost 175
+  ok    swap 127938843 Y in, the most ERG the cu… expected pass          got pass          cost 153
+  ok    swap 127938843 Y in, one nanoERG too man… expected fail          got fail          cost 175
+  ok    swap 1215302567 Y in, the most ERG the c… expected pass          got pass          cost 153
+  ok    swap 1215302567 Y in, one nanoERG too ma… expected fail          got fail          cost 175
+  ok    swap 266862673 Y in, the most ERG the cu… expected pass          got pass          cost 153
+  ok    swap 266862673 Y in, one nanoERG too man… expected fail          got fail          cost 175
+  ok    swap 480402028 Y in, the most ERG the cu… expected pass          got pass          cost 153
+  ok    swap 480402028 Y in, one nanoERG too man… expected fail          got fail          cost 175
+  ok    swap 1355258844 Y in, the most ERG the c… expected pass          got pass          cost 153
+  ok    swap 1355258844 Y in, one nanoERG too ma… expected fail          got fail          cost 175
+  ok    deposit 321.52 ERG + 266695473 Y, the pr… expected pass          got pass          cost 171
+  ok    deposit 321.52 ERG + 266695473 Y, one LP… expected fail          got fail          cost 181
+  ok    deposit 321.31 ERG + 1704729684 Y, the p… expected pass          got pass          cost 171
+  ok    deposit 321.31 ERG + 1704729684 Y, one L… expected fail          got fail          cost 159
+  ok    deposit 23.42 ERG + 2391857534 Y, the pr… expected pass          got pass          cost 171
+  ok    deposit 23.42 ERG + 2391857534 Y, one LP… expected fail          got fail          cost 159
+  ok    deposit 77.70 ERG + 1244862422 Y, the pr… expected pass          got pass          cost 171
+  ok    deposit 77.70 ERG + 1244862422 Y, one LP… expected fail          got fail          cost 159
+  ok    deposit 80.11 ERG + 2323228204 Y, the pr… expected pass          got pass          cost 171
+  ok    deposit 80.11 ERG + 2323228204 Y, one LP… expected fail          got fail          cost 159
+  ok    deposit 315.04 ERG + 1325919352 Y, the p… expected pass          got pass          cost 171
+  ok    deposit 315.04 ERG + 1325919352 Y, one L… expected fail          got fail          cost 181
+  ok    redeem 301785835 LP for the proportional… expected pass          got pass          cost 193
+  ok    redeem 301785835 LP taking one nanoERG t… expected fail          got fail          cost 165
+  ok    redeem 301785835 LP taking one Y too man… expected fail          got fail          cost 193
+  ok    redeem 439154501 LP for the proportional… expected pass          got pass          cost 193
+  ok    redeem 439154501 LP taking one nanoERG t… expected fail          got fail          cost 165
+  ok    redeem 439154501 LP taking one Y too man… expected fail          got fail          cost 193
+  ok    redeem 367147410 LP for the proportional… expected pass          got pass          cost 193
+  ok    redeem 367147410 LP taking one nanoERG t… expected fail          got fail          cost 165
+  ok    redeem 367147410 LP taking one Y too man… expected fail          got fail          cost 193
+  ok    redeem 98026737 LP for the proportional … expected pass          got pass          cost 193
+  ok    redeem 98026737 LP taking one nanoERG to… expected fail          got fail          cost 165
+  ok    redeem 98026737 LP taking one Y too many expected fail          got fail          cost 193
+  ok    redeem 56327612 LP for the proportional … expected pass          got pass          cost 193
+  ok    redeem 56327612 LP taking one nanoERG to… expected fail          got fail          cost 165
+  ok    redeem 56327612 LP taking one Y too many expected fail          got fail          cost 193
+  ok    redeem 313244210 LP for the proportional… expected pass          got pass          cost 193
+  ok    redeem 313244210 LP taking one nanoERG t… expected fail          got fail          cost 165
+  ok    redeem 313244210 LP taking one Y too man… expected fail          got fail          cost 193
+  ok    a fair swap that also mints LP for free  expected fail          got fail          cost 138
+  ok    a fair swap into a box under another scr… expected fail          got fail          cost 83
+  ok    a fair swap that swaps the NFT for anoth… expected fail          got fail          cost 95
+  ok    a fair swap that changes the LP token id expected fail          got fail          cost 100
+  ok    a successor with only two tokens         expected fail          got fail          cost 20
+  ok    a deposit that takes ERG out             expected fail          got fail          cost 136
+  ok    no outputs at all                        expected fail          got fail          cost 12
+69 passed, 0 failed
+== examples/tests/amm-swap-order.test.json
+contract: 27MvqBJibKstBFF3hbT84CoCmzyasP83iqArW1RYW1rgesYHiJr26aHDgBPZq17yBgQdmNGKWS6bs4c8418diQLzefDoQKwjY1BYYcb3oFVo1p8DZVSCB9rFYdaYooG2ckAkUGNBZaZB2TDUzo5LetyG17p1nC8LWxgj1apC6a7RU3e3KJpZ3WKaGbv9JWvKm58AGRo4DxZWi7dR4LTVqXrACyHFUCUQpRVyFjXsPJ8NybD5Ss4gGN9PGJ1LWMcUcW91SPRCHfvMG4NBs3BkrZeRGRFT19nESYqta4ns4gUp23KXgZoxUHf3zWN6eVJzHfop3Q7vgwjQdCbsqBgHfihbc8qDddeCqmNzzcAHpB7boqurhzDCJLnC87mjsw3UU
+  ok    filled at the minimum: no key needed     expected pass          got pass          cost 89
+  ok    filled above the minimum                 expected pass          got pass          cost 89
+  ok    one unit short: only the trader could si… expected needsProof    got needsProof    cost 89  -> ProveDlog(028333f9f7454f8d…)
+  ok    paid in the wrong token                  expected needsProof    got needsProof    cost 77  -> ProveDlog(028333f9f7454f8d…)
+  ok    against a box that is not the pool (no N… expected needsProof    got needsProof    cost 45  -> ProveDlog(028333f9f7454f8d…)
+  ok    the trader cancels                       expected needsProof    got needsProof    cost 30  -> ProveDlog(028333f9f7454f8d…)
+6 passed, 0 failed
+== examples/tests/auction.test.json
+contract: 2AVd6LQP8T13qk7WqTFZSSA2X8gtVpu3CxdmwqEdkUTL3uvhVVi4RcV8UGPVAakFBDcxdrACyB6NR2GPLVXmyueLQc1PkGaZzhQeMuHvMTwS27ZUGbUmAqiTX8GYtoZaTY8B2Hywv2qhrUd96Wgao1LPCXre6kSm3LobfJMkDiJfDqdm1Jo4F1eZ1C92538CfJnSVJ9iREQNLRwqR8NTDPPb2dF6nxTn1aFiEaFNyHjnpmkVajtpVC4sswjrbgRwzdMnGq9mrnyFeokZknrnAUGdEqufcBhfyhzdhZhgyKz9ETGGFDD4ensFy4FyErnNL7kr9ou24
+  ok    first bid at the starting price: box reb… expected pass          got pass          cost 114
+  ok    a fresh box with no R4 counts as no bids expected pass          got pass          cost 114
+  ok    first bid one nanoERG under the starting… expected needsProof    got needsProof    cost 103  -> ProveDlog(028333f9f7454f8d…)
+  ok    a raise by the minimum, refunding the pr… expected pass          got pass          cost 117
+  ok    a raise one nanoERG too small            expected fail          got fail          cost 107
+  ok    a raise that does not refund the previou… expected fail          got fail          cost 125
+  ok    a bid that drops the item from the box   expected fail          got fail          cost 91
+  ok    a bid that forgets to name the bidder in… expected fail          got fail          cost 117
+  ok    no bids once the auction has ended       expected fail          got fail          cost 80
+  ok    settle after the end: seller paid the wi… expected pass          got pass          cost 112
+  ok    settling before the end is refused       expected fail          got fail          cost 79
+  ok    settling that shorts the seller          expected fail          got fail          cost 91
+  ok    settling that sends the item to someone … expected fail          got fail          cost 99
+  ok    with no bids the seller can take the ite… expected needsProof    got needsProof    cost 72  -> ProveDlog(028333f9f7454f8d…)
+  ok    once someone has bid, the seller cannot … expected fail          got fail          cost 72
+15 passed, 0 failed
+== examples/tests/bank.test.json
+contract: 2ZP4M9EkTHmirF8vURA89ApwJdKRBgAat41msuUzkHcazyk3vgeYNYvDvjhJ98W8AHHBvquth4CzS3msCzbPMuJn3tXWVJY9vxEC55hv3Hv8HupMNm6BVfViM9Hb1smEv77kqDrHJTsJkQGDnTJjNuKGQaSyxku1SkQXxt8o8kmEYUnSb9wmvx9jA4mfKu11f5nzGBCXQaAWYQuZYWfxDekB24xRBr6ammHAge4Lcz6Pr1CzdZyLiBAhNdjYWrX35MsCXZrB2XREenwk23nVzUrWvpdRnojtcKBk6niBy9CMbZ5ATPB4VepuKkcannN8sbJEcmkS2YzHp8z3p3vVW8wMwRJ9D1CnJYMoJnsGPCWLRnUHetfstwRCXV7iAbJhM2vV9XZUTwhQBdozjM5zQUC86c5eymSkQQQtSee6YJo4GDM5BT5LMoWUcdFoe8fce3FQu5eRHDz58gXBDCKwSYjirDp9w9CvJ6fF2fw27Wqo8MrgC8wt1UMM5uMfGhuzk9JndAJhoVnBcg8wTwyjuiJHeux58LTUomisSe56hT35jsFg8iWhRVE9Vpn3twQmpvoWbN2wdsdEHuRfQaZMEceL1i7EvJDd7QFDrkqy7HkiLKkT9nuG9RGcDMAukBJrDMLiNeR23LnfyadKbRkkS8KcdonbGvaYCyc9Tcg7LHqxeuQr1xZSgv4MQghSuP6sV4tkUzksHDeDmLNjDgEzTC7P1QhCbdpSWPuzDod35qWBXkmpsrofHeNfYp7YDv3gNZFX1TwcCRzij2ZBSSpurGnFjdWuuHk4rpP9zK4X2cR7gGWhtn2hgCRYnu2wNPAN4eEdbzgthnWJj6npJBcm4qTMUk3BZJkT6m8FAovAnbCH6oyBCPk8D9zx5qp8bDMK28hCwzLgiETdAEDRr1SBzBNhA3688pAQEWgUaRESLzi7b1A9aKJtjfoUj5xE97pcL8kUSnWtQsMFzazxySLsvvf3CPinw6nb8h
+  ok    ERG at rate 12000000, ratio 277%: redeem… expected fail          got fail          cost 374
+  ok    ERG at rate 12000000, ratio 277%: redeem… expected fail          got fail          cost 340
+  ok    ERG at rate 20000000, ratio 166%: redeem… expected pass          got pass          cost 334
+  ok    ERG at rate 20000000, ratio 166%: redeem… expected fail          got fail          cost 327
+  ok    ERG at rate 20000000, ratio 166%: redeem… expected fail          got fail          cost 374
+  ok    ERG at rate 20000000, ratio 166%: redeem… expected fail          got fail          cost 340
+  ok    ERG at rate 4000000, ratio 833%: redeem … expected pass          got pass          cost 374
+  ok    ERG at rate 4000000, ratio 833%: redeem … expected fail          got fail          cost 340
+  ok    ERG at rate 6666667, ratio 499%: mint 14… expected fail          got fail          cost 345
+  ok    ERG at rate 6666667, ratio 499%: mint 14… expected fail          got fail          cost 321
+  ok    ERG at rate 40000000, ratio 83%: mint 15… expected fail          got fail          cost 345
+  ok    ERG at rate 40000000, ratio 83%: mint 15… expected fail          got fail          cost 321
+  ok    ERG at rate 12000000, ratio 277%: redeem… expected fail          got fail          cost 374
+  ok    ERG at rate 12000000, ratio 277%: redeem… expected fail          got fail          cost 340
+  ok    ERG at rate 20000000, ratio 166%: mint 1… expected fail          got fail          cost 345
+  ok    ERG at rate 20000000, ratio 166%: mint 1… expected fail          got fail          cost 321
+  ok    ERG at rate 4000000, ratio 833%: mint 10… expected pass          got pass          cost 345
+  ok    ERG at rate 4000000, ratio 833%: mint 10… expected fail          got fail          cost 321
+  ok    ERG at rate 6666667, ratio 499%: redeem … expected pass          got pass          cost 334
+  ok    ERG at rate 6666667, ratio 499%: redeem … expected fail          got fail          cost 327
+  ok    ERG at rate 12000000, ratio 277%: mint 9… expected pass          got pass          cost 368
+  ok    ERG at rate 12000000, ratio 277%: mint 9… expected fail          got fail          cost 334
+  ok    ERG at rate 20000000, ratio 166%: redeem… expected pass          got pass          cost 334
+  ok    ERG at rate 20000000, ratio 166%: redeem… expected fail          got fail          cost 327
+  ok    ERG at rate 6666667, ratio 499%: mint 10… expected pass          got pass          cost 368
+  ok    ERG at rate 6666667, ratio 499%: mint 10… expected fail          got fail          cost 334
+  ok    ERG at rate 4000000, ratio 833%: mint 12… expected pass          got pass          cost 345
+  ok    ERG at rate 4000000, ratio 833%: mint 12… expected fail          got fail          cost 321
+  ok    ERG at rate 40000000, ratio 83%: mint 85… expected pass          got pass          cost 371
+  ok    ERG at rate 40000000, ratio 83%: mint 85… expected fail          got fail          cost 337
+  ok    ERG at rate 20000000, ratio 166%: mint 1… expected fail          got fail          cost 345
+  ok    ERG at rate 20000000, ratio 166%: mint 1… expected fail          got fail          cost 321
+  ok    ERG at rate 8000000, ratio 416%: mint 15… expected pass          got pass          cost 368
+  ok    ERG at rate 8000000, ratio 416%: mint 15… expected fail          got fail          cost 334
+  ok    ERG at rate 6666667, ratio 499%: mint 63… expected pass          got pass          cost 368
+  ok    ERG at rate 6666667, ratio 499%: mint 63… expected fail          got fail          cost 334
+  ok    registers not updated for the SC minted  expected fail          got fail          cost 325
+  ok    minting SC and RC in one action          expected fail          got fail          cost 315
+  ok    oracle box with the wrong NFT            expected fail          got fail          cost 70
+  ok    no oracle box at all                     expected fail          got fail          cost 46
+  ok    bank rebuilt under another script        expected fail          got fail          cost 242
+  ok    under-collateralised (ratio below minimu… expected fail          got fail          cost 345
+  ok    under-collateralised: SC redeem at the c… expected pass          got pass          cost 334
+  ok    under-collateralised: RC minted at the d… expected pass          got pass          cost 371
+  ok    under-collateralised: RC redeem is refus… expected fail          got fail          cost 371
+  ok    over-collateralised (ratio above maximum… expected fail          got fail          cost 368
+  ok    over-collateralised: redeeming RC is all… expected pass          got pass          cost 374
+47 passed, 0 failed
+== examples/tests/bounty.test.json
+contract: sAPtQrr1YD62H9rK4XzhmwWUfBEwBBWuS2Yg3dRCqbD8UZki3rCStB8o2Qgc5rBvet6pF2FiNq1eeC558ssdmmodfrr4S1BZWCwrE18RZQ3jYMz2DuS3GNyPnXac7szuDVh7BJrXQSxrvBWmjiSyT4kiMFab
+  ok    revealing the secret before the deadline… expected pass          got pass          cost 29
+  ok    a wrong secret gets nothing before the d… expected fail          got fail          cost 24
+  ok    no secret before the deadline: nothing   expected fail          got fail          cost 17
+  ok    after the deadline the funder may reclai… expected needsProof    got needsProof    cost 17  -> ProveDlog(0279be667ef9dcbb…)
+  ok    after the deadline the secret no longer … expected needsProof    got needsProof    cost 29  -> ProveDlog(0279be667ef9dcbb…)
+5 passed, 0 failed
+== examples/tests/cliff-vesting.test.json
+contract: 7nGURyRbCLDGmJBUyQCXnB7f7B1bQD4C4XnmGsDfXQba35yMZpDmM2nUGifA4RfWx3bthFA3zC7XTZHVPy9hbbjgy6P3HeS3Pid697xqkLpTcPH2feY7YeS6NKfUwyUiD81FxVFd5zRN114PaqyNNYn4a8qMHgKDscBDhCmNJmJEJ4DkNPM6sorVEt9zrwtp
+  ok    before the cliff nothing can be taken ev… expected fail          got fail          cost 42
+  ok    before the cliff the box may be re-locke… expected needsProof    got needsProof    cost 46  -> ProveDlog(028333f9f7454f8d…)
+  ok    at 1600, 60% has vested since the start:… expected needsProof    got needsProof    cost 59  -> ProveDlog(028333f9f7454f8d…)
+  ok    at 1600, taking 700 is refused           expected fail          got fail          cost 54
+  ok    after the end everything may go          expected needsProof    got needsProof    cost 19  -> ProveDlog(028333f9f7454f8d…)
+5 passed, 0 failed
+== examples/tests/compose-state-box.test.json
+contract: Mmx2RzgUMuSAehfeXGXMWKeWtyJdMLrWeeipsqgBMPKouFSKCtJr6p792RpiAh8FtnAWNpbUHsvnGUedqdoMV4MmjYytJgAbL8WkoN2SnjQrEmScFJsA8mPU3VyrmKFPLgNBVQmPuPhDEGUc1biEyJmmrzCzwVdMQjtzmtb3fc4o1TZXAdU8gJQPuNURkcoV39b2pKLJK93NGKH2GRPgSNTzp2UX6viNYEez4kBn98wMQAykheiQzjfR13YRTSz8dyvJHQ8qscZRmqzCavLcVfNyS7cgGgZzHAkxX9RSR33zEQPGJau8hQ1BtE2JuN7KCLczGmmp2WGfEnfEuqgp8NKPhyexd4G4yg9VU94NSi4Kx9kg7EMqdFnGXwvh9biGXxrU1oXKVWbMd1C9ay8aXLrpmLmeKTNoDUhFhjLJwbSaYze8p7CCKMzzdHq8ng7Qt8jgFeUkHPVk9VPYKWsgW3AHdubWS9iNaGCz9SbwpXuYoQaheJ86M6w4ocR25RzAJMCSmNeXcVKDJEFczoj3Z1FKv5xdPPgB4PoNReBh4GJJDmsy5Cw512G8tZeaZV2WY1f3bpU3JdsE6SveJFrRfEvq6BJmzUa9kY6vNnhNwXwehDqEpT
+  ok    owner ticks the box: every condition met expected needsProof    got needsProof    cost 180  -> ProveDlog(026dc059d64a50d0…)
+  ok    owner ticks the box: output 0 not record… expected fail          got fail          cost 108
+  ok    owner ticks the box: paying one nanoERG … expected fail          got fail          cost 170
+  ok    owner ticks the box: one block too young expected fail          got fail          cost 180
+  ok    anyone closes it on a low price with the… expected pass          got pass          cost 129
+  ok    anyone closes it on a low price with the… expected fail          got fail          cost 90
+  ok    anyone closes it on a low price with the… expected fail          got fail          cost 102
+  ok    anyone closes it on a low price with the… expected fail          got fail          cost 123
+  ok    anyone closes it on a low price with the… expected fail          got fail          cost 129
+  ok    baseline: no conditions met, no outputs  expected fail          got fail          cost 51
+10 passed, 0 failed
+== examples/tests/escrow.test.json
+contract: DSVZ5kQVv7sPsu15Rkoi3seBP5rXyJLKXS7QmVTrF99yge5pES6RLdcdr1TvCfUu3v5SMn3ihGBGWGHLCcz4hWDn1JcmsG4Pypz6njL96bw41J5PLnYnyJEky8jXdVVnEMXs1Bv9d3cHwgQLEKLZeG547b1YuciPu6T8y38UkP
+  ok    nobody can take it alone: two of three k… expected needsProof    got needsProof    cost 5  -> Cthreshold { k: 2, children: [ProveDlog(GroupElement(028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197)), ProveDlog(GroupElement(0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798)), ProveDlog(GroupElement(0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798))] }
+1 passed, 0 failed
+== examples/tests/height-lock.test.json
+contract: 5yE8zzMJzqRuDkU1rYb8
+  ok    still locked at the unlock height        expected fail          got fail          cost 6
+  ok    unlocked one block after                 expected pass          got pass          cost 6
+2 passed, 0 failed
+== examples/tests/htlc.test.json
+contract: C1BaDpFweX81WKNF5j1g3xZNrqvEKvse4e2MwxjWbFQhz8gPcDKjtQGQ9jywgvccQWwwYwLMkVqXPE4i3UjgUszTwDeGH4aq1xY66giH2EuN4pQmva8TgWXn9fyavAzwtshY151M8LJxQDdhr4UeopZn7YTzyL2zC8BPLgU6TmPft2MNFJaXxqFXqdAEajN2URUosn11YzPUoGbHj6J
+  ok    the receiver claims with the secret befo… expected needsProof    got needsProof    cost 36  -> ProveDlog(0279be667ef9dcbb…)
+  ok    a wrong secret claims nothing            expected fail          got fail          cost 32
+  ok    no secret at all: nothing before the dea… expected fail          got fail          cost 19
+  ok    the sender takes the funds back after th… expected needsProof    got needsProof    cost 19  -> ProveDlog(028333f9f7454f8d…)
+  ok    after the deadline the secret no longer … expected needsProof    got needsProof    cost 36  -> ProveDlog(028333f9f7454f8d…)
+5 passed, 0 failed
+== examples/tests/mixer-full.test.json
+contract: 2ma4dyxJRF4CJkthcd2hZmDxfWh4xSgvSz2jN5vTDSTtN4ffua6y6FFbPQWEXav521FKhe8rBGSJLX9TuG9kT9rXRdKXmk
+  ok    box (g^y, u^y): the owner proves the Dif… expected proofAccepted got proofAccepted cost 1136
+  ok    box (g^y, u^y): the spender cannot (c2 =… expected needsProof    got needsProof    cost 23  (no proof from these secrets: scenario error: missing secret key for proving: OR proposition: no branch is provable)
+  ok    box (u^y, g^y): the spender proves the d… expected proofAccepted got proofAccepted cost 1136
+  ok    box (u^y, g^y): the owner cannot (c2 = g… expected needsProof    got needsProof    cost 23  (no proof from these secrets: scenario error: missing secret key for proving: OR proposition: no branch is provable)
+  ok    a stranger cannot spend either box       expected needsProof    got needsProof    cost 23  (no proof from these secrets: scenario error: missing secret key for proving: OR proposition: no branch is provable)
+5 passed, 0 failed
+== examples/tests/mixer-half.test.json
+contract: 64T7mLiBKDjGMu2tYddSoJK4cUANkFAQG6dJSVuRH98m5qUJchJQNPx2xmmfZJ7tSTfZkan4ijx2NkCsCjWpmLcBpm3AyaEELSiiW2v7z1b3tARTPE6CPvLZaTxzBmpEC4SVA46ZDnX9NGhTZ5KRBZNUg6De2QZc65eDXv2wmADgK5X6wETBdc4MZmMZotJSdyxFnjab3PTaHG5ghNTpdL9CEoiUrfmN8AXedGWdctLAzcwTdfYn3SYLEuvB2z426Kve39iuqbDortk3j7u6P6r8Z4StRt52iQFsFpXXjgnkzoPDu7jYwegf3pXjeJj4nuWmhUXMrL
+  ok    the owner takes the funds back           expected proofAccepted got proofAccepted cost 412
+  ok    a partner mixes: two full-mix boxes (c1,… expected proofAccepted got proofAccepted cost 1286
+  ok    a partner who cannot prove the tuple (wr… expected needsProof    got needsProof    cost 173  (no proof from these secrets: scenario error: missing secret key for proving: OR proposition: no branch is provable)
+  ok    the mirror box not mirrored: refused     expected needsProof    got needsProof    cost 124  (no proof from these secrets: scenario error: internal: produced proof failed self-verification (proof bug))
+  ok    a full-mix box with less value: refused  expected needsProof    got needsProof    cost 152  (no proof from these secrets: scenario error: internal: produced proof failed self-verification (proof bug))
+  ok    outputs under another script: refused    expected needsProof    got needsProof    cost 94  (no proof from these secrets: scenario error: internal: produced proof failed self-verification (proof bug))
+  ok    three outputs: only the owner            expected needsProof    got needsProof    cost 14  (no proof from these secrets: scenario error: internal: produced proof failed self-verification (proof bug))
+7 passed, 0 failed
+== examples/tests/nft-sale.test.json
+contract: NPmDDon31hQp9nAZXonjS5NgfVFz7iuyJFLqkxxnqxmg2RhEa3bjj7vta7h7Y9YVmrQ3wksquQf77sWobrvtBwreYoZefHDjnBoH9g9mBR2RGZ6576YBRwfpj9aLZpyWurWHPF3dbWVAjkAFts75HP2ZbizZuegUL3oHbDHz4LJGntiNq551RgGuEcWbVdbycTRSaqrHra6kmd6fwDx96DudHBtUvnfw35tcXxgJETYoMjPe5gh65rxej7jyhCLGQT1g
+  ok    buyer pays the seller 0.9, the creator 0… expected pass          got pass          cost 89
+  ok    the royalty one nanoERG short: only the … expected needsProof    got needsProof    cost 70  -> ProveDlog(028333f9f7454f8d…)
+  ok    the price one nanoERG short: only the se… expected needsProof    got needsProof    cost 44  -> ProveDlog(028333f9f7454f8d…)
+  ok    paying without taking the token is not a… expected needsProof    got needsProof    cost 85  -> ProveDlog(028333f9f7454f8d…)
+  ok    the seller can cancel at any time, with … expected needsProof    got needsProof    cost 23  -> ProveDlog(028333f9f7454f8d…)
+5 passed, 0 failed
+== examples/tests/oracle-price-gate.test.json
+contract: xuVQDwAeaic8aYUofyQS4HbqLFckkZv7UHKcmo5Ta5qjarw65smgAVSZn9yXgmTcU36WCcJkcbKPXGd3Tkm8VQczTJFjnWc16kd7qkMGKdvPYJBXhRs
+  ok    no oracle box at all throws              expected error         got error         cost 5  (type error: expected valid box index, got DataInputs[0] (len=0))
+  ok    price above the floor passes             expected pass          got pass          cost 26
+  ok    price below the floor fails              expected fail          got fail          cost 26
+  ok    a box without the oracle NFT fails       expected fail          got fail          cost 17
+4 passed, 0 failed
+== examples/tests/registry.test.json
+contract: 4QwWX9HBgnWFjarddsjiTMfrTXDjcaFT6srNCKerp1izb5TwiyJerSNjuFW8WXrcryjapNL2eSX9So8sF1Db3TRgDPXbLbFqfNQvBhnfFUCH4PiiB1YgfJexikaxMK1hdw1Z9nE45Eoqo5w4eQYswkjCERoewYpGwZyY3Ng8mLH5eioFXWGWc7RccvGCNukJWXwyEohzEVJ1ZDo63v77B6ao3qS54fqYwkcrhjkygqgqt5bZKaxnWFAyUUafqnriVNb9cxoGMmGHdcT8hWBuza2mXxT4tmKyrqehw7yPHCqixSXR9emCcbsK2dXYndefxe3exc
+  ok    register a new name with the prover's pr… expected pass          got pass          cost 150
+  ok    the fee one nanoERG short: only the regi… expected needsProof    got needsProof    cost 150  -> ProveDlog(028333f9f7454f8d…)
+  ok    successor keeps the OLD digest: refused  expected needsProof    got needsProof    cost 132  -> ProveDlog(028333f9f7454f8d…)
+  ok    a proof for a lookup does not authentica… expected error         got error         cost 67  (runtime exception: AvlTree.insert failed on a pre-v3 ErgoTree)
+  ok    registering a name that already exists: … expected error         got error         cost 67  (runtime exception: AvlTree.insert failed on a pre-v3 ErgoTree)
+  ok    the registrar may spend freely (an upgra… expected needsProof    got needsProof    cost 20  -> ProveDlog(028333f9f7454f8d…)
+6 passed, 0 failed
+== examples/tests/savings-cap.test.json
+contract: 61M5Xz6gxdZ7G72DSds5M9hvMSeuNCrvUKYHVwTrCrge7u6ywweyhriANzFogRkGi722cEcSEoRWMQnGHSHaLx9diC5PKW2iu3Y2GQi97CTDnGiuGDV7xRpmE74cCHTThyS9mNNPF9kA5wCse9pz27bcpfSLraZ1x5fBuHyqAUVWzo75yJJrC7YGPYMgJC6DenZQojNgHsk
+  ok    a small draw once a period has passed, r… expected needsProof    got needsProof    cost 55  -> OR(ProveDlog(028333f9f7454f8d…), AND(ProveDlog(028333f9f7454f8d…), ProveDlog(0279be667ef9dcbb…)))
+  ok    drawing more than the cap needs the back… expected needsProof    got needsProof    cost 45  -> AND(ProveDlog(028333f9f7454f8d…), ProveDlog(0279be667ef9dcbb…))
+  ok    drawing again too soon needs the backup … expected needsProof    got needsProof    cost 28  -> AND(ProveDlog(028333f9f7454f8d…), ProveDlog(0279be667ef9dcbb…))
+  ok    owner and backup together may empty the … expected needsProof    got needsProof    cost 29  -> AND(ProveDlog(028333f9f7454f8d…), ProveDlog(0279be667ef9dcbb…))
+4 passed, 0 failed
+== examples/tests/subscription.test.json
+contract: 6JhCJJL9hn21opY4CxJvLxwQ3t9cG3yLXXY4ARvquRpKwMdKoaJCtQogni6A1mmSUU3no5e6HUgCKW3SvkpXjtGAcHidjpUQErQrk2nzq2B5ntoMbDcCFLtLWHq3UZQHNuDv21FyGHBACP6ui22wLmMYGPUe9M1sM6gz49BjdyKCQ9Ch5PYN8751GkwN3UhN4zEXFznCLaD4WYBcSJ9jprvkGsW2zGQMGiV8EVDUnbkyRT2jBPLBvifQdvXvJYeu1hsjkYLVjxzU5qqH8h
+  ok    first payment once a period has passed, … expected needsProof    got needsProof    cost 93  -> OR(ProveDlog(0279be667ef9dcbb…), ProveDlog(028333f9f7454f8d…))
+  ok    too early: only the funder could act     expected needsProof    got needsProof    cost 37  -> ProveDlog(0279be667ef9dcbb…)
+  ok    taking more than one payment is refused … expected needsProof    got needsProof    cost 85  -> ProveDlog(0279be667ef9dcbb…)
+  ok    not recording the claim height is refuse… expected needsProof    got needsProof    cost 100  -> ProveDlog(0279be667ef9dcbb…)
+  ok    the last payment may empty the pot       expected needsProof    got needsProof    cost 58  -> OR(ProveDlog(0279be667ef9dcbb…), ProveDlog(028333f9f7454f8d…))
+  ok    the funder can always cancel             expected needsProof    got needsProof    cost 38  -> ProveDlog(0279be667ef9dcbb…)
+6 passed, 0 failed
+== examples/tests/token-sale.test.json
+contract: 2Ps36LwmFsXrQAKynppqdiWSKjLeQizGSyMeqKV7rRobmx2fCKVebdMo9WWWG7jgP9ZeXpaC1axe3zLZqoTjeaQjL8K8cty5V4ywYJZ6VvX4NnNrfS6gFcctYhyhR1tmkZj94BaCDEbaKadYQc5DWjLFQPQddngkDNWwHPvUqHtm193f97SPCkhLpTKvCy51UG4xe2fHJXRoJVmb5XYipZfFmB3J3M6sCEv7FY4EjWYtuGsfY517DcXhN1er3vUrsCvSji3Pi5Bcf4z9FxgU35xkj4Kav4kNMGs7YwPKtsTRtSZZeAVtB2FCXsmV4yP441rcrKA6tBPeMWBrY2wnP7NeCQc2RaE6sjEdB9p
+  ok    buy 4 of 10: seller paid 4 ERG-units, 6 … expected pass          got pass          cost 124
+  ok    underpaying is only allowed for the sell… expected needsProof    got needsProof    cost 106  -> ProveDlog(028333f9f7454f8d…)
+  ok    the rest must stay under this contract   expected needsProof    got needsProof    cost 119  -> ProveDlog(028333f9f7454f8d…)
+  ok    buy all 10 with a single payment output  expected pass          got pass          cost 76
+  ok    paying someone else is only allowed for … expected needsProof    got needsProof    cost 68  -> ProveDlog(028333f9f7454f8d…)
+  ok    an empty box (no stock) errors at SELF.t… expected error         got error         cost 7  (type error: expected valid token index, got index 0 in 0 tokens)
+6 passed, 0 failed
+== examples/tests/vesting.test.json
+contract: 4NqjMQi1t7YEjws8uw6VRVo7Ybf3gvhLx7vjWX2319zfSgi8ZaF6CkqUDc5AKLk9WzNXeJcxSkCefkro1ofMQZziL7VjRhGhN6F5VaVjg3VxqN1PNTr3Bsm1Hnam8fB2pZE6eLvLBqvMh8gYZwU3PGPRRua3woeMneDnKfp2tqW28oXoeGZHv9BaDbxzkF4gufG6LHv
+  ok    before the start, keeping everything und… expected needsProof    got needsProof    cost 57  -> ProveDlog(028333f9f7454f8d…)
+  ok    before the start, taking anything is ref… expected fail          got fail          cost 44
+  ok    halfway, half may be withdrawn           expected needsProof    got needsProof    cost 69  -> ProveDlog(028333f9f7454f8d…)
+  ok    halfway, more than half is refused       expected fail          got fail          cost 56
+  ok    halfway, the rest must stay under this c… expected fail          got fail          cost 29
+  ok    after the end, everything may be taken   expected needsProof    got needsProof    cost 19  -> ProveDlog(028333f9f7454f8d…)
+  ok    nobody but the beneficiary: the boolean … expected needsProof    got needsProof    cost 19  -> ProveDlog(028333f9f7454f8d…)
+7 passed, 0 failed
+== examples/incidents/use-lp-drain.deployed-pool.test.json
+contract: 3W5ZTNTWAwgjcNhctkBccWeUVruJJVLATdYp1makMwoP78WiW2MDjMd2HKxZ2eUwtaSrhtRujuvi27k49msqFVAi7T2BsVHvMCHQ879nf5oJvuXjhEshf76EZgrijL3v3KcEA8CYi511YFtwN1b9u7ZUXeQSSUhqcMvyXMwaCZrpZsgCfbiLxk2DQMrngBMUh96vh7cBfPxZWhsZ9DGUtkGhiquqH3DcgFhpP33rRMjanCRXPAx9SbbphH3RBA2Z9K9j9TvWV6PnUafVGSpixUS8eawxUCiAuUAZHttXK9DjWqzeTDxDH9Tz1gSyjy7aKokwZyoAGTEafuiNQQrJ1UVfuVJCHPUD5v9eomJLmLVqdVDEUm7gj6Qj9a2cEKDfzedex977RkqXvuaeUdaumcikVCr9spzgmv7rhFCovdzAJscwTio98iRGS9rqcnUoTZFN6YmNJPXKe3krdQ7c9yvv74Ad7SBQmvNyuMkchFRnbPRozogKzV3xmTMxpLzagjQ1AdcP
+  ok    deployed useLp pool PASSES too — its onl… expected pass          got pass          cost 89
+1 passed, 0 failed
+== examples/incidents/use-lp-drain.deployed-swap.test.json
+contract: 8W5UV9yEpKMQLuKzk7oDmaFEBGqeC1RGauuADViEfYJcs8x55ySXMKUUnSni3itEbscEo4qT8X2GuWY9zNdbYWWCqZmJjsFdynhWPc3FBtE45nrPgf4gqVzqN7RX9LpWJBTj97b4tkMxqMEL8QFDmLb8UzWKpp79MD94AziQvArc33KCQ9nYz3MafjrV3YACCxKcNbwgsKH1AuNUWoRLbFYVJvqzCJRiDHPboNcVSWTFotKkrm3yHZafyifT9BTD6Rs62V6UbiWHi2U4njP84wVyLFE5PvJemVJKy3Bc2MHwXBaoKVuLqZXJMu62nbjANBzHoZZ1cVmA4y
+  ok    deployed useLpSwap PASSES on the drain t… expected pass          got pass          cost 123
+1 passed, 0 failed
+== examples/incidents/use-lp-drain.fixed-swap.test.json
+contract: VM1AV5VQX2SLYMMjCy3F6WUFuGwsRtLh9qK7hzVD58nsGbTKgs4WGWL7WLdfYPLJXCqW7unJJjBjRKNc5ovKNQphbM84qqWvRJVyiDDDJ4MZcyp3kMUg8Kj1Ly52S9h5v1YyemH74GQhJ6q8sJD5NjSYWusUJN3gs5KYsTiDJbjRw98eCgz6bLgaDzEj5ipEHG7Vc3HGigmKadLDrydSGgacnUf8o91U8JJb9mLzd22VH6rfR3UCgjfS8ZpQpp4DybhfyQwVXvHRyFDCCGBFDc9eREeDgRFA4jysRXNHLgaP85WLUF12tozrcwyLHpwjaafBmphkjyharFbUc29RZYV3aqyuDRrwwigZcT6uaNax8zZiz9ysNpVcNhmBiLLhDBRoTKv7by6LYC5m2ieDgoPrScggkJzsMszD6t5zwg93uHhp
+  ok    fixed useLpSwap FAILS on the same drain … expected fail          got fail          cost 50
+1 passed, 0 failed

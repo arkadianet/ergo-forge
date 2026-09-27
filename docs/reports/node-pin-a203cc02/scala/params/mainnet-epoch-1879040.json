@@ -1,0 +1,117 @@
+{
+ "network": "mainnet",
+ "epoch_start_height": 1879040,
+ "header_id": "c59429a14571f2e99184d14d193d20ab6fe47106ef2ea116028737e4ad40f215",
+ "header_hex": "04943e6dddb8d94841a55f5a06f692858b8d289a7b8f2ea27bf1eaf99bdc589bbacc399ebdadc85b7d8b0966828d8bacf2d878d5c79cd3fb19b4d435fff8ca939adbc628d7cc1857f6d058940d19b4558330b53b3bf0f761c10351624c9da6f9f0e2d0669ce827475d53bcf8adcbeaddb8e7970e2098a59a26e38345ed87a7cf6919899befdc8c34ecf0edf49ada93083db9873c3c58e410decdec5c224bd574bddf0585c31b85160637484280d872000000000274e729bb6615cbda94d9d176a2f1525068f12b330e38bbbf387232797dfd891fb8a2667293237ac2",
+ "source": "GET /blocks/{header_id} on a mainnet node (v6.0.6), 2026-09-24; the header in its node serialization, whose id, proof of work and extension root the harness checks",
+ "fields": [
+  {
+   "key": "0005",
+   "value": "00000064"
+  },
+  {
+   "key": "0001",
+   "value": "001312d0"
+  },
+  {
+   "key": "0006",
+   "value": "00000967"
+  },
+  {
+   "key": "0009",
+   "value": "0000001e"
+  },
+  {
+   "key": "0002",
+   "value": "00000168"
+  },
+  {
+   "key": "0007",
+   "value": "00000064"
+  },
+  {
+   "key": "0003",
+   "value": "001364e1"
+  },
+  {
+   "key": "007b",
+   "value": "00000004"
+  },
+  {
+   "key": "0008",
+   "value": "0000012a"
+  },
+  {
+   "key": "0004",
+   "value": "007a1643"
+  },
+  {
+   "key": "007c",
+   "value": "02d701990300"
+  },
+  {
+   "key": "0100",
+   "value": "01b0244dfc267baca974a4caee06120321562784303a8a688976ae56170e4d175b"
+  },
+  {
+   "key": "0101",
+   "value": "0423e64616911973ff14480fe295ba32902dc426449b116df38fd46ef6de3d4093"
+  },
+  {
+   "key": "0105",
+   "value": "0111347ec5b40da38d465f2f174e375b1d470f9a0f7f7d732fcecba8f45cf21b92"
+  },
+  {
+   "key": "0106",
+   "value": "01e4b0d9643a37e599e8bad60cddd74a98ecbb512e25d2fa7aed22ed3f1f793955"
+  },
+  {
+   "key": "0107",
+   "value": "01b8dfb03f0c2ba83bd8dc9eded9226317f95315d17ceb3076a3d85bee38391d86"
+  },
+  {
+   "key": "0108",
+   "value": "01dfe71c6d80589612024e6d8b34a930af5df4ab49fcd4f107944866f5b4632166"
+  },
+  {
+   "key": "0109",
+   "value": "05e4fa516c708d145ea8d973966e647af4a69a794af434409189c255a02fc3127e"
+  },
+  {
+   "key": "010e",
+   "value": "0183a749aaafdfccfa23a147cedf9761fc5fd6ee31b548a7ff2ce408050631e7cd"
+  },
+  {
+   "key": "010f",
+   "value": "0443fa779aece67bcdfe34a657dbc12b6b9bcf6980c7afcb8bc45d14ea462517eb"
+  },
+  {
+   "key": "0113",
+   "value": "025b2a42d924ea4cbd34e312cb1b96ef1f52dd5f59cdad7d6891d0ea601e32360e"
+  },
+  {
+   "key": "0200",
+   "value": "02d70199030307010311080103120b010310"
+  }
+ ],
+ "expected": {
+  "storage_fee_factor": 1250000,
+  "min_value_per_byte": 360,
+  "max_block_size": 1271009,
+  "max_block_cost": 8001091,
+  "token_access_cost": 100,
+  "input_cost": 2407,
+  "data_input_cost": 100,
+  "output_cost": 298,
+  "block_version": 4,
+  "validation_rules_disabled": [
+   215,
+   409
+  ],
+  "validation_rules_replaced": {
+   "1007": 1017,
+   "1008": 1018,
+   "1011": 1016
+  }
+ }
+}

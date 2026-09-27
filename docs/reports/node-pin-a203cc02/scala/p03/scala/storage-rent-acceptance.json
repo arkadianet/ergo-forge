@@ -1,0 +1,41 @@
+{
+  "id" : "storage-rent-acceptance",
+  "scala" : {
+    "ergo_version" : "6.0.6",
+    "sigma_version" : "6.0.6",
+    "tx_bytes_blake2b256" : "6ea6db3fd95dd1d39c098aa3b885e4c70cf8dc3e917bcc0455b1d8a7deaef4b8",
+    "request" : {
+      "height" : 1051200,
+      "pre_header" : {
+        "version" : 1,
+        "parent_id" : "4444444444444444444444444444444444444444444444444444444444444444",
+        "timestamp" : 1700000000000,
+        "n_bits" : 117586360,
+        "votes" : "000000",
+        "miner_pk" : "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+      },
+      "fixture_blake2b256" : "409bd4a9ca8396055b106a87aab35e882ac9774580081efc3b1efe1ef1881028",
+      "min_value_per_byte" : 360,
+      "input_ids" : [
+        "31add96f9fc153ba26761824bb13cd72901ebc99b75fad71f375258a97c0af70"
+      ],
+      "data_input_ids" : [
+      ],
+      "activated_script_version" : 0,
+      "last_headers" : 0
+    },
+    "tx_id" : "6ea6db3fd95dd1d39c098aa3b885e4c70cf8dc3e917bcc0455b1d8a7deaef4b8",
+    "stateless_ok" : true,
+    "accepted" : true,
+    "total_block_cost" : 12150,
+    "failing_input" : null,
+    "error" : null,
+    "per_input" : [
+      {
+        "index" : 0,
+        "ok" : true,
+        "block_cost" : 50
+      }
+    ]
+  }
+}
