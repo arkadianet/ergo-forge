@@ -187,7 +187,7 @@ fn lift_inner(e: &Expr, cx: &mut LiftCtx, constants: &[(SigmaType, SigmaValue)])
     cx.depth += 1;
     let kind = match e {
         Expr::Const { tpe, val } => lift_const(tpe, val, cx),
-        Expr::Unparsed(bytes) => NodeKind::Raw(format!("<unparsed {} bytes>", bytes.len())),
+        Expr::Unparsed(bytes) => NodeKind::Raw(format!("<unparsed {} bytes>", bytes.bytes.len())),
         Expr::Op(node) => lift_op(node, cx, constants),
     };
     cx.depth -= 1;

@@ -44,5 +44,5 @@ explorer = ["dep:ureq"]
 cost-trace = ["ergo-sigma/cost-trace"]
 
 [dev-dependencies]
-ergo-chain-spec = { git = "https://github.com/arkadianet/ergo", rev = "016533194f94ad95b1a87df70bb9bfce493922e2" }
-ergo-crypto = { git = "https://github.com/arkadianet/ergo", rev = "016533194f94ad95b1a87df70bb9bfce493922e2" }
+ergo-chain-spec = { git = "https://github.com/arkadianet/ergo", rev = "a203cc02f585bcbe13c743aee008222b208f3c82" }
+ergo-crypto = { git = "https://github.com/arkadianet/ergo", rev = "a203cc02f585bcbe13c743aee008222b208f3c82" }

@@ -313,7 +313,7 @@ fn fmt_expr(e: &Expr, out: &mut String) {
             out.push_str(&const_str(tpe, val));
         }
         Expr::Unparsed(bytes) => {
-            out.push_str(&format!("<UNPARSED {} bytes>", bytes.len()));
+            out.push_str(&format!("<UNPARSED {} bytes>", bytes.bytes.len()));
         }
         Expr::Op(node) => {
             let name = opcode_name(node.opcode).unwrap_or("OP_?");
