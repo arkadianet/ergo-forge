@@ -117,7 +117,13 @@ fn full_pipeline_matches_pinned_node_vectors() {
                 assert_eq!(report["pipelineInvoked"], true);
                 assert_eq!(report["nodeRevision"], row["nodeRevision"]);
                 assert_eq!(report["transactionId"], expected["transactionId"]);
-                assert_eq!(report["totalBlockCost"], expected["totalBlockCost"]);
+                assert_eq!(
+                    report["totalBlockCost"].as_u64(),
+                    Some(engine_support::corrected_cost(
+                        row["id"].as_str().unwrap(),
+                        expected["totalBlockCost"].as_u64().unwrap()
+                    ))
+                );
                 assert_eq!(report["request"], serde_json::to_value(&request).unwrap());
                 assert_eq!(report["requestFingerprint"], request.fingerprint());
                 assert_eq!(

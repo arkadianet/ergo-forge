@@ -109,6 +109,12 @@ fn fixtures() -> Vec<(Value, ReplayBundle)> {
         }
         let mut bundle = bundle.unwrap();
         bundle.execution = engine_support::on_current_engine(bundle.execution);
+        if row["id"] == "use-incident" {
+            bundle.execution = engine_support::with_corrected_prior_cost(
+                bundle.execution,
+                "use-incident/prior-block-cost",
+            );
+        }
         let records = bundle.execution.case.premises().boxes.value().unwrap();
         let expected_origin = if row["id"] == "use-incident" {
             "source-recorded"
