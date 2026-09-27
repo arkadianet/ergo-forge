@@ -409,7 +409,15 @@ pub fn analyze_with(root: &Node, bounds: Bounds) -> Report {
     );
 
     let mut sinks = Vec::new();
-    collect_sinks(root, &env, &measured, bounds, &mut sinks, &mut limits);
+    collect_sinks(
+        root,
+        &env,
+        &measured,
+        bounds,
+        &mut sinks,
+        &mut limits,
+        &mut HashMap::new(),
+    );
 
     let mut flows: Vec<Flow> = Vec::new();
     let mut seen: BTreeSet<(u64, SinkKind, String)> = BTreeSet::new();
@@ -580,23 +588,28 @@ fn measure(
     out: &mut Measured,
     limits: &mut Limits,
 ) {
-    let d = deref(n, &env.vals);
-    for c in children(d) {
+    let d = match &n.kind {
+        NodeKind::Val(name) => env.vals.get(name).copied().unwrap_or(n),
+        _ => n,
+    };
+    for c in children(n) {
         measure(c, env, bounds, depth.saturating_sub(1), out, limits);
     }
     let taint = if std::ptr::eq(d, n) {
         classify(d, env, bounds, depth, out, limits)
     } else {
         // `val` indirection: the use stands for the bound expression, whose
-        // taint the recursion above has already recorded. An out-of-order
+        // taint the binding site has already recorded. An out-of-order
         // binding is reported as unresolved rather than assumed clean.
         out.taint.get(&d.id).cloned().unwrap_or_else(|| {
             limits.depth = true;
             Taint::tainted(UNRESOLVED)
         })
     };
-    if let Some(origin) = self_origin(d, env) {
-        out.origins.insert(d.id, origin.label);
+    if std::ptr::eq(d, n) {
+        if let Some(origin) = self_origin(n, env) {
+            out.origins.insert(n.id, origin.label);
+        }
     }
     if taint.alternatives_dropped {
         limits.alternatives = true;
@@ -672,11 +685,12 @@ fn collect_sinks<'a>(
     bounds: Bounds,
     out: &mut Vec<Sink<'a>>,
     limits: &mut Limits,
+    self_mentions: &mut HashMap<(u64, u32), Option<bool>>,
 ) {
     if !sink_room(out, bounds, limits) {
         return;
     }
-    let d = deref(n, &env.vals);
+    let d = n;
 
     // Dynamic code and code-template bytes.
     if let Some((operand, label)) = code_bytes(d) {
@@ -724,7 +738,7 @@ fn collect_sinks<'a>(
 
     // Comparisons whose meaning is anchored on the box being spent.
     if let NodeKind::Infix(op, lhs, rhs) = &d.kind {
-        if is_comparison(op) && self_cannot_be_ruled_out(d, env, bounds, limits) {
+        if is_comparison(op) && self_cannot_be_ruled_out(d, env, bounds, limits, self_mentions) {
             let (kind, label) = self_anchor(op, d, env);
             for side in [lhs.as_ref(), rhs.as_ref()] {
                 if tainted(side, measured) {
@@ -744,7 +758,7 @@ fn collect_sinks<'a>(
     }
 
     for c in children(d) {
-        collect_sinks(c, env, measured, bounds, out, limits);
+        collect_sinks(c, env, measured, bounds, out, limits, self_mentions);
     }
 }
 
@@ -839,8 +853,14 @@ fn collection_name<'a>(coll: &'a Node, vals: &Vals<'a>) -> String {
 ///
 /// A bound that runs out is a `yes`, not a `no`: a comparison whose anchor the
 /// search could not read is treated as a `SELF` guard.
-fn self_cannot_be_ruled_out(n: &Node, env: &Env, bounds: Bounds, limits: &mut Limits) -> bool {
-    match mentions_self(n, env, bounds.max_depth) {
+fn self_cannot_be_ruled_out(
+    n: &Node,
+    env: &Env,
+    bounds: Bounds,
+    limits: &mut Limits,
+    cache: &mut HashMap<(u64, u32), Option<bool>>,
+) -> bool {
+    match mentions_self(n, env, bounds.max_depth, cache) {
         Some(false) => false,
         Some(true) => true,
         None => {
@@ -852,17 +872,42 @@ fn self_cannot_be_ruled_out(n: &Node, env: &Env, bounds: Bounds, limits: &mut Li
 
 /// `Some(true)`/`Some(false)` once the search completed; `None` if the depth
 /// bound cut it short with the answer still open.
-fn mentions_self(n: &Node, env: &Env, depth: u32) -> Option<bool> {
+fn mentions_self(
+    n: &Node,
+    env: &Env,
+    depth: u32,
+    cache: &mut HashMap<(u64, u32), Option<bool>>,
+) -> Option<bool> {
+    if let Some(found) = cache.get(&(n.id, depth)) {
+        return *found;
+    }
+    cache.insert((n.id, depth), None);
+    let found = mentions_self_uncached(n, env, depth, cache);
+    cache.insert((n.id, depth), found);
+    found
+}
+
+fn mentions_self_uncached(
+    n: &Node,
+    env: &Env,
+    depth: u32,
+    cache: &mut HashMap<(u64, u32), Option<bool>>,
+) -> Option<bool> {
     if depth == 0 {
         return None;
     }
-    let d = deref(n, &env.vals);
+    if let NodeKind::Val(name) = &n.kind {
+        if let Some(bound) = env.vals.get(name) {
+            return mentions_self(bound, env, depth, cache);
+        }
+    }
+    let d = n;
     if matches!(d.kind, NodeKind::Leaf("SELF")) {
         return Some(true);
     }
     let mut found = false;
     for c in children(d) {
-        match mentions_self(c, env, depth - 1) {
+        match mentions_self(c, env, depth - 1, cache) {
             Some(true) => found = true,
             Some(false) => {}
             None => return None,
@@ -960,6 +1005,7 @@ fn trace<'a>(
     let mut cut = false;
     while let Some((n, path)) = queue.pop_front() {
         if out.len() >= bounds.max_alternatives {
+            limits.alternatives = true;
             cut = true;
             break;
         }

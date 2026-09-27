@@ -13,7 +13,7 @@
 //! orders intentionally leave a tail: LOW is an observation for review, never
 //! a vulnerability verdict. Silence never proves all value exits constrained.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 use crate::audit::boxrefs::{box_collection, collect_vals, deref, positional_key, Vals};
 use crate::audit::{children, Finding, Severity};
@@ -53,15 +53,29 @@ fn outputs(n: &Node, vals: &Vals) -> bool {
 }
 
 fn mentions_outputs(n: &Node, vals: &Vals, depth: u32) -> bool {
+    mentions_outputs_cached(n, vals, depth, &mut HashMap::new())
+}
+
+fn mentions_outputs_cached(
+    n: &Node,
+    vals: &Vals,
+    depth: u32,
+    cache: &mut HashMap<(u64, u32), bool>,
+) -> bool {
+    if let Some(found) = cache.get(&(n.id, depth)) {
+        return *found;
+    }
     if depth == 0 {
         return true; // Unknown cannot establish an independent bound.
     }
     let d = deref(n, vals);
-    outputs(d, vals)
+    let found = outputs(d, vals)
         || matches!(d.kind, NodeKind::Raw(_) | NodeKind::Val(_))
         || children(d)
             .into_iter()
-            .any(|c| mentions_outputs(c, vals, depth - 1))
+            .any(|c| mentions_outputs_cached(c, vals, depth - 1, cache));
+    cache.insert((n.id, depth), found);
+    found
 }
 
 fn size(n: &Node, vals: &Vals) -> bool {
@@ -151,6 +165,19 @@ fn constrained_predicate(n: &Node, param: &str, vals: &Vals) -> bool {
 }
 
 fn positions(n: &Node, vals: &Vals, sites: &mut BTreeMap<String, u64>, depth: u32) {
+    positions_seen(n, vals, sites, depth, &mut HashSet::new());
+}
+
+fn positions_seen(
+    n: &Node,
+    vals: &Vals,
+    sites: &mut BTreeMap<String, u64>,
+    depth: u32,
+    seen: &mut HashSet<(u64, u32)>,
+) {
+    if !seen.insert((n.id, depth)) {
+        return;
+    }
     if depth == 0 {
         return;
     }
@@ -160,7 +187,7 @@ fn positions(n: &Node, vals: &Vals, sites: &mut BTreeMap<String, u64>, depth: u3
         return;
     }
     for c in children(d) {
-        positions(c, vals, sites, depth - 1);
+        positions_seen(c, vals, sites, depth - 1, seen);
     }
 }
 
