@@ -251,8 +251,8 @@
       "expectResidual": "028333f9"
     },
     {
-      "name": "a proof for a lookup does not authenticate an insert",
-      "expect": "needsProof",
+      "name": "a proof for a lookup does not authenticate an insert: the refused insert throws on this pre-v3 tree",
+      "expect": "error",
       "height": 1,
       "avl": {
         "names": {
@@ -326,12 +326,11 @@
           "value": 100000000,
           "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
         }
-      ],
-      "expectResidual": "028333f9"
+      ]
     },
     {
-      "name": "registering a name that already exists: the tree refuses the proof",
-      "expect": "needsProof",
+      "name": "registering a name that already exists: the tree refuses the proof, and on this pre-v3 tree that throws",
+      "expect": "error",
       "height": 1,
       "avl": {
         "names": {
@@ -405,8 +404,7 @@
           "value": 100000000,
           "ergoTree": "0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197"
         }
-      ],
-      "expectResidual": "028333f9"
+      ]
     },
     {
       "name": "the registrar may spend freely (an upgrade), proving with the registrar's key",
