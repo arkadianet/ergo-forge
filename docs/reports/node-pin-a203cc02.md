@@ -172,7 +172,7 @@ checkout beside forge was at the pin, as CI provides it.
 | `roadmap-p08` | `python3 scripts/roadmap_gate.py --require P08` | 0 | [roadmap-p08.log](node-pin-a203cc02/roadmap-p08.log) |
 | `roadmap-ci` | `python3 scripts/roadmap_gate.py --ci` | 0 | [roadmap-ci.log](node-pin-a203cc02/roadmap-ci.log) |
 | `contract-suites` | `ergo-es test on every examples/tests and examples/incidents suite (contract-tests.yml)` | 0 | [contract-suites.log](node-pin-a203cc02/contract-suites.log) |
-| `lockfile` | `sha256sum -c node-pin-a203cc02/Cargo.lock.sha256` | 0 | [lockfile.log](node-pin-a203cc02/lockfile.log) |
+| `lockfile` | `sha256sum -c --quiet docs/reports/node-pin-a203cc02/Cargo.lock.sha256` | 0 | [lockfile.log](node-pin-a203cc02/lockfile.log) |
 
 The workspace and `cost-trace` suites each ran 76 test binaries and 580 tests, none failed, one ignored
 (the external measurement above); `contract-suites` ran all 22 example suites.
