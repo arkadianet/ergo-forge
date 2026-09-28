@@ -62,3 +62,40 @@ observation; the control produces none for that lint. The new sibling leaves
 `trust-assumptions` and every existing lint unchanged. Branch authority is a
 static observation, with no claim about an executable or exploitable upgrade.
 The deployed-corpus measurement and every new site review are in batch-7.
+
+## H01 holdout namespace (v1)
+
+`holdout.json` is a separate cohort outside the frozen hunt measurement, and
+`holdout/v1/` is its version directory. Nothing in the harness *enforces*
+append-only, so the discipline is explicit: a correction to a committed fixture
+is a new version directory with a new manifest, never a silent rewrite of v1.
+What the harness does enforce is that every fixture and its compiled tree still
+match their recorded digests, that each pair is exactly one recorded
+`find` → `replace` applied to its control, and that the declared caps equal the
+instrument's own published caps — so editing a v1 fixture fails the run until it
+is re-recorded on purpose.
+
+Per row the manifest carries the pair, the role, the digests, the declared SELF
+box, the expected verdict **with its stated basis**, and one `authoring` value.
+There is no per-row `exposure` field, and there is deliberately no per-row
+exposure *claim* either: exposure is **measured** by the harness, which scans the
+declared roots and extensions for verbatim copies and for shared clauses (a
+conjunct, not only a whole line, split on newlines, `&&`, `||` and `;`), with
+the namespace and the manifest itself excluded. The discovery-eligible
+denominator is derived from the declared `authoring` and that measurement, so
+every current row — `instrument-visible` — yields a denominator of zero and no
+rate at all. The harness reproduces the recorded expectations and reports them
+as self-consistency; it does not claim novel discovery.
+
+`shadow_model.rs` checks bookkeeping consistency between recorded aggregates and
+probe records, and it checks each aggregate class's relation **in both
+directions**: the class must have the probe evidence it names, and must not
+carry the evidence that names a different class (`movableByAnyone` may not also
+report a passing attacker sample, `requiresProof` and `notUnderProbes` may not
+report a pass of either shape). It is not a second reducer, cannot produce node
+acceptance or a property-violation verdict, and refuses unknown tokens rather
+than guessing. It is also write-only: only the recorded input and the policy
+deserialise, so a report read back from JSON — including one claiming
+`nodeValidated: true` — cannot enter its vocabulary. Every count and text field
+it reads is capped, and every finding's detail is at most
+`MAX_RESIDUAL_TEXT` characters.

@@ -26,6 +26,36 @@ const Checklist = (() => {
     return line;
   }
 
+  function renderAuditSupport(response, root) {
+    const coverage = response.coverage;
+    if (coverage?.rows?.length) {
+      const details = element(root, "details", null, "checklist-coverage");
+      element(details, "summary", "Instrument availability");
+      const list = element(details, "ul");
+      for (const row of coverage.rows) {
+        const item = element(list, "li");
+        element(item, "strong", row.instrument);
+        element(item, "span", ` ${row.availability}; observations: ${row.observations}`, "chip");
+        element(item, "p", row.note);
+      }
+    }
+    const flow = response.flow;
+    if (flow?.flows?.length) {
+      const details = element(root, "details", null, "checklist-flow");
+      element(details, "summary", "Spender-controlled flow review obligations");
+      const list = element(details, "ul");
+      for (const item of flow.flows) {
+        const li = element(list, "li");
+        element(li, "strong", item.kind);
+        element(li, "p", `${item.source} → ${item.sink}`);
+        if (item.bounded) element(li, "small", "A bound applied; this is a lower bound.");
+      }
+      if (flow.limits && Object.values(flow.limits).some(Boolean)) {
+        element(details, "p", "One or more analysis bounds applied; absence of a flow is not evidence of absence.", "hint");
+      }
+    }
+  }
+
   function render(response, root, select) {
     root.replaceChildren();
     root.hidden = false;
@@ -33,6 +63,7 @@ const Checklist = (() => {
     if (response.completeness && response.completeness !== "complete") {
       element(root, "p", "Recovery is partial. Static observations cover only the recovered code; missing findings prove nothing.", "hint");
     }
+    renderAuditSupport(response, root);
     const list = element(root, "ul", null, "checklist-rows");
     for (const row of response.rows || []) {
       const li = element(list, "li");

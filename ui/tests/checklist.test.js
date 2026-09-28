@@ -38,6 +38,18 @@ test("checklist shows every unchecked row in Write and Read without a score", ()
   }
 });
 
+test("checklist renders coverage and flow support without turning them into a score", () => {
+  const document = page();
+  const body = response();
+  body.coverage = { rows: [{ instrument: "lint:unchecked-get", availability: "ran", observations: 2, note: "Static observations for review." }] };
+  body.flow = { flows: [{ kind: "reserve-guard", source: "INPUTS(0).R4[Long]", sink: "SELF.value", bounded: false }], limits: { depth: false, alternatives: false, sinks: false, observations: false } };
+  const root = document.getElementById("checklist");
+  Checklist.render(body, root);
+  assert.match(root.textContent, /Instrument availability/);
+  assert.match(root.textContent, /lint:unchecked-get/);
+  assert.match(root.textContent, /INPUTS\(0\)\.R4\[Long\]/);
+  assert.doesNotMatch(root.textContent, /\b(score|grade|percentage)\b|\d+%/i);
+});
 test("checklist renders provenance and anchors as text, retaining static findings beside artifacts", () => {
   const document = page();
   const body = response();

@@ -10,6 +10,17 @@ Baseline: main `ee4ac6a874531872c27828d94e21e4fe7a1d7f7c`, inspected 2026-09-09.
 
 **The landing situation has changed:** local main already contains #95, #94, #93, #92, #90, and #91. Six sibling branches are patch-equivalent to changes on main; `git cherry main HEAD` reports `-` for their unique commits. The GitHub API and web lookup were unavailable, so the current remote PR state is unverified. This plan does not pretend #95 is still pending: its implementation is present locally, and the next change is an amendment on top of it.
 
+## Audit-discovery amendment
+
+The user-authorized `feature/audit-discovery` branch adds bounded coverage,
+property templates, seeded stateful adversary search, flow review obligations,
+a holdout namespace and a non-authoritative shadow consistency model. The
+authorization, limits and stop conditions are recorded in
+`docs/discovery/AUDIT-DISCOVERY-DECISION.md`. It is an explicit exception to
+the discovery-axis freeze in `docs/discovery/CONSOLIDATION-DECISION.md`; it
+does not reopen M05/D03, change the pinned evidence boundary, or alter either
+frozen policy block.
+
 | Earlier conclusion | Governing decision now |
 |---|---|
 | One pinned compiler/reducer; no alternative acceptance engine | **Survives.** Extend the dependency boundary to the pinned node's full transaction validator. |
@@ -18,7 +29,7 @@ Baseline: main `ee4ac6a874531872c27828d94e21e4fe7a1d7f7c`, inspected 2026-09-09.
 | A/C before deeper search, B is important | **Narrowed.** Preserve provenance and demote claims now. General automatic composition is not in this delivery queue. Existing conditional discharge remains useful. |
 | `txcheck::check` is always the authoritative oracle | **Superseded.** It is unsigned preflight. Only the full pinned validator can produce node-accepted execution evidence. |
 | Blind generation is a permanent invariant | **Superseded as a universal rule.** Keep the current blind family frozen and measurable; a future target-guided proposer would need its own declared method and gate. None is authorized here. |
-| Expand 3a–3c, then steering, solver, chains, autonomy | **Superseded as a build queue.** No new search axes in this cycle. Existing gains remain. 3d/4/5 are unplanned; phase 6 autonomous discovery is cancelled. |
+| Expand 3a–3c, then steering, solver, chains, autonomy | **Superseded as a build queue.** No new search axes in this cycle, except for the separately authorized bounded audit-discovery amendment above. Existing gains remain. 3d/4/5 are unplanned; phase 6 autonomous discovery is cancelled. |
 | Twenty mutants/all operators before accepting broader search coverage | **Retained for any future coverage expansion.** It does not block honest preflight releases or the evidence boundary. Five proven mutants do not satisfy it. |
 | One-transaction composition subsumes chains; chains depend on effective steering | **Rejected.** These are distinct representation and scheduling questions. Neither becomes a task by implication. |
 | “Complete lift” or successful constant substitution supports a complete audit | **Rejected.** Recovery coverage, exact identity, property coverage, and execution validity are separate measurements. |

@@ -132,6 +132,8 @@ pub struct Checklist {
     pub raw_placeholders: usize,
     pub truncated: bool,
     pub rows: Vec<Row>,
+    pub coverage: audit::coverage::Coverage,
+    pub flow: audit::flow::Report,
     pub artifacts: Vec<ArtifactResult>,
 }
 
@@ -230,6 +232,8 @@ pub fn checklist(
     let tree = crate::inspect::parse_tree(bytes).map_err(|e| e.to_string())?;
     let lifted = crate::lift_tree(&tree, network == NetworkPrefix::Testnet);
     let audit = audit::audit(&lifted);
+    let coverage = audit::coverage::coverage(&audit);
+    let flow = audit::flow::analyze(&lifted.node);
     let vectors = catalogue();
     let mut artifacts = Vec::new();
     let tree_hex = hex::encode(bytes);
@@ -381,6 +385,8 @@ pub fn checklist(
         raw_placeholders,
         truncated,
         rows,
+        coverage,
+        flow,
         artifacts,
     })
 }

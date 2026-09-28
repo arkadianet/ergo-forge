@@ -79,6 +79,20 @@ negative space refer to the same recovery without a second analysis pass. Each
 line preserves the instrument's text, lint, anchor and snippet and is visibly
 labelled `static` beneath the plain words. It covers the existing observations
 about positional reserves, output tails, successor fields, register presence
-and trust, writable sigma alternatives and unauthenticated code. No additional
-AST analysis or absence claims are introduced. Silence is not a claim that all
-boxes, outputs or registers are constrained.
+and trust, writable sigma alternatives and unauthenticated code. The
+negative-space projection itself introduces no additional AST analysis or
+absence claims. Silence is not a claim that all boxes, outputs or registers are
+constrained.
+
+Checklist responses additionally carry `coverage` and `flow`. `coverage` reports
+instrument availability and observation counts only; it has no score, share or
+verdict. Availability comes from the audit registry, so a lint a document names
+but the registry does not run is reported as `unregistered`, never as an
+instrument that ran. `ran` records that a registered lint executed over the
+recovered tree and nothing more: it does not assert that the lint's own analysis
+bound covered every construct, and it is not a clean-bill-of-health. `coverage`
+repeats the recovery state as the same `"complete"`/`"partial"` label the
+response already carries, rather than a second spelling of the same fact.
+`flow` reports bounded spender-controlled source-to-sink review obligations from
+the lifted tree. A partial recovery or an analysis bound is shown as a lower
+bound, never as absence of risk.

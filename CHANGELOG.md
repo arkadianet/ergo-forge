@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased — audit discovery workbench
+
+- Added availability-only audit coverage and bounded spender-controlled flow
+  review obligations to the checklist surface. Coverage availability is read
+  from the audit registry, so a name no registered lint runs is reported as
+  unregistered; `ran` records that the registered lint executed over the
+  recovered tree, not that its own analysis bound was exhaustive.
+- Added bounded `author-property:v1` templates that re-enter the existing
+  declaration parser.
+- Added deterministic multi-step adversary search with carry-forward drafts,
+  delta-debug shrinking, caps, truncation and synthetic provenance.
+- Added an honest holdout namespace and a strictly weaker shadow consistency
+  model; neither grants node acceptance or discovery credit.
+- Added `ergo-es adversary`, `ergo-es property-template`,
+  `ergo-es shadow-check` and `POST /api/v2/adversary`.
+
 ## 0.5.0 — prepared, unreleased
 
 This release collects roadmap v2 batches 0–11. Cutting `v0.5.0` after merge is

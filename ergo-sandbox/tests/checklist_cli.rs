@@ -21,6 +21,11 @@ fn checklist_cli_lists_sources_addresses_and_supplied_scenarios() {
     let body: Value = serde_json::from_slice(&output.stdout).unwrap();
     assert_eq!(body["rows"].as_array().unwrap().len(), 15);
     assert_eq!(body["nodeValidated"], false);
+    assert!(body["coverage"]["rows"]
+        .as_array()
+        .is_some_and(|rows| !rows.is_empty()));
+    assert!(body["flow"]["flows"].is_array());
+    assert!(body["coverage"].get("score").is_none());
     let address = body["address"].as_str().unwrap();
     let from_address = cli(&["checklist", address, "--json"]);
     assert!(from_address.status.success());

@@ -72,6 +72,19 @@ fn register(n: &Node, vals: &Vals) -> Option<(String, String)> {
 // Only value/option expressions, never Boolean presence tests or nested
 // comparisons: `SELF.R4.isDefined == out.R4.isDefined` does not carry R4.
 fn register_operands(n: &Node, vals: &Vals, depth: u32, out: &mut HashSet<(String, String)>) {
+    register_operands_seen(n, vals, depth, out, &mut HashSet::new());
+}
+
+fn register_operands_seen(
+    n: &Node,
+    vals: &Vals,
+    depth: u32,
+    out: &mut HashSet<(String, String)>,
+    seen: &mut HashSet<(u64, u32)>,
+) {
+    if !seen.insert((n.id, depth)) {
+        return;
+    }
     if depth == 0 {
         return;
     }
@@ -90,7 +103,7 @@ fn register_operands(n: &Node, vals: &Vals, depth: u32, out: &mut HashSet<(Strin
     };
     if descend {
         for c in children(d) {
-            register_operands(c, vals, depth - 1, out);
+            register_operands_seen(c, vals, depth - 1, out, seen);
         }
     }
 }

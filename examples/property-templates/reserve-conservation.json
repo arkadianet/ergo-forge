@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "property-template:v1",
+  "name": "reserve-conservation",
+  "slots": {
+    "property_id": "reserve-conservation",
+    "source": {
+      "origin": "hypothetical",
+      "reference": "local:author-review",
+      "sha256": "abababababababababababababababababababababababababababababababab"
+    }
+  },
+  "declaration": "{\"schemaVersion\":\"author-property:v1\",\"propertyId\":\"{{property_id}}\",\"revision\":\"1\",\"contracts\":{\"reserve\":{\"script\":\"10010100d17300\",\"compilerRevision\":\"pinned-author-compiler\"}},\"scope\":{\"kind\":\"transition\"},\"roles\":{\"after\":{\"cardinality\":\"all-matches\",\"collection\":\"outputs\",\"selector\":{\"hex\":\"10010100d17300\",\"kind\":\"script\"}},\"before\":{\"cardinality\":\"exactly-one\",\"collection\":\"inputs\",\"selector\":{\"index\":0,\"kind\":\"position\"}}},\"registers\":{\"liability\":{\"index\":4,\"role\":\"before\",\"unit\":{\"kind\":\"nano-erg\"},\"valueType\":\"long\"}},\"guard\":{\"op\":\"boolean\",\"value\":true},\"assertion\":{\"left\":{\"left\":{\"op\":\"sum-erg\",\"role\":\"after\"},\"op\":\"sub\",\"right\":{\"op\":\"sum-erg\",\"role\":\"before\"}},\"op\":\"ge\",\"right\":{\"op\":\"integer\",\"unit\":{\"kind\":\"nano-erg\"},\"value\":\"0\"}},\"authorizationPremises\":[{\"id\":\"funding\",\"source\":\"{{source}}\",\"statement\":\"Only supplied test funding credentials are available\"}],\"sources\":[\"{{source}}\"]}"
+}

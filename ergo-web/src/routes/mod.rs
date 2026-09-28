@@ -1,3 +1,4 @@
+pub mod adversary;
 pub mod attack;
 pub mod checklist;
 pub mod compile;
