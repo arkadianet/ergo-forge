@@ -76,6 +76,36 @@ async fn garbage_input_is_a_400() {
     assert_eq!(body["error"]["code"], "invalid_input");
 }
 
+/// Rule 1001: no node lets a tree without a size bit and without a SigmaProp root exist on chain,
+/// so inspect refuses it with the parser's message. The same tree with a size bit is an unparsed
+/// soft-fork tree, which inspect still shows.
+#[tokio::test]
+async fn a_sizeless_non_sigma_prop_tree_is_a_400() {
+    let base = spawn().await;
+    for tree in ["100101d17300", "10810001d17300"] {
+        let r = reqwest::Client::new()
+            .post(format!("{base}/api/v1/inspect"))
+            .json(&serde_json::json!({ "input": tree }))
+            .send()
+            .await
+            .unwrap();
+        assert_eq!(r.status(), 400, "{tree}");
+        let body: serde_json::Value = r.json().await.unwrap();
+        assert_eq!(body["error"]["code"], "invalid_input", "{tree}");
+        let message = body["error"]["message"].as_str().unwrap();
+        assert!(message.contains("rule 1001"), "{tree}: {message}");
+    }
+    for tree in ["18050101d17300", "10010101d17300", "1081000101d17300"] {
+        let r = reqwest::Client::new()
+            .post(format!("{base}/api/v1/inspect"))
+            .json(&serde_json::json!({ "input": tree }))
+            .send()
+            .await
+            .unwrap();
+        assert_eq!(r.status(), 200, "{tree}");
+    }
+}
+
 #[tokio::test]
 async fn malformed_json_body_is_a_json_400() {
     let base = spawn().await;

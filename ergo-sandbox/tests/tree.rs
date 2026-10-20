@@ -96,6 +96,61 @@ fn rejects_corruption_networks_types_lengths_and_malformed_trees() {
     assert!(ingest_tree(&encode_p2s(NetworkPrefix::Mainnet, &[0xff]), None, None).is_err());
 }
 
+// Rule 1001 (CheckDeserializedScriptIsSigmaProp): both nodes refuse a tree without a size bit whose
+// root is not a SigmaProp when they deserialize it, so no box can hold one. Vectors checked against
+// Scala sigma-state 6.0.7 in docs/reports/parse-tree-rule-1001.md.
+const SIZELESS_BOOLEAN_TREES: [&str; 2] = ["100101d17300", "10810001d17300"];
+
+#[test]
+fn a_sizeless_non_sigma_prop_tree_is_not_ingested() {
+    for tree in SIZELESS_BOOLEAN_TREES {
+        let bytes = hex::decode(tree).unwrap();
+        for input in [
+            format!("tree:{tree}"),
+            tree.to_string(),
+            encode_p2s(NetworkPrefix::Mainnet, &bytes),
+        ] {
+            let err = ingest_tree(&input, None, None).unwrap_err();
+            assert!(
+                err.contains("invalid ErgoTree") && err.contains("rule 1001"),
+                "{input}: {err}"
+            );
+        }
+    }
+    // With the size bit the nodes keep the tree as an unparsed soft-fork tree.
+    let sized = ingest_tree("tree:18050101d17300", None, None).unwrap();
+    assert_eq!(sized.tree_hex, "18050101d17300");
+    // sigmaProp(true), also with the overlong constant count.
+    for valid in [TRUE_TREE, "1081000101d17300"] {
+        assert_eq!(ingest_tree(valid, None, None).unwrap().tree_hex, valid);
+    }
+}
+
+#[test]
+fn the_cli_reports_the_rule_1001_refusal() {
+    for tree in SIZELESS_BOOLEAN_TREES {
+        for command in ["tree", "decompile", "audit", "checklist"] {
+            let output = cli(&[command, tree]);
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            assert!(!output.status.success(), "{command} {tree} was accepted");
+            assert!(
+                stderr.contains("expected SigmaProp") && stderr.contains("rule 1001"),
+                "{command} {tree}: {stderr}"
+            );
+        }
+    }
+    for tree in ["18050101d17300", TRUE_TREE, "1081000101d17300"] {
+        for command in ["tree", "decompile", "audit", "checklist"] {
+            let output = cli(&[command, tree]);
+            assert!(
+                output.status.success(),
+                "{command} {tree}: {}",
+                String::from_utf8_lossy(&output.stderr)
+            );
+        }
+    }
+}
+
 #[test]
 fn fixture_box_preserves_all_data_and_addresses_never_query_source() {
     let id = "ab".repeat(32);

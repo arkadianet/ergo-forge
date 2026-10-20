@@ -12,7 +12,7 @@
 
 use ergo_primitives::reader::VlqReader;
 use ergo_primitives::writer::VlqWriter;
-use ergo_ser::ergo_tree::{read_ergo_tree, write_ergo_tree, ErgoTree};
+use ergo_ser::ergo_tree::{check_sigma_prop_root, read_ergo_tree, write_ergo_tree, ErgoTree};
 use ergo_ser::opcode::{Expr, Payload};
 use ergo_ser::sigma_type::SigmaType;
 use ergo_ser::sigma_value::{CollValue, SigmaBoolean, SigmaValue};
@@ -150,15 +150,30 @@ pub fn sigma_boolean_pretty(sb: &SigmaBoolean) -> String {
     }
 }
 
-/// Parse ErgoTree wire bytes (public shim for the decompile module).
-pub fn parse_tree(bytes: &[u8]) -> Result<ErgoTree, crate::SandboxError> {
-    let mut r = VlqReader::new(bytes);
-    read_ergo_tree(&mut r).map_err(|e| crate::SandboxError::Tree(e.to_string()))
+/// Read one ErgoTree as the node reads a box script: the structural parse, then rule 1001.
+///
+/// A tree with no size bit whose root is not a SigmaProp is refused when it is deserialized
+/// (Scala `ErgoTreeSerializer`, "ErgoTree serialized without size bit", caused by
+/// `CheckDeserializedScriptIsSigmaProp`; the node's `check_sigma_prop_root`), so no box can hold
+/// it. With the size bit set the nodes wrap the same tree as unparsed and refuse it only when it
+/// is spent, which `read_ergo_tree` already does and this keeps.
+fn read_checked(r: &mut VlqReader) -> Result<ErgoTree, SandboxError> {
+    let tree = read_ergo_tree(r).map_err(|e| SandboxError::Tree(e.to_string()))?;
+    check_sigma_prop_root(&tree).map_err(|e| SandboxError::Tree(e.to_string()))?;
+    Ok(tree)
 }
 
+/// Parse ErgoTree wire bytes (public shim for the decompile module).
+///
+/// Refuses a size-less tree whose root is not a SigmaProp, as both nodes do ([`read_checked`]).
+pub fn parse_tree(bytes: &[u8]) -> Result<ErgoTree, crate::SandboxError> {
+    read_checked(&mut VlqReader::new(bytes))
+}
+
+/// [`parse_tree`], and the whole input must be the tree.
 pub fn parse_tree_complete(bytes: &[u8]) -> Result<ErgoTree, SandboxError> {
     let mut r = VlqReader::new(bytes);
-    let tree = read_ergo_tree(&mut r).map_err(|e| SandboxError::Tree(e.to_string()))?;
+    let tree = read_checked(&mut r)?;
     if r.remaining() != 0 {
         return Err(SandboxError::Tree("trailing bytes after ErgoTree".into()));
     }
@@ -169,7 +184,7 @@ pub fn parse_tree_complete(bytes: &[u8]) -> Result<ErgoTree, SandboxError> {
 /// the constants table, the structural body, and a byte-identity note.
 pub fn tree_report(bytes: &[u8]) -> Result<String, SandboxError> {
     let mut r = VlqReader::new(bytes);
-    let tree = read_ergo_tree(&mut r).map_err(|e| SandboxError::Tree(e.to_string()))?;
+    let tree = read_checked(&mut r)?;
     let mut out = String::new();
     out.push_str(&format!(
         "version={} segregated={} constants={}\n",

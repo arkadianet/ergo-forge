@@ -1,0 +1,6 @@
+versions: sigma sigma-state_2.12-6.0.7.jar java 17.0.20.1+1
+100101d17300: box script REJECTED at deserialization: sigma.serialization.SerializerException: Cannot handle ValidationException, ErgoTree serialized without size bit.
+10810001d17300: box script REJECTED at deserialization: sigma.serialization.SerializerException: Cannot handle ValidationException, ErgoTree serialized without size bit.
+18050101d17300: deserialized: unparsed (Left); spend with empty proof: REJECTED: Script has not been recognized due to ValidationException, and it cannot be accepted as soft-fork.
+10010101d17300: deserialized: parsed, root BoolToSigmaProp(ConstantPlaceholder(0,SBoolean)); spend with empty proof: verified=true
+1081000101d17300: deserialized: parsed, root BoolToSigmaProp(ConstantPlaceholder(0,SBoolean)); spend with empty proof: verified=true
