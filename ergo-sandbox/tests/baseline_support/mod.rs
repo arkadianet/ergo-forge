@@ -41,6 +41,19 @@ pub fn historical_bytes(workspace: &Path, path: &str) -> Vec<u8> {
                     .replace("version    = \"0.3.0\"", "version    = \"0.5.0\"")
                     // Node 55229e00 moves to num-bigint 0.5.
                     .replace("num-bigint = \"0.4\"", "num-bigint = \"0.5\"");
+            } else if path == "ergo-sandbox/Cargo.toml" {
+                // Emission constants (docs/reports/emission-constants.md): `evidence::emission`
+                // names the node's `MonetaryParams`, so `ergo-chain-spec` moves from the
+                // dev-dependencies to the dependencies. Same line, same revision. Cargo.lock lists
+                // both kinds together and does not change.
+                let line = format!(
+                    "ergo-chain-spec = {{ git = \"https://github.com/arkadianet/ergo\", rev = \"{rev}\" }}\n"
+                );
+                assert_eq!(expected.matches(&line).count(), 1);
+                expected = expected.replace(&line, "").replace(
+                    "ergo-validation = { workspace = true }\n",
+                    &format!("ergo-validation = {{ workspace = true }}\n{line}"),
+                );
             } else if path == "Cargo.lock" {
                 expected = expected
                     .split("[[package]]")
@@ -91,6 +104,18 @@ pub fn historical_bytes(workspace: &Path, path: &str) -> Vec<u8> {
                 .replace("    let params = required(&request.parameters, \"parameters\")\n        .map_err(input)?\n        .node();\n", "")
                 .replace("        .map_err(input)?;\n    let rules = required(&request.network_rules, \"network rules\")",
                     "        .map_err(input)?;\n    let params = required(&request.parameters, \"parameters\")\n        .map_err(input)?\n        .node(context.activated_script_version + 1);\n    let rules = required(&request.network_rules, \"network rules\")");
+            // Emission constants (docs/reports/emission-constants.md): an optional `emission`
+            // premise inside the enabled network rules, passed to the node as
+            // `ReemissionRuleInputs::emission`. Requests without it are unchanged.
+            expected = expected
+                .replace("use super::{wire::WireBox, EvidenceCase, Origin, Premise};",
+                    "use super::{emission::EmissionConstants, wire::WireBox, EvidenceCase, Origin, Premise};")
+                .replace("        pay_to_reemission_tree: String,\n    },",
+                    "        pay_to_reemission_tree: String,\n        /// The emission constants that let the node check the emission box's allocation. Absent:\n        /// that check does not run.\n        #[serde(default, skip_serializing_if = \"Option::is_none\")]\n        emission: Option<EmissionConstants>,\n    },")
+                .replace("                pay_to_reemission_tree,\n            } if !description.is_empty() => {",
+                    "                pay_to_reemission_tree,\n                emission,\n            } if !description.is_empty() => {")
+                .replace("Emission-box allocation needs the emission constants,\n                // which a network-rule description does not carry, so it is not checked.\n                Ok(Some(ReemissionRuleInputs {\n                    check_rules: true,\n                    emission: None,\n",
+                    "Emission-box allocation needs the emission constants:\n                // without `emission` it is not checked.\n                Ok(Some(ReemissionRuleInputs {\n                    check_rules: true,\n                    emission: emission\n                        .as_ref()\n                        .map(|e| e.node(activated_script_version))\n                        .transpose()?,\n");
         }
         assert_eq!(
             current,

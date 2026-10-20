@@ -19,7 +19,7 @@ use ergo_validation::{
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
-use super::{wire::WireBox, EvidenceCase, Origin, Premise};
+use super::{emission::EmissionConstants, wire::WireBox, EvidenceCase, Origin, Premise};
 
 /// Explicit snapshot, with no mainnet-default fallback. These fields map
 /// directly to the node's ProtocolParams; no consensus predicates live here.
@@ -104,6 +104,10 @@ pub enum NetworkRules {
         activation_height: u32,
         reemission_token_id: String,
         pay_to_reemission_tree: String,
+        /// The emission constants that let the node check the emission box's allocation. Absent:
+        /// that check does not run.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        emission: Option<EmissionConstants>,
     },
 }
 impl NetworkRules {
@@ -121,6 +125,7 @@ impl NetworkRules {
                 activation_height,
                 reemission_token_id,
                 pay_to_reemission_tree,
+                emission,
             } if !description.is_empty() => {
                 let tree = hex::decode(pay_to_reemission_tree).map_err(err)?;
                 // Check the actual supplied tree through node codec APIs only.
@@ -138,11 +143,14 @@ impl NetworkRules {
                 ergo_ser::ergo_tree::check_resolvable_methods(&parsed).map_err(err)?;
                 ergo_ser::ergo_tree::check_sigma_prop_root(&parsed).map_err(err)?;
                 // The node applies rule 123 only when asked (`check_rules`); these rules are given
-                // to be checked, as before. Emission-box allocation needs the emission constants,
-                // which a network-rule description does not carry, so it is not checked.
+                // to be checked, as before. Emission-box allocation needs the emission constants:
+                // without `emission` it is not checked.
                 Ok(Some(ReemissionRuleInputs {
                     check_rules: true,
-                    emission: None,
+                    emission: emission
+                        .as_ref()
+                        .map(|e| e.node(activated_script_version))
+                        .transpose()?,
                     activation_height: *activation_height,
                     reemission_token_id: array(reemission_token_id)?,
                     pay_to_reemission_tree: tree,

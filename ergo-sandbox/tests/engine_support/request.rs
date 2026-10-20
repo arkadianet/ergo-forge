@@ -18,9 +18,14 @@ pub fn fixture_revision() -> &'static str {
         .unwrap()
 }
 
-pub fn on_current_engine(mut request: ValidationRequest) -> ValidationRequest {
-    assert_eq!(request.case.premises().engine_revision, fixture_revision());
-    if fixture_revision() != engine_revision() {
+pub fn on_current_engine(request: ValidationRequest) -> ValidationRequest {
+    on_current_engine_from(request, fixture_revision())
+}
+
+/// [`on_current_engine`] for fixtures recorded at another revision than the P03 manifest's.
+pub fn on_current_engine_from(mut request: ValidationRequest, recorded: &str) -> ValidationRequest {
+    assert_eq!(request.case.premises().engine_revision, recorded);
+    if recorded != engine_revision() {
         let failure = validate(&request).unwrap_err();
         assert!(
             !failure.pipeline_invoked,

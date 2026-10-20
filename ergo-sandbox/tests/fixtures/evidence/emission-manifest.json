@@ -1,0 +1,50 @@
+{
+  "cases": [
+    {
+      "claimStatus": "no-property-claim",
+      "expected": {
+        "detail": "ReemissionRulesViolated(\"emission token allocation is invalid\")",
+        "errorVariant": "ReemissionRulesViolated",
+        "stage": "node-validation",
+        "status": "node-rejected"
+      },
+      "family": "transaction-pipeline",
+      "files": [
+        {
+          "path": "emission-vectors/emission-allocation-rejection.fixture",
+          "sha256": "6c3455882783ec54fae8acd29a7fd609140e2b2f454a2cc95a5b252bb4839e42"
+        }
+      ],
+      "id": "emission-allocation-rejection",
+      "nodeRevision": "55229e0040b83b57521334030fe2842e85d43422",
+      "propertyVersion": "none-emission",
+      "publicationEligibility": "public-authored",
+      "sourceKind": "authored-full-node-vector"
+    },
+    {
+      "claimStatus": "no-property-claim",
+      "expected": {
+        "stage": "complete",
+        "status": "node-accepted",
+        "totalBlockCost": 13101,
+        "transactionId": "5ec299c95a506e6ae2e0d67b7b336fa6e498a8c7c7cc6d427d68b77785f400c6"
+      },
+      "family": "transaction-pipeline",
+      "files": [
+        {
+          "path": "emission-vectors/emission-allocation-acceptance.fixture",
+          "sha256": "f5a9571fd0a2ceeed2d3c5ae9642dbd14389157742204b474b532589eb5e2bea"
+        }
+      ],
+      "id": "emission-allocation-acceptance",
+      "nodeRevision": "55229e0040b83b57521334030fe2842e85d43422",
+      "propertyVersion": "none-emission",
+      "publicationEligibility": "public-authored",
+      "sourceKind": "authored-full-node-vector"
+    }
+  ],
+  "formatVersion": 1,
+  "nodeRevision": "55229e0040b83b57521334030fe2842e85d43422",
+  "producer": "generate_emission_vectors.rs; direct ergo_validation::tx::validate_transaction",
+  "stateScope": "hypothetical supplied state/rules; no historical or property claims"
+}
