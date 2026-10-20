@@ -85,6 +85,12 @@ pub fn create_with_header(
     network: NetworkPrefix,
     header: HeaderVersion,
 ) -> Result<Lockfile, SandboxError> {
+    // The header's three version bits hold 0..=7, and no node accepts above 3 (as `ingest`).
+    if header == HeaderVersion::Requested && tree_version > 3 {
+        return Err(SandboxError::Tree(format!(
+            "unsupported tree version {tree_version}: expected 0..=3"
+        )));
+    }
     let mut compiled = crate::compile::compile_with_params(source, params, tree_version, network)?;
     if header == HeaderVersion::Requested
         && tree_version > 0

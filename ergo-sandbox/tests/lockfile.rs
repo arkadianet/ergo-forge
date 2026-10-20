@@ -412,6 +412,18 @@ fn requested_tree_version_stamps_any_script() {
         .map(|d| d.kind)
         .collect();
     assert!(kinds.contains(&DriftKind::TreeBytes) && kinds.contains(&DriftKind::TreeVersion));
+    // No node accepts a version above 3, and above 7 the header cannot hold it.
+    for v in [4, 8] {
+        let err = lockfile::create_with_header(
+            SOURCE,
+            &params(),
+            v,
+            NetworkPrefix::Mainnet,
+            HeaderVersion::Requested,
+        )
+        .unwrap_err();
+        assert!(err.to_string().contains("expected 0..=3"), "{err}");
+    }
 }
 
 #[test]
@@ -465,5 +477,14 @@ fn lock_cli_explicit_tree_version() {
     };
     assert_eq!(verify(&["--tree-version", "3"]), Some(0));
     assert_eq!(verify(&[]), Some(5), "the default header is v0: drift");
+    let r = run(&[
+        "lock",
+        "contract.es",
+        "--params",
+        "params.json",
+        "--tree-version",
+        "4",
+    ]);
+    assert_eq!(r.status.code(), Some(1));
     std::fs::remove_dir_all(dir).unwrap();
 }
