@@ -33,6 +33,16 @@ fn corpus(path: &str) -> Lifted {
     )
 }
 
+fn deployed_bank() -> Lifted {
+    let fixture: serde_json::Value =
+        serde_json::from_str(include_str!("fixtures/identity_phoenix.json")).unwrap();
+    let bytes = hex::decode(fixture["bank"]["tree"].as_str().unwrap()).unwrap();
+    lift_tree(
+        &ergo_sandbox::inspect::parse_tree_complete(&bytes).unwrap(),
+        true,
+    )
+}
+
 fn input<'a>(name: &'a str, index: usize, lifted: &'a Lifted) -> InputContract<'a> {
     InputContract {
         name,
@@ -62,7 +72,10 @@ fn phoenix_bank_binds_the_proxy_bank_successor() {
     let proxy_name = "hodlcoin/phoenix/phoenix_v1_hodltoken_proxy.es";
     let bank_name = "hodlcoin/phoenix/phoenix_v1_hodltoken_bank.es";
     let proxy = corpus(proxy_name);
-    let bank = corpus(bank_name);
+    // The sigma-state 6.0.7 typer, and node 55229e00's, reject this bank source (a `val x: Long`
+    // bound to a BigInt expression; docs/reports/node-pin-55229e00.md), so the companion is the
+    // bank tree deployed on mainnet (the identity fixture), not a compilation of the source.
+    let bank = deployed_bank();
     let inputs = [input(bank_name, 0, &bank), input(proxy_name, 1, &proxy)];
     let tokens = BTreeMap::new();
     let set = ContractSet {

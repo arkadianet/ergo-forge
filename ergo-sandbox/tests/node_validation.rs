@@ -107,7 +107,8 @@ fn cases() -> Vec<(Value, ValidationRequest)> {
 #[test]
 fn full_pipeline_matches_pinned_node_vectors() {
     for (row, request) in cases() {
-        let expected = &row["expected"];
+        let expected =
+            &engine_support::corrected_expected(row["id"].as_str().unwrap(), &row["expected"]);
         match validate(&request) {
             Ok(accepted) => {
                 let report = accepted.report();
@@ -295,7 +296,7 @@ fn accepted_execution_cannot_be_deserialized_or_fabricated() {
 
 #[test]
 fn node_vectors_pass_on_new_rev() {
-    let expected = "a203cc02f585bcbe13c743aee008222b208f3c82";
+    let expected = "55229e0040b83b57521334030fe2842e85d43422";
     let recorded = ergo_sandbox::evidence::case::engine_revision();
     assert_eq!(
         recorded, expected,

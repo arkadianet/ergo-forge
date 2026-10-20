@@ -1,0 +1,8 @@
+versions: ergo-core ergo-core_2.12.jar ergo-wallet ergo-wallet_2.12.jar sigma sigma-state_2.12-6.0.7.jar java 17.0.17+10-LTS
+[item2 canonical-encoding-rejection] input box id 87ca67e4822b4c8777457f779eb98fb3a348fc40d9a3de8940a124ab29c4ad6a
+[item2 canonical-encoding-rejection] parsed; re-serialized equal to input bytes: false; tx id 2241d787c541e90e3904f200a4a0b3bb213401b5a59dffa4e81591602e712a3d
+[item2 canonical-encoding-rejection] stateless true
+[item2 canonical-encoding-rejection] stateful ACCEPTED=true cost 12101
+[item3 create output with tree 10810001d17300] input box id 87ca67e4822b4c8777457f779eb98fb3a348fc40d9a3de8940a124ab29c4ad6a
+[item3 create output with tree 10810001d17300] PARSE REJECTED: sigma.serialization.SerializerException: Cannot handle ValidationException, ErgoTree serialized without size bit.
+[item3] tree PARSE REJECTED: sigma.serialization.SerializerException: Cannot handle ValidationException, ErgoTree serialized without size bit.

@@ -129,7 +129,7 @@ impl Observation<'_> {
                 let v = &b
                     .node()
                     .candidate
-                    .additional_registers
+                    .additional_registers()
                     .registers
                     .get((r.index - 4) as usize)
                     .ok_or("missing register")?

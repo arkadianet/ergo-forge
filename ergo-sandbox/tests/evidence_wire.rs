@@ -172,11 +172,19 @@ fn transaction_id_and_message_use_node_bytes_to_sign() {
             tx.bytes_to_sign(),
             "unsigned wire layout is not the signing message"
         );
+        // Parsed registers cleared, the cached register bytes kept: the node's fields are
+        // private now, and only its trusted constructor can build such a desynced candidate.
         let mut stale = node.clone();
-        stale.output_candidates[0]
-            .additional_registers
-            .registers
-            .clear();
+        let c = &stale.output_candidates[0];
+        stale.output_candidates[0] = ergo_ser::ergo_box::ErgoBoxCandidate::from_trusted_raw_parts(
+            c.value,
+            c.ergo_tree().clone(),
+            c.ergo_tree_bytes().to_vec(),
+            c.creation_height,
+            c.tokens.clone(),
+            Default::default(),
+            c.register_bytes().to_vec(),
+        );
         assert!(
             WireTransaction::from_node(stale).is_err(),
             "a stale node byte cache must not override parsed fields"

@@ -98,6 +98,7 @@ fn deeply_nested_constant_truncates_instead_of_overflowing() {
         version: 3,
         has_size: false,
         constant_segregation: false,
+        reserved_header_bits: 0,
         constants: vec![],
         body: Expr::Const { tpe, val },
     };

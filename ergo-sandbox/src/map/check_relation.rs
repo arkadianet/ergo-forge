@@ -729,7 +729,7 @@ fn resolve_register_equalities<'a>(
                     let register = config
                         .node()
                         .candidate
-                        .additional_registers
+                        .additional_registers()
                         .registers
                         .get((reg - 4) as usize)
                         .map(|r| (&r.tpe, &r.value));
@@ -858,6 +858,7 @@ mod scope_tests {
             version: 3,
             has_size: true,
             constant_segregation: false,
+            reserved_header_bits: 0,
             constants: vec![],
             body,
         };

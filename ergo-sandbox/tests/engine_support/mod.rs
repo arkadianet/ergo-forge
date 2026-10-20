@@ -116,6 +116,48 @@ pub fn with_corrected_prior_cost(request: ValidationRequest, key: &str) -> Valid
     serde_json::from_value(v).unwrap()
 }
 
+/// Pinned node-vector outcomes the pinned engine gives differently from the revision the vector was
+/// recorded at (docs/reports/node-pin-55229e00.md). Each new outcome is the one the Scala 6.0.8
+/// reference node (sigma-state 6.0.7) gives for the same transaction. A correction applies only
+/// where the row holds exactly the historical expectation; any other change still fails.
+pub const OUTCOME_CORRECTIONS: &[(&str, &str, &str)] = &[
+    // The input count is the overlong VLQ 0x81 0x00. Scala parses and accepts the transaction
+    // (cost 12,101, the canonically encoded `accepted-keyless-spend`); node 55229e00 does too.
+    (
+        "canonical-encoding-rejection",
+        r#"{"detail":"NonCanonical","errorVariant":"NonCanonical","stage":"canonical-encoding","status":"node-rejected"}"#,
+        r#"{"stage":"complete","status":"node-accepted","totalBlockCost":12101,"transactionId":"2241d787c541e90e3904f200a4a0b3bb213401b5a59dffa4e81591602e712a3d"}"#,
+    ),
+];
+
+/// The expected outcome of the pinned node vector `id`, as the pinned engine gives it.
+pub fn corrected_expected(id: &str, historical: &serde_json::Value) -> serde_json::Value {
+    match OUTCOME_CORRECTIONS.iter().find(|(k, _, _)| *k == id) {
+        Some((_, old, new)) => {
+            let old: serde_json::Value = serde_json::from_str(old).unwrap();
+            assert_eq!(
+                historical, &old,
+                "{id}: the row holds another expectation than the correction is for"
+            );
+            serde_json::from_str(new).unwrap()
+        }
+        None => historical.clone(),
+    }
+}
+
+/// Node a203cc02 derived `maxTokensPerBox` 122; sigma-state 6.0.7 `SigmaConstants.MaxTokens`, and
+/// node 55229e00, give 255 (docs/reports/node-pin-55229e00.md). The correction applies only where
+/// the record holds exactly 122.
+pub fn with_corrected_max_tokens(request: ValidationRequest) -> ValidationRequest {
+    let mut v = serde_json::to_value(&request).unwrap();
+    let historical = v["parameters"]["value"]["maxTokensPerBox"]
+        .as_u64()
+        .unwrap();
+    assert_eq!(historical, 122, "the correction is for 122");
+    v["parameters"]["value"]["maxTokensPerBox"] = serde_json::json!(255);
+    serde_json::from_value(v).unwrap()
+}
+
 pub fn mapping_revisions() -> RevisionMap {
     use serde_json::Value;
     use sha2::{Digest, Sha256};

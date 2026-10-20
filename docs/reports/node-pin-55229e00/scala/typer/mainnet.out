@@ -1,0 +1,19 @@
+changed | examples/contracts/dexy/bank/payout.es | ERROR TyperException:  line 58:   val dexyInCirculation = $initialDexyTokens - bankDexy                ^ Expected type SInt$, but got SLong$
+changed | examples/contracts/dexy/lp/pool/mint.es | ERROR TyperException:  line 27:     val supplyLpIn = $initialLp - lpReservesIn._2                  ^ Expected type SInt$, but got SLong$
+changed | examples/contracts/hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_bank.es | ERROR TyperException:  line 107:             val expectedAmountDeposited: Long = (hodlERGCircDelta * price) / precisionFactor // Price of hodlCoin in nanoERG.                        
+changed | examples/contracts/hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_proxy.es | ERROR TyperException:  line 88:                 val expectedAmountDeposited: Long = (hodlERGCircDelta * price) / precisionFactor                              ^ Expected type SLong$, 
+changed | examples/contracts/hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodltoken_bank.es | ERROR TyperException:  line 136:             val expectedAmountDeposited: Long = (hodlTokensCircDelta * price) / precisionFactor // Price of hodlCoin in nanoERG.                     
+changed | examples/contracts/hodlcoin/phoenix/phoenix_v1_hodlcoin_bank.es | ERROR TyperException:  line 58:     val price: Long                 = (reserveIn.toBigInt * precisionFactor) / hodlCoinsCircIn                  ^ Expected type SLong$, but got SBigIn
+changed | examples/contracts/hodlcoin/phoenix/phoenix_v1_hodlcoin_proxy.es | ERROR TyperException:  line 73:         val price: Long                 = (reserveIn.toBigInt * precisionFactor) / hodlCoinsCircIn                      ^ Expected type SLong$, but go
+changed | examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_bank.es | ERROR TyperException:  line 136:             val expectedAmountDeposited: Long = (hodlTokensCircDelta * price) / precisionFactor // Price of hodlCoin in nanoERG.                     
+changed | examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_fee.es | ERROR TyperException:  line 112:     val validSignatures: Boolean = {                   ^ Expected type SBoolean, but got SSigmaProp
+changed | examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_feeTest_mainnet.es | ERROR TyperException:  line 112:     val validSignatures: Boolean = {                   ^ Expected type SBoolean, but got SSigmaProp
+changed | examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_feeTest_testnet.es | ERROR IllegalArgumentException: requirement failed: Trying to decode testnet address in mainnet
+control | examples/contracts/dexy/bank/bank.es | compiled tree=rust
+control | examples/contracts/dexy/bank/update/ballot.es | compiled tree=rust
+control | examples/contracts/dexy/gort-dev/emission.es | compiled tree=rust
+control | examples/contracts/dexy/tracking.es | compiled tree=rust
+control | examples/contracts/hodlcoin/phoenix/phoenix_v1_hodlcoin_fee.es | compiled tree=rust
+control | examples/contracts/hodlcoin/phoenix/phoenix_v1_hodlcoin_feeTest.es | ERROR IllegalArgumentException: requirement failed: Trying to decode testnet address in mainnet
+control | examples/contracts/hodlcoin/phoenix/phoenix_v1_hodlcoin_feeTest_mainnet.es | compiled tree=rust
+control | examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_proxy.es | compiled tree=rust

@@ -226,7 +226,7 @@ fn unavailable_information_is_always_a_visible_structural_placeholder() {
         },
         Expr::Const {
             tpe: SigmaType::SSigmaProp,
-            val: SigmaValue::SigmaProp(ergo_ser::sigma_value::SigmaBoolean::Cand(vec![])),
+            val: SigmaValue::SigmaProp(ergo_ser::sigma_value::SigmaBoolean::Cand(vec![].into())),
         },
     ] {
         let report = render_ir(expr);

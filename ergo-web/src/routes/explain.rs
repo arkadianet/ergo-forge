@@ -250,9 +250,9 @@ impl SigmaText<'_> {
             }
         }
         Some(if and {
-            S::Cand(children)
+            S::Cand(children.into())
         } else {
-            S::Cor(children)
+            S::Cor(children.into())
         })
     }
 }
@@ -266,7 +266,7 @@ mod tests {
         for sb in [
             S::TrivialProp(true),
             S::ProveDlog(GroupElement::from_bytes([2; 33])),
-            S::Cand(vec![S::TrivialProp(true), S::TrivialProp(false)]),
+            S::Cand(vec![S::TrivialProp(true), S::TrivialProp(false)].into()),
         ] {
             assert_eq!(
                 residual_from_trace(&format!("SigmaProp({sb:?})")),

@@ -11,15 +11,15 @@ repository = "https://github.com/arkadianet/ergo-forge"
 [workspace.dependencies]
 # Engine crates — consumed from the Rust Ergo node (arkadianet/ergo).
 # Pinned to a main rev for reproducible builds; bump deliberately.
-ergo-primitives = { git = "https://github.com/arkadianet/ergo", rev = "a203cc02f585bcbe13c743aee008222b208f3c82" }
-ergo-ser        = { git = "https://github.com/arkadianet/ergo", rev = "a203cc02f585bcbe13c743aee008222b208f3c82" }
-ergo-sigma      = { git = "https://github.com/arkadianet/ergo", rev = "a203cc02f585bcbe13c743aee008222b208f3c82" }
-ergo-compiler   = { git = "https://github.com/arkadianet/ergo", rev = "a203cc02f585bcbe13c743aee008222b208f3c82" }
+ergo-primitives = { git = "https://github.com/arkadianet/ergo", rev = "55229e0040b83b57521334030fe2842e85d43422" }
+ergo-ser        = { git = "https://github.com/arkadianet/ergo", rev = "55229e0040b83b57521334030fe2842e85d43422" }
+ergo-sigma      = { git = "https://github.com/arkadianet/ergo", rev = "55229e0040b83b57521334030fe2842e85d43422" }
+ergo-compiler   = { git = "https://github.com/arkadianet/ergo", rev = "55229e0040b83b57521334030fe2842e85d43422" }
 # The node's wallet prover (Schnorr / DH-tuple / AND / OR / threshold) and
 # the AVL+ crate whose verifier the node's evaluator uses — so the sandbox
 # can PRODUCE the proofs a spender attaches, not only check them.
-ergo-validation = { git = "https://github.com/arkadianet/ergo", rev = "a203cc02f585bcbe13c743aee008222b208f3c82" }
-ergo-wallet     = { git = "https://github.com/arkadianet/ergo", rev = "a203cc02f585bcbe13c743aee008222b208f3c82" }
+ergo-validation = { git = "https://github.com/arkadianet/ergo", rev = "55229e0040b83b57521334030fe2842e85d43422" }
+ergo-wallet     = { git = "https://github.com/arkadianet/ergo", rev = "55229e0040b83b57521334030fe2842e85d43422" }
 ergo_avltree_rust = "0.1.1"
 k256       = { version = "0.13", features = ["arithmetic"] }
 zeroize    = "1"
@@ -30,7 +30,7 @@ serde      = { version = "1", features = ["derive"] }
 serde_json = "1"
 hex        = "0.4"
 indexmap   = { version = "2", features = ["serde"] }
-num-bigint = "0.4"
+num-bigint = "0.5"
 bs58       = "0.5"
 ureq       = "3"
 axum       = "0.8"

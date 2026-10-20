@@ -39,8 +39,14 @@ pub struct Parameters {
     pub storage_period: u32,
 }
 impl Parameters {
-    pub fn node(&self) -> ProtocolParams {
+    /// The node's parameters at `block_version`, which the node derives transaction rules and the
+    /// activated script version from (`activated script version = block version - 1`).
+    pub fn node(&self, block_version: u8) -> ProtocolParams {
         ProtocolParams {
+            missing_core_parameters: 0,
+            disabled_rules: Default::default(),
+            block_rule_inputs: None,
+            block_version,
             min_value_per_byte: self.min_value_per_byte,
             max_block_cost: self.max_block_cost,
             max_block_size: self.max_block_size,
@@ -131,7 +137,12 @@ impl NetworkRules {
                 ergo_ser::ergo_tree::check_header_size_bit(&parsed).map_err(err)?;
                 ergo_ser::ergo_tree::check_resolvable_methods(&parsed).map_err(err)?;
                 ergo_ser::ergo_tree::check_sigma_prop_root(&parsed).map_err(err)?;
+                // The node applies rule 123 only when asked (`check_rules`); these rules are given
+                // to be checked, as before. Emission-box allocation needs the emission constants,
+                // which a network-rule description does not carry, so it is not checked.
                 Ok(Some(ReemissionRuleInputs {
+                    check_rules: true,
+                    emission: None,
                     activation_height: *activation_height,
                     reemission_token_id: array(reemission_token_id)?,
                     pay_to_reemission_tree: tree,
@@ -251,13 +262,13 @@ pub fn validate(request: &ValidationRequest) -> Result<AcceptedExecution, Valida
             "case context disagrees with the typed block context; resolve explicitly".into(),
         ));
     }
-    let params = required(&request.parameters, "parameters")
-        .map_err(input)?
-        .node();
     let context = required(&request.block_context, "block context/activation")
         .map_err(input)?
         .node()
         .map_err(input)?;
+    let params = required(&request.parameters, "parameters")
+        .map_err(input)?
+        .node(context.activated_script_version + 1);
     let rules = required(&request.network_rules, "network rules")
         .map_err(input)?
         .node(context.activated_script_version)

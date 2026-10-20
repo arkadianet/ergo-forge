@@ -1,0 +1,2 @@
+changed | examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_feeTest_testnet.es | ERROR TyperException:  line 112:     val validSignatures: Boolean = {                   ^ Expected type SBoolean, but got SSigmaProp
+control | examples/contracts/hodlcoin/phoenix/phoenix_v1_hodlcoin_feeTest.es | compiled tree=rust

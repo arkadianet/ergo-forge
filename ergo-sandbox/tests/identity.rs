@@ -172,36 +172,56 @@ fn phoenix_deployments_and_near_miss_siblings() {
                 "minTxOperatorFee": {"type":"Long","value":2000000}
             }))
             .unwrap();
-        for (name, source, sibling) in [
+        // The sigma-state 6.0.7 typer, and node 55229e00's, reject a `val x: Long` bound to a
+        // BigInt expression, as these sources write (docs/reports/node-pin-55229e00.md). Their
+        // identity can no longer be checked from source; the exact rejection is checked instead.
+        let rejected = "Expected type SLong, but got SBigInt";
+        for (name, source, source_rejected, sibling, sibling_rejected) in [
             (
                 "bank",
                 include_str!(
                     "../../examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_bank.es"
                 ),
+                true,
                 include_str!(
                     "../../examples/contracts/hodlcoin/phoenix/phoenix_v1_hodlcoin_bank.es"
                 ),
+                true,
             ),
             (
                 "proxy",
                 include_str!(
                     "../../examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_proxy.es"
                 ),
+                false,
                 include_str!(
                     "../../examples/contracts/hodlcoin/phoenix/phoenix_v1_hodlcoin_proxy.es"
                 ),
+                true,
             ),
         ] {
             let deployed = hex::decode(fixture[name]["tree"].as_str().unwrap()).unwrap();
-            let compiled = compile_with_params(source, &params, 3, NetworkPrefix::Mainnet).unwrap();
-            let r = match_trees(&compiled.tree_bytes, &deployed).unwrap();
-            println!("Phoenix {name}: {}", serde_json::to_string(&r).unwrap());
-            assert_eq!(
-                r.verdict,
-                MatchVerdict::SameProgramWithDifferingConstants,
-                "{name}"
-            );
-            let sibling = compile_with_params(sibling, &params, 3, NetworkPrefix::Mainnet).unwrap();
+            let compiled = compile_with_params(source, &params, 3, NetworkPrefix::Mainnet);
+            if source_rejected {
+                let e = compiled.unwrap_err().to_string();
+                assert!(e.contains(rejected), "{name}: {e}");
+            } else {
+                let compiled = compiled.unwrap();
+                let r = match_trees(&compiled.tree_bytes, &deployed).unwrap();
+                println!("Phoenix {name}: {}", serde_json::to_string(&r).unwrap());
+                assert_eq!(
+                    r.verdict,
+                    MatchVerdict::SameProgramWithDifferingConstants,
+                    "{name}"
+                );
+            }
+            let sibling = compile_with_params(sibling, &params, 3, NetworkPrefix::Mainnet);
+            if sibling_rejected {
+                let e = sibling.unwrap_err().to_string();
+                assert!(e.contains(rejected), "{name} sibling: {e}");
+                continue;
+            }
+            let sibling = sibling.unwrap();
             let r = match_trees(&sibling.tree_bytes, &deployed).unwrap();
             println!(
                 "Phoenix {name} sibling: {}",

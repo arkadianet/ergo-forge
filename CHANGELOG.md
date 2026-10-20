@@ -53,6 +53,17 @@ the value the Scala 6.0.6 node charges. Two `registry` example scenarios now exp
 error the Scala node raises for a refused insert on a pre-v3 tree. See
 `docs/reports/node-pin-a203cc02.md`.
 
+The pin then moved to `55229e0040b83b57521334030fe2842e85d43422` (node 0.13.1, Rust
+1.99). Seed and mainnet stayed 79/92 and 270/279, tree for tree, and the external
+compiled fixtures are unchanged. Every changed expectation is a move to what the Scala
+6.0.8 node (sigma-state 6.0.7) does: its typer rejects eleven bundled Dexy/Phoenix
+sources, so they no longer compile and the deployed-contract sweeps record nine of them
+as compile failures (their findings withdrawn, not reclassified); one node vector with
+an overlong input count is accepted; a Boolean-rooted tree is refused (rule 1001); and
+the USE incident's derived `maxTokensPerBox` is 255. Forge does not check the node's
+emission-box allocation rule, for want of the emission constants. See
+`docs/reports/node-pin-55229e00.md`.
+
 The existing test action downloads the matching `ergo-es` asset from a named
 tag or the latest release. The 0.5.0 source includes `verify-lock`, satisfying
 its lockfile compatibility probe once `v0.5.0` becomes the latest release.
