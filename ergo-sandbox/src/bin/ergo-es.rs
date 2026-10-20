@@ -96,10 +96,13 @@ USAGE:
                [--tree-version N] [--out contract.lock.json]
       Record exact source SHA-256, typed params, pinned engine and workbench versions,
       tree bytes, P2S address, tree version and stable static lint digest.
+      --tree-version N puts exactly vN (with the size flag) on the header; without it
+      the header is v0 unless a v6 method needs v3.
   ergo-es verify-lock <contract.lock.json> --source f.es [--params p.json]
                       [--network mainnet|testnet] [--tree-version N] [--json]
                       [--explorer URL] [--nft tokenId]
       Recompile with independent inputs (defaults: empty params, mainnet, version 3).
+      Pass the --tree-version the lock was made with.
       Exit 0 local fields current; 5 drift; 6 requested live check unverified; 1 error.
       Optional live lookup uses --explorer or EXPLORER_URL. Otherwise unverified.
       Lint digest: SHA-256 of compact JSON sorted [lint id, node id, message] triples.

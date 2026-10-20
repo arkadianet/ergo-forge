@@ -2,6 +2,15 @@
 
 ## Unreleased — audit discovery workbench
 
+- `ergo-es lock` and `verify-lock` honour an explicit `--tree-version N`: the
+  tree header is exactly vN, with the size flag, for any script. Without the
+  flag nothing changes (v0 unless a v6 method needs v3). Library:
+  `lockfile::HeaderVersion`, `create_with_header` and
+  `verify_lock_with_header`; compiling is unchanged. A lock made before with
+  an explicit `--tree-version` holds the v0 header of a script without a v6
+  method, so `verify-lock --tree-version N` now reports it as drift: lock it
+  again. An explicit version above 3 is refused.
+
 - Added availability-only audit coverage and bounded spender-controlled flow
   review obligations to the checklist surface. Coverage availability is read
   from the audit registry, so a name no registered lint runs is reported as

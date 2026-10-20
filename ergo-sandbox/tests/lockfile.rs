@@ -355,3 +355,136 @@ fn lock_cli_roundtrip_drift_and_offline_live_status() {
     assert_eq!(r.status.code(), Some(1));
     std::fs::remove_dir_all(dir).unwrap();
 }
+
+#[test]
+fn requested_tree_version_stamps_any_script() {
+    use ergo_sandbox::lockfile::HeaderVersion;
+    // No v6 method: by default the header stays v0 under the compiler option 3.
+    let default = create();
+    assert_eq!(default.tree_version, 0);
+    assert_eq!(&default.tree_hex[..2], "10");
+    let v3 = lockfile::create_with_header(
+        SOURCE,
+        &params(),
+        3,
+        NetworkPrefix::Mainnet,
+        HeaderVersion::Requested,
+    )
+    .unwrap();
+    assert_eq!(v3.tree_version, 3);
+    assert_eq!(
+        &v3.tree_hex[..2],
+        "1b",
+        "v3, size flag, segregated constants"
+    );
+    // The same bytes as stamping the default build's tree v3 with the size flag by hand,
+    // as a wallet does; only the header differs, so the proposition (and P2SH) is the same.
+    let parse = |h: &str| {
+        let bytes = hex::decode(h).unwrap();
+        ergo_ser::ergo_tree::read_ergo_tree_with_activated_version(
+            &mut ergo_primitives::reader::VlqReader::new(&bytes),
+            3,
+        )
+        .unwrap()
+    };
+    let mut tree = parse(&default.tree_hex);
+    tree.version = 3;
+    tree.has_size = true;
+    let mut w = ergo_primitives::writer::VlqWriter::new();
+    ergo_ser::ergo_tree::write_ergo_tree(&mut w, &tree).unwrap();
+    assert_eq!(v3.tree_hex, hex::encode(w.result()));
+    assert_eq!(parse(&v3.tree_hex), tree);
+    // A lock made with the requested version verifies with it, and drifts without it.
+    let same = lockfile::verify_lock_with_header(
+        &v3,
+        SOURCE,
+        &params(),
+        3,
+        NetworkPrefix::Mainnet,
+        HeaderVersion::Requested,
+    )
+    .unwrap();
+    assert!(same.drifts.is_empty(), "{:?}", same.drifts);
+    let kinds: Vec<_> = lockfile::verify_lock(&v3, SOURCE, &params(), 3, NetworkPrefix::Mainnet)
+        .unwrap()
+        .drifts
+        .iter()
+        .map(|d| d.kind)
+        .collect();
+    assert!(kinds.contains(&DriftKind::TreeBytes) && kinds.contains(&DriftKind::TreeVersion));
+    // No node accepts a version above 3, and above 7 the header cannot hold it.
+    for v in [4, 8] {
+        let err = lockfile::create_with_header(
+            SOURCE,
+            &params(),
+            v,
+            NetworkPrefix::Mainnet,
+            HeaderVersion::Requested,
+        )
+        .unwrap_err();
+        assert!(err.to_string().contains("expected 0..=3"), "{err}");
+    }
+}
+
+#[test]
+fn lock_cli_explicit_tree_version() {
+    let dir = std::env::temp_dir().join(format!("forge-lock-v3-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::write(dir.join("contract.es"), SOURCE).unwrap();
+    std::fs::write(
+        dir.join("params.json"),
+        serde_json::to_vec(&params()).unwrap(),
+    )
+    .unwrap();
+    let run = |args: &[&str]| {
+        std::process::Command::new(env!("CARGO_BIN_EXE_ergo-es"))
+            .current_dir(&dir)
+            .env_remove("EXPLORER_URL")
+            .args(args)
+            .output()
+            .unwrap()
+    };
+    let r = run(&[
+        "lock",
+        "contract.es",
+        "--params",
+        "params.json",
+        "--tree-version",
+        "3",
+    ]);
+    assert_eq!(
+        r.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&r.stderr)
+    );
+    let lock: Value =
+        serde_json::from_slice(&std::fs::read(dir.join("contract.lock.json")).unwrap()).unwrap();
+    assert_eq!(lock["treeVersion"], 3);
+    assert!(lock["treeHex"].as_str().unwrap().starts_with("1b"));
+    let verify = |extra: &[&str]| {
+        let mut args = vec![
+            "verify-lock",
+            "contract.lock.json",
+            "--source",
+            "contract.es",
+            "--params",
+            "params.json",
+            "--json",
+        ];
+        args.extend(extra);
+        run(&args).status.code()
+    };
+    assert_eq!(verify(&["--tree-version", "3"]), Some(0));
+    assert_eq!(verify(&[]), Some(5), "the default header is v0: drift");
+    let r = run(&[
+        "lock",
+        "contract.es",
+        "--params",
+        "params.json",
+        "--tree-version",
+        "4",
+    ]);
+    assert_eq!(r.status.code(), Some(1));
+    std::fs::remove_dir_all(dir).unwrap();
+}
