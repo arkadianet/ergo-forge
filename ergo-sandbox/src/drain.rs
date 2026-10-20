@@ -836,7 +836,7 @@ fn drain_hunt_multi_instance(req: &DrainRequest) -> Result<DrainReport, SandboxE
         }
         match merged.as_mut() {
             None => {
-                best_total = report.best.as_ref().map(&hit_total).unwrap_or(0);
+                best_total = report.best.as_ref().map(hit_total).unwrap_or(0);
                 merged = Some(report);
             }
             Some(acc) => {

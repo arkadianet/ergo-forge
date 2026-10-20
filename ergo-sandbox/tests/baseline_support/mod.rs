@@ -17,11 +17,30 @@ pub fn historical_bytes(workspace: &Path, path: &str) -> Vec<u8> {
             std::fs::read(workspace.join("docs/reports/batch-10/baseline").join(path)).unwrap();
         let old = String::from_utf8(historical.clone()).unwrap();
         let mut expected = old.clone();
-        if path.ends_with("Cargo.toml") || path == "Cargo.lock" {
+        if path == "Cargo.lock" {
+            // Node 55229e00 moves most of the node's dependency graph (num-bigint 0.5 and the
+            // crates it pulls in), too many entries to rewrite one by one here. The lockfile must
+            // be byte for byte the one reviewed in docs/reports/node-pin-55229e00.md.
+            use sha2::{Digest, Sha256};
+            let reviewed = std::fs::read_to_string(
+                workspace.join("docs/reports/node-pin-55229e00/Cargo.lock.sha256"),
+            )
+            .unwrap();
+            assert_eq!(
+                format!("{}  Cargo.lock\n", hex::encode(Sha256::digest(&current))),
+                reviewed,
+                "unreviewed engine migration edit: {path}"
+            );
+            return historical;
+        }
+        if path.ends_with("Cargo.toml") {
             let rev = ergo_sandbox::evidence::case::engine_revision();
             expected = expected.replace("9468043396e5daa2828211bcff4234bc70fae4f0", rev);
             if path == "Cargo.toml" {
-                expected = expected.replace("version    = \"0.3.0\"", "version    = \"0.5.0\"");
+                expected = expected
+                    .replace("version    = \"0.3.0\"", "version    = \"0.5.0\"")
+                    // Node 55229e00 moves to num-bigint 0.5.
+                    .replace("num-bigint = \"0.4\"", "num-bigint = \"0.5\"");
             } else if path == "Cargo.lock" {
                 expected = expected
                     .split("[[package]]")
@@ -61,6 +80,17 @@ pub fn historical_bytes(workspace: &Path, path: &str) -> Vec<u8> {
                     "required(&request.network_rules, \"network rules\")\n        .map_err(input)?\n        .node(context.activated_script_version)")
                 .replace("            storage_period: self.storage_period,\n",
                     "            storage_period: self.storage_period,\n            validation_settings: Default::default(),\n");
+            // Node 55229e00: the protocol parameters carry the block version (from which the node
+            // takes the activated script version) and its rule state, and the re-emission inputs
+            // say whether to check rule 123 and with which emission constants (none here).
+            expected = expected
+                .replace("    pub fn node(&self) -> ProtocolParams {\n        ProtocolParams {\n",
+                    "    /// The node's parameters at `block_version`, which the node derives transaction rules and the\n    /// activated script version from (`activated script version = block version - 1`).\n    pub fn node(&self, block_version: u8) -> ProtocolParams {\n        ProtocolParams {\n            missing_core_parameters: 0,\n            disabled_rules: Default::default(),\n            block_rule_inputs: None,\n            block_version,\n")
+                .replace("                Ok(Some(ReemissionRuleInputs {\n",
+                    "                // The node applies rule 123 only when asked (`check_rules`); these rules are given\n                // to be checked, as before. Emission-box allocation needs the emission constants,\n                // which a network-rule description does not carry, so it is not checked.\n                Ok(Some(ReemissionRuleInputs {\n                    check_rules: true,\n                    emission: None,\n")
+                .replace("    let params = required(&request.parameters, \"parameters\")\n        .map_err(input)?\n        .node();\n", "")
+                .replace("        .map_err(input)?;\n    let rules = required(&request.network_rules, \"network rules\")",
+                    "        .map_err(input)?;\n    let params = required(&request.parameters, \"parameters\")\n        .map_err(input)?\n        .node(context.activated_script_version + 1);\n    let rules = required(&request.network_rules, \"network rules\")");
         }
         assert_eq!(
             current,

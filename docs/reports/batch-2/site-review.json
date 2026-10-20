@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "method": "static-analysis",
-  "sweepSha256": "7b906e32fbf47229c96331a0fc7832e880c1438795cc92f535eb6f6d05ec9495",
+  "sweepSha256": "90752bf7256005c7928413d1ce3e527cb7ce7e239d3a6bb7e5cc0a728e7469e5",
   "decisions": {
     "unconstrained-outputs": {
       "reviewPriority": "LOW",
@@ -265,34 +265,6 @@
       "nodeId": 53,
       "outcome": "benign",
       "reason": "R7 intentionally changes between a HEIGHT window and the infinity sentinel when the alarm triggers or resets."
-    },
-    {
-      "contract": "hodlcoin/phoenix/phoenix_v1_hodlcoin_bank.es",
-      "lint": "unconstrained-outputs",
-      "nodeId": 8,
-      "outcome": "benign",
-      "reason": "Mint/burn reserve deltas and the developer-fee output are checked; user redemption outputs are open."
-    },
-    {
-      "contract": "hodlcoin/phoenix/phoenix_v1_hodltoken_bank.es",
-      "lint": "unconstrained-outputs",
-      "nodeId": 8,
-      "outcome": "benign",
-      "reason": "ERG is preserved, token reserve deltas and developer fee are checked; recipient/funding outputs vary."
-    },
-    {
-      "contract": "hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_bank.es",
-      "lint": "unconstrained-outputs",
-      "nodeId": 8,
-      "outcome": "benign",
-      "reason": "This variant also checks mint/burn reserve deltas and developer fee, leaving user redemption outputs open."
-    },
-    {
-      "contract": "hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodltoken_bank.es",
-      "lint": "unconstrained-outputs",
-      "nodeId": 8,
-      "outcome": "benign",
-      "reason": "This variant preserves ERG and checks token reserve/fee deltas; it has no fixed recipient/output count policy."
     },
     {
       "contract": "lsp/test_simple.es",

@@ -114,6 +114,9 @@ fn fixtures() -> Vec<(Value, ReplayBundle)> {
                 bundle.execution,
                 "use-incident/prior-block-cost",
             );
+            // Its parameters are derived from the chain, and the derivation now takes the
+            // reference's 255 tokens per box.
+            bundle.execution = engine_support::with_corrected_max_tokens(bundle.execution);
         }
         let records = bundle.execution.case.premises().boxes.value().unwrap();
         let expected_origin = if row["id"] == "use-incident" {

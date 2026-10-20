@@ -16,7 +16,7 @@ use ergo_ser::ergo_box::{write_ergo_box, ErgoBox, ErgoBoxCandidate};
 use ergo_ser::ergo_tree::read_ergo_tree;
 use ergo_ser::register::{write_registers, AdditionalRegisters, RegisterValue};
 use ergo_ser::token::Token;
-use ergo_sigma::evaluator::EvalBox;
+use ergo_sigma::evaluator::{EvalBox, EvalBoxLazyVals};
 
 use crate::scenario::ScenarioBox;
 use crate::SandboxError;
@@ -137,6 +137,7 @@ pub fn build_eval_box_in(
             tokens,
             raw_bytes: Vec::new(),
             register_bytes: Vec::new(),
+            lazy_vals: Default::default(),
         });
     };
     let additional_registers = AdditionalRegisters {
@@ -188,5 +189,6 @@ pub fn build_eval_box_in(
         tokens,
         raw_bytes,
         register_bytes,
+        lazy_vals: std::sync::Arc::new(EvalBoxLazyVals::from_candidate(&ergo_box.candidate)),
     })
 }

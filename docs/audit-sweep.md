@@ -275,3 +275,35 @@ authored pair below. No precision-regression stop was needed after narrowing.
 | Contract | Lint | Node | Outcome | Review reason |
 | --- | --- | ---: | --- | --- |
 | `vectors/mutable-upgrade-digest/vulnerable.es` | `upgrade-hook` | 8 | true-positive | The authored same-script continuation preserves value but omits R4 equality; the alternative selects code by SELF.R4. No sigma guard is recognised on the continuation. The fixed source carries R4 on that path and does not report. This is a true-positive static pattern, not a validated upgrade. |
+
+## Node 55229e00 (0.13.1) — 2026-10-21
+
+Node 55229e00's ErgoScript typer rejects nine of the sources below, as the Scala reference
+compiler (sigma-state 6.0.7) does with the same errors at the same lines
+([node-pin report](reports/node-pin-55229e00.md)). Each is now a failed record in both raw
+sweeps ([S02](reports/batch-2/audit-sweep.json), [I04](reports/batch-7/audit-sweep.json));
+the population is **124 files: 105 complete, 0 partial, 19 compile failures**. No other row
+changed. The findings these files reported, and the S02 site reviews on them, are withdrawn,
+not reclassified: nothing is claimed about these contracts until source-level coverage is
+restored.
+
+| File | Recorded compile failure | Findings withdrawn (S02 / I04) |
+| --- | --- | --- |
+| `hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_bank.es` | type error: Expected type SLong, but got SBigInt (pos 3823) | 12 / 12 |
+| `hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_proxy.es` | type error: Expected type SLong, but got SBigInt (pos 3365) | 15 / 15 |
+| `hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodltoken_bank.es` | type error: Expected type SLong, but got SBigInt (pos 5451) | 11 / 11 |
+| `hodlcoin/phoenix/phoenix_v1_hodlcoin_bank.es` | type error: Expected type SLong, but got SBigInt (pos 2149) | 12 / 12 |
+| `hodlcoin/phoenix/phoenix_v1_hodlcoin_proxy.es` | type error: Expected type SLong, but got SBigInt (pos 2907) | 15 / 15 |
+| `hodlcoin/phoenix/phoenix_v1_hodltoken_bank.es` | type error: Expected type SLong, but got SBigInt (pos 5446) | 11 / 11 |
+| `hodlcoin/phoenix/phoenix_v1_hodltoken_fee.es` | type error: Expected type SBoolean, but got SSigmaProp (pos 4058) | 0 / 0 |
+| `hodlcoin/phoenix/phoenix_v1_hodltoken_feeTest_mainnet.es` | type error: Expected type SBoolean, but got SSigmaProp (pos 4058) | 0 / 0 |
+| `hodlcoin/phoenix/phoenix_v1_hodltoken_feeTest_testnet.es` | type error: Expected type SBoolean, but got SSigmaProp (pos 4061) | 0 / 0 |
+
+Withdrawn S02 site reviews:
+
+| Contract | Lint | Node | Outcome |
+| --- | --- | --- | --- |
+| `hodlcoin/phoenix/phoenix_v1_hodlcoin_bank.es` | `unconstrained-outputs` | 8 | benign |
+| `hodlcoin/phoenix/phoenix_v1_hodltoken_bank.es` | `unconstrained-outputs` | 8 | benign |
+| `hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_bank.es` | `unconstrained-outputs` | 8 | benign |
+| `hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodltoken_bank.es` | `unconstrained-outputs` | 8 | benign |

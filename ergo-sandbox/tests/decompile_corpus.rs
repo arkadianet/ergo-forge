@@ -8,6 +8,21 @@ use ergo_ser::address::NetworkPrefix;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 
+/// Bundled sources the reference typer rejects since node 55229e00 (see the correction below).
+const REFERENCE_TYPER_REJECTIONS: [&str; 11] = [
+    "examples/contracts/dexy/bank/payout.es",
+    "examples/contracts/dexy/lp/pool/mint.es",
+    "examples/contracts/hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_bank.es",
+    "examples/contracts/hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_proxy.es",
+    "examples/contracts/hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodltoken_bank.es",
+    "examples/contracts/hodlcoin/phoenix/phoenix_v1_hodlcoin_bank.es",
+    "examples/contracts/hodlcoin/phoenix/phoenix_v1_hodlcoin_proxy.es",
+    "examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_bank.es",
+    "examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_fee.es",
+    "examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_feeTest_mainnet.es",
+    "examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_feeTest_testnet.es",
+];
+
 fn files(root: &Path, extension: &str) -> Vec<std::path::PathBuf> {
     let mut found = Vec::new();
     for entry in std::fs::read_dir(root).expect("corpus directory") {
@@ -287,6 +302,21 @@ fn bundled_contracts_and_compiled_fixtures_round_trip() {
                 expected.insert(id.clone(), outcome).is_none(),
                 "baseline override: {id}"
             );
+        }
+        // Node 55229e00's typer, as the Scala reference's (sigma-state 6.0.7), rejects these
+        // bundled sources (docs/reports/node-pin-55229e00.md). The expectations file is a
+        // frozen roadmap baseline, so each row is corrected here, only from a compiled outcome.
+        for id in REFERENCE_TYPER_REJECTIONS {
+            let row = expected
+                .get_mut(id)
+                .expect("a rejected source is in the corpus");
+            assert_ne!(row["bucket"], "initial-compile-failed", "{id}");
+            *row = json!({
+                "bucket": "initial-compile-failed",
+                "raw_placeholders": 0,
+                "truncated": false,
+                "tree_sha256": null,
+            });
         }
         assert_eq!(actual.len(), rows.len(), "duplicate measurement IDs");
         assert_eq!(

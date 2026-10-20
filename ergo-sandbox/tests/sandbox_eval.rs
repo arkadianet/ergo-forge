@@ -203,7 +203,19 @@ fn standalone_tree_input_must_consume_all_bytes() {
     assert!(ergo_sandbox::inspect::parse_tree_complete(&bytes).is_ok());
     let sc: Scenario =
         serde_json::from_str(&format!(r#"{{"height":100,"tree":"{overlong}"}}"#)).unwrap();
-    assert_eq!(eval_scenario(&sc).unwrap().verdict, Verdict::Pass);
+    // Its root is a Boolean, not a SigmaProp: the reference node refuses it (rule 1001), and so
+    // does node 55229e00 (docs/reports/node-pin-55229e00.md).
+    let report = eval_scenario(&sc).unwrap();
+    assert_eq!(report.verdict, Verdict::Error);
+    assert!(
+        report
+            .error
+            .as_deref()
+            .unwrap()
+            .contains("expected SigmaProp"),
+        "{:?}",
+        report.error
+    );
 }
 
 // ----- cost -----
