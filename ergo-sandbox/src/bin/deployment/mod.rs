@@ -1,4 +1,4 @@
-use ergo_sandbox::{decompile::with_large_stack, TypedValue};
+use ergo_sandbox::{decompile::with_large_stack, lockfile::HeaderVersion, TypedValue};
 use ergo_ser::address::NetworkPrefix;
 use std::collections::BTreeMap;
 
@@ -79,27 +79,34 @@ pub fn verify(args: &[String]) -> Result<u8, String> {
     Ok(report.outcome.exit_code())
 }
 
-fn compile_options(opts: &BTreeMap<&str, &str>) -> Result<(u8, NetworkPrefix), String> {
-    let version = opts
+// An explicit `--tree-version N` puts exactly vN on the header; without it the
+// compiler option is 3 and the header is v0 unless a v6 method needs v3.
+fn compile_options(
+    opts: &BTreeMap<&str, &str>,
+) -> Result<(u8, HeaderVersion, NetworkPrefix), String> {
+    let requested = opts
         .get("--tree-version")
         .map(|v| v.parse::<u8>().map_err(|e| e.to_string()))
-        .transpose()?
-        .unwrap_or(3);
+        .transpose()?;
+    let (version, header) = match requested {
+        Some(v) => (v, HeaderVersion::Requested),
+        None => (3, HeaderVersion::AsNeeded),
+    };
     let network = opts
         .get("--network")
         .map(|n| super::parse_network(n))
         .transpose()?
         .unwrap_or(NetworkPrefix::Mainnet);
-    Ok((version, network))
+    Ok((version, header, network))
 }
 
 pub fn lock(args: &[String]) -> Result<u8, String> {
     let (input, opts) = options(args, &["--params", "--network", "--tree-version", "--out"])?;
     let source = super::read_input(input)?;
     let params = params(opts.get("--params"))?;
-    let (version, network) = compile_options(&opts)?;
+    let (version, header, network) = compile_options(&opts)?;
     let lock = with_large_stack(move || {
-        ergo_sandbox::lockfile::create(&source, &params, version, network)
+        ergo_sandbox::lockfile::create_with_header(&source, &params, version, network, header)
     })
     .map_err(|e| e.to_string())?;
     let path = opts.get("--out").copied().unwrap_or("contract.lock.json");
@@ -130,10 +137,14 @@ pub fn verify_lock(args: &[String]) -> Result<u8, String> {
             .ok_or("verify-lock requires --source f.es")?,
     )?;
     let params = params(opts.get("--params"))?;
-    let (version, network) = compile_options(&opts)?;
+    let (version, header, network) = compile_options(&opts)?;
     let mut report = with_large_stack({
         let locked = locked.clone();
-        move || ergo_sandbox::lockfile::verify_lock(&locked, &source, &params, version, network)
+        move || {
+            ergo_sandbox::lockfile::verify_lock_with_header(
+                &locked, &source, &params, version, network, header,
+            )
+        }
     })
     .map_err(|e| e.to_string())?;
     let explorer = opts

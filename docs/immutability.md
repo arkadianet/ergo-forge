@@ -52,7 +52,8 @@ The JSON object contains `schemaVersion`, `sourceSha256`, `params`,
   in this batch share `9468043396e5daa2828211bcff4234bc70fae4f0`.
 - `treeHex` is lowercase serialized ErgoTree hex. `address` is the P2S address
   for the selected network. `treeVersion` is the actual emitted tree header
-  version, which can be 0 even when the compiler option is 3.
+  version: 0 for a script without a v6 method under the default compiler
+  option 3, and the requested version when `--tree-version` is given.
 - `lintSweepDigest` is SHA-256 of compact UTF-8 JSON containing arrays
   `[lint_id, node_id, message]` for **all** `audit::audit` findings on the tree.
   Sort by lint id lexicographically, node id numerically, then message
@@ -62,9 +63,13 @@ The JSON object contains `schemaVersion`, `sourceSha256`, `params`,
   This records the current static lint sweep for this tree, not a hash of the
   historical S02 corpus report and not a vulnerability assertion.
 
-Both commands accept `--tree-version N` (compiler option, default 3) and
-`--network mainnet|testnet` (default mainnet). Supply the same independent
-options when verifying a nondefault build. Inferring these options from the
+Both commands accept `--tree-version N` and `--network mainnet|testnet`
+(default mainnet). Without `--tree-version` the compiler option is 3 and the
+header stays v0 unless the script uses a v6 method, which gets v3. With it,
+the header is exactly vN, with the size flag from v1 on, as a wallet stamps it.
+An EIP-5 template's header always carries the version. Supply the same
+independent options when verifying a nondefault build: a lock made with
+`--tree-version 3` is verified with `--tree-version 3`. Inferring these options from the
 lock's address or tree version would conceal drift in the field being checked.
 `POST /api/v1/lock` accepts the compile request shape under the same engine and
 request limits and returns the lock object.
