@@ -9,6 +9,7 @@ use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 
 /// Bundled sources the reference typer rejects since node 55229e00 (see the correction below).
+/// The trees the old compiler made from them are pinned in `historical_trees.json`.
 const REFERENCE_TYPER_REJECTIONS: [&str; 11] = [
     "examples/contracts/dexy/bank/payout.es",
     "examples/contracts/dexy/lp/pool/mint.es",
@@ -147,6 +148,19 @@ fn measure(id: String, bytes: &[u8], version: u8, testnet: bool) -> Value {
     row
 }
 
+/// What the expectations file pins for one measured row.
+fn outcome(row: &Value) -> Value {
+    let hash = row["tree"]
+        .as_str()
+        .map(|tree| hex::encode(Sha256::digest(hex::decode(tree).unwrap())));
+    json!({
+        "bucket": row["bucket"],
+        "raw_placeholders": row["raw_placeholders"].as_u64().unwrap_or(0),
+        "truncated": row["truncated"].as_bool().unwrap_or(false),
+        "tree_sha256": hash,
+    })
+}
+
 fn trees(value: &Value, pointer: &str, found: &mut BTreeMap<String, Vec<String>>) {
     match value {
         Value::Object(map) => {
@@ -258,20 +272,7 @@ fn bundled_contracts_and_compiled_fixtures_round_trip() {
         // Keep known divergences visible until deliberately fixed and reviewed.
         let actual: BTreeMap<String, Value> = rows
             .iter()
-            .map(|row| {
-                let hash = row["tree"]
-                    .as_str()
-                    .map(|tree| hex::encode(Sha256::digest(hex::decode(tree).unwrap())));
-                (
-                    row["id"].as_str().unwrap().into(),
-                    json!({
-                        "bucket": row["bucket"],
-                        "raw_placeholders": row["raw_placeholders"].as_u64().unwrap_or(0),
-                        "truncated": row["truncated"].as_bool().unwrap_or(false),
-                        "tree_sha256": hash,
-                    }),
-                )
-            })
+            .map(|row| (row["id"].as_str().unwrap().into(), outcome(row)))
             .collect();
         let mut expected: BTreeMap<String, Value> =
             serde_json::from_str(include_str!("fixtures/decompile_corpus_expectations.json"))
@@ -327,6 +328,85 @@ fn bundled_contracts_and_compiled_fixtures_round_trip() {
         for (id, outcome) in actual {
             assert_eq!(outcome, expected[&id], "{id}: round-trip outcome or original bytes changed; inspect DC_REPORT before updating expectations");
         }
+    });
+}
+
+/// The trees the old compiler (node a203cc02, forge 211c5b5) made from the sources the current
+/// typer rejects (docs/reports/historical-trees.md). The fixture names its tree `treeHex`, not
+/// `tree`, so the corpus above does not also measure it as a fixture tree.
+fn historical_rows() -> Vec<Value> {
+    let doc: Value = serde_json::from_str(include_str!("fixtures/historical_trees.json")).unwrap();
+    doc["rows"].as_array().unwrap().clone()
+}
+
+fn frozen_expectations() -> BTreeMap<String, Value> {
+    serde_json::from_str(include_str!("fixtures/decompile_corpus_expectations.json")).unwrap()
+}
+
+#[test]
+fn historical_trees_are_the_frozen_corpus_trees() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
+    let frozen = frozen_expectations();
+    let rows = historical_rows();
+    assert_eq!(
+        rows.iter()
+            .map(|row| row["source"].as_str().unwrap())
+            .collect::<Vec<_>>(),
+        REFERENCE_TYPER_REJECTIONS
+    );
+    for row in &rows {
+        let id = row["source"].as_str().unwrap();
+        let tree = hex::decode(row["treeHex"].as_str().unwrap()).unwrap();
+        let hash = hex::encode(Sha256::digest(&tree));
+        assert_eq!(row["treeSha256"], hash, "{id}");
+        assert_eq!(frozen[id]["tree_sha256"], hash, "{id}: not the frozen tree");
+        let source = std::fs::read(root.join(id)).unwrap();
+        assert_eq!(
+            row["sourceSha256"],
+            hex::encode(Sha256::digest(&source)),
+            "{id}: the bundled source changed"
+        );
+        // The corpus derives its parameters from the source, so a row cannot carry others.
+        let params = parameters(std::str::from_utf8(&source).unwrap());
+        assert_eq!(row["params"], serde_json::to_value(params).unwrap(), "{id}");
+        assert_eq!(
+            row["compiler"],
+            json!({
+                "node": "a203cc02f585bcbe13c743aee008222b208f3c82",
+                "forge": "211c5b517d4aedd3a5a6e525999d4134af27fa7a",
+            }),
+            "{id}"
+        );
+        assert!(matches!(
+            row["network"].as_str(),
+            Some("mainnet" | "testnet")
+        ));
+    }
+}
+
+/// The current decompiler and compiler take each pinned tree to the bucket the corpus froze
+/// before the typer rejected its source: 7 byte-identical, 4 recompiles-but-differs.
+#[test]
+fn historical_trees_round_trip_to_the_frozen_buckets() {
+    decompile::with_large_stack(|| {
+        let frozen = frozen_expectations();
+        let mut counts = BTreeMap::<String, usize>::new();
+        for row in historical_rows() {
+            let id = row["source"].as_str().unwrap();
+            let bytes = hex::decode(row["treeHex"].as_str().unwrap()).unwrap();
+            let measured = measure(id.into(), &bytes, 3, row["network"] == "testnet");
+            assert_eq!(outcome(&measured), frozen[id], "{id}");
+            *counts
+                .entry(measured["bucket"].as_str().unwrap().into())
+                .or_default() += 1;
+        }
+        assert_eq!(
+            counts,
+            BTreeMap::from([
+                ("byte-identical".to_string(), 7),
+                ("recompiles-but-differs".to_string(), 4)
+            ])
+        );
     });
 }
 
