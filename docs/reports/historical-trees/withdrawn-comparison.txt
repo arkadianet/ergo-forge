@@ -1,0 +1,13 @@
+S02: audit-sweep.json at 211c5b5 has SHA-256 7b906e32fbf47229c96331a0fc7832e880c1438795cc92f535eb6f6d05ec9495
+I04: audit-sweep.json at 211c5b5 has SHA-256 770d53cee90436cddf67585deb7e95cdf875e4a1bede39f43ddc2b069a1f5f1f
+contract                                                             tree         findings  S02  I04  other fields
+hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_bank.es       80668da9449e       12   12   12  equal
+hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_proxy.es      56f963c73952       15   15   15  equal
+hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodltoken_bank.es     aa90a85c4a60       11   11   11  equal
+hodlcoin/phoenix/phoenix_v1_hodlcoin_bank.es                         80668da9449e       12   12   12  equal
+hodlcoin/phoenix/phoenix_v1_hodlcoin_proxy.es                        56f963c73952       15   15   15  equal
+hodlcoin/phoenix/phoenix_v1_hodltoken_bank.es                        6c8de11351f2       11   11   11  equal
+hodlcoin/phoenix/phoenix_v1_hodltoken_fee.es                         2df688329912        0    0    0  equal
+hodlcoin/phoenix/phoenix_v1_hodltoken_feeTest_mainnet.es             83d682ec6303        0    0    0  equal
+hodlcoin/phoenix/phoenix_v1_hodltoken_feeTest_testnet.es             ed5bb0f93e44        0    0    0  equal
+findings: 76 restored; withdrawn 76 (S02), 76 (I04)
