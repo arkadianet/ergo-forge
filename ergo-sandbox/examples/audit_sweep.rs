@@ -6,6 +6,11 @@
 //! Optional argument: corpus directory (defaults to examples/contracts).
 //! Compile failures and partial lifts are records, not silently skipped files.
 //! No evaluation, transaction construction, or network access is performed.
+//!
+//! `--tree-rows rows.json` audits recorded trees instead of compiling the sources: each row
+//! names a contract, the parameters and network of an earlier compile, that compiler's
+//! revision and the tree it produced (docs/reports/historical-trees.md). Rows are labelled
+//! `historical-compile`. A tree has no compile map, so findings carry no source positions.
 
 use std::collections::BTreeMap;
 use std::error::Error;
@@ -16,6 +21,7 @@ use ergo_sandbox::audit::{audit, Completeness};
 use ergo_sandbox::compile::{compile_with_params, scan_params, ParamError, ParamNeed};
 use ergo_sandbox::{lift_tree, TypedValue};
 use ergo_ser::address::NetworkPrefix;
+use ergo_ser::ergo_tree::ErgoTree;
 use k256::elliptic_curve::sec1::ToEncodedPoint;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
@@ -219,8 +225,14 @@ fn analyse(path: &Path, root: &Path) -> Value {
             }
         }
     };
-    record["treeSha256"] = json!(hex::encode(Sha256::digest(&compiled.tree_bytes)));
-    let lifted = lift_tree(&compiled.ergo_tree, false);
+    audit_tree(&mut record, &compiled.tree_bytes, &compiled.ergo_tree);
+    record
+}
+
+/// Lift and audit one tree into its record, whether compiled now or recorded earlier.
+fn audit_tree(record: &mut Value, tree_bytes: &[u8], tree: &ErgoTree) {
+    record["treeSha256"] = json!(hex::encode(Sha256::digest(tree_bytes)));
+    let lifted = lift_tree(tree, false);
     let result = audit(&lifted);
     record["status"] = json!(match result.completeness {
         Completeness::Complete => "complete",
@@ -243,25 +255,97 @@ fn analyse(path: &Path, root: &Path) -> Value {
             "message": finding.message,
         }))
         .collect::<Vec<_>>());
+}
+
+/// A failed record, keeping the row's fields.
+fn failed(mut record: Value, stage: &str, error: impl ToString) -> Value {
+    record["stage"] = json!(stage);
+    record["error"] = json!(error.to_string());
+    record
+}
+
+/// A tree row: a tree an earlier compiler produced from `contract`, audited as recorded.
+fn analyse_tree_row(row: &Value, root: &Path) -> Value {
+    let contract = row["contract"].as_str().unwrap_or_default();
+    let mut record = json!({
+        "contract": contract,
+        "protocol": contract.split('/').next().unwrap_or(""),
+        "status": "failed",
+        "provenance": "historical-compile",
+        "compiler": row["compiler"],
+        "params": row["params"],
+        "network": row["network"],
+        "sourceSha256": row["sourceSha256"],
+        "findings": [],
+    });
+    // The row must still describe the bundled source, as a compiled record does.
+    match fs::read(root.join(contract)) {
+        Ok(source) if hex::encode(Sha256::digest(&source)) == row["sourceSha256"] => (),
+        Ok(_) => {
+            return failed(
+                record,
+                "source",
+                "the bundled source differs from the row's",
+            )
+        }
+        Err(error) => return failed(record, "read", error),
+    }
+    let Some(bytes) = row["treeHex"]
+        .as_str()
+        .and_then(|hex| hex::decode(hex).ok())
+    else {
+        return failed(record, "tree", "treeHex is not hex");
+    };
+    if hex::encode(Sha256::digest(&bytes)) != row["treeSha256"] {
+        return failed(record, "tree", "treeHex does not hash to treeSha256");
+    }
+    let tree = match ergo_sandbox::inspect::parse_tree_complete(&bytes) {
+        Ok(tree) => tree,
+        Err(error) => return failed(record, "parse", error),
+    };
+    audit_tree(&mut record, &bytes, &tree);
     record
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
+    const USAGE: &str = "usage: audit_sweep [--tree-rows rows.json] [corpus-directory]";
     let mut args = std::env::args_os().skip(1);
-    let root = args
-        .next()
-        .map(PathBuf::from)
-        .unwrap_or_else(|| Path::new(env!("CARGO_MANIFEST_DIR")).join("../examples/contracts"));
-    if args.next().is_some() {
-        return Err("usage: audit_sweep [corpus-directory]".into());
+    let mut tree_rows = None;
+    let mut root = None;
+    while let Some(arg) = args.next() {
+        if arg == "--tree-rows" && tree_rows.is_none() {
+            tree_rows = Some(PathBuf::from(args.next().ok_or(USAGE)?));
+        } else if root.is_none() {
+            root = Some(PathBuf::from(arg));
+        } else {
+            return Err(USAGE.into());
+        }
     }
-    let mut paths = Vec::new();
-    contracts(&root, &mut paths)?;
-    paths.sort();
-    if paths.is_empty() {
-        return Err("no .es contracts found".into());
-    }
-    let records: Vec<_> = paths.iter().map(|path| analyse(path, &root)).collect();
+    let root =
+        root.unwrap_or_else(|| Path::new(env!("CARGO_MANIFEST_DIR")).join("../examples/contracts"));
+    let mut rows_sha256 = None;
+    let records: Vec<_> = if let Some(path) = &tree_rows {
+        let text = fs::read(path)?;
+        rows_sha256 = Some(hex::encode(Sha256::digest(&text)));
+        let rows: Value = serde_json::from_slice(&text)?;
+        let rows = rows["rows"]
+            .as_array()
+            .ok_or("tree rows need a `rows` array")?;
+        if rows.is_empty() {
+            return Err("no tree rows found".into());
+        }
+        rows.iter()
+            .map(|row| analyse_tree_row(row, &root))
+            .collect()
+    } else {
+        let mut paths = Vec::new();
+        contracts(&root, &mut paths)?;
+        paths.sort();
+        if paths.is_empty() {
+            return Err("no .es contracts found".into());
+        }
+        paths.iter().map(|path| analyse(path, &root)).collect()
+    };
     let mut by_lint = BTreeMap::<String, usize>::new();
     let mut by_protocol = BTreeMap::<String, usize>::new();
     let mut by_status = BTreeMap::<String, usize>::new();
@@ -283,7 +367,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .or_default() += 1;
         }
     }
-    let output = json!({
+    let mut output = json!({
         "schemaVersion": 1,
         "treeVersion": 3,
         "networkPolicy": "testnet, retry mainnet on address network mismatch; recorded per contract",
@@ -295,6 +379,15 @@ fn main() -> Result<(), Box<dyn Error>> {
         "bySeverity": by_severity,
         "results": records,
     });
+    if let Some(sha256) = rows_sha256 {
+        output["networkPolicy"] =
+            json!("As recorded per row: the network of the historical compile.");
+        output["parameterPolicy"] = json!(
+            "As recorded per row: the parameters of the historical compile, not deployment values."
+        );
+        output["provenance"] = json!("historical-compile");
+        output["treeRowsSha256"] = json!(sha256);
+    }
     serde_json::to_writer_pretty(std::io::stdout().lock(), &output)?;
     println!();
     Ok(())

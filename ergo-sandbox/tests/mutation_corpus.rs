@@ -1173,6 +1173,12 @@ fn check_sweep(batch: &str, lints: BTreeSet<&str>) {
         serde_json::to_value(status_counts).unwrap()
     );
     assert!(!reported.is_empty(), "no empty sweep can satisfy the gate");
+    check_reviews(&review, reported, &doc);
+}
+
+/// Every reported site is reviewed exactly once, with its reason and the lint's decision in
+/// `docs/audit-sweep.md`.
+fn check_reviews(review: &Value, reported: BTreeMap<(String, String, u64), Value>, doc: &str) {
     let mut reviewed = BTreeSet::new();
     for row in review["sites"].as_array().unwrap() {
         let contract = row["contract"].as_str().unwrap();
@@ -1206,6 +1212,169 @@ fn check_sweep(batch: &str, lints: BTreeSet<&str>) {
         reported.into_keys().collect(),
         "every reported site reviewed exactly once"
     );
+}
+
+/// The historical sweep audits the trees the old compiler made from the nine swept sources the
+/// current typer rejects (docs/reports/historical-trees.md). It restores the findings and the
+/// S02 site reviews that batch-2 and batch-7 withdrew when those sources became failed records.
+#[test]
+fn historical_sweep_is_recorded() {
+    use sha2::{Digest, Sha256};
+    use std::path::Path;
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
+    let corpus_root = root.join("examples/contracts");
+    let report = root.join("docs/reports");
+    let read = |path: &Path| std::fs::read(path).unwrap();
+    let hash = |bytes: &[u8]| hex::encode(Sha256::digest(bytes));
+    let dir = report.join("2026-10-21-historical-sweep");
+    let sweep_bytes = read(&dir.join("audit-sweep.json"));
+    let rows_bytes = read(&dir.join("trees.json"));
+    let sweep: Value = serde_json::from_slice(&sweep_bytes).unwrap();
+    let rows: Value = serde_json::from_slice(&rows_bytes).unwrap();
+    let review: Value = serde_json::from_slice(&read(&dir.join("site-review.json"))).unwrap();
+    let doc = std::fs::read_to_string(root.join("docs/audit-sweep.md")).unwrap();
+    assert_eq!(review["sweepSha256"], hash(&sweep_bytes));
+    assert_eq!(review["method"], "static-analysis");
+    assert_eq!(sweep["treeVersion"], 3);
+    assert_eq!(sweep["provenance"], "historical-compile");
+    assert_eq!(sweep["treeRowsSha256"], hash(&rows_bytes));
+    let rows = rows["rows"].as_array().unwrap();
+    let records = sweep["results"].as_array().unwrap();
+    assert_eq!(sweep["contracts"], records.len());
+    assert_eq!(rows.len(), records.len());
+    // Exactly the records the typer withdrew from both recorded sweeps.
+    let restored: BTreeSet<_> = records
+        .iter()
+        .map(|r| r["contract"].as_str().unwrap())
+        .collect();
+    assert_eq!(restored.len(), records.len(), "no duplicate records");
+    for batch in ["batch-2", "batch-7"] {
+        let recorded: Value =
+            serde_json::from_slice(&read(&report.join(batch).join("audit-sweep.json"))).unwrap();
+        let withdrawn: BTreeSet<_> = recorded["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|r| {
+                r["error"]
+                    .as_str()
+                    .is_some_and(|e| e.starts_with("type error: "))
+            })
+            .map(|r| r["contract"].as_str().unwrap())
+            .collect();
+        assert_eq!(restored, withdrawn, "{batch}");
+    }
+    // The findings the typer withdrew, per contract (docs/reports/node-pin-55229e00.md).
+    let withdrawn_findings = BTreeMap::from([
+        (
+            "hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_bank.es",
+            12,
+        ),
+        (
+            "hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_proxy.es",
+            15,
+        ),
+        (
+            "hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodltoken_bank.es",
+            11,
+        ),
+        ("hodlcoin/phoenix/phoenix_v1_hodlcoin_bank.es", 12),
+        ("hodlcoin/phoenix/phoenix_v1_hodlcoin_proxy.es", 15),
+        ("hodlcoin/phoenix/phoenix_v1_hodltoken_bank.es", 11),
+        ("hodlcoin/phoenix/phoenix_v1_hodltoken_fee.es", 0),
+        (
+            "hodlcoin/phoenix/phoenix_v1_hodltoken_feeTest_mainnet.es",
+            0,
+        ),
+        (
+            "hodlcoin/phoenix/phoenix_v1_hodltoken_feeTest_testnet.es",
+            0,
+        ),
+    ]);
+    let lints = BTreeSet::from([
+        "unconstrained-outputs",
+        "successor-field-drift",
+        "trivial-sigma-branch",
+        "unauthenticated-code-execution",
+    ]);
+    let mut reported = BTreeMap::new();
+    for (row, record) in rows.iter().zip(records) {
+        let contract = record["contract"].as_str().unwrap();
+        for key in [
+            "contract",
+            "sourceSha256",
+            "params",
+            "network",
+            "compiler",
+            "treeSha256",
+        ] {
+            assert_eq!(record[key], row[key], "{contract}: {key}");
+        }
+        assert_eq!(record["provenance"], "historical-compile", "{contract}");
+        assert_eq!(
+            record["sourceSha256"],
+            hash(&read(&corpus_root.join(contract))),
+            "{contract}"
+        );
+        let tree = hex::decode(row["treeHex"].as_str().unwrap()).unwrap();
+        assert_eq!(row["treeSha256"], hash(&tree), "{contract}");
+        let tree = ergo_sandbox::parse_tree_complete(&tree).unwrap();
+        let lifted = ergo_sandbox::lift_tree(&tree, false);
+        assert_eq!(record["rawPlaceholders"], lifted.raw_placeholders);
+        assert_eq!(record["truncated"], lifted.truncated);
+        let audit = ergo_sandbox::audit::audit(&lifted);
+        assert_eq!(
+            record["status"],
+            match audit.completeness {
+                ergo_sandbox::audit::Completeness::Complete => "complete",
+                ergo_sandbox::audit::Completeness::Partial { .. } => "partial",
+            }
+        );
+        // All registered lints, not only the four S02 reviewed: this sweep is recorded now.
+        let observed: Vec<_> = audit
+            .findings
+            .iter()
+            .map(|f| {
+                json!({
+                    "lint": f.lint, "severity": f.severity.label(), "nodeId": f.node_id,
+                    "irId": f.ir_id, "snippet": f.snippet, "message": f.message,
+                })
+            })
+            .collect();
+        assert_eq!(
+            Value::Array(observed.clone()),
+            record["findings"],
+            "{contract}: rerun and review changed sites"
+        );
+        assert_eq!(observed.len(), withdrawn_findings[contract], "{contract}");
+        for finding in observed {
+            if lints.contains(finding["lint"].as_str().unwrap()) {
+                let key = (
+                    contract.to_owned(),
+                    finding["lint"].as_str().unwrap().to_owned(),
+                    finding["nodeId"].as_u64().unwrap(),
+                );
+                assert!(reported.insert(key, finding).is_none());
+            }
+        }
+    }
+    assert_eq!(restored, withdrawn_findings.keys().copied().collect());
+    assert_eq!(sweep["byStatus"], json!({"complete": rows.len()}));
+    // The four S02 reviews withdrawn with them.
+    assert_eq!(
+        review["decisions"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(String::as_str)
+            .collect::<BTreeSet<_>>(),
+        reported
+            .keys()
+            .map(|(_, lint, _)| lint.as_str())
+            .collect::<BTreeSet<_>>()
+    );
+    assert_eq!(review["sites"].as_array().unwrap().len(), 4);
+    check_reviews(&review, reported, &doc);
 }
 
 /// I04's versioned pair is also exercised by the shared mechanical-pair gate.
