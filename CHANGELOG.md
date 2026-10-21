@@ -73,6 +73,13 @@ the USE incident's derived `maxTokensPerBox` is 255. Forge does not check the no
 emission-box allocation rule, for want of the emission constants. See
 `docs/reports/node-pin-55229e00.md`.
 
+Forge's tree readers (`inspect::parse_tree`, `parse_tree_complete`, `tree_report` and
+`ergo-es tree`) now refuse a tree with no size bit whose root is not a SigmaProp, as both
+nodes do when they deserialize a box (rule 1001). A tree with a size bit is still kept as
+an unparsed soft-fork tree, which both nodes refuse only when it is spent. Evaluating such
+a size-less tree is now an input error, not an `error` verdict. See
+`docs/reports/parse-tree-rule-1001.md`.
+
 The existing test action downloads the matching `ergo-es` asset from a named
 tag or the latest release. The 0.5.0 source includes `verify-lock`, satisfying
 its lockfile compatibility probe once `v0.5.0` becomes the latest release.

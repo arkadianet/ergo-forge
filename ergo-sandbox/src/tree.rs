@@ -127,6 +127,9 @@ fn report(
     let mut reader = VlqReader::new(&bytes);
     let tree = ergo_ser::ergo_tree::read_ergo_tree(&mut reader)
         .map_err(|e| format!("invalid ErgoTree: {e}"))?;
+    // The node's rule 1001, as `inspect::parse_tree`: no box can hold a size-less non-SigmaProp tree.
+    ergo_ser::ergo_tree::check_sigma_prop_root(&tree)
+        .map_err(|e| format!("invalid ErgoTree: {e}"))?;
     if reader.remaining() != 0 {
         return Err("trailing bytes after ErgoTree".into());
     }

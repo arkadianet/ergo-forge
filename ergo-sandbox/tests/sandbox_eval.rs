@@ -197,25 +197,91 @@ fn standalone_tree_input_must_consume_all_bytes() {
     let err = eval_scenario(&sc).unwrap_err().to_string();
     assert!(err.contains("trailing"), "{err}");
 
-    let overlong = "10810001d17300";
+    // sigmaProp(true) with its constant count written as the overlong VLQ `0x81 0x00`. Scala
+    // sigma-state 6.0.7 and node 55229e00 both read it, so it parses and is spent.
+    let overlong = "1081000101d17300";
     let bytes = hex::decode(overlong).unwrap();
     assert!(ergo_sandbox::inspect::parse_tree(&bytes).is_ok());
     assert!(ergo_sandbox::inspect::parse_tree_complete(&bytes).is_ok());
     let sc: Scenario =
         serde_json::from_str(&format!(r#"{{"height":100,"tree":"{overlong}"}}"#)).unwrap();
-    // Its root is a Boolean, not a SigmaProp: the reference node refuses it (rule 1001), and so
-    // does node 55229e00 (docs/reports/node-pin-55229e00.md).
+    let report = eval_scenario(&sc).unwrap();
+    assert_eq!(report.verdict, Verdict::Pass);
+    assert_eq!(report.reduced_to.as_deref(), Some("true"));
+}
+
+/// Whether the node's box reader (the one transaction outputs go through) accepts a box holding
+/// `tree_hex` as its script: a 1,000,000 nanoErg box at height 100 with no tokens or registers.
+fn node_box_reader_accepts(tree_hex: &str) -> bool {
+    let mut bytes = hex::decode("c0843d").unwrap();
+    bytes.extend(hex::decode(tree_hex).unwrap());
+    bytes.extend([0x64, 0, 0]);
+    let mut reader = ergo_primitives::reader::VlqReader::new(&bytes);
+    ergo_ser::ergo_box::read_ergo_box_candidate(&mut reader).is_ok() && reader.remaining() == 0
+}
+
+/// Rule 1001 (`CheckDeserializedScriptIsSigmaProp`): a tree with no size bit whose root is not a
+/// SigmaProp is refused when it is deserialized, so no box can hold it. The same tree with a size
+/// bit is wrapped as unparsed and refused only when spent. Vectors checked against Scala
+/// sigma-state 6.0.7 (docs/reports/node-pin-55229e00.md section 3 and its follow-up).
+#[test]
+fn a_sizeless_tree_with_a_non_sigma_prop_root_is_refused_at_parse() {
+    // Header 0x10 (segregated, no size bit), one Boolean constant, root ConstantPlaceholder(0).
+    // The second writes the count as the overlong VLQ `0x81 0x00`.
+    for refused in ["100101d17300", "10810001d17300"] {
+        assert!(!node_box_reader_accepts(refused), "{refused}");
+        let bytes = hex::decode(refused).unwrap();
+        for err in [
+            inspect::parse_tree(&bytes).unwrap_err(),
+            inspect::parse_tree_complete(&bytes).unwrap_err(),
+            inspect::tree_report(&bytes).unwrap_err(),
+        ] {
+            let err = err.to_string();
+            assert!(
+                err.contains("expected SigmaProp") && err.contains("rule 1001"),
+                "{refused}: {err}"
+            );
+        }
+        let sc: Scenario =
+            serde_json::from_str(&format!(r#"{{"height":100,"tree":"{refused}"}}"#)).unwrap();
+        let err = eval_scenario(&sc).unwrap_err().to_string();
+        assert!(err.contains("rule 1001"), "{refused}: {err}");
+    }
+
+    // Size bit set (header 0x18, six declared bytes): the same body is kept as an unparsed
+    // soft-fork tree, which parses and re-serializes but is refused at spend.
+    let sized = "18050101d17300";
+    assert!(node_box_reader_accepts(sized));
+    let bytes = hex::decode(sized).unwrap();
+    assert!(inspect::parse_tree(&bytes).is_ok());
+    assert!(inspect::parse_tree_complete(&bytes).is_ok());
+    assert!(inspect::tree_report(&bytes)
+        .unwrap()
+        .contains("re-serializes byte-identical"));
+    let sc: Scenario =
+        serde_json::from_str(&format!(r#"{{"height":100,"tree":"{sized}"}}"#)).unwrap();
     let report = eval_scenario(&sc).unwrap();
     assert_eq!(report.verdict, Verdict::Error);
     assert!(
-        report
-            .error
-            .as_deref()
-            .unwrap()
-            .contains("expected SigmaProp"),
+        report.error.as_deref().unwrap().contains("unparsed"),
         "{:?}",
         report.error
     );
+
+    // sigmaProp(true), without and with the overlong count: valid, parsed and spent.
+    for valid in ["10010101d17300", "1081000101d17300"] {
+        assert!(node_box_reader_accepts(valid), "{valid}");
+        let bytes = hex::decode(valid).unwrap();
+        assert!(inspect::parse_tree_complete(&bytes).is_ok(), "{valid}");
+        assert!(inspect::tree_report(&bytes).is_ok(), "{valid}");
+        let sc: Scenario =
+            serde_json::from_str(&format!(r#"{{"height":100,"tree":"{valid}"}}"#)).unwrap();
+        assert_eq!(
+            eval_scenario(&sc).unwrap().verdict,
+            Verdict::Pass,
+            "{valid}"
+        );
+    }
 }
 
 // ----- cost -----
