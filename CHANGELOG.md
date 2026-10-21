@@ -30,6 +30,18 @@
   Requests without it are unchanged, keep their fingerprints, and still do not run that check.
   See `docs/reports/emission-constants.md`.
 
+- Restored source-level audit coverage of the eleven bundled Dexy/Phoenix
+  sources the node-pin typer rejects, by pinning the trees the old compiler
+  (node a203cc02, forge `211c5b5`) made from them
+  (`docs/reports/historical-trees.md`). They are neither deployed bytes nor
+  current-compiler output, and have no compile map, so findings carry no source
+  positions. The decompile round trips (7 byte-identical, 4 differing), the
+  Phoenix bank match and both near-miss checks are asserted again. A new record
+  under `docs/reports/2026-10-21-historical-sweep/` restores 76 findings and 4
+  reviewed sites, labelled `historical-compile`; `audit_sweep` takes
+  `--tree-rows` to audit recorded trees. The batch-2 and batch-7 sweeps are
+  unchanged.
+
 ## 0.5.0 — prepared, unreleased
 
 This release collects roadmap v2 batches 0–11. Cutting `v0.5.0` after merge is

@@ -173,61 +173,74 @@ fn phoenix_deployments_and_near_miss_siblings() {
             }))
             .unwrap();
         // The sigma-state 6.0.7 typer, and node 55229e00's, reject a `val x: Long` bound to a
-        // BigInt expression, as these sources write (docs/reports/node-pin-55229e00.md). Their
-        // identity can no longer be checked from source; the exact rejection is checked instead.
+        // BigInt expression, as three of these sources write (docs/reports/node-pin-55229e00.md).
+        // For those, the tree the old compiler made from the source is matched instead
+        // (historical_trees.json, docs/reports/historical-trees.md): neither the deployed bytes
+        // nor what a current compiler emits, but the tree this check was recorded against.
         let rejected = "Expected type SLong, but got SBigInt";
-        for (name, source, source_rejected, sibling, sibling_rejected) in [
+        let historical: serde_json::Value =
+            serde_json::from_str(include_str!("fixtures/historical_trees.json")).unwrap();
+        let pinned = |file: &str| {
+            let path = format!("examples/contracts/hodlcoin/phoenix/{file}");
+            historical["rows"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|row| row["source"] == path.as_str())
+                .map(|row| hex::decode(row["treeHex"].as_str().unwrap()).unwrap())
+        };
+        for (name, file, source, sibling_file, sibling) in [
             (
                 "bank",
+                "phoenix_v1_hodltoken_bank.es",
                 include_str!(
                     "../../examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_bank.es"
                 ),
-                true,
+                "phoenix_v1_hodlcoin_bank.es",
                 include_str!(
                     "../../examples/contracts/hodlcoin/phoenix/phoenix_v1_hodlcoin_bank.es"
                 ),
-                true,
             ),
             (
                 "proxy",
+                "phoenix_v1_hodltoken_proxy.es",
                 include_str!(
                     "../../examples/contracts/hodlcoin/phoenix/phoenix_v1_hodltoken_proxy.es"
                 ),
-                false,
+                "phoenix_v1_hodlcoin_proxy.es",
                 include_str!(
                     "../../examples/contracts/hodlcoin/phoenix/phoenix_v1_hodlcoin_proxy.es"
                 ),
-                true,
             ),
         ] {
             let deployed = hex::decode(fixture[name]["tree"].as_str().unwrap()).unwrap();
-            let compiled = compile_with_params(source, &params, 3, NetworkPrefix::Mainnet);
-            if source_rejected {
-                let e = compiled.unwrap_err().to_string();
-                assert!(e.contains(rejected), "{name}: {e}");
-            } else {
-                let compiled = compiled.unwrap();
-                let r = match_trees(&compiled.tree_bytes, &deployed).unwrap();
-                println!("Phoenix {name}: {}", serde_json::to_string(&r).unwrap());
-                assert_eq!(
-                    r.verdict,
+            for (label, file, source, verdict) in [
+                (
+                    name.to_string(),
+                    file,
+                    source,
                     MatchVerdict::SameProgramWithDifferingConstants,
-                    "{name}"
-                );
+                ),
+                (
+                    format!("{name} sibling"),
+                    sibling_file,
+                    sibling,
+                    MatchVerdict::DifferentProgram,
+                ),
+            ] {
+                let compiled = compile_with_params(source, &params, 3, NetworkPrefix::Mainnet);
+                let tree = match pinned(file) {
+                    Some(tree) => {
+                        let e = compiled.unwrap_err().to_string();
+                        assert!(e.contains(rejected), "{label}: {e}");
+                        tree
+                    }
+                    None => compiled.unwrap().tree_bytes,
+                };
+                let r = match_trees(&tree, &deployed).unwrap();
+                println!("Phoenix {label}: {}", serde_json::to_string(&r).unwrap());
+                assert_eq!(r.verdict, verdict, "{label}");
             }
-            let sibling = compile_with_params(sibling, &params, 3, NetworkPrefix::Mainnet);
-            if sibling_rejected {
-                let e = sibling.unwrap_err().to_string();
-                assert!(e.contains(rejected), "{name} sibling: {e}");
-                continue;
-            }
-            let sibling = sibling.unwrap();
-            let r = match_trees(&sibling.tree_bytes, &deployed).unwrap();
-            println!(
-                "Phoenix {name} sibling: {}",
-                serde_json::to_string(&r).unwrap()
-            );
-            assert_eq!(r.verdict, MatchVerdict::DifferentProgram, "{name} sibling");
         }
     });
 }

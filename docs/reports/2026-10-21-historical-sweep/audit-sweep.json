@@ -1,0 +1,910 @@
+{
+  "byLint": {
+    "unbound-box-reserves": 12,
+    "unchecked-get": 60,
+    "unconstrained-outputs": 4
+  },
+  "byProtocol": {
+    "hodlcoin": 76
+  },
+  "bySeverity": {
+    "HIGH": 72,
+    "LOW": 4
+  },
+  "byStatus": {
+    "complete": 9
+  },
+  "contracts": 9,
+  "networkPolicy": "As recorded per row: the network of the historical compile.",
+  "parameterPolicy": "As recorded per row: the parameters of the historical compile, not deployment values.",
+  "provenance": "historical-compile",
+  "results": [
+    {
+      "compiler": {
+        "forge": "211c5b517d4aedd3a5a6e525999d4134af27fa7a",
+        "node": "a203cc02f585bcbe13c743aee008222b208f3c82"
+      },
+      "contract": "hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_bank.es",
+      "findings": [
+        {
+          "irId": 37,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 26,
+          "severity": "HIGH",
+          "snippet": "SELF.R5[Long].get"
+        },
+        {
+          "irId": 44,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 31,
+          "severity": "HIGH",
+          "snippet": "SELF.R4[Long].get"
+        },
+        {
+          "irId": 57,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 42,
+          "severity": "HIGH",
+          "snippet": "SELF.R6[Long].get"
+        },
+        {
+          "irId": 61,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 45,
+          "severity": "HIGH",
+          "snippet": "SELF.R7[Long].get"
+        },
+        {
+          "irId": 65,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 48,
+          "severity": "HIGH",
+          "snippet": "SELF.R8[Long].get"
+        },
+        {
+          "irId": 99,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 81,
+          "severity": "HIGH",
+          "snippet": "v4.R4[Long].get"
+        },
+        {
+          "irId": 104,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 86,
+          "severity": "HIGH",
+          "snippet": "v4.R5[Long].get"
+        },
+        {
+          "irId": 109,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 91,
+          "severity": "HIGH",
+          "snippet": "v4.R6[Long].get"
+        },
+        {
+          "irId": 114,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 96,
+          "severity": "HIGH",
+          "snippet": "v4.R7[Long].get"
+        },
+        {
+          "irId": 119,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 101,
+          "severity": "HIGH",
+          "snippet": "v4.R8[Long].get"
+        },
+        {
+          "irId": 180,
+          "lint": "unbound-box-reserves",
+          "message": "reserves of OUTPUTS(2) drive value math but this box is never bound by a singleton NFT (no tokens(0)._1 == <nft> check); a transaction can place a different box at this index. Bind it by its NFT.",
+          "nodeId": 159,
+          "severity": "HIGH",
+          "snippet": "OUTPUTS(2).value"
+        },
+        {
+          "irId": 12,
+          "lint": "unconstrained-outputs",
+          "message": "Specific outputs (OUTPUTS(0), OUTPUTS(2)) are compared, but no output-count upper bound, total-value comparison or universal tail constraint is recognised. Additional fee or change outputs may be intentional value exits. Review transaction-wide accounting; this syntax observation is not evidence of exploitability.",
+          "nodeId": 8,
+          "severity": "LOW",
+          "snippet": "OUTPUTS: positional checks without a recognised tail bound"
+        }
+      ],
+      "network": "testnet",
+      "params": {
+        "phoenixFeeContractBytesHash": {
+          "type": "Coll[Byte]",
+          "value": "1d6e74edc4de51afe718b401b1a5b257f5e6cbaa6fcd8e2d56bedf30a5667d75"
+        }
+      },
+      "protocol": "hodlcoin",
+      "provenance": "historical-compile",
+      "rawPlaceholders": 0,
+      "sourceSha256": "16711d9ed862cbb61ab90b70e4c5187aaebf359756b9673c005041effd360e18",
+      "status": "complete",
+      "treeSha256": "80668da9449e38399e135f091d5a880863eafa8d0fe73699b43586ba3268c91b",
+      "truncated": false
+    },
+    {
+      "compiler": {
+        "forge": "211c5b517d4aedd3a5a6e525999d4134af27fa7a",
+        "node": "a203cc02f585bcbe13c743aee008222b208f3c82"
+      },
+      "contract": "hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_proxy.es",
+      "findings": [
+        {
+          "irId": 9,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 6,
+          "severity": "HIGH",
+          "snippet": "SELF.R7[Long].get"
+        },
+        {
+          "irId": 13,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 9,
+          "severity": "HIGH",
+          "snippet": "SELF.R8[Long].get"
+        },
+        {
+          "irId": 17,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 12,
+          "severity": "HIGH",
+          "snippet": "SELF.R9[Long].get"
+        },
+        {
+          "irId": 21,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 15,
+          "severity": "HIGH",
+          "snippet": "SELF.R4[SigmaProp].get"
+        },
+        {
+          "irId": 38,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 31,
+          "severity": "HIGH",
+          "snippet": "SELF.R5[Coll[Byte]].get"
+        },
+        {
+          "irId": 46,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 39,
+          "severity": "HIGH",
+          "snippet": "SELF.R6[Coll[Byte]].get"
+        },
+        {
+          "irId": 63,
+          "lint": "unbound-box-reserves",
+          "message": "reserves of OUTPUTS(0) drive value math but this box is never bound by a singleton NFT (no tokens(0)._1 == <nft> check); a transaction can place a different box at this index. Bind it by its NFT.",
+          "nodeId": 53,
+          "severity": "HIGH",
+          "snippet": "OUTPUTS(0).tokens(1)._2"
+        },
+        {
+          "irId": 71,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 59,
+          "severity": "HIGH",
+          "snippet": "v.R5[Long].get"
+        },
+        {
+          "irId": 83,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 70,
+          "severity": "HIGH",
+          "snippet": "v.R4[Long].get"
+        },
+        {
+          "irId": 122,
+          "lint": "unbound-box-reserves",
+          "message": "reserves of OUTPUTS(1) drive value math but this box is never bound by a singleton NFT (no tokens(0)._1 == <nft> check); a transaction can place a different box at this index. Bind it by its NFT.",
+          "nodeId": 107,
+          "severity": "HIGH",
+          "snippet": "OUTPUTS(1).value"
+        },
+        {
+          "irId": 142,
+          "lint": "unbound-box-reserves",
+          "message": "reserves of OUTPUTS(2) drive value math but this box is never bound by a singleton NFT (no tokens(0)._1 == <nft> check); a transaction can place a different box at this index. Bind it by its NFT.",
+          "nodeId": 127,
+          "severity": "HIGH",
+          "snippet": "OUTPUTS(2).value"
+        },
+        {
+          "irId": 156,
+          "lint": "unbound-box-reserves",
+          "message": "reserves of OUTPUTS(3) drive value math but this box is never bound by a singleton NFT (no tokens(0)._1 == <nft> check); a transaction can place a different box at this index. Bind it by its NFT.",
+          "nodeId": 141,
+          "severity": "HIGH",
+          "snippet": "OUTPUTS(3).value"
+        },
+        {
+          "irId": 207,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 189,
+          "severity": "HIGH",
+          "snippet": "v.R7[Long].get"
+        },
+        {
+          "irId": 215,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 197,
+          "severity": "HIGH",
+          "snippet": "v.R8[Long].get"
+        },
+        {
+          "irId": 241,
+          "lint": "unbound-box-reserves",
+          "message": "reserves of OUTPUTS(4) drive value math but this box is never bound by a singleton NFT (no tokens(0)._1 == <nft> check); a transaction can place a different box at this index. Bind it by its NFT.",
+          "nodeId": 223,
+          "severity": "HIGH",
+          "snippet": "OUTPUTS(4).value"
+        }
+      ],
+      "network": "testnet",
+      "params": {
+        "minTxOperatorFee": {
+          "type": "Long",
+          "value": 1000000
+        }
+      },
+      "protocol": "hodlcoin",
+      "provenance": "historical-compile",
+      "rawPlaceholders": 0,
+      "sourceSha256": "242012149c62ae3f68d9c6a024ea99dbe50c9bcfc563249c3c74e2b31122c2cf",
+      "status": "complete",
+      "treeSha256": "56f963c73952a96f696c64bed83e1d7da5c4b5ab9a920e0463326443a4b55b15",
+      "truncated": false
+    },
+    {
+      "compiler": {
+        "forge": "211c5b517d4aedd3a5a6e525999d4134af27fa7a",
+        "node": "a203cc02f585bcbe13c743aee008222b208f3c82"
+      },
+      "contract": "hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodltoken_bank.es",
+      "findings": [
+        {
+          "irId": 47,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 33,
+          "severity": "HIGH",
+          "snippet": "SELF.R5[Long].get"
+        },
+        {
+          "irId": 54,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 38,
+          "severity": "HIGH",
+          "snippet": "SELF.R4[Long].get"
+        },
+        {
+          "irId": 70,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 51,
+          "severity": "HIGH",
+          "snippet": "SELF.R6[Long].get"
+        },
+        {
+          "irId": 74,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 54,
+          "severity": "HIGH",
+          "snippet": "SELF.R7[Long].get"
+        },
+        {
+          "irId": 78,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 57,
+          "severity": "HIGH",
+          "snippet": "SELF.R8[Long].get"
+        },
+        {
+          "irId": 121,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 99,
+          "severity": "HIGH",
+          "snippet": "v4.R4[Long].get"
+        },
+        {
+          "irId": 126,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 104,
+          "severity": "HIGH",
+          "snippet": "v4.R5[Long].get"
+        },
+        {
+          "irId": 131,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 109,
+          "severity": "HIGH",
+          "snippet": "v4.R6[Long].get"
+        },
+        {
+          "irId": 136,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 114,
+          "severity": "HIGH",
+          "snippet": "v4.R7[Long].get"
+        },
+        {
+          "irId": 141,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 119,
+          "severity": "HIGH",
+          "snippet": "v4.R8[Long].get"
+        },
+        {
+          "irId": 12,
+          "lint": "unconstrained-outputs",
+          "message": "Specific outputs (OUTPUTS(0), OUTPUTS(2)) are compared, but no output-count upper bound, total-value comparison or universal tail constraint is recognised. Additional fee or change outputs may be intentional value exits. Review transaction-wide accounting; this syntax observation is not evidence of exploitability.",
+          "nodeId": 8,
+          "severity": "LOW",
+          "snippet": "OUTPUTS: positional checks without a recognised tail bound"
+        }
+      ],
+      "network": "testnet",
+      "params": {
+        "phoenixFeeContractBytesHash": {
+          "type": "Coll[Byte]",
+          "value": "1d6e74edc4de51afe718b401b1a5b257f5e6cbaa6fcd8e2d56bedf30a5667d75"
+        }
+      },
+      "protocol": "hodlcoin",
+      "provenance": "historical-compile",
+      "rawPlaceholders": 0,
+      "sourceSha256": "c7da0ccee683099790c74ec994e0c881c41fdd8cac1b23f0d3d5169c630b5396",
+      "status": "complete",
+      "treeSha256": "aa90a85c4a60cc74ae332cd7fdb0e1bc071b035d5988774769397ec90a0a61ff",
+      "truncated": false
+    },
+    {
+      "compiler": {
+        "forge": "211c5b517d4aedd3a5a6e525999d4134af27fa7a",
+        "node": "a203cc02f585bcbe13c743aee008222b208f3c82"
+      },
+      "contract": "hodlcoin/phoenix/phoenix_v1_hodlcoin_bank.es",
+      "findings": [
+        {
+          "irId": 37,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 26,
+          "severity": "HIGH",
+          "snippet": "SELF.R5[Long].get"
+        },
+        {
+          "irId": 44,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 31,
+          "severity": "HIGH",
+          "snippet": "SELF.R4[Long].get"
+        },
+        {
+          "irId": 57,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 42,
+          "severity": "HIGH",
+          "snippet": "SELF.R6[Long].get"
+        },
+        {
+          "irId": 61,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 45,
+          "severity": "HIGH",
+          "snippet": "SELF.R7[Long].get"
+        },
+        {
+          "irId": 65,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 48,
+          "severity": "HIGH",
+          "snippet": "SELF.R8[Long].get"
+        },
+        {
+          "irId": 99,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 81,
+          "severity": "HIGH",
+          "snippet": "v4.R4[Long].get"
+        },
+        {
+          "irId": 104,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 86,
+          "severity": "HIGH",
+          "snippet": "v4.R5[Long].get"
+        },
+        {
+          "irId": 109,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 91,
+          "severity": "HIGH",
+          "snippet": "v4.R6[Long].get"
+        },
+        {
+          "irId": 114,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 96,
+          "severity": "HIGH",
+          "snippet": "v4.R7[Long].get"
+        },
+        {
+          "irId": 119,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 101,
+          "severity": "HIGH",
+          "snippet": "v4.R8[Long].get"
+        },
+        {
+          "irId": 180,
+          "lint": "unbound-box-reserves",
+          "message": "reserves of OUTPUTS(2) drive value math but this box is never bound by a singleton NFT (no tokens(0)._1 == <nft> check); a transaction can place a different box at this index. Bind it by its NFT.",
+          "nodeId": 159,
+          "severity": "HIGH",
+          "snippet": "OUTPUTS(2).value"
+        },
+        {
+          "irId": 12,
+          "lint": "unconstrained-outputs",
+          "message": "Specific outputs (OUTPUTS(0), OUTPUTS(2)) are compared, but no output-count upper bound, total-value comparison or universal tail constraint is recognised. Additional fee or change outputs may be intentional value exits. Review transaction-wide accounting; this syntax observation is not evidence of exploitability.",
+          "nodeId": 8,
+          "severity": "LOW",
+          "snippet": "OUTPUTS: positional checks without a recognised tail bound"
+        }
+      ],
+      "network": "testnet",
+      "params": {
+        "phoenixFeeContractBytesHash": {
+          "type": "Coll[Byte]",
+          "value": "1d6e74edc4de51afe718b401b1a5b257f5e6cbaa6fcd8e2d56bedf30a5667d75"
+        }
+      },
+      "protocol": "hodlcoin",
+      "provenance": "historical-compile",
+      "rawPlaceholders": 0,
+      "sourceSha256": "e48a47ef11c3a1806150b79f34116b011a5100a66f9b74e67d9f577bbe25d745",
+      "status": "complete",
+      "treeSha256": "80668da9449e38399e135f091d5a880863eafa8d0fe73699b43586ba3268c91b",
+      "truncated": false
+    },
+    {
+      "compiler": {
+        "forge": "211c5b517d4aedd3a5a6e525999d4134af27fa7a",
+        "node": "a203cc02f585bcbe13c743aee008222b208f3c82"
+      },
+      "contract": "hodlcoin/phoenix/phoenix_v1_hodlcoin_proxy.es",
+      "findings": [
+        {
+          "irId": 9,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 6,
+          "severity": "HIGH",
+          "snippet": "SELF.R7[Long].get"
+        },
+        {
+          "irId": 13,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 9,
+          "severity": "HIGH",
+          "snippet": "SELF.R8[Long].get"
+        },
+        {
+          "irId": 17,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 12,
+          "severity": "HIGH",
+          "snippet": "SELF.R9[Long].get"
+        },
+        {
+          "irId": 21,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 15,
+          "severity": "HIGH",
+          "snippet": "SELF.R4[SigmaProp].get"
+        },
+        {
+          "irId": 38,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 31,
+          "severity": "HIGH",
+          "snippet": "SELF.R5[Coll[Byte]].get"
+        },
+        {
+          "irId": 46,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 39,
+          "severity": "HIGH",
+          "snippet": "SELF.R6[Coll[Byte]].get"
+        },
+        {
+          "irId": 63,
+          "lint": "unbound-box-reserves",
+          "message": "reserves of OUTPUTS(0) drive value math but this box is never bound by a singleton NFT (no tokens(0)._1 == <nft> check); a transaction can place a different box at this index. Bind it by its NFT.",
+          "nodeId": 53,
+          "severity": "HIGH",
+          "snippet": "OUTPUTS(0).tokens(1)._2"
+        },
+        {
+          "irId": 71,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 59,
+          "severity": "HIGH",
+          "snippet": "v.R5[Long].get"
+        },
+        {
+          "irId": 83,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 70,
+          "severity": "HIGH",
+          "snippet": "v.R4[Long].get"
+        },
+        {
+          "irId": 122,
+          "lint": "unbound-box-reserves",
+          "message": "reserves of OUTPUTS(1) drive value math but this box is never bound by a singleton NFT (no tokens(0)._1 == <nft> check); a transaction can place a different box at this index. Bind it by its NFT.",
+          "nodeId": 107,
+          "severity": "HIGH",
+          "snippet": "OUTPUTS(1).value"
+        },
+        {
+          "irId": 142,
+          "lint": "unbound-box-reserves",
+          "message": "reserves of OUTPUTS(2) drive value math but this box is never bound by a singleton NFT (no tokens(0)._1 == <nft> check); a transaction can place a different box at this index. Bind it by its NFT.",
+          "nodeId": 127,
+          "severity": "HIGH",
+          "snippet": "OUTPUTS(2).value"
+        },
+        {
+          "irId": 156,
+          "lint": "unbound-box-reserves",
+          "message": "reserves of OUTPUTS(3) drive value math but this box is never bound by a singleton NFT (no tokens(0)._1 == <nft> check); a transaction can place a different box at this index. Bind it by its NFT.",
+          "nodeId": 141,
+          "severity": "HIGH",
+          "snippet": "OUTPUTS(3).value"
+        },
+        {
+          "irId": 207,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 189,
+          "severity": "HIGH",
+          "snippet": "v.R7[Long].get"
+        },
+        {
+          "irId": 215,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 197,
+          "severity": "HIGH",
+          "snippet": "v.R8[Long].get"
+        },
+        {
+          "irId": 241,
+          "lint": "unbound-box-reserves",
+          "message": "reserves of OUTPUTS(4) drive value math but this box is never bound by a singleton NFT (no tokens(0)._1 == <nft> check); a transaction can place a different box at this index. Bind it by its NFT.",
+          "nodeId": 223,
+          "severity": "HIGH",
+          "snippet": "OUTPUTS(4).value"
+        }
+      ],
+      "network": "testnet",
+      "params": {
+        "minTxOperatorFee": {
+          "type": "Long",
+          "value": 1000000
+        }
+      },
+      "protocol": "hodlcoin",
+      "provenance": "historical-compile",
+      "rawPlaceholders": 0,
+      "sourceSha256": "a2cc728a094ece2a4dfecb4027439e81ef551a135d7e23aa8726759d853c3929",
+      "status": "complete",
+      "treeSha256": "56f963c73952a96f696c64bed83e1d7da5c4b5ab9a920e0463326443a4b55b15",
+      "truncated": false
+    },
+    {
+      "compiler": {
+        "forge": "211c5b517d4aedd3a5a6e525999d4134af27fa7a",
+        "node": "a203cc02f585bcbe13c743aee008222b208f3c82"
+      },
+      "contract": "hodlcoin/phoenix/phoenix_v1_hodltoken_bank.es",
+      "findings": [
+        {
+          "irId": 47,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 33,
+          "severity": "HIGH",
+          "snippet": "SELF.R5[Long].get"
+        },
+        {
+          "irId": 54,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 38,
+          "severity": "HIGH",
+          "snippet": "SELF.R4[Long].get"
+        },
+        {
+          "irId": 70,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 51,
+          "severity": "HIGH",
+          "snippet": "SELF.R6[Long].get"
+        },
+        {
+          "irId": 74,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 54,
+          "severity": "HIGH",
+          "snippet": "SELF.R7[Long].get"
+        },
+        {
+          "irId": 78,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 57,
+          "severity": "HIGH",
+          "snippet": "SELF.R8[Long].get"
+        },
+        {
+          "irId": 121,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 99,
+          "severity": "HIGH",
+          "snippet": "v4.R4[Long].get"
+        },
+        {
+          "irId": 126,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 104,
+          "severity": "HIGH",
+          "snippet": "v4.R5[Long].get"
+        },
+        {
+          "irId": 131,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 109,
+          "severity": "HIGH",
+          "snippet": "v4.R6[Long].get"
+        },
+        {
+          "irId": 136,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 114,
+          "severity": "HIGH",
+          "snippet": "v4.R7[Long].get"
+        },
+        {
+          "irId": 141,
+          "lint": "unchecked-get",
+          "message": "Option.get with no isDefined guard — the script throws if the option is empty, making this spending path unusable.",
+          "nodeId": 119,
+          "severity": "HIGH",
+          "snippet": "v4.R8[Long].get"
+        },
+        {
+          "irId": 12,
+          "lint": "unconstrained-outputs",
+          "message": "Specific outputs (OUTPUTS(0), OUTPUTS(2)) are compared, but no output-count upper bound, total-value comparison or universal tail constraint is recognised. Additional fee or change outputs may be intentional value exits. Review transaction-wide accounting; this syntax observation is not evidence of exploitability.",
+          "nodeId": 8,
+          "severity": "LOW",
+          "snippet": "OUTPUTS: positional checks without a recognised tail bound"
+        }
+      ],
+      "network": "testnet",
+      "params": {
+        "phoenixFeeContractBytes": {
+          "type": "Coll[Byte]",
+          "value": "e9fe08e184764121e324e0dd02217945068cb5e6294edc4619b3b59ec89a4283"
+        }
+      },
+      "protocol": "hodlcoin",
+      "provenance": "historical-compile",
+      "rawPlaceholders": 0,
+      "sourceSha256": "7f6318c64d3af87b9acf55a0fb8fd6362e7ff860a6f6f9208a2dfaba4d03ce4b",
+      "status": "complete",
+      "treeSha256": "6c8de11351f23ad21fe2eabac49bfcd217961b3923f08d427a83a4c14eda716a",
+      "truncated": false
+    },
+    {
+      "compiler": {
+        "forge": "211c5b517d4aedd3a5a6e525999d4134af27fa7a",
+        "node": "a203cc02f585bcbe13c743aee008222b208f3c82"
+      },
+      "contract": "hodlcoin/phoenix/phoenix_v1_hodltoken_fee.es",
+      "findings": [],
+      "network": "mainnet",
+      "params": {
+        "baseTokenId": {
+          "type": "Coll[Byte]",
+          "value": "a14964337a9e7e79998cb1518e31a8856c05a2d44c2919db19a2667a05817854"
+        },
+        "brunoNum": {
+          "type": "Long",
+          "value": 10
+        },
+        "creatorAddress": {
+          "type": "SigmaProp",
+          "value": "03fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556"
+        },
+        "creatorNum": {
+          "type": "Long",
+          "value": 1
+        },
+        "kushtiNum": {
+          "type": "Long",
+          "value": 10
+        },
+        "minerFee": {
+          "type": "Long",
+          "value": 1000000
+        },
+        "phoenixNum": {
+          "type": "Long",
+          "value": 10
+        }
+      },
+      "protocol": "hodlcoin",
+      "provenance": "historical-compile",
+      "rawPlaceholders": 0,
+      "sourceSha256": "dc1c14dc1b4690e94261d9362f7d26e8c7c11620735c55654aee45bb16a67bf1",
+      "status": "complete",
+      "treeSha256": "2df68832991207a46d554d7fe19addd92573585efdc946e3033c0d057ab9188f",
+      "truncated": false
+    },
+    {
+      "compiler": {
+        "forge": "211c5b517d4aedd3a5a6e525999d4134af27fa7a",
+        "node": "a203cc02f585bcbe13c743aee008222b208f3c82"
+      },
+      "contract": "hodlcoin/phoenix/phoenix_v1_hodltoken_feeTest_mainnet.es",
+      "findings": [],
+      "network": "mainnet",
+      "params": {
+        "baseTokenId": {
+          "type": "Coll[Byte]",
+          "value": "a14964337a9e7e79998cb1518e31a8856c05a2d44c2919db19a2667a05817854"
+        },
+        "brunoNum": {
+          "type": "Long",
+          "value": 10
+        },
+        "creatorAddress": {
+          "type": "SigmaProp",
+          "value": "03fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556"
+        },
+        "creatorNum": {
+          "type": "Long",
+          "value": 1
+        },
+        "kushtiNum": {
+          "type": "Long",
+          "value": 10
+        },
+        "minerFee": {
+          "type": "Long",
+          "value": 1000000
+        },
+        "phoenixNum": {
+          "type": "Long",
+          "value": 10
+        }
+      },
+      "protocol": "hodlcoin",
+      "provenance": "historical-compile",
+      "rawPlaceholders": 0,
+      "sourceSha256": "118def8bdf72f966be8d690f887c287d41324ce39d9947b742fb925f5a024776",
+      "status": "complete",
+      "treeSha256": "83d682ec63031fd14f610ae77df1a039e5615156507bd7114a2ae77945400f3f",
+      "truncated": false
+    },
+    {
+      "compiler": {
+        "forge": "211c5b517d4aedd3a5a6e525999d4134af27fa7a",
+        "node": "a203cc02f585bcbe13c743aee008222b208f3c82"
+      },
+      "contract": "hodlcoin/phoenix/phoenix_v1_hodltoken_feeTest_testnet.es",
+      "findings": [],
+      "network": "testnet",
+      "params": {
+        "baseTokenId": {
+          "type": "Coll[Byte]",
+          "value": "a14964337a9e7e79998cb1518e31a8856c05a2d44c2919db19a2667a05817854"
+        },
+        "brunoNum": {
+          "type": "Long",
+          "value": 10
+        },
+        "creatorAddress": {
+          "type": "SigmaProp",
+          "value": "03fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556"
+        },
+        "creatorNum": {
+          "type": "Long",
+          "value": 1
+        },
+        "kushtiNum": {
+          "type": "Long",
+          "value": 10
+        },
+        "minerFee": {
+          "type": "Long",
+          "value": 1000000
+        },
+        "phoenixNum": {
+          "type": "Long",
+          "value": 10
+        }
+      },
+      "protocol": "hodlcoin",
+      "provenance": "historical-compile",
+      "rawPlaceholders": 0,
+      "sourceSha256": "ead8e8cc7ff61b012ac7a2a636cdea56f45d3be9612800b3c55156f293d45ff7",
+      "status": "complete",
+      "treeSha256": "ed5bb0f93e44874172d88d3b28e1e9e88c91ce83baa5a2b59b87895b012bfad7",
+      "truncated": false
+    }
+  ],
+  "schemaVersion": 1,
+  "treeRowsSha256": "3950ac87395c86c9f1577367f68b1e7aa11bb52d5d8635ffb132219edb7db081",
+  "treeVersion": 3
+}

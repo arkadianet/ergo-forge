@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "method": "static-analysis",
+  "sweepSha256": "cd7bc62403ed72c4fa7cc83949ad89120a4b3820249e77507e196c99d351bafa",
+  "decisions": {
+    "unconstrained-outputs": {
+      "reviewPriority": "LOW",
+      "decision": "Ship as observation: ordinary fee/change, composable accounting and inverted branch guards cannot be distinguished from missing policy within scope."
+    }
+  },
+  "sites": [
+    {
+      "contract": "hodlcoin/phoenix/phoenix_v1_hodlcoin_bank.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 8,
+      "outcome": "benign",
+      "reason": "Mint/burn reserve deltas and the developer-fee output are checked; user redemption outputs are open."
+    },
+    {
+      "contract": "hodlcoin/phoenix/phoenix_v1_hodltoken_bank.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 8,
+      "outcome": "benign",
+      "reason": "ERG is preserved, token reserve deltas and developer fee are checked; recipient/funding outputs vary."
+    },
+    {
+      "contract": "hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodlerg_bank.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 8,
+      "outcome": "benign",
+      "reason": "This variant also checks mint/burn reserve deltas and developer fee, leaving user redemption outputs open."
+    },
+    {
+      "contract": "hodlcoin/phoenix-hodlcoin-contracts/phoenix_v1_hodltoken_bank.es",
+      "lint": "unconstrained-outputs",
+      "nodeId": 8,
+      "outcome": "benign",
+      "reason": "This variant preserves ERG and checks token reserve/fee deltas; it has no fixed recipient/output count policy."
+    }
+  ]
+}
