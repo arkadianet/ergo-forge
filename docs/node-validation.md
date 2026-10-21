@@ -22,8 +22,19 @@ voted into effect at the stated height.
 ID and pay-to-reemission tree, or explicitly disables it with a description and
 reason. These are supplied rule configurations, not authenticated network
 identities. The adapter never silently substitutes the node's default disabled
-rules. `localPolicy.maxTransactionSize` remains local policy, not a consensus
-claim. `priorBlockCost` uses block-cost units and initializes the node's single
+rules. Enabled rules may also carry `emission`, the constants the node needs to
+check how a spend of the emission box allocates the emission NFT and the
+re-emission token: the six monetary fields (`fixedRate`, `fixedRatePeriod`,
+`epochLength`, `oneEpochReduction`, `foundersInitialReward`, `minerRewardDelay`),
+`emissionNftId` and `emissionTree`. They share the premise's origin and are
+passed to the node as given; none has a default, and `epochLength` must be at
+least 1. **Without `emission` that allocation check does not run**, so a
+`node-accepted` result for a transaction that spends the emission box does not
+cover it, though the re-emission burn checks still run. The report's `request`
+shows which case applies. `tests/fixtures/evidence/emission-vectors/` (with
+`emission-manifest.json`) holds one rejected and one accepted allocation, apart
+from the P03 vectors. `localPolicy.maxTransactionSize` remains local policy, not
+a consensus claim. `priorBlockCost` uses block-cost units and initializes the node's single
 cost accumulator before validation; no per-input accumulator reset is added.
 
 The case's `boxes` premise is the supplied UTXO snapshot. Every record goes

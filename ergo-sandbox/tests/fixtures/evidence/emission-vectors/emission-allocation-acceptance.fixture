@@ -1,0 +1,117 @@
+{
+  "blockContext": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": {
+      "activatedScriptVersion": 0,
+      "height": 100,
+      "minerPubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+      "preHeaderNBits": 117586360,
+      "preHeaderParentId": "4444444444444444444444444444444444444444444444444444444444444444",
+      "preHeaderTimestamp": 1700000000000,
+      "preHeaderVersion": 1,
+      "preHeaderVotes": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "case": {
+    "deploymentIdentity": "unknown",
+    "formatVersion": 1,
+    "nodeValidated": false,
+    "premises": {
+      "assumptions": {},
+      "boxes": {
+        "origin": "hypothetical",
+        "status": "present",
+        "value": [
+          {
+            "document": {
+              "boxId": "516d7a8322e798c2b49239ff7076c0e1f3729595c9d344c39c54c8fde3ad6ac3",
+              "bytes": "8094d4e0b4de1610010101d173006402222222222222222222222222222222222222222222222222222222222222222201333333333333333333333333333333333333333333333333333333333333333380a094a58d1d00111111111111111111111111111111111111111111111111111111111111111100",
+              "ergoTree": "10010101d17300"
+            },
+            "origin": "hypothetical",
+            "record": null
+          }
+        ]
+      },
+      "constants": {
+        "reason": "binding origins not supplied",
+        "status": "missing"
+      },
+      "context": {
+        "reason": "execution context not supplied",
+        "status": "missing"
+      },
+      "engineRevision": "55229e0040b83b57521334030fe2842e85d43422",
+      "source": {
+        "reason": "source identity not supplied",
+        "status": "missing"
+      },
+      "targetBytes": {
+        "reason": "target bytes not supplied",
+        "status": "missing"
+      }
+    }
+  },
+  "formatVersion": 1,
+  "headers": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": []
+  },
+  "localPolicy": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": {
+      "maxTransactionSize": 524288
+    }
+  },
+  "networkRules": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": {
+      "activation_height": 99,
+      "description": "authored EIP-27 emission-allocation vector; the monetary schedule is the Scala mainnet default (MonetarySettings), the NFT, token and trees are hypothetical",
+      "emission": {
+        "emissionNftId": "2222222222222222222222222222222222222222222222222222222222222222",
+        "emissionTree": "10010101d17300",
+        "epochLength": 64800,
+        "fixedRate": 75000000000,
+        "fixedRatePeriod": 525600,
+        "foundersInitialReward": 7500000000,
+        "minerRewardDelay": 720,
+        "oneEpochReduction": 3000000000
+      },
+      "mode": "enabled",
+      "pay_to_reemission_tree": "10010101d17300",
+      "reemission_token_id": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+  },
+  "parameters": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": {
+      "dataInputCost": 100,
+      "inputCost": 2000,
+      "maxBlockCost": 8001091,
+      "maxBlockSize": 524288,
+      "maxBoxSize": 4096,
+      "maxTokensPerBox": 255,
+      "minValuePerByte": 360,
+      "outputCost": 100,
+      "storageFeeFactor": 1250000,
+      "storagePeriod": 1051200,
+      "tokenAccessCost": 100
+    }
+  },
+  "priorBlockCost": {
+    "origin": "hypothetical",
+    "status": "present",
+    "value": 0
+  },
+  "transactionBytes": "01516d7a8322e798c2b49239ff7076c0e1f3729595c9d344c39c54c8fde3ad6ac300000002222222222222222222222222222222222222222222222222222222222222222233333333333333333333333333333333333333333333333333333333333333330280b8efad9ddc1610010101d17300640200010180b08ecbe01c0080dce4b2970210010101d1730064010180f085da2c00"
+}

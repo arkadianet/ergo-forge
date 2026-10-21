@@ -24,6 +24,11 @@
   model; neither grants node acceptance or discovery credit.
 - Added `ergo-es adversary`, `ergo-es property-template`,
   `ergo-es shadow-check` and `POST /api/v2/adversary`.
+- Added an optional `emission` premise to enabled `networkRules` in full-node validation
+  requests: the monetary schedule, emission NFT and emission tree the node needs to check how
+  a spend of the emission box allocates the emission NFT and the re-emission token (rule 123).
+  Requests without it are unchanged, keep their fingerprints, and still do not run that check.
+  See `docs/reports/emission-constants.md`.
 
 ## 0.5.0 — prepared, unreleased
 

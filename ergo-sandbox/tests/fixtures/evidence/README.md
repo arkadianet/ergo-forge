@@ -66,3 +66,21 @@ The [recovery directory](../../../../docs/p05-recovery/README.md) records raw pu
 material and the pinned-node derivation, repeated by the P05 target. The rejected
 prior USE candidate remains stop evidence outside this accepted manifest. No
 P03/P04 manifest row or preflight corpus measurement was changed.
+
+# Emission-allocation vectors
+
+`emission-manifest.json` registers two authored requests in `emission-vectors/*.fixture`
+for rule 123's emission-box allocation check, which the node runs only when the enabled
+network rules carry `emission` (`docs/node-validation.md`). Both spend a 100,001 ERG box
+holding the emission NFT and the re-emission token; the rejected one gives the reward box
+one billion tokens more than the monetary schedule allows, the accepted one the exact
+schedule amount. The manifest is separate from `manifest.json`, whose case IDs the
+roadmap policy names, so no P03 row changed. `emission_allocation.rs` authenticates the
+hashes, runs both through Forge, and runs the rejected one without `emission`, which the
+node accepts.
+
+`generate_emission_vectors.rs` is the retained one-time producer. It calls
+`ergo_validation::tx::validate_transaction` directly, not Forge's adapter, so the
+recorded results test the adapter against the node. Run it as the others, from a
+temporary Cargo example, and never as a repair for a failed test. Its monetary schedule is
+the Scala mainnet default; the NFT, token and trees are hypothetical, as is all state.
