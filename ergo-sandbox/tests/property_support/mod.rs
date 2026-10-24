@@ -17,7 +17,7 @@ pub fn sha(bytes: &[u8]) -> String {
 pub fn read(path: &str) -> Value {
     serde_json::from_slice(&std::fs::read(root().join(path)).unwrap()).unwrap()
 }
-pub const MANIFEST_SHA: &str = "72609b827694feca9fb78ae440afc69644abb29238d9fd48dd7fe3467658304f";
+pub const MANIFEST_SHA: &str = "5e5d0a2aa1d945d9a7bbe22919660d070472f35fa24ebcc120d8d006cea7317b";
 pub const ANSWER_SHA: &str = "311f160e08a8875de546263474fb10ec621e881b34afc28bb65323db32c7f319";
 pub fn check(
     manifest: &[u8],

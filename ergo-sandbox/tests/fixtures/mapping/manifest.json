@@ -3,7 +3,7 @@
   "baselineArtifacts": {
     "docs/ingestion-lithos-results.json": "1c43bc46d910b11d4e970ce714657175515a0cf61e1ec420b4c58a3d4e7bc69e",
     "docs/roadmap-metrics.json": "4cc60a3f4b342aebe85b91a17ff64c7b79d6fcace73ad0518e7c49e3a57c134d",
-    "ergo-sandbox/tests/fixtures/decompile_corpus_expectations.json": "5d2bfc24d758dac520e24968793fe95a87c1cc673d54fe577d4a93b89768aa69",
+    "ergo-sandbox/tests/fixtures/decompile_corpus_expectations.json": "226d70804af8f546e0919121ddbf7fe5198f25213ddf7557351a6031a17b1825",
     "ergo-sandbox/tests/fixtures/map/dexy-gold.json": "c2c0125d98d7735c021b970acbc10de7242d5f56846bd17912f7c13db1256ea8",
     "ergo-sandbox/tests/fixtures/map/use-lp.json": "6fc05c9fdcbe19f47990a2749003d7a148b435136f5ca6c64d1abd783a80e51f",
     "examples/mutants/answer-key.custody-v1.json": "4d038f5ab7722e954c44c426719237c9df2098e689f54eb4c679f3348b485259",

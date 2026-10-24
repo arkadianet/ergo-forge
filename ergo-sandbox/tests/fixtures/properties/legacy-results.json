@@ -5,7 +5,7 @@
   "discoveryCredit": 0,
   "evaluatorAgreement": null,
   "linkedTraceReplay": false,
-  "manifestSha256": "72609b827694feca9fb78ae440afc69644abb29238d9fd48dd7fe3467658304f",
+  "manifestSha256": "5e5d0a2aa1d945d9a7bbe22919660d070472f35fa24ebcc120d8d006cea7317b",
   "nodeValidationCalls": 70,
   "referenceTransactions": 35,
   "registeredSyntheticCases": 24,
@@ -14,7 +14,7 @@
   "version": "property-legacy-measurement:v1",
   "raw": {
     "path": "legacy-results-raw.fixture",
-    "sha256": "9a2031b9324ab62b9bb91f7cf6960aa8a00209148b1b2eca0c1dfbd6323ea451"
+    "sha256": "4318d64f0d30a1d4a211ad0bb0aedae3d0f59ee53df91bb507109b85255fee7f"
   },
   "cases": [
     {

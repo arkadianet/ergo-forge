@@ -296,7 +296,7 @@ fn accepted_execution_cannot_be_deserialized_or_fabricated() {
 
 #[test]
 fn node_vectors_pass_on_new_rev() {
-    let expected = "55229e0040b83b57521334030fe2842e85d43422";
+    let expected = "254d00cbeb8070d3804d363862aa157ad1c6cb15";
     let recorded = ergo_sandbox::evidence::case::engine_revision();
     assert_eq!(
         recorded, expected,

@@ -11,7 +11,7 @@ use ergo_sandbox::evidence::{
 use property_support::*;
 use serde_json::{json, Value};
 use std::collections::BTreeMap;
-const LEGACY_SHA: &str = "9a2031b9324ab62b9bb91f7cf6960aa8a00209148b1b2eca0c1dfbd6323ea451";
+const LEGACY_SHA: &str = "4318d64f0d30a1d4a211ad0bb0aedae3d0f59ee53df91bb507109b85255fee7f";
 fn bytes(path: &str) -> Vec<u8> {
     std::fs::read(root().join(path)).unwrap()
 }

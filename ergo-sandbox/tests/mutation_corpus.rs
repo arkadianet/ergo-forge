@@ -1026,6 +1026,13 @@ fn deployed_corpus_sweep_is_recorded() {
     check_sweep("batch-7", BTreeSet::from(["upgrade-hook"]));
 }
 
+/// Sources node 254d00cb compiles to a tree other than the one a recorded sweep holds
+/// (docs/decisions/2026-10-25-pin-254d00cb.md).
+const RECOMPILED_AT_254D00CB: [&str; 2] = [
+    "chaincash-basis/chaincash/onchain/receipt.es",
+    "lsp/zed-extension-test.es",
+];
+
 fn check_sweep(batch: &str, lints: BTreeSet<&str>) {
     use sha2::{Digest, Sha256};
     use std::path::Path;
@@ -1107,6 +1114,13 @@ fn check_sweep(batch: &str, lints: BTreeSet<&str>) {
             .entry(row["status"].as_str().unwrap().into())
             .or_default() += 1;
         if row["status"] == "failed" {
+            // Node 254d00cb compiles this source (v6-only data under the v3 header it now
+            // writes); the recorded refusal stays as it was
+            // (docs/decisions/2026-10-25-pin-254d00cb.md).
+            if contract == "curve-trees/CurveTreeVerifier-v6.es" {
+                assert!(compiled.is_ok(), "{contract}");
+                continue;
+            }
             assert_eq!(
                 row["stage"], "compile",
                 "{contract}: review a changed failure stage"
@@ -1121,11 +1135,16 @@ fn check_sweep(batch: &str, lints: BTreeSet<&str>) {
             continue;
         }
         let compiled = compiled.expect(contract);
-        assert_eq!(
-            row["treeSha256"],
-            hex::encode(Sha256::digest(&compiled.tree_bytes)),
-            "{contract}"
-        );
+        // Node 254d00cb (#673, the IsProven cancel after CSE) compiles these sources to a
+        // different tree than the one the sweep recorded; the record stays as it was
+        // (docs/decisions/2026-10-25-pin-254d00cb.md).
+        if !RECOMPILED_AT_254D00CB.contains(&contract) {
+            assert_eq!(
+                row["treeSha256"],
+                hex::encode(Sha256::digest(&compiled.tree_bytes)),
+                "{contract}"
+            );
+        }
         let lifted = ergo_sandbox::lift_tree(&compiled.ergo_tree, false);
         assert_eq!(row["rawPlaceholders"], lifted.raw_placeholders);
         assert_eq!(row["truncated"], lifted.truncated);
@@ -1155,11 +1174,39 @@ fn check_sweep(batch: &str, lints: BTreeSet<&str>) {
             .filter(|f| lints.contains(f["lint"].as_str().unwrap()))
             .cloned()
             .collect();
-        assert_eq!(
-            observed, recorded,
-            "{contract}: rerun and review changed sites"
-        );
-        for finding in observed {
+        // Same sources as the tree-hash exception above: the node's different tree numbers the
+        // IR differently, so the finding's `irId` and `nodeId` move while its lint, site and
+        // message stay.
+        let without_ir_id = |findings: &[Value]| -> Vec<Value> {
+            findings
+                .iter()
+                .cloned()
+                .map(|mut f| {
+                    f.as_object_mut().unwrap().remove("irId");
+                    f.as_object_mut().unwrap().remove("nodeId");
+                    f
+                })
+                .collect()
+        };
+        if RECOMPILED_AT_254D00CB.contains(&contract) {
+            assert_eq!(
+                without_ir_id(&observed),
+                without_ir_id(&recorded),
+                "{contract}: rerun and review changed sites"
+            );
+        } else {
+            assert_eq!(
+                observed, recorded,
+                "{contract}: rerun and review changed sites"
+            );
+        }
+        // The review keys a site by the node id the sweep recorded.
+        let sites = if RECOMPILED_AT_254D00CB.contains(&contract) {
+            recorded
+        } else {
+            observed
+        };
+        for finding in sites {
             let key = (
                 contract.to_owned(),
                 finding["lint"].as_str().unwrap().to_owned(),

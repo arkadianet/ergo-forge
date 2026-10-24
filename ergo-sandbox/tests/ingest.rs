@@ -150,17 +150,12 @@ fn real_values_and_types_override_inference_and_feed_other_constants() {
 }
 
 #[test]
-fn version_gate_is_precise_even_when_version_three_requested() {
+fn v6_only_data_compiles_under_the_requested_version_three_header() {
+    // Node 254d00cb writes the requested version into the header, so a v6-only constant no
+    // longer meets the v0-header refusal the earlier pins gave it (docs/decisions/2026-10-25-pin-254d00cb.md).
     let source = "sigmaProp(unsignedBigInt(\"1\") == SELF.R4[UnsignedBigInt].get)";
     let r = ingest_source(source, &IngestOptions::default());
-    assert_eq!(r.report.status, Status::NotCompiled);
-    let e = r.report.reason.unwrap();
-    assert!(
-        e.contains("UnsignedBigInt constant data")
-            && e.contains("v0")
-            && e.contains("no public compile option"),
-        "{e}"
-    );
+    assert_eq!(r.report.status, Status::Compiled, "{:?}", r.report.reason);
 }
 
 #[test]

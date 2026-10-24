@@ -66,12 +66,16 @@ pub fn compile_source_raw(
         p2s_address,
         p2sh_address,
     } = ergo_compiler::compile(&ScriptEnv::new(), source, tree_version, network)?;
-    Ok(CompileOutput {
+    let out = CompileOutput {
         tree_bytes,
         ergo_tree,
         p2s_address,
         p2sh_address,
-    })
+    };
+    if tree_version == 0 {
+        return Ok(out);
+    }
+    with_v0_header(&out, network)
 }
 
 pub fn compile_source(
@@ -107,33 +111,56 @@ fn compile_env(
 }
 
 /// Put the requested version on the tree header when the tree needs it.
-/// The compiler leaves the header at version 0 on purpose (parity with the
-/// Scala node's compile route, which never forwards `treeVersion` into the
-/// header); wallets stamp the header themselves. A plain script keeps v0
-/// — that is what mainnet trees look like and what its address has always
-/// been — but a script that uses a v6 method would fail the node's own
-/// method-resolution gate under a v0 header, so it gets the requested
-/// version (3 or above) with the size flag the format requires. The P2SH
-/// address hashes the proposition and is unchanged either way.
+/// The compiler writes the requested version into the header (Scala parity);
+/// forge keeps the older rule. A plain script keeps v0 — that is what mainnet
+/// trees look like and what its address has always been — but a script that
+/// uses a v6 method, or v6-only constant data, would fail the node's own
+/// readers under a v0 header, so it keeps the requested version (3 or above)
+/// with the size flag the format requires. The P2SH address hashes the
+/// proposition and is unchanged either way.
 pub(crate) fn stamp_version(
-    mut out: CompileOutput,
+    out: CompileOutput,
     tree_version: u8,
     network: NetworkPrefix,
 ) -> CompileOutput {
-    if tree_version < 3
-        || out.ergo_tree.version == tree_version
-        || ergo_ser::opcode::find_unresolved_v5_method(&out.ergo_tree.body).is_none()
+    if tree_version == 0
+        || out.ergo_tree.version == 0
+        || ergo_ser::opcode::find_unresolved_v5_method(&out.ergo_tree.body).is_some()
     {
         return out;
     }
-    out.ergo_tree.version = tree_version;
-    out.ergo_tree.has_size = true;
-    let mut w = ergo_primitives::writer::VlqWriter::new();
-    if ergo_ser::ergo_tree::write_ergo_tree(&mut w, &out.ergo_tree).is_ok() {
-        out.tree_bytes = w.result();
-        out.p2s_address = encode_p2s(network, &out.tree_bytes);
+    match with_v0_header(&out, network) {
+        Ok(v0) => v0,
+        Err(_) => out,
     }
-    out
+}
+
+/// `out` with the version-0 header (no size flag) and its P2S address;
+/// refused when a v0 header cannot carry the tree (a v6-only type or method).
+fn with_v0_header(
+    out: &CompileOutput,
+    network: NetworkPrefix,
+) -> Result<CompileOutput, CompileError> {
+    let mut tree = out.ergo_tree.clone();
+    tree.version = 0;
+    tree.has_size = false;
+    let mut w = ergo_primitives::writer::VlqWriter::new();
+    ergo_ser::ergo_tree::write_ergo_tree(&mut w, &tree).map_err(|e| CompileError::Serializer {
+        what: format!("{e:?}"),
+    })?;
+    let tree_bytes = w.result();
+    let mut r = ergo_primitives::reader::VlqReader::new(&tree_bytes);
+    ergo_ser::ergo_tree::read_ergo_tree_with_activated_version(&mut r, 0).map_err(|e| {
+        CompileError::Serializer {
+            what: format!("a version 0 header cannot carry this tree ({e:?})"),
+        }
+    })?;
+    Ok(CompileOutput {
+        p2s_address: encode_p2s(network, &tree_bytes),
+        p2sh_address: out.p2sh_address.clone(),
+        tree_bytes,
+        ergo_tree: tree,
+    })
 }
 
 /// Why a parameterised compile failed.

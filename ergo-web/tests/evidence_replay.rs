@@ -124,6 +124,8 @@ fn dom_test(name: &str) {
         .current_dir(root())
         .args([
             "--test",
+            // Newer node defaults to the spec reporter outside a terminal; the assertion below reads TAP.
+            "--test-reporter=tap",
             "--test-name-pattern",
             name,
             "ui/tests/evidence-replay.test.js",

@@ -8,7 +8,7 @@ use mapping_support::*;
 use serde_json::{json, Value};
 use std::collections::BTreeSet;
 
-const MANIFEST_SHA256: &str = "7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f";
+const MANIFEST_SHA256: &str = "a3a6e47931e5f2e12279a00f447159cd9b5cd45fc1451afc6f2993cad30aa4cc";
 const EXPECTED_SHA256: &str = "291923d76f2de8a69deec82cc049d233d87d91f816295312ed89f9291e13405e";
 const FAMILIES: [&str; 16] = [
     "literal_spend",

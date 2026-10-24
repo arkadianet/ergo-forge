@@ -1158,10 +1158,10 @@
     "tree_sha256": "9a1c511b78d211fc5048ea5aef13cfb963491078a89e3d775d010c7fd3d4e075"
   },
   "examples/contracts/chaincash-basis/chaincash/onchain/receipt.es": {
-    "bucket": "recompiles-but-differs",
+    "bucket": "byte-identical",
     "raw_placeholders": 0,
     "truncated": false,
-    "tree_sha256": "84dcabfe6db33e2e4ec7e6cecbd8445d76c7ae73f65677c8844421238099e0fa"
+    "tree_sha256": "d788baaa797948820134df6f167dd84ebddc9b41bdaade581e8f7cec94f3d0fc"
   },
   "examples/contracts/chaincash-basis/chaincash/onchain/reserve.es": {
     "bucket": "recompiles-but-differs",
@@ -1200,10 +1200,10 @@
     "tree_sha256": "d10161c9021db4b40514ab59e0a66af2a5420acad2dfad1144cdb61b07019058"
   },
   "examples/contracts/curve-trees/CurveTreeVerifier-v6.es": {
-    "bucket": "initial-compile-failed",
-    "raw_placeholders": 0,
+    "bucket": "fails-to-recompile",
+    "raw_placeholders": 8,
     "truncated": false,
-    "tree_sha256": null
+    "tree_sha256": "daecd91c8ff56882ecb1f563df515c12fca7096ff7480e250454a3aad18ce06a"
   },
   "examples/contracts/dexy/bank/arbmint.es": {
     "bucket": "recompiles-but-differs",
@@ -1521,7 +1521,7 @@
     "bucket": "recompiles-but-differs",
     "raw_placeholders": 0,
     "truncated": false,
-    "tree_sha256": "7939ada71f8f01a6cf0ef4e2ce46e07897509da9c9c639d9a6879e02e382f27c"
+    "tree_sha256": "784dcdcd7c765ddbce182e489864dad96e8fb2b3eb31ee20ef8ca8d2de0f7d6f"
   },
   "examples/contracts/protocols/amm/pool.es": {
     "bucket": "recompiles-but-differs",
