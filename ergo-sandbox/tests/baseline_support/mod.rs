@@ -18,12 +18,12 @@ pub fn historical_bytes(workspace: &Path, path: &str) -> Vec<u8> {
         let old = String::from_utf8(historical.clone()).unwrap();
         let mut expected = old.clone();
         if path == "Cargo.lock" {
-            // Node 55229e00 moves most of the node's dependency graph (num-bigint 0.5 and the
-            // crates it pulls in), too many entries to rewrite one by one here. The lockfile must
-            // be byte for byte the one reviewed in docs/reports/node-pin-55229e00.md.
+            // A node pin moves many of the lockfile's entries, too many to rewrite one by one
+            // here. The lockfile must
+            // be byte for byte the one reviewed in docs/decisions/2026-10-25-pin-254d00cb.md.
             use sha2::{Digest, Sha256};
             let reviewed = std::fs::read_to_string(
-                workspace.join("docs/reports/node-pin-55229e00/Cargo.lock.sha256"),
+                workspace.join("docs/reports/node-pin-254d00cb/Cargo.lock.sha256"),
             )
             .unwrap();
             assert_eq!(

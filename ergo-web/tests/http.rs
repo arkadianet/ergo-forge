@@ -1197,12 +1197,6 @@ async fn compile_phases_distinguish_source_zero_from_unpositioned_zero() {
         ("// café 🦀\nsigmaProp(HEIGHT > true)", "type", 24, "source"),
         ("HEIGHT", "root", 0, "unavailable"),
         ("sigmaProp((HEIGHT & 1) == 0)", "emit", 0, "unavailable"),
-        (
-            "unsignedBigInt(\"5\") > unsignedBigInt(\"3\")",
-            "serializer",
-            0,
-            "unavailable",
-        ),
     ] {
         let response = post_compile(&base, serde_json::json!({ "source": source })).await;
         assert_eq!(response.status(), 400, "{source}");

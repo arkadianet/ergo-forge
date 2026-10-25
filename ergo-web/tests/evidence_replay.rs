@@ -119,11 +119,21 @@ async fn http_and_cli_replay_have_identical_semantic_results() {
     }
 }
 fn dom_test(name: &str) {
-    let output = Command::new("node")
-        .env("ERGO_REPLAY_CLI", cli())
+    // The assertion below reads TAP, which newer node no longer picks outside a terminal; ask for
+    // it, and drop any reporter `NODE_OPTIONS` names (node refuses a reporter given twice).
+    let options = std::env::var("NODE_OPTIONS")
+        .unwrap_or_default()
+        .split_whitespace()
+        .filter(|o| !o.starts_with("--test-reporter"))
+        .collect::<Vec<_>>()
+        .join(" ");
+    let mut node = Command::new("node");
+    node.env("ERGO_REPLAY_CLI", cli())
+        .env("NODE_OPTIONS", options)
         .current_dir(root())
+        .args(["--test", "--test-reporter=tap"]);
+    let output = node
         .args([
-            "--test",
             "--test-name-pattern",
             name,
             "ui/tests/evidence-replay.test.js",
