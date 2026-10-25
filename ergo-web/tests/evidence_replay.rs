@@ -119,15 +119,19 @@ async fn http_and_cli_replay_have_identical_semantic_results() {
     }
 }
 fn dom_test(name: &str) {
-    // Newer node defaults to the spec reporter outside a terminal; the assertion below reads TAP.
-    let reporter = std::env::var("NODE_OPTIONS").map_or(true, |o| !o.contains("--test-reporter"));
+    // The assertion below reads TAP, which newer node no longer picks outside a terminal; ask for
+    // it, and drop any reporter `NODE_OPTIONS` names (node refuses a reporter given twice).
+    let options = std::env::var("NODE_OPTIONS")
+        .unwrap_or_default()
+        .split_whitespace()
+        .filter(|o| !o.starts_with("--test-reporter"))
+        .collect::<Vec<_>>()
+        .join(" ");
     let mut node = Command::new("node");
     node.env("ERGO_REPLAY_CLI", cli())
+        .env("NODE_OPTIONS", options)
         .current_dir(root())
-        .arg("--test");
-    if reporter {
-        node.arg("--test-reporter=tap");
-    }
+        .args(["--test", "--test-reporter=tap"]);
     let output = node
         .args([
             "--test-name-pattern",
