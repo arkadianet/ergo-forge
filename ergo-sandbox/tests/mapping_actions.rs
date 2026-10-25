@@ -17,7 +17,7 @@ fn pinned(path: &str, hash: &str) -> Value {
 fn inventory() -> Vec<(Value, Value, Requirement)> {
     let manifest = pinned(
         "manifest.json",
-        "a3a6e47931e5f2e12279a00f447159cd9b5cd45fc1451afc6f2993cad30aa4cc",
+        "7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f",
     );
     let answers = pinned(
         "expected.json",

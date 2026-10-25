@@ -1,7 +1,7 @@
 {
   "version": "mapping-artifacts-results:v1",
-  "inputManifestSha256": "a3a6e47931e5f2e12279a00f447159cd9b5cd45fc1451afc6f2993cad30aa4cc",
-  "legacyResultsSha256": "00cefde1175524803c7873bcf498b324082d72779a36bea9a33316ad58269223",
+  "inputManifestSha256": "7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f",
+  "legacyResultsSha256": "76f8c817944be882fbc4f726d7016ffd55d244c307a68b85729804d8a98f2150",
   "byteStableCaseIds": [
     "literal_spend-positive",
     "literal_spend-control",

@@ -319,6 +319,20 @@ fn bundled_contracts_and_compiled_fixtures_round_trip() {
                 "tree_sha256": null,
             });
         }
+        // Node 254d00cb (#673 CSE fix, #670 header) changes the outcome of three bundled sources
+        // (docs/decisions/2026-10-25-pin-254d00cb.md). The expectations file is a frozen roadmap
+        // baseline, so each row is corrected here, from the measured compiled outcome.
+        for (id, bucket, raw_placeholders, tree_sha256) in COMPILED_DIFFERENTLY_AT_254D00CB {
+            let row = expected.get_mut(id).expect("the source is in the corpus");
+            let corrected = json!({
+                "bucket": bucket,
+                "raw_placeholders": raw_placeholders,
+                "truncated": false,
+                "tree_sha256": tree_sha256,
+            });
+            assert_ne!(*row, corrected, "{id}");
+            *row = corrected;
+        }
         assert_eq!(actual.len(), rows.len(), "duplicate measurement IDs");
         assert_eq!(
             actual.keys().collect::<Vec<_>>(),
@@ -330,6 +344,28 @@ fn bundled_contracts_and_compiled_fixtures_round_trip() {
         }
     });
 }
+
+/// Sources whose round-trip outcome moves at node 254d00cb: id, bucket, raw placeholders, tree hash.
+const COMPILED_DIFFERENTLY_AT_254D00CB: [(&str, &str, u64, &str); 3] = [
+    (
+        "examples/contracts/chaincash-basis/chaincash/onchain/receipt.es",
+        "byte-identical",
+        0,
+        "d788baaa797948820134df6f167dd84ebddc9b41bdaade581e8f7cec94f3d0fc",
+    ),
+    (
+        "examples/contracts/curve-trees/CurveTreeVerifier-v6.es",
+        "fails-to-recompile",
+        8,
+        "daecd91c8ff56882ecb1f563df515c12fca7096ff7480e250454a3aad18ce06a",
+    ),
+    (
+        "examples/contracts/lsp/zed-extension-test.es",
+        "recompiles-but-differs",
+        0,
+        "784dcdcd7c765ddbce182e489864dad96e8fb2b3eb31ee20ef8ca8d2de0f7d6f",
+    ),
+];
 
 /// The trees the old compiler (node a203cc02, forge 211c5b5) made from the sources the current
 /// typer rejects (docs/reports/historical-trees.md). The fixture names its tree `treeHex`, not

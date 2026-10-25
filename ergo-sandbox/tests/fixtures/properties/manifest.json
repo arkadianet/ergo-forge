@@ -12,8 +12,8 @@
     "ergo-sandbox/src/evidence/replay.rs": "b32e6af828eee12ff06aead54c4c6a16d0a5f66976a1e0a7e719635e228576d8",
     "ergo-sandbox/src/evidence/validate.rs": "7553e745d581cc05e43cd03232a61e5b8641fd05cc5763fb9112b864d285e278",
     "ergo-sandbox/tests/fixtures/mapping/expected.json": "291923d76f2de8a69deec82cc049d233d87d91f816295312ed89f9291e13405e",
-    "ergo-sandbox/tests/fixtures/mapping/legacy-results.json": "00cefde1175524803c7873bcf498b324082d72779a36bea9a33316ad58269223",
-    "ergo-sandbox/tests/fixtures/mapping/manifest.json": "a3a6e47931e5f2e12279a00f447159cd9b5cd45fc1451afc6f2993cad30aa4cc",
+    "ergo-sandbox/tests/fixtures/mapping/legacy-results.json": "76f8c817944be882fbc4f726d7016ffd55d244c307a68b85729804d8a98f2150",
+    "ergo-sandbox/tests/fixtures/mapping/manifest.json": "7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f",
     "examples/mutants/answer-key.json": "e7f31518f021dca2d74ce4267126313f1624f091b6cedda0246e8115ead3c3d5"
   },
   "budgets": {

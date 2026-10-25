@@ -114,7 +114,7 @@ fn raw_provenance_and_legacy_map_bytes_survive() {
     let manifest = read("manifest.json");
     assert_eq!(
         sha(&std::fs::read(root().join("manifest.json")).unwrap()),
-        "a3a6e47931e5f2e12279a00f447159cd9b5cd45fc1451afc6f2993cad30aa4cc"
+        "7f956f559b3912348f6759ab0e1855cd90056fcbf94fe47c2305fb668805c53f"
     );
     assert_eq!(
         sha(&std::fs::read(root().join("expected.json")).unwrap()),

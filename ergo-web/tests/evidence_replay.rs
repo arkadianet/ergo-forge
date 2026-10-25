@@ -119,13 +119,17 @@ async fn http_and_cli_replay_have_identical_semantic_results() {
     }
 }
 fn dom_test(name: &str) {
-    let output = Command::new("node")
-        .env("ERGO_REPLAY_CLI", cli())
+    // Newer node defaults to the spec reporter outside a terminal; the assertion below reads TAP.
+    let reporter = std::env::var("NODE_OPTIONS").map_or(true, |o| !o.contains("--test-reporter"));
+    let mut node = Command::new("node");
+    node.env("ERGO_REPLAY_CLI", cli())
         .current_dir(root())
+        .arg("--test");
+    if reporter {
+        node.arg("--test-reporter=tap");
+    }
+    let output = node
         .args([
-            "--test",
-            // Newer node defaults to the spec reporter outside a terminal; the assertion below reads TAP.
-            "--test-reporter=tap",
             "--test-name-pattern",
             name,
             "ui/tests/evidence-replay.test.js",
